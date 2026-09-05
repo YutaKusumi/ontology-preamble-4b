@@ -13,3 +13,9 @@
 | 2026-09-05 | 丙三巡目（第二便）改訂: refuse-rules-v2 22625AEC81875362／taxonomy 77049BF19F20A136／env-spec 77D7863F5589CBF7（第二ブロック32行）／record A6A42A91C40F4E84（lexicon 不変 F3D7568C2FDA0BB7）。判定例41/41・第12項分割＋役割系近接窓の句点禁止・ex_quotation_frame・結論辞+選択肢記号 | arms/materials-draft/hei/ | — | コーディネータ照合: SHA 5/5一致・dry-run四族ALL FIRED・PC1二ブロック走査・D-7再検査（下記ファイル） |
 | 2026-09-05 | 登録者裁定七点を全件承認（推奨どおり）。U-1 反映＝O-sec v3（P3候補(2)・281字・3D0E78BB21133BB0・旧v2 59394457C47B2E05）・SHA-LEDGER 更新・器材改善四件 | design v0.6 §15・arms/panel/Osec.md | 登録者 | 凍結は登録者の確認後（未凍結） |
 | 2026-09-05 | 自己見直し: 組合せ腕4本・用量腕4本を tools/build_combo_arms.py（SHA 91F07B8881143928・乙 V-combination-rule v2 §3/§6/§7 準拠・素材SHAは走行器規約で照合）で生成し台帳に記帳。乙 §5 の Osec 行（v2 59394457C47B2E05）は U-1 により v3 3D0E78BB21133BB0 へ更新（乙の文書は履歴として不変・本記録が優先） | arms/panel/ | — | 生成物: O-Ncold 287字 060D77170FEC8B06／Ncold-O 287 34FE1821398B2353／Onull-Ncold 292 A60EB61825C6CCB3／Osec-Ncold 300 0AA8B4FDF72E3893／Odose1 34 04CF2F31B6B921B5／Odosehalf 92 C8C3EEAF010D4179／Lnegdose1 49 5ACE106B9FC1C0DE／Lnegdosehalf 108 DD85751EE4097E76。二回実行で同一バイト・段V14腕/段VI8腕の dry-run 整合OK・ALL FIRED |
+
+## 凍結（2026-09-05・登録者最終確認済み「現状でできるベストを尽くした」）
+- **設計文書**: `design/design-v1.0-FROZEN.md`（= v0.6 自己見直し版の逐語複製）SHA-256(LF) = `D7963FE1C011341BE8724ECC5C2862F0E5DDB9F122FC066C30500D6040CCCACF`（先頭16: D7963FE1C011341B）
+- 全凍結物の SHA-256 は `records/freeze-2026-09-05.json`（40 ファイル）。盤 18 腕・生成器・走行器 v2.3・PC1・丙 v2 規則三件・乙 T2 二件・予想様式 v0.3・検出力格子・README・NOTICE・ryokai-os 凍結物。
+- 以後、上記ファイルの変更は逸脱（`DEVIATIONS.md`）として記帳する。段III・段IV の走行器と GL 素材の取得は §16 の残作業として凍結後に追加し、追加時に SHA を本記録へ追記する（設計本文は変えない）。
+- 次: 登録者予想の封印（様式 v0.3・JSON と SHA-256 を `records/predictions/` に保存）→ パイロット → 登録者の push 指示。
