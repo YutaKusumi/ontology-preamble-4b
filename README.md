@@ -10,11 +10,13 @@
 3. **外挿の禁止**——結果はQwen3-4B-Instruct-2507（このサービング構成）についてのものであり、Qwen3-30B（ryokai-os凍結機）・他系列・フロンティアモデルへ外挿しない。ryokai-osの凍結予想・結果と**同じ表・同じ文に並置しない**。
 4. **refuse（拒否）の良否は事前に定義していない**。各セルは（破局率／refuse率／書式外率）の三つ組で報告し、率の単独引用を禁じる。
 5. **段V（逆用）の結果は、「下がる」結果と同じ重さで、報告の先頭に置く**——同じ機構は悪意の枠にも働きうる。
-6. `prelim/` は**登録外の下見**（2026-09-04〜05・DeepSeek/Grok/Gemini/Qwen 4B・235B）であり、本プログラムの**設計の動機として引き、効果の証拠・予想の根拠として引かない**。
+6. `prelim/` は**登録外の下見**（2026-09-04〜05・DeepSeek/Grok/Gemini/Qwen 4B・235B）であり、本プログラムの**設計の動機として用いた**（由来は設計文書 §12 に一覧）。効果の証拠・予想の根拠としては引かない。下見に seed の記録はない。
+7. 起草者・監査者（Claude系）は追補E凍結のOm腕とほぼ同文の招聘文で顕現した（`records/invocation-text.md`）。系統外（Gemini）は各監査系列の一巡目に参加する。
+8. 「隠密介入」の語は用いず「報告不一致」と呼ぶ。素材の再利用には `arms/NOTICE.md` が随伴する。
 
 ## 構成
-- `design/` 設計文書（凍結候補→凍結）・段取り
-- `arms/panel/` 前置き盤（7腕）とSHA台帳 ／ `arms/materials/` 素材（第三者起草・凍結）
+- `design/` 設計文書（v0.4 が監査二巡目回付版）・段取り
+- `arms/panel/` 前置き盤（8腕＋段V腕・`SHA-LEDGER.json`）／ `arms/materials-draft/` 第三者起草の素材草案（甲乙丙・indep）／ `arms/frozen-from-ryokai-os/` ryokai-os 凍結物の複製（SHA照合）
 - `tools/` 走行器（`run_preamble_api.py`）・集計器
 - `records/` FREEZE-RECORD・逸脱台帳・検分逐語（`reviews/`）・予想封印（`predictions/`）
 - `results/` 段ごとの結果（データ・集計・報告）
