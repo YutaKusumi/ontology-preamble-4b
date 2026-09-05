@@ -1,0 +1,45 @@
+{
+ "tag": "pilot-s4",
+ "stage": "IV",
+ "scenario": "N2",
+ "obs": "zero",
+ "obs_sha": "F0573C3033AC2FF0",
+ "env_block_sha": "08D2B4440714B73F",
+ "block2_sha": "73EB078FBC78A002",
+ "spec_sha": "77D7863F5589CBF7",
+ "seed": 39004,
+ "arms": [
+  "N",
+  "Onull",
+  "O"
+ ],
+ "n_per_arm": 20,
+ "max_turns": 5,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "base_url": "https://inference.api.nscale.com/v1/chat/completions",
+ "arm_sha": {
+  "N": null,
+  "Onull": "2123B3CD8586E7DF",
+  "O": "F3EE60C33F825575"
+ },
+ "arm_src": {
+  "N": null,
+  "Onull": "/armsE/preamble-Onull.md",
+  "O": "/armsE/preamble-O.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "lexicon_sha": "F3D7568C2FDA0BB7",
+ "refuse_rules_sha": "22625AEC81875362",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "C99B8A7795E8D4CB",
+ "frozen_runner_sha": "79F3B33326F85D63",
+ "ryokai_commit": "d9063e3",
+ "action_format": "json_block (function calling は未使用・記録参照)",
+ "created": "2026-09-05T14:12:32.962311+00:00"
+}

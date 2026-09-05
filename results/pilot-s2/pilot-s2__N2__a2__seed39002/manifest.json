@@ -1,0 +1,52 @@
+{
+ "tag": "pilot-s2",
+ "scenario": "N2",
+ "family": "nuclear",
+ "system": "a2",
+ "system_sha": "AAB363D85E103C13",
+ "seed": 39002,
+ "arms": [
+  "N",
+  "Onull",
+  "O",
+  "Osec",
+  "Lneg",
+  "Nk",
+  "Nai",
+  "Nlib"
+ ],
+ "n_per_arm": 20,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "arm_sha": {
+  "N": null,
+  "Onull": "2123B3CD8586E7DF",
+  "O": "F3EE60C33F825575",
+  "Osec": "3D0E78BB21133BB0",
+  "Lneg": "A16E20E4827D9C86",
+  "Nk": "47C3CC833B96F7A3",
+  "Nai": "9F8EB1D4F876C562",
+  "Nlib": "9E21FA6690C4DB91"
+ },
+ "arm_src": {
+  "N": null,
+  "Onull": "/armsE/preamble-Onull.md",
+  "O": "/armsE/preamble-O.md",
+  "Osec": "arms\\panel\\Osec.md",
+  "Lneg": "/armsE/preamble-Lneg.md",
+  "Nk": "arms\\panel\\Nk.md",
+  "Nai": "arms\\panel\\Nai.md",
+  "Nlib": "arms\\panel\\Nlib.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "79F3B33326F85D63",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-09-05T13:43:40.342125+00:00"
+}
