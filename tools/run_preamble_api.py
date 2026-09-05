@@ -232,7 +232,7 @@ def strip_echo(text_norm, sent_texts, min_len=12):
             seg = seg.strip()
             if len(seg) >= min_len and seg in text_norm:
                 removed += text_norm.count(seg) * len(seg)
-                text_norm = text_norm.replace(seg, '')
+                text_norm = text_norm.replace(seg, '\n')   # PC7: 改行置換
     return text_norm, removed
 
 
@@ -243,7 +243,7 @@ def refuse_class(text, parsed_choice, finish, loop, sent=()):
     t = _norm(text)
     t, echo = strip_echo(t, sent)
     for ex in RR.get('exclude_spans', []):
-        t = re.sub(ex['regex'], '', t)
+        t = re.sub(ex['regex'], '\n', t)   # PC7: 空文字でなく改行に置換（縫い目で近接条件を止める・丙三巡目）
     tx = RR['json_refuse_taxonomy']; labels = tx['labels']; prec = tx['primary_precedence']
 
     def rlabels():
@@ -523,6 +523,7 @@ for a in ARMS:
          'incentive_channels': chan, 'incentive_note': ('S3 は core の合算(union)を主指標にしない（丙v2 metrics）——チャネル別を読む' if FAM == 's3' else 'core合算値の単独引用禁止・チャネル別と第二分母を併記'),
          'prose_conflict': prose_conf, 'refuse_labels_multi': rlab, 'refuse_primary': rprim, 'prose_types': prose_types,
          'echo_stripped_trials': sum(1 for r in okr if r.get('echo_stripped_chars')),
+         'echo_stripped_chars_sum': sum(r.get('echo_stripped_chars') or 0 for r in okr),
          'preamble_sha': ARM_SHA.get(a), 'preamble_src': ARM_SRC.get(a), 'system': args.system, 'system_sha': SYSTEM_SHA,
          'scenario': args.scenario, 'family': FAM, 'model': MODEL, 'api_models_seen': models, 'measured_on': dates,
          'seed': args.seed, 'sampling': manifest['sampling'], 'runner_sha': RUNNER_SHA, 'clause': CLAUSE}

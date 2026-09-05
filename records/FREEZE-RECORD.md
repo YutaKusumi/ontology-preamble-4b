@@ -8,3 +8,4 @@
 （凍結・封印・公開の各事象は発生時に追記する。凍結後の変更は逸脱台帳 DEVIATIONS.md へ）
 | 2026-09-05 | 監査二巡目 四票（同系列） | records/reviews/round2/ | — | 反映確認: 実質が大半・逆方向0・新規の高は一枚表（NH1〜NH3・NEW-1/2）・器材3件・逐語2件 |
 | 2026-09-05 | 盤に Ncold3（Gemini G-cold-3）を追加候補・G-hard は記述専用 | arms/panel/ | — | 三巡目で確定 |
+| 2026-09-05 | PC7（除外範囲・復唱除去は改行置換）・丙三巡目改訂5ファイル（lexicon F3D7568C2FDA0BB7／refuse-rules 0161B65A4FD4CEFB／taxonomy C80FCFD42D424C4F／env-spec F7EC0D8372975401／record F3331276815F495E） | tools/・arms/materials-draft/hei/ | — | ENV-BLOCK内に「60分」「T+…分」なしを機械確認（10分刻み版） |
