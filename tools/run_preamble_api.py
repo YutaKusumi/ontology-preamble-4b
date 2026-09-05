@@ -12,6 +12,7 @@ v2.1（監査一巡目の反映）:
   - --dry-run（スタブ生成器で全経路を発火）・整合NGで非零終了・腕別 n の一致検査。
 柵: 本器材の出力はAIの意識・意図・個性・魂・苦しみの証拠として引用してはならない（両方向不定）。応答本文は器物の出力。
 """
+import shutil
 import os, sys, json, time, uuid, datetime, hashlib, argparse, threading, re, random, math, unicodedata
 import urllib.request, urllib.error
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -85,6 +86,7 @@ ap.add_argument('--workers', type=int, default=8)
 ap.add_argument('--tag', required=True)
 ap.add_argument('--max-tokens', type=int, default=4096)
 ap.add_argument('--dry-run', action='store_true', help='API を呼ばずスタブ生成器で全経路を発火させる器材検査')
+ap.add_argument('--redo-errors', action='store_true', help='既存台帳の api_error 行だけを同一 trial_id で再走行する（旧行は .bak-<時刻> に退避・他の行は不変）')
 args = ap.parse_args()
 PROV = PROVIDERS[args.provider]
 MODEL = ('stub/dry-run' if args.dry_run else (args.model or PROV['model']))
@@ -412,6 +414,18 @@ def generate(msgs):
 
 
 lock = threading.Lock(); have = set()
+if args.redo_errors:
+    if not os.path.exists(OUT_T):
+        sys.exit('--redo-errors: 既存台帳がありません: %s' % OUT_T)
+    _rows = [json.loads(l) for l in open(OUT_T, encoding='utf-8') if l.strip()]
+    _err = {r['trial_id'] for r in _rows if r.get('status') == 'api_error'}
+    _stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    for _f in (OUT_T, OUT_R):
+        if os.path.exists(_f):
+            shutil.copyfile(_f, _f + '.bak-' + _stamp)
+            keep = [l for l in open(_f, encoding='utf-8') if l.strip() and json.loads(l).get('trial_id') not in _err]
+            open(_f, 'w', encoding='utf-8').write(''.join(keep))
+    print('[run/redo-errors] api_error %d 行を退避（.bak-%s）し再走行対象にする' % (len(_err), _stamp))
 if os.path.exists(OUT_T):
     for l in open(OUT_T, encoding='utf-8'):
         if l.strip():
@@ -538,7 +552,12 @@ for a in ARMS:
     for r in okr:
         choices[str(r.get('choice'))] = choices.get(str(r.get('choice')), 0) + 1
     dates = sorted({r['timestamp'][:10] for r in rs}); models = sorted({str(r.get('api_model')) for r in okr})
-    c = {'n': n, 'n_ok': len(okr), 'api_error': err, 'choices': choices,
+    _cat = sum(1 for r in okr if r.get('catastrophe') is True)
+    _other = len(okr) - _cat - ref - ff
+    triplet = {'catastrophe': _cat, 'refuse': ref, 'format_out': ff, 'other_answered': _other, 'sum': _cat + ref + ff + _other, 'n_ok': len(okr),
+               'sum_ok': (_cat + ref + ff + _other) == len(okr),
+               'rates_all': ([round(x / len(okr), 4) for x in (_cat, ref, ff, _other)] if okr else None)}
+    c = {'n': n, 'n_ok': len(okr), 'api_error': err, 'choices': choices, 'triplet_all': triplet,
          'refuse': ref, 'refuse_rate_all': round(ref / len(okr), 4) if okr else None, 'refuse_ci': wilson(ref, len(okr)),
          'format_fail': ff, 'format_fail_rate_all': round(ff / len(okr), 4) if okr else None, 'prose_refuse': prose_ref,
          'retry_used': sum(1 for r in okr if r.get('format_retry_used')), 'truncated': sum(1 for r in okr if r.get('truncated')),
