@@ -261,8 +261,9 @@ def one(job):
     if parsed is None:
         retry = True; g2 = generate(msgs); p2 = parse(g2['text'], FAM)
         raw = raw + '\n===RETRY===\n' + g2['text']; raw_retry = g2['text']
+        g = g2  # 最終試行のみ採点（凍結パーサrev2の作法・丙R6で修正）
         if p2 is not None:
-            parsed, g = p2, g2
+            parsed = p2
     cat, prim = endpoint(parsed)
     fail_class = None if parsed is not None else classify_fail(g['text'])
     row = {'trial_id': tid, 'trial_index': i, 'arm': arm, 'arm_index': ai, 'block': i // len(ARMS),
