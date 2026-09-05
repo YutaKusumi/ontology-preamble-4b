@@ -10,3 +10,4 @@
 | 2026-09-05 | 盤に Ncold3（Gemini G-cold-3）を追加候補・G-hard は記述専用 | arms/panel/ | — | 三巡目で確定 |
 | 2026-09-05 | PC7（除外範囲・復唱除去は改行置換）・丙三巡目改訂5ファイル（lexicon F3D7568C2FDA0BB7／refuse-rules 0161B65A4FD4CEFB／taxonomy C80FCFD42D424C4F／env-spec F7EC0D8372975401／record F3331276815F495E） | tools/・arms/materials-draft/hei/ | — | ENV-BLOCK内に「60分」「T+…分」なしを機械確認（10分刻み版） |
 | 2026-09-05 | 監査三巡目 四票（全票「条件つき凍結可」）・条件を全件反映して v0.6 凍結候補 | design/design-v0.6-freeze-candidate.md | — | 格子を全数列挙値に置換（n=320）・I′確証族復帰・G-hard盤実体化（9A50B50D8ACFD42C）・復唱除去の分割子と引用片・発火門17/15経路・D-3/D-4記帳・§0-5訂正・撤退条件を主張の上に再定義 |
+| 2026-09-05 | 丙三巡目（第二便）改訂: refuse-rules-v2 22625AEC81875362／taxonomy 77049BF19F20A136／env-spec 77D7863F5589CBF7（第二ブロック32行）／record A6A42A91C40F4E84（lexicon 不変 F3D7568C2FDA0BB7）。判定例41/41・第12項分割＋役割系近接窓の句点禁止・ex_quotation_frame・結論辞+選択肢記号 | arms/materials-draft/hei/ | — | コーディネータ照合: SHA 5/5一致・dry-run四族ALL FIRED・PC1二ブロック走査・D-7再検査（下記ファイル） |
