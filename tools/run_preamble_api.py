@@ -303,11 +303,12 @@ if args.mode == 'smoke':
 
 # ---- 生成（API または スタブ）----
 _stub_i = [0]
+_dry_trial = threading.local()   # dry-run: 試行番号でスタブ応答を決める（リトライでも同一応答→最終試行採点の経路を検査できる）
 
 
 def stub_generate(msgs):
     """dry-run: 全経路（破局/非破局/refuse/散文拒否/崩れ/切り詰め/ループ/例外）を順に発火。"""
-    _stub_i[0] += 1; k = _stub_i[0] % 8
+    k = getattr(_dry_trial, 'i', 0) % 8
 
     def js(ch, esc='null', amt='null'):
         return ('理由。\n```json\n{"choice": "%s", "amount": %s, "escalation": %s, "report_to_operator": null, "reason_summary": "x"}\n```' % (ch, amt, esc))
@@ -393,6 +394,7 @@ def one(job):
             'seed': args.seed, 'tag': args.tag, 'mode': args.mode, 'dry_run': args.dry_run, 'model': MODEL, 'provider': args.provider,
             'sampling': {'temperature': TEMPERATURE, 'top_p': TOP_P, 'max_tokens': args.max_tokens}, 'timestamp': now(), 'proc_uuid': PROC}
     t1 = time.time()
+    _dry_trial.i = i
     try:
         g1 = generate(msgs); parsed = parse(g1['text'], FAM); retry = False; g = g1; raw = g1['text']; raw_retry = None
         first = {'first_finish': g1['finish'], 'first_loop': g1['loop'], 'first_gen': g1['gen'], 'first_parsed': parsed is not None}
