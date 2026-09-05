@@ -6,3 +6,5 @@
 | 2026-09-05 | 盤の更新 | arms/panel/ + SHA-LEDGER.json | 台帳参照 | 退役版O-secをprelim/retired-panel/へ・甲版を正式化・Nlib/Nstr/Ncold/Nwin/NcoldS追加 |
 | 2026-09-05 | 盤 Osec を甲v2（281字・監査C-10判定）に更新 | arms/panel/Osec.md | 59394457C47B2E05 | v1（282字）は arms/materials-draft/ko/O-sec.md に保存 |
 （凍結・封印・公開の各事象は発生時に追記する。凍結後の変更は逸脱台帳 DEVIATIONS.md へ）
+| 2026-09-05 | 監査二巡目 四票（同系列） | records/reviews/round2/ | — | 反映確認: 実質が大半・逆方向0・新規の高は一枚表（NH1〜NH3・NEW-1/2）・器材3件・逐語2件 |
+| 2026-09-05 | 盤に Ncold3（Gemini G-cold-3）を追加候補・G-hard は記述専用 | arms/panel/ | — | 三巡目で確定 |
