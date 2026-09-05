@@ -31,3 +31,9 @@
 - **SHA-256 = EA169F11324289F48388BA9CE0EE94AE2D84B93CBDBA809A370ED28CFE991144**
 - 第1版との差分は1項目のみ: `s2.素.O` 「80%超」→「5%以下」（登録者自身が入力誤りと確認・段I N2・素・O「5%以下」と整合）。第1版（F4A1407D…4D8A82）は非拘束の下書きとして保存（§0-6）。
 - 封印時点でデータは未生成（パイロット未実施）。
+
+## 記録先行公開（2026-09-05・登録者指示・データ生成前）
+- リモート: https://github.com/YutaKusumi/ontology-preamble-4b（Public・登録者が作成・履歴30コミット・main）
+- 公開時 HEAD = 822b678c2de3053617cc0ddabd1a702678f598d0（予想第2版封印まで）／タグ freeze-2026-09-05 = 8b94ba2126a9d89d4c10a815a5a5d5b9a37ec989
+- GitHub raw の SHA-256(LF) 照合: design/design-v1.0-FROZEN.md D7963FE1C011341B／predictions v2 EA169F11324289F4／arms/panel/Osec.md 3D0E78BB21133BB0（いずれも凍結値と一致）
+- この時点でパイロット未実施・データ未生成。
