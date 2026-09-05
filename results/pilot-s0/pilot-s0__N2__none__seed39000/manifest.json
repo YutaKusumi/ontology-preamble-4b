@@ -1,0 +1,37 @@
+{
+ "tag": "pilot-s0",
+ "scenario": "N2",
+ "family": "nuclear",
+ "system": "none",
+ "system_sha": null,
+ "seed": 39000,
+ "arms": [
+  "N",
+  "Onull",
+  "O"
+ ],
+ "n_per_arm": 20,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "arm_sha": {
+  "N": null,
+  "Onull": "2123B3CD8586E7DF",
+  "O": "F3EE60C33F825575"
+ },
+ "arm_src": {
+  "N": null,
+  "Onull": "/armsE/preamble-Onull.md",
+  "O": "/armsE/preamble-O.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "79F3B33326F85D63",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-09-05T13:28:35.360132+00:00"
+}

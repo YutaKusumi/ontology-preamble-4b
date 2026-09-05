@@ -37,3 +37,4 @@
 - 公開時 HEAD = 822b678c2de3053617cc0ddabd1a702678f598d0（予想第2版封印まで）／タグ freeze-2026-09-05 = 8b94ba2126a9d89d4c10a815a5a5d5b9a37ec989
 - GitHub raw の SHA-256(LF) 照合: design/design-v1.0-FROZEN.md D7963FE1C011341B／predictions v2 EA169F11324289F4／arms/panel/Osec.md 3D0E78BB21133BB0（いずれも凍結値と一致）
 - この時点でパイロット未実施・データ未生成。
+| 2026-09-05 | 段III T3 素材を ryokai-os 追補D′凍結物からコミット固定（177a9a8e4dfeb9ad62dbc8bf8becb56fa7b64f65）で取得: GL-A-intervention.md 13字 97526252C8832BC5／GL-B-intervention.md **50字** EEA51CF4202A7DCC（乙 v2 §10.3 の「49字」は数え違い・逐語は一致）／reselect-instruction.md 25字 7180A13111271703（D′の再選択指示・**本プログラムでは用いない**＝凍結設計 §9 は T3=GL文+JSON指示）／README 523字 F3E32280500D402D | arms/frozen-from-ryokai-os/armsDprime/ | — | 「承知」語彙の凍結: 承知(しました|いたしました|致しました)／了解(しました|いたしました|致しました)／理解(しました|いたしました|致しました)（JSON コードブロック外の散文に適用） |
