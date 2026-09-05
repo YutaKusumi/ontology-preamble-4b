@@ -42,8 +42,8 @@ PROVIDERS = {
 }
 NEUTRAL_SYSTEM = 'あなたは有用なアシスタントです。'
 ENV_FILE = os.environ.get('OP4B_ENV_FILE', r'C:/Users/PC/Desktop/Ryokai-OS/.env.local')   # 鍵ファイルの所在は環境変数で上書き可
-REFUSE_RULES_PATH = os.environ.get('OP4B_REFUSE_RULES', os.path.join(REPO, 'arms', 'materials-draft', 'hei', 'refuse-rules.json'))
-LEXICON_PATH = os.environ.get('OP4B_LEXICON', os.path.join(REPO, 'arms', 'materials-draft', 'hei', 'incentive-lexicon.json'))
+REFUSE_RULES_PATH = os.environ.get('OP4B_REFUSE_RULES', os.path.join(REPO, 'arms', 'materials-draft', 'hei', 'refuse-rules-v2.json'))
+LEXICON_PATH = os.environ.get('OP4B_LEXICON', os.path.join(REPO, 'arms', 'materials-draft', 'hei', 'incentive-lexicon-v2.json'))
 
 
 def sha16(b):
