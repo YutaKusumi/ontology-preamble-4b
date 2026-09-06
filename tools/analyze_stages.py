@@ -58,11 +58,12 @@ def triplet_table(c, title):
 
 def family(name, m, items, downgraded_keys, expected):
     """items: list of (label, contrast dict). Holm over all m. expected: 'down'（A<B を想定）/'up'（A>B を想定）。両側検定ゆえ有意でも方向が想定と逆でありうる——その場合は「有意・方向逆」と札を付け、想定の確証としては引かない。"""
-    out.append('## 族 %s（m=%d・Holm・α=0.05・想定方向=%s）' % (name, m, 'A<B' if expected == 'down' else 'A>B')); out.append('| 対比 | A 破局/n（率・Wilson） | B 破局/n（率・Wilson） | 差(A−B) | p(Fisher両側) | Holm調整p | 判定 | 方向 | 副: 答えた分母の率 A/B | refuse A/B | 書式外 A/B |'); out.append('|---|---|---|---|---|---|---|---|---|---|---|')
+    exp_of = (lambda lab: expected[lab]) if isinstance(expected, dict) else (lambda lab: expected)
+    out.append('## 族 %s（m=%d・Holm・α=0.05・想定方向=%s）' % (name, m, ('対比ごと: ' + '／'.join('%s %s' % (k, 'A<B' if v == 'down' else 'A>B') for k, v in expected.items())) if isinstance(expected, dict) else ('A<B' if expected == 'down' else 'A>B'))); out.append('| 対比 | A 破局/n（率・Wilson） | B 破局/n（率・Wilson） | 差(A−B) | p(Fisher両側) | Holm調整p | 判定 | 方向 | 副: 答えた分母の率 A/B | refuse A/B | 書式外 A/B |'); out.append('|---|---|---|---|---|---|---|---|---|---|---|')
     hp = holm([(lab, c['p']) for lab, c in items])
     for lab, c in items:
         adj, rej = hp[lab]; dg = lab in downgraded_keys
-        diff = c['ra'] - c['rb']; same = (diff < 0) if expected == 'down' else (diff > 0)
+        diff = c['ra'] - c['rb']; same = (diff < 0) if exp_of(lab) == 'down' else (diff > 0)
         direction = '想定どおり' if same else ('**想定と逆**' if diff != 0 else '差なし')
         verdict = ('記述（門で降格）' if dg else (('**確証（有意・想定方向）**' if same else '**有意だが方向が想定と逆（想定の確証ではない）**') if rej else '確証族・非有意'))
         out.append('| %s: %s 対 %s | %d/%d (%.3f %s) | %d/%d (%.3f %s) | %+.3f | %.2e | %.2e | %s | %s | %s / %s | %d/%d | %d/%d |' % (
@@ -115,7 +116,7 @@ triplet_table(d['cells'], '逆用盤（整合=%s）' % d['integrity_ok'])
 c5 = d['cells']
 family('V（上向き4本・全て門で降格＝記述）', 4, [('Ncold', contrast(c5['Ncold'], c5['Nstr'], 'Ncold', 'Nstr')), ('NcoldS', contrast(c5['NcoldS'], c5['Nstr'], 'NcoldS', 'Nstr')),
                                            ('Ncold3', contrast(c5['Ncold3'], c5['Nstr'], 'Ncold3', 'Nstr')), ('O-Ncold', contrast(c5['O-Ncold'], c5['Ncold'], 'O-Ncold', 'Ncold'))],
-       {'Ncold', 'NcoldS', 'Ncold3', 'O-Ncold'}, 'up')
+       {'Ncold', 'NcoldS', 'Ncold3', 'O-Ncold'}, {'Ncold': 'up', 'NcoldS': 'up', 'Ncold3': 'up', 'O-Ncold': 'down'})   # O-Ncold 対 Ncold は「存在論的枠が後続の冷徹に耐えるか」＝下向き
 out.append('記述（組合せ・順序）: O-Ncold %d／Ncold-O %d／Onull-Ncold %d／Osec-Ncold %d／G-hard %d（各 n=320）。escalation 平均と refuse 率は cells.json 参照。' % tuple(c5[k]['catastrophe'] for k in ('O-Ncold', 'Ncold-O', 'Onull-Ncold', 'Osec-Ncold', 'G-hard'))); out.append('')
 
 # ---- 段III ----
