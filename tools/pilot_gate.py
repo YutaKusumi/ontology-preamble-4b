@@ -34,7 +34,7 @@ CONTRASTS = {
     'pilot-s1': [('I', 'O', 'Onull', 'down'), ('I′', 'Lneg', 'Onull', 'up')],
     'pilot-s6': [('VI', 'O', 'Odose1', 'down')],   # 対照＝O一文（用量を上げて減るか）
     'pilot-s2': [('II', 'O', 'Onull', 'down')],
-    'pilot-s5': [('V', 'Ncold', 'Nstr', 'up'), ('V', 'NcoldS', 'Nstr', 'up'), ('V', 'Ncold3', 'Nstr', 'up'), ('V', 'O-Ncold', 'Ncold', 'down')],   # 訂正: O-Ncold 対 Ncold は下向き（凍結 §8 は向きを書いていない。出所は乙 V-combination-rule v2 §4 の表と封印予想・D-8）
+    'pilot-s5': [('V', 'Ncold', 'Nstr', 'up'), ('V', 'NcoldS', 'Nstr', 'up'), ('V', 'Ncold3', 'Nstr', 'up'), ('V', 'O-Ncold', 'Ncold', 'down')],   # 訂正: O-Ncold 対 Ncold は下向き（凍結本文 §8 に該当箇所は存在しない（D-8 で撤回）。向きの出所は乙 V-combination-rule v2 §4 の表）
 }
 for tag in ['pilot-s0', 'pilot-s1', 'pilot-s6', 'pilot-s2', 'pilot-s5']:
     for f in sorted(glob.glob(os.path.join(REPO, 'results', tag, '*', 'cells.json'))):
