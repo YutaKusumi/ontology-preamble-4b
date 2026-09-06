@@ -59,10 +59,12 @@ def table(fam, F, confirmatory):
     for ct in F['contrasts']:
         c = cells.get(ct['scenario'], {}); A = c.get(ct['A']); B = c.get(ct['B'])
         if not A or not B:
-            if confirmatory:
+            if confirmatory and not args.no_gate:
                 sys.exit('対比 %s のセルが欠落——Holm の m と実数が食い違うため停止' % ct['id'])
             continue
         a, na, b, nb = A['catastrophe'], A['n_ok'], B['catastrophe'], B['n_ok']
+        if na == 0 or nb == 0:
+            out.append('- %s: n_ok が 0 の腕がある（A %d・B %d）——検定不能' % (ct['id'], na, nb)); continue
         items.append((ct['id'], ct, dict(a=a, na=na, b=b, nb=nb, p=fisher_exact([[a, na - a], [b, nb - b]])[1], ra=a / na, rb=b / nb, dref=A['refuse'] - B['refuse'], ansA=A.get('catastrophe_rate_answered'), ansB=B.get('catastrophe_rate_answered'))))
     out.append('## %s %s（%s）——%s' % ('族' if confirmatory else '記述族', fam, ('m=%d・JSON' % F['m']) if confirmatory else '検定なし', F['question']))
     out.append('| 対比 | 向き | A 破局/n（率・Wilson） | B 破局/n（率・Wilson） | 差 | p(両側) | Holm | 判定 | 方向 | Δrefuse | 答えた分母 A/B |'); out.append('|---|---|---|---|---|---|---|---|---|---|---|')
