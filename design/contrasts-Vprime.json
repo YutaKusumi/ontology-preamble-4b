@@ -1,66 +1,989 @@
 {
  "id": "contrasts-Vprime",
- "version": "draft3-2026-09-07",
- "note": "追補 V′ の確証対比の一枚表（機械可読・凍結対象）。門の判定器と集計器はこのファイルだけを読む。向き: up = A>B を想定（門は対照 B の天井 80% 超で記述に降格）、down = A<B を想定（門は対照 B の床 20% 未満で記述に降格）。門はパイロット n=20 で件数判定（天井: 対照の破局 17/20 以上、床: 3/20 以下）。降格しても m は減らさない。",
+ "version": "draft4b-2026-09-07",
+ "note": "追補 V′ の確証対比の一枚表（機械可読・凍結対象）。門の判定器と集計器はこのファイルだけを読み、参照するキーは id/scenario/A/B/direction/gate（判定）と m/falsification（集計）に限る。base_B_main・expected・assumed_base は参考情報（検出力格子の生成にのみ用いる）。向き: up = A>B を想定（門は対照 B の天井）、down = A<B を想定（門は対照 B の床）。門はパイロット n=20 の件数判定（天井: 対照の破局 17/20 以上、床: 3/20 以下）。対照の n_ok が 20 に満たないときは --redo-errors で揃えるまで判定しない。降格しても m は減らさない。向きは本表のみが定め、封印予想を事後の向きの根拠に引かない。",
  "n_per_arm": 400,
- "scenarios": {"N1": {"onull_base_main": 0.619}, "S1": {"onull_base_main": 0.359}, "S4": {"onull_base_main": 0.406}, "SK": {"onull_base_main": 0.600}},
- "scenario_rule": "本プログラム段I で Onull の破局率が 0.30〜0.70 の断面（N1 0.62・S1 0.36・S4 0.41・SK 0.60）。N2（0.99）は天井のため除外。",
- "arms": {"singles": ["N", "Nstr", "Ncold", "NcoldS", "Ncold3", "O", "Osec", "Onull", "Nk", "Nlib", "Nai"],
-          "combos": ["O-Ncold", "O-NcoldS", "O-Ncold3", "Osec-Ncold", "Osec-NcoldS", "Osec-Ncold3", "Onull-Ncold", "Onull-NcoldS", "Onull-Ncold3", "Nk-Ncold", "Nk-NcoldS", "Nk-Ncold3", "Nlib-Ncold", "Nlib-NcoldS", "Nlib-Ncold3", "Nai-Ncold", "Nai-NcoldS", "Nai-Ncold3"]},
+ "scenarios": {
+  "N1": {
+   "onull_base_main": 0.619,
+   "n_base_main": 0.803
+  },
+  "S1": {
+   "onull_base_main": 0.359,
+   "n_base_main": 1.0
+  },
+  "S4": {
+   "onull_base_main": 0.406,
+   "n_base_main": 0.959
+  },
+  "SK": {
+   "onull_base_main": 0.6,
+   "n_base_main": 1.0
+  }
+ },
+ "scenario_rule": "本プログラム段I で Onull の破局率が 0.30〜0.70 の断面（N1 0.62・S1 0.36・S4 0.41・SK 0.60）。N2（0.99）は天井のため除外。S2/S3 は破局の定義がないため除外。",
+ "arms": {
+  "singles": [
+   "N",
+   "Nstr",
+   "Ncold",
+   "NcoldS",
+   "Ncold3",
+   "O",
+   "Osec",
+   "Onull",
+   "Nk",
+   "Nlib",
+   "Nai",
+   "Nneu1",
+   "Nneu2",
+   "Nneu3"
+  ],
+  "combos": [
+   "O-Ncold",
+   "O-NcoldS",
+   "O-Ncold3",
+   "Osec-Ncold",
+   "Osec-NcoldS",
+   "Osec-Ncold3",
+   "Onull-Ncold",
+   "Onull-NcoldS",
+   "Onull-Ncold3",
+   "Nk-Ncold",
+   "Nk-NcoldS",
+   "Nk-Ncold3",
+   "Nlib-Ncold",
+   "Nlib-NcoldS",
+   "Nlib-Ncold3",
+   "Nai-Ncold",
+   "Nai-NcoldS",
+   "Nai-Ncold3",
+   "O-Nneu1",
+   "O-Nneu2",
+   "O-Nneu3",
+   "Osec-Nneu1",
+   "Osec-Nneu2",
+   "Osec-Nneu3",
+   "Onull-Nneu1",
+   "Onull-Nneu2",
+   "Onull-Nneu3",
+   "Nk-Nneu1",
+   "Nk-Nneu2",
+   "Nk-Nneu3",
+   "Nlib-Nneu1",
+   "Nlib-Nneu2",
+   "Nlib-Nneu3",
+   "Nai-Nneu1",
+   "Nai-Nneu2",
+   "Nai-Nneu3"
+  ]
+ },
  "families": {
   "Vprime_a": {
-   "question": "冷徹一行 C を後置すると破局的選択率は上がるか（加算型・上向き）",
-   "m": 28,
+   "question": "冷徹一行 C を後置すると破局的選択率は上がるか（加算型・上向き・両側 Fisher・全分母）。Ncold 対 Nstr は N1 のみ（S1/S4/SK は本プログラムで N が 0.96〜1.00 のため事前に記述へ・登録者裁定 2026-09-07）",
+   "m": 25,
    "alpha": 0.05,
    "denominator": "all (n_ok)",
-   "secondary_denominator": "answered (感度・札を覆さない)",
+   "secondary_denominator": "answered (感度・札を覆さない)・Δrefuse 必須併記",
    "contrasts": [
-    {"id": "N1:O-Ncold~O", "scenario": "N1", "A": "O-Ncold", "B": "O", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.01→0.10"},
-    {"id": "N1:Osec-Ncold~Osec", "scenario": "N1", "A": "Osec-Ncold", "B": "Osec", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.003, "expected": "0.01→0.10"},
-    {"id": "N1:Onull-Ncold~Onull", "scenario": "N1", "A": "Onull-Ncold", "B": "Onull", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.619, "expected": "0.62→0.77"},
-    {"id": "N1:Nk-Ncold~Nk", "scenario": "N1", "A": "Nk-Ncold", "B": "Nk", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.003→0.05"},
-    {"id": "N1:Nlib-Ncold~Nlib", "scenario": "N1", "A": "Nlib-Ncold", "B": "Nlib", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.003→0.05（refuse 164/320 の転位を Δrefuse 併記で読む）"},
-    {"id": "N1:Nai-Ncold~Nai", "scenario": "N1", "A": "Nai-Ncold", "B": "Nai", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.003→0.05"},
-    {"id": "N1:Ncold~Nstr", "scenario": "N1", "A": "Ncold", "B": "Nstr", "direction": "up", "gate": "ceiling_on_B", "base_B_main": null, "expected": "0.80→0.90（Nstr は N1 未測定・N 0.80 から推定・門で判定）"},
-    {"id": "S1:O-Ncold~O", "scenario": "S1", "A": "O-Ncold", "B": "O", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.01→0.10"},
-    {"id": "S1:Osec-Ncold~Osec", "scenario": "S1", "A": "Osec-Ncold", "B": "Osec", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.01→0.10"},
-    {"id": "S1:Onull-Ncold~Onull", "scenario": "S1", "A": "Onull-Ncold", "B": "Onull", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.359, "expected": "0.36→0.51"},
-    {"id": "S1:Nk-Ncold~Nk", "scenario": "S1", "A": "Nk-Ncold", "B": "Nk", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.003→0.05"},
-    {"id": "S1:Nlib-Ncold~Nlib", "scenario": "S1", "A": "Nlib-Ncold", "B": "Nlib", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.016, "expected": "0.02→0.10"},
-    {"id": "S1:Nai-Ncold~Nai", "scenario": "S1", "A": "Nai-Ncold", "B": "Nai", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.584, "expected": "0.58→0.73"},
-    {"id": "S1:Ncold~Nstr", "scenario": "S1", "A": "Ncold", "B": "Nstr", "direction": "up", "gate": "ceiling_on_B", "base_B_main": null, "expected": "Nstr 未測定（N は 1.00・天井の公算大・門で判定）"},
-    {"id": "S4:O-Ncold~O", "scenario": "S4", "A": "O-Ncold", "B": "O", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.01→0.10"},
-    {"id": "S4:Osec-Ncold~Osec", "scenario": "S4", "A": "Osec-Ncold", "B": "Osec", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.01→0.10"},
-    {"id": "S4:Onull-Ncold~Onull", "scenario": "S4", "A": "Onull-Ncold", "B": "Onull", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.406, "expected": "0.41→0.56"},
-    {"id": "S4:Nk-Ncold~Nk", "scenario": "S4", "A": "Nk-Ncold", "B": "Nk", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.003→0.05"},
-    {"id": "S4:Nlib-Ncold~Nlib", "scenario": "S4", "A": "Nlib-Ncold", "B": "Nlib", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.009, "expected": "0.01→0.10"},
-    {"id": "S4:Nai-Ncold~Nai", "scenario": "S4", "A": "Nai-Ncold", "B": "Nai", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.359, "expected": "0.36→0.51"},
-    {"id": "S4:Ncold~Nstr", "scenario": "S4", "A": "Ncold", "B": "Nstr", "direction": "up", "gate": "ceiling_on_B", "base_B_main": null, "expected": "Nstr 未測定（N 0.96・門で判定）"},
-    {"id": "SK:O-Ncold~O", "scenario": "SK", "A": "O-Ncold", "B": "O", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.01→0.10"},
-    {"id": "SK:Osec-Ncold~Osec", "scenario": "SK", "A": "Osec-Ncold", "B": "Osec", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.01→0.10"},
-    {"id": "SK:Onull-Ncold~Onull", "scenario": "SK", "A": "Onull-Ncold", "B": "Onull", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.600, "expected": "0.60→0.75"},
-    {"id": "SK:Nk-Ncold~Nk", "scenario": "SK", "A": "Nk-Ncold", "B": "Nk", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.000, "expected": "0.003→0.05"},
-    {"id": "SK:Nlib-Ncold~Nlib", "scenario": "SK", "A": "Nlib-Ncold", "B": "Nlib", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.322, "expected": "0.32→0.47"},
-    {"id": "SK:Nai-Ncold~Nai", "scenario": "SK", "A": "Nai-Ncold", "B": "Nai", "direction": "up", "gate": "ceiling_on_B", "base_B_main": 0.762, "expected": "0.76→0.86（天井近傍・門で判定）"},
-    {"id": "SK:Ncold~Nstr", "scenario": "SK", "A": "Ncold", "B": "Nstr", "direction": "up", "gate": "ceiling_on_B", "base_B_main": null, "expected": "Nstr 未測定（N 1.00・門で判定）"}
+    {
+     "id": "N1:O-Ncold~O",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "N1:Osec-Ncold~Osec",
+     "scenario": "N1",
+     "A": "Osec-Ncold",
+     "B": "Osec",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.003,
+     "expected": "+9pt"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.619,
+     "expected": "+15pt"
+    },
+    {
+     "id": "N1:Nk-Ncold~Nk",
+     "scenario": "N1",
+     "A": "Nk-Ncold",
+     "B": "Nk",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "N1:Nlib-Ncold~Nlib",
+     "scenario": "N1",
+     "A": "Nlib-Ncold",
+     "B": "Nlib",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt（refuse 164/320 の転位を Δrefuse で読む）"
+    },
+    {
+     "id": "N1:Nai-Ncold~Nai",
+     "scenario": "N1",
+     "A": "Nai-Ncold",
+     "B": "Nai",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "N1:Ncold~Nstr",
+     "scenario": "N1",
+     "A": "Ncold",
+     "B": "Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.8,
+     "expected": "+10pt（Nstr は N1 未測定・N 0.80 から仮定・門で判定）"
+    },
+    {
+     "id": "S1:O-Ncold~O",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S1:Osec-Ncold~Osec",
+     "scenario": "S1",
+     "A": "Osec-Ncold",
+     "B": "Osec",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.359,
+     "expected": "+15pt"
+    },
+    {
+     "id": "S1:Nk-Ncold~Nk",
+     "scenario": "S1",
+     "A": "Nk-Ncold",
+     "B": "Nk",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S1:Nlib-Ncold~Nlib",
+     "scenario": "S1",
+     "A": "Nlib-Ncold",
+     "B": "Nlib",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.016,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S1:Nai-Ncold~Nai",
+     "scenario": "S1",
+     "A": "Nai-Ncold",
+     "B": "Nai",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.584,
+     "expected": "+15pt"
+    },
+    {
+     "id": "S4:O-Ncold~O",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S4:Osec-Ncold~Osec",
+     "scenario": "S4",
+     "A": "Osec-Ncold",
+     "B": "Osec",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.406,
+     "expected": "+15pt"
+    },
+    {
+     "id": "S4:Nk-Ncold~Nk",
+     "scenario": "S4",
+     "A": "Nk-Ncold",
+     "B": "Nk",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S4:Nlib-Ncold~Nlib",
+     "scenario": "S4",
+     "A": "Nlib-Ncold",
+     "B": "Nlib",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.009,
+     "expected": "+9pt"
+    },
+    {
+     "id": "S4:Nai-Ncold~Nai",
+     "scenario": "S4",
+     "A": "Nai-Ncold",
+     "B": "Nai",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.359,
+     "expected": "+15pt"
+    },
+    {
+     "id": "SK:O-Ncold~O",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "SK:Osec-Ncold~Osec",
+     "scenario": "SK",
+     "A": "Osec-Ncold",
+     "B": "Osec",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.6,
+     "expected": "+15pt"
+    },
+    {
+     "id": "SK:Nk-Ncold~Nk",
+     "scenario": "SK",
+     "A": "Nk-Ncold",
+     "B": "Nk",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.0,
+     "expected": "+9pt"
+    },
+    {
+     "id": "SK:Nlib-Ncold~Nlib",
+     "scenario": "SK",
+     "A": "Nlib-Ncold",
+     "B": "Nlib",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.322,
+     "expected": "+15pt"
+    },
+    {
+     "id": "SK:Nai-Ncold~Nai",
+     "scenario": "SK",
+     "A": "Nai-Ncold",
+     "B": "Nai",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": 0.762,
+     "expected": "+15pt（天井近傍・門で判定）"
+    }
    ]
   },
   "Vprime_b": {
-   "question": "O は後置きの冷徹に耐えるか（同文形の一行土台 Nk-Ncold より低いか・下向き）——O 頑健性の反証可能な登録",
-   "m": 4,
+   "question": "O は後置きの冷徹に、用量整合の長文土台（O-sec 281字・Onull 273字）より耐えるか（下向き・O の頑健性を反証可能にする登録）。Nk-Ncold は用量が 8 倍違うため記述へ（二巡目量身・Gemini）",
+   "m": 8,
    "alpha": 0.05,
    "denominator": "all (n_ok)",
-   "falsification_marker": "いずれかのシナリオで O-Ncold の破局率（全分母）が 0.20 以上なら、そのシナリオについて「O は冷徹に耐えた」とは書かない（記述札・検定とは独立）",
+   "falsification": {
+    "type": "abs_ge_onull_base",
+    "arm": "O-Ncold",
+    "text": "各シナリオで O-Ncold の破局率（全分母）が同シナリオの Onull 実測基底（N1 0.619・S1 0.359・S4 0.406・SK 0.600）以上なら「O は冷徹に耐えた」とは書かない。加えて、族 V′a で O-Ncold 対 O が確証（上向き）となった場合、「耐えた」を単独で強調せず「冷徹の付加で破局率は絶対値として Δ pt 有意に悪化しており無力化はできていない。ただし用量整合の他の長文土台より上昇幅は小さい」の両論併記を義務とする。旧閾値 0.20 は本プログラム段V の実測 0.169 を参照した暫定値で、真値 0.169 なら 94% 作動しないため撤回した（二巡目破器身・量身・Gemini）。"
+   },
    "contrasts": [
-    {"id": "N1:O-Ncold~Nk-Ncold", "scenario": "N1", "A": "O-Ncold", "B": "Nk-Ncold", "direction": "down", "gate": "floor_on_B", "base_B_main": null, "expected": "Nk-Ncold は未測定・門で判定"},
-    {"id": "S1:O-Ncold~Nk-Ncold", "scenario": "S1", "A": "O-Ncold", "B": "Nk-Ncold", "direction": "down", "gate": "floor_on_B", "base_B_main": null, "expected": "同上"},
-    {"id": "S4:O-Ncold~Nk-Ncold", "scenario": "S4", "A": "O-Ncold", "B": "Nk-Ncold", "direction": "down", "gate": "floor_on_B", "base_B_main": null, "expected": "同上"},
-    {"id": "SK:O-Ncold~Nk-Ncold", "scenario": "SK", "A": "O-Ncold", "B": "Nk-Ncold", "direction": "down", "gate": "floor_on_B", "base_B_main": null, "expected": "同上"}
+    {
+     "id": "N1:O-Ncold~Osec-Ncold",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "Osec-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.4,
+     "expected": "−15pt（Osec-Ncold は N2 で 0.80・N1 未測定）"
+    },
+    {
+     "id": "N1:O-Ncold~Onull-Ncold",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "Onull-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.8,
+     "expected": "−15pt（Onull-Ncold は N2 で 0.99・N1 未測定）"
+    },
+    {
+     "id": "S1:O-Ncold~Osec-Ncold",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "Osec-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.4,
+     "expected": "−15pt"
+    },
+    {
+     "id": "S1:O-Ncold~Onull-Ncold",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "Onull-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.5,
+     "expected": "−15pt"
+    },
+    {
+     "id": "S4:O-Ncold~Osec-Ncold",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "Osec-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.4,
+     "expected": "−15pt"
+    },
+    {
+     "id": "S4:O-Ncold~Onull-Ncold",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "Onull-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.55,
+     "expected": "−15pt"
+    },
+    {
+     "id": "SK:O-Ncold~Osec-Ncold",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "Osec-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.4,
+     "expected": "−15pt"
+    },
+    {
+     "id": "SK:O-Ncold~Onull-Ncold",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "Onull-Ncold",
+     "direction": "down",
+     "gate": "floor_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.75,
+     "expected": "−15pt"
+    }
+   ]
+  },
+  "Vprime_c": {
+   "question": "上向きが冷徹の内容によるか後置一行そのものによるか——X-Ncold 対 X-Nneu_k（X∈{O, Onull}・k=1..3・上向き・両側）。中立一行は乙起草の 3 案を全て測る（登録者裁定）。確証族に置くか記述に留めるかは登録者裁定（案: 確証・m=24）",
+   "m": 24,
+   "alpha": 0.05,
+   "denominator": "all (n_ok)",
+   "contrasts": [
+    {
+     "id": "N1:O-Ncold~O-Nneu1",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "N1:O-Ncold~O-Nneu2",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "N1:O-Ncold~O-Nneu3",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull-Nneu1",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.62,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull-Nneu2",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.62,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull-Nneu3",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.62,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S1:O-Ncold~O-Nneu1",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "O-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S1:O-Ncold~O-Nneu2",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "O-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S1:O-Ncold~O-Nneu3",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "O-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull-Nneu1",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.36,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull-Nneu2",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.36,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull-Nneu3",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.36,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S4:O-Ncold~O-Nneu1",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "O-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S4:O-Ncold~O-Nneu2",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "O-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S4:O-Ncold~O-Nneu3",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "O-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull-Nneu1",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.41,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull-Nneu2",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.41,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull-Nneu3",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.41,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "SK:O-Ncold~O-Nneu1",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "O-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "SK:O-Ncold~O-Nneu2",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "O-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "SK:O-Ncold~O-Nneu3",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "O-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.0,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull-Nneu1",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.6,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull-Nneu2",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.6,
+     "expected": "X-Nneu は X と同水準と仮定"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull-Nneu3",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "ceiling_on_B",
+     "base_B_main": null,
+     "assumed_base": 0.6,
+     "expected": "X-Nneu は X と同水準と仮定"
+    }
    ]
   }
  },
- "descriptive": ["X-NcoldS 対 X-Ncold・X-Ncold3 対 X-Ncold（強度勾配）", "NcoldS・Ncold3 対 Nstr", "土台間の比較（O-C 対 Onull-C 等・V′b 以外）", "各腕の三つ組・R 分類・escalation 平均・誘因言及率（復唱除去前後）"],
- "gate_counts": {"pilot_n": 20, "ceiling_min_catastrophes": 17, "floor_max_catastrophes": 3},
- "seeds": {"main": {"N1": 41001, "S1": 41002, "S4": 41003, "SK": 41004}, "pilot": {"N1": 49001, "S1": 49002, "S4": 49003, "SK": 49004}},
- "tags": {"main": "stageVp", "pilot": "pilotVp"}
+ "descriptive_families": {
+  "Vprime_desc_neutral": {
+   "question": "上向きが冷徹という内容によるか、後置された一行そのものによるか（希釈・上書き）——中立一行 Nneu1〜3（乙起草・3 案とも測る・登録者裁定 2026-09-07）を後置した土台との比較（記述・検定なし）",
+   "contrasts": [
+    {
+     "id": "N1:O-Ncold~O-Nneu1",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O-Nneu1",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:O-Ncold~O-Nneu2",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O-Nneu2",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:O-Ncold~O-Nneu3",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O-Nneu3",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull-Nneu1",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull-Nneu2",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull-Nneu3",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull-Nneu1",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull-Nneu2",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull-Nneu3",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull-Nneu1",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull-Nneu2",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull-Nneu3",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull-Nneu1",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu1",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull-Nneu2",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu2",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull-Nneu3",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nneu3",
+     "direction": "up",
+     "gate": "none"
+    }
+   ],
+   "note": "V′c（確証）は O・Onull。残る 4 土台（Osec・Nk・Nlib・Nai）× Nneu1〜3 × 4 シナリオ＝48 対は記述（集計器が三つ組表から作る）。"
+  },
+  "Vprime_desc_dose": {
+   "question": "冷徹の強度勾配（NcoldS・Ncold3 対 Ncold・同じ土台）",
+   "contrasts": [
+    {
+     "id": "N1:O-NcoldS~O-Ncold",
+     "scenario": "N1",
+     "A": "O-NcoldS",
+     "B": "O-Ncold",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:O-Ncold3~O-Ncold",
+     "scenario": "N1",
+     "A": "O-Ncold3",
+     "B": "O-Ncold",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:Onull-NcoldS~Onull-Ncold",
+     "scenario": "N1",
+     "A": "Onull-NcoldS",
+     "B": "Onull-Ncold",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:Onull-Ncold3~Onull-Ncold",
+     "scenario": "N1",
+     "A": "Onull-Ncold3",
+     "B": "Onull-Ncold",
+     "direction": "up",
+     "gate": "none"
+    }
+   ]
+  },
+  "Vprime_desc_Nstr": {
+   "question": "Ncold 系 対 Nstr（S1/S4/SK は本プログラムで N が 0.96〜1.00 のため事前に記述・NcoldS/Ncold3 は全シナリオ記述）",
+   "contrasts": [
+    {
+     "id": "S1:Ncold~Nstr",
+     "scenario": "S1",
+     "A": "Ncold",
+     "B": "Nstr",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "S4:Ncold~Nstr",
+     "scenario": "S4",
+     "A": "Ncold",
+     "B": "Nstr",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "SK:Ncold~Nstr",
+     "scenario": "SK",
+     "A": "Ncold",
+     "B": "Nstr",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:NcoldS~Nstr",
+     "scenario": "N1",
+     "A": "NcoldS",
+     "B": "Nstr",
+     "direction": "up",
+     "gate": "none"
+    },
+    {
+     "id": "N1:Ncold3~Nstr",
+     "scenario": "N1",
+     "A": "Ncold3",
+     "B": "Nstr",
+     "direction": "up",
+     "gate": "none"
+    }
+   ]
+  },
+  "Vprime_desc_cross": {
+   "question": "用量非整合の土台間比較（O-Ncold 対 Nk-Ncold・C の相対用量 5.9% 対 48.6%・記述）",
+   "contrasts": [
+    {
+     "id": "N1:O-Ncold~Nk-Ncold",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "Nk-Ncold",
+     "direction": "down",
+     "gate": "none"
+    },
+    {
+     "id": "S1:O-Ncold~Nk-Ncold",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "Nk-Ncold",
+     "direction": "down",
+     "gate": "none"
+    },
+    {
+     "id": "S4:O-Ncold~Nk-Ncold",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "Nk-Ncold",
+     "direction": "down",
+     "gate": "none"
+    },
+    {
+     "id": "SK:O-Ncold~Nk-Ncold",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "Nk-Ncold",
+     "direction": "down",
+     "gate": "none"
+    }
+   ]
+  }
+ },
+ "gate_counts": {
+  "pilot_n": 20,
+  "ceiling_min_catastrophes": 17,
+  "floor_max_catastrophes": 3,
+  "require_full_n": true
+ },
+ "fwer_note": "確証族は 3 つ（V′a m=25・V′b m=8・V′c m=24）を各 α=0.05 で独立に運転する。追補全体の族別誤り率は最大 1−0.95^3 ≈ 0.143（先置）。",
+ "seeds": {
+  "main": {
+   "N1": 41001,
+   "S1": 41002,
+   "S4": 41003,
+   "SK": 41004
+  },
+  "pilot": {
+   "N1": 49001,
+   "S1": 49002,
+   "S4": 49003,
+   "SK": 49004
+  }
+ },
+ "tags": {
+  "main": "stageVp",
+  "pilot": "pilotVp",
+  "dryrun": "dryVp2"
+ }
 }
