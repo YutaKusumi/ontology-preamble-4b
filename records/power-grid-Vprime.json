@@ -21,7 +21,22 @@
    "floor": 16,
    "mid": 8,
    "assumed": 33
-  }
+  },
+  "coverage_by_family": {
+   "Vprime_a": {
+    "measured": 24,
+    "assumed": 1
+   },
+   "Vprime_b": {
+    "measured": 0,
+    "assumed": 8
+   },
+   "Vprime_c": {
+    "measured": 0,
+    "assumed": 24
+   }
+  },
+  "coverage_line": "帯が覆う範囲: 実測基底の 24 本（Vprime_a 24）に対するもの。仮定基底の 33 本（Vprime_a 1・Vprime_b 8・Vprime_c 24）は走行前に検出力を確定できず、検出域の申告に用いない。"
  },
  "grid": [
   {
@@ -1109,7 +1124,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "N1:O-Ncold~O-Nneu1",
+   "id": "N1:Osec-Ncold~Osec-Nneu1",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1128,7 +1143,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "N1:O-Ncold~O-Nneu2",
+   "id": "N1:Osec-Ncold~Osec-Nneu2",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1147,7 +1162,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "N1:O-Ncold~O-Nneu3",
+   "id": "N1:Osec-Ncold~Osec-Nneu3",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1166,7 +1181,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "N1:Onull-Ncold~Onull-Nneu1",
+   "id": "N1:Nk-Ncold~Nk-Nneu1",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1185,7 +1200,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "N1:Onull-Ncold~Onull-Nneu2",
+   "id": "N1:Nk-Ncold~Nk-Nneu2",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1204,7 +1219,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "N1:Onull-Ncold~Onull-Nneu3",
+   "id": "N1:Nk-Ncold~Nk-Nneu3",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1223,7 +1238,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "S1:Onull-Ncold~Onull-Nneu1",
+   "id": "N1:Nlib-Ncold~Nlib-Nneu1",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1242,7 +1257,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "S1:Onull-Ncold~Onull-Nneu2",
+   "id": "N1:Nlib-Ncold~Nlib-Nneu2",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1261,7 +1276,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "S1:Onull-Ncold~Onull-Nneu3",
+   "id": "N1:Nlib-Ncold~Nlib-Nneu3",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1280,7 +1295,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "S4:Onull-Ncold~Onull-Nneu1",
+   "id": "N1:Nai-Ncold~Nai-Nneu1",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1299,7 +1314,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "S4:Onull-Ncold~Onull-Nneu2",
+   "id": "N1:Nai-Ncold~Nai-Nneu2",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1318,7 +1333,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "S4:Onull-Ncold~Onull-Nneu3",
+   "id": "N1:Nai-Ncold~Nai-Nneu3",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1337,7 +1352,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "SK:Onull-Ncold~Onull-Nneu1",
+   "id": "S1:Osec-Ncold~Osec-Nneu1",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1356,7 +1371,7 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "SK:Onull-Ncold~Onull-Nneu2",
+   "id": "S1:Osec-Ncold~Osec-Nneu2",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1375,7 +1390,634 @@
   },
   {
    "family": "Vprime_desc_neutral",
-   "id": "SK:Onull-Ncold~Onull-Nneu3",
+   "id": "S1:Osec-Ncold~Osec-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nk-Ncold~Nk-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nk-Ncold~Nk-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nk-Ncold~Nk-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nlib-Ncold~Nlib-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nlib-Ncold~Nlib-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nlib-Ncold~Nlib-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nai-Ncold~Nai-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nai-Ncold~Nai-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S1:Nai-Ncold~Nai-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Osec-Ncold~Osec-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Osec-Ncold~Osec-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Osec-Ncold~Osec-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nk-Ncold~Nk-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nk-Ncold~Nk-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nk-Ncold~Nk-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nlib-Ncold~Nlib-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nlib-Ncold~Nlib-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nlib-Ncold~Nlib-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nai-Ncold~Nai-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nai-Ncold~Nai-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "S4:Nai-Ncold~Nai-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Osec-Ncold~Osec-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Osec-Ncold~Osec-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Osec-Ncold~Osec-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nk-Ncold~Nk-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nk-Ncold~Nk-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nk-Ncold~Nk-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nlib-Ncold~Nlib-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nlib-Ncold~Nlib-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nlib-Ncold~Nlib-Nneu3",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nai-Ncold~Nai-Nneu1",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nai-Ncold~Nai-Nneu2",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_neutral",
+   "id": "SK:Nai-Ncold~Nai-Nneu3",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1432,6 +2074,44 @@
   },
   {
    "family": "Vprime_desc_dose",
+   "id": "N1:Osec-NcoldS~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "N1:Osec-Ncold3~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
    "id": "N1:Onull-NcoldS~Onull-Ncold",
    "base": 0.4,
    "base_src": "仮定 0.40",
@@ -1452,6 +2132,804 @@
   {
    "family": "Vprime_desc_dose",
    "id": "N1:Onull-Ncold3~Onull-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "N1:Nk-NcoldS~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "N1:Nk-Ncold3~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "N1:Nlib-NcoldS~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "N1:Nlib-Ncold3~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "N1:Nai-NcoldS~Nai-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "N1:Nai-Ncold3~Nai-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:O-NcoldS~O-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:O-Ncold3~O-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Osec-NcoldS~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Osec-Ncold3~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Onull-NcoldS~Onull-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Onull-Ncold3~Onull-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Nk-NcoldS~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Nk-Ncold3~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Nlib-NcoldS~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Nlib-Ncold3~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Nai-NcoldS~Nai-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S1:Nai-Ncold3~Nai-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:O-NcoldS~O-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:O-Ncold3~O-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Osec-NcoldS~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Osec-Ncold3~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Onull-NcoldS~Onull-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Onull-Ncold3~Onull-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Nk-NcoldS~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Nk-Ncold3~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Nlib-NcoldS~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Nlib-Ncold3~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Nai-NcoldS~Nai-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "S4:Nai-Ncold3~Nai-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:O-NcoldS~O-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:O-Ncold3~O-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Osec-NcoldS~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Osec-Ncold3~Osec-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Onull-NcoldS~Onull-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Onull-Ncold3~Onull-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Nk-NcoldS~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Nk-Ncold3~Nk-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Nlib-NcoldS~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Nlib-Ncold3~Nlib-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Nai-NcoldS~Nai-Ncold",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_dose",
+   "id": "SK:Nai-Ncold3~Nai-Ncold",
    "base": 0.4,
    "base_src": "仮定 0.40",
    "floor": false,
@@ -1635,6 +3113,386 @@
     0.9942678905003403,
     0.8259861938128695,
     0.28689817215278823
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "N1:Nneu1~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "N1:Nneu2~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "N1:Nneu3~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "N1:Ncold~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "N1:Nstr~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S1:Nneu1~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S1:Nneu2~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S1:Nneu3~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S1:Ncold~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S1:Nstr~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S4:Nneu1~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S4:Nneu2~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S4:Nneu3~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S4:Ncold~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "S4:Nstr~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "SK:Nneu1~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "SK:Nneu2~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "SK:Nneu3~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "SK:Ncold~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
+   ],
+   "alpha": 0.05,
+   "confirmatory": false
+  },
+  {
+   "family": "Vprime_desc_weakness",
+   "id": "SK:Nstr~N",
+   "base": 0.4,
+   "base_src": "仮定 0.40",
+   "floor": false,
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power": [
+    0.9877596170893799,
+    0.7944062174555693,
+    0.2721942495867409
    ],
    "alpha": 0.05,
    "confirmatory": false

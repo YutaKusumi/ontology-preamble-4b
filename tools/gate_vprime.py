@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-"""gate_vprime.py v2 —— 追補 V′ の門（GO/NO-GO）。判定規則は `design/contrasts-Vprime.json` だけから読む（手書きの対比辞書を持たない・D-5 再発防止）。
+"""gate_vprime.py v3 —— 追補 V′ の門（GO/NO-GO）。判定規則は `design/contrasts-Vprime.json` だけから読む（手書きの対比辞書を持たない・D-5 再発防止）。
 v2（二巡目反映）: 参照キーを id/scenario/A/B/direction/gate に限定／`gate` 欄と `direction` の整合を検査（不整合は非零終了）／対照 B の n_ok が pilot_n に満たない場合は判定せず非零終了
 （--redo-errors で揃えてから）／結果を Markdown と **JSON**（集計器が読む正本）に書き、同名があれば上書きせず連番。
+v3（三巡目反映）: --allow-short を JSON と Markdown の見出しに刻む／対照の n_ok=0 は判定せず not_judgeable（天井の恒真判定を防ぐ）／id は全族（確証＋記述）を通じて一意でなければ非零終了。
 用法: python tools/gate_vprime.py --tag pilotVp
 """
 import os, sys, json, glob, datetime, argparse
@@ -10,12 +11,15 @@ ap = argparse.ArgumentParser(); ap.add_argument('--tag', default='pilotVp'); ap.
 ap.add_argument('--allow-short', action='store_true', help='dry-run 検査用: n_ok < pilot_n でも率で判定（本番では用いない）')
 args = ap.parse_args()
 T = json.load(open(args.contrasts, encoding='utf-8')); G = T['gate_counts']
+_ids = [c['id'] for F in list(T['families'].values()) + list(T.get('descriptive_families', {}).values()) for c in F['contrasts']]
+if len(_ids) != len(set(_ids)):
+    sys.exit('[gate] id が全族で一意でない: %s' % sorted({i for i in _ids if _ids.count(i) > 1}))
 KEYS = ('id', 'scenario', 'A', 'B', 'direction', 'gate')
 cells = {}
 for f in glob.glob(os.path.join(REPO, 'results', '*', args.tag + '__*', 'cells.json')):   # 走行ディレクトリは <tag>__… で始まる（dry-run は results/_dryrun/ 配下）
     d = json.load(open(f, encoding='utf-8')); cells[d['manifest']['scenario']] = d['cells']
-res = {'tag': args.tag, 'contrasts_version': T['version'], 'gate_counts': G, 'when': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'results': {}}
-out = ['# 追補 V′ 門の判定 —— %s（tag %s・規則 %s）' % (datetime.date.today().isoformat(), args.tag, T['version']), '',
+res = {'tag': args.tag, 'contrasts_version': T['version'], 'gate_counts': G, 'when': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'allow_short': bool(args.allow_short), 'results': {}}
+out = ['# 追補 V′ 門の判定 —— %s（tag %s・規則 %s%s）' % (datetime.date.today().isoformat(), args.tag, T['version'], '・**--allow-short（率換算・dry-run 検査用・本番判定ではない）**' if args.allow_short else ''), '',
        '規則: 上向き対比＝対照 B の破局が %d/%d 以上で天井（記述に降格）／下向き対比＝対照 B の破局が %d/%d 以下で床（記述に降格）。m は減らさない。対照の n_ok が %d に満たない対比は判定しない。' % (G['ceiling_min_catastrophes'], G['pilot_n'], G['floor_max_catastrophes'], G['pilot_n'], G['pilot_n']), '']
 errors = []
 for fam, F in T['families'].items():
@@ -28,6 +32,8 @@ for fam, F in T['families'].items():
         if not cB:
             out.append('| %s | %s | %s | （未走行） | — | 判定不能 |' % (c['id'], c['direction'], c['gate'])); res['results'][c['id']] = {'status': 'not_run'}; continue
         kB, nB = cB['catastrophe'], cB['n_ok']
+        if nB == 0:
+            out.append('| %s | %s | %s | 0/0 | — | 判定不能（対照 n_ok=0） |' % (c['id'], c['direction'], c['gate'])); res['results'][c['id']] = {'status': 'not_judgeable', 'B_n_ok': 0}; continue
         if nB != G['pilot_n'] and not args.allow_short:
             errors.append('対照 %s（%s）の n_ok=%d ≠ pilot_n=%d——--redo-errors で揃えてから判定' % (c['B'], c['scenario'], nB, G['pilot_n'])); continue
         thr_c = G['ceiling_min_catastrophes'] * nB / G['pilot_n']; thr_f = G['floor_max_catastrophes'] * nB / G['pilot_n']

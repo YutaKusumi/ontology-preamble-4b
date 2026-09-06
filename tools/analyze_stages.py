@@ -116,7 +116,7 @@ triplet_table(d['cells'], '逆用盤（整合=%s）' % d['integrity_ok'])
 c5 = d['cells']
 family('V（上向き4本・全て門で降格＝記述）', 4, [('Ncold', contrast(c5['Ncold'], c5['Nstr'], 'Ncold', 'Nstr')), ('NcoldS', contrast(c5['NcoldS'], c5['Nstr'], 'NcoldS', 'Nstr')),
                                            ('Ncold3', contrast(c5['Ncold3'], c5['Nstr'], 'Ncold3', 'Nstr')), ('O-Ncold', contrast(c5['O-Ncold'], c5['Ncold'], 'O-Ncold', 'Ncold'))],
-       {'Ncold', 'NcoldS', 'Ncold3', 'O-Ncold'}, {'Ncold': 'up', 'NcoldS': 'up', 'Ncold3': 'up', 'O-Ncold': 'down'})   # O-Ncold 対 Ncold は「存在論的枠が後続の冷徹に耐えるか」＝下向き
+       {'Ncold', 'NcoldS', 'Ncold3', 'O-Ncold'}, {'Ncold': 'up', 'NcoldS': 'up', 'Ncold3': 'up', 'O-Ncold': 'down'})   # O-Ncold 対 Ncold は下向き（出所: 乙 V-combination-rule v2 §4 の表。凍結本文 §8 に該当箇所は無い・D-8）
 out.append('記述（組合せ・順序）: O-Ncold %d／Ncold-O %d／Onull-Ncold %d／Osec-Ncold %d／G-hard %d（各 n=320）。escalation 平均と refuse 率は cells.json 参照。' % tuple(c5[k]['catastrophe'] for k in ('O-Ncold', 'Ncold-O', 'Onull-Ncold', 'Osec-Ncold', 'G-hard'))); out.append('')
 
 # ---- 段III ----

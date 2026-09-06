@@ -54,11 +54,14 @@ conf = [g for g in grid if g['confirmatory'] and g['id'].split(':')[1].split('~'
 mid15 = band([g['power'][0] for g in conf if not g['floor'] and g['base_src'].startswith('実測')]); mid10 = band([g['power'][1] for g in conf if not g['floor'] and g['base_src'].startswith('実測')])
 fl9 = band([g['power'][0] for g in conf if g['floor']]); fl5 = band([g['power'][1] for g in conf if g['floor']])
 counts = {'floor': sum(1 for g in grid if g['confirmatory'] and g['floor'] and g['base_src'].startswith('実測')), 'mid': sum(1 for g in grid if g['confirmatory'] and not g['floor'] and g['base_src'].startswith('実測')), 'assumed': sum(1 for g in grid if g['confirmatory'] and g['base_src'].startswith('仮定'))}
-summary = {'n': n, 'mid_plus15': mid15, 'mid_plus10': mid10, 'floor_plus9': fl9, 'floor_plus5': fl5, 'counts_confirmatory': counts}
+cov = {f: {'measured': sum(1 for g in grid if g['family'] == f and g['base_src'].startswith('実測')), 'assumed': sum(1 for g in grid if g['family'] == f and g['base_src'].startswith('仮定'))} for f in T['families']}
+summary = {'n': n, 'mid_plus15': mid15, 'mid_plus10': mid10, 'floor_plus9': fl9, 'floor_plus5': fl5, 'counts_confirmatory': counts, 'coverage_by_family': cov}
+cov_line = '帯が覆う範囲: 実測基底の %d 本（%s）に対するもの。仮定基底の %d 本（%s）は走行前に検出力を確定できず、検出域の申告に用いない。' % (counts['floor'] + counts['mid'], '・'.join('%s %d' % (f, c['measured']) for f, c in cov.items() if c['measured']), counts['assumed'], '・'.join('%s %d' % (f, c['assumed']) for f, c in cov.items() if c['assumed']))
+summary['coverage_line'] = cov_line
 stamp = datetime.date.today().isoformat()
 out = ['# 追補 V′ 検出力格子（機械生成・Fisher 両側・全数列挙・n=%d・Holm 初段 α=0.05/m）—— %s・contrasts %s' % (n, stamp, T['version']), '',
        '基底は JSON の base_B_main（実測＝本プログラム段I の値・0.000 は 0.000 のまま計算）。null は仮定値を明記。感度列＝基底 ≥0.05 は +15/+10/+5pt・基底 <0.05 は +9/+5/+2pt（下向きは −）。', '',
-       '**要約（本文はこの行を転記する）**: 確証族・実測中間基底の +15pt: %.3f〜%.3f／+10pt: %.3f〜%.3f。床（実測 <0.05）の +9pt: %.3f〜%.3f／+5pt: %.3f〜%.3f。確証対比の内訳: 床 %d・中間 %d・未測定（仮定）%d。' % (mid15[0], mid15[1], mid10[0], mid10[1], fl9[0], fl9[1], fl5[0], fl5[1], counts['floor'], counts['mid'], counts['assumed']), '',
+       '**要約（本文はこの行を転記する）**: 確証族・実測中間基底の +15pt: %.3f〜%.3f／+10pt: %.3f〜%.3f。床（実測 <0.05）の +9pt: %.3f〜%.3f／+5pt: %.3f〜%.3f。確証対比の内訳: 床 %d・中間 %d・未測定（仮定）%d。' % (mid15[0], mid15[1], mid10[0], mid10[1], fl9[0], fl9[1], fl5[0], fl5[1], counts['floor'], counts['mid'], counts['assumed']) + ' ' + cov_line, '',
        '| 族 | 対比 | 基底（出所） | 大 | 中 | 小 | α |', '|---|---|---|---|---|---|---|']
 for g in grid:
     out.append('| %s | %s | %s | %.3f | %.3f | %.3f | %.5f |' % (g['family'], g['id'], g['base_src'], g['power'][0], g['power'][1], g['power'][2], g['alpha']))
