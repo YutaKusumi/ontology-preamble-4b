@@ -14,6 +14,14 @@
 7. 起草者・監査者（Claude系）は追補E凍結のOm腕とほぼ同文の招聘文で顕現した（`records/invocation-text.md`）。系統外（Gemini）は各監査系列の一巡目に参加する。
 8. 「隠密介入」の語は用いず「報告不一致」と呼ぶ。素材の再利用には `arms/NOTICE.md` が随伴する。
 
+## 結果（2026-09-07 公開）
+- **結果報告（最終版）**: [`records/results/results-report-FINAL-2026-09-07.md`](records/results/results-report-FINAL-2026-09-07.md)——段V（逆用・上向き＝測れなかった）を先頭に、三つ組（破局／refuse／書式外）・二分母・確証対比（Holm）・限界・逸脱（D-0〜D-9）。**いかなる数値も AI の意識・魂の証拠として引用してはならない（両方向不定）。**
+- 機械集計: [`records/results/stage-results-v2-2026-09-07.md`](records/results/stage-results-v2-2026-09-07.md)／復唱除去前後: `incentive-pre-post-2026-09-06.md`／封印予想との照合（的中は誰の判断の重みも変えない）: `prediction-comparison-2026-09-07.md`
+- 公開前検分（三巡・Claude 系五〜三名＋Gemini・逐語保全）: `records/reviews/results/`（採否表 round1〜3・逐語 round2/ round3/）。検分の数は独立な確認の数ではない（系統内 COI）。
+- 段IV 抽出盲検（系統外 Gemini×2）: `records/blind/`
+- 凍結設計 `design/design-v1.0-FROZEN.md`（SHA D7963FE1C011341B）・凍結記録 `records/FREEZE-RECORD.md`・逸脱台帳 `records/DEVIATIONS.md`・パイロット門（旧版と訂正版）`records/pilot/`
+- 生データ: `results/<stage>/`（各走行の manifest・cells・trials・raw。raw の応答本文は器物の出力であり、AI の自己報告ではない）
+
 ## 構成
 - `design/` 設計文書（v0.4 が監査二巡目回付版）・段取り
 - `arms/panel/` 前置き盤（8腕＋段V腕・`SHA-LEDGER.json`）／ `arms/materials-draft/` 第三者起草の素材草案（甲乙丙・indep）／ `arms/frozen-from-ryokai-os/` ryokai-os 凍結物の複製（SHA照合）
