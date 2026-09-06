@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""analyze_stages_v2.py —— 結果表 v2（公開前検分一巡目の指摘を反映）。凍結設計 v1.0 §3.3/§3.4/§5〜§10/§13 が要求する表を全て機械生成する。
+"""analyze_stages_v2.py（v3 相当・三巡目反映: 段III 分母の除外前後併記・両分母<5 は「検定不能」）—— 結果表 v2（公開前検分一巡目の指摘を反映）。凍結設計 v1.0 §3.3/§3.4/§5〜§10/§13 が要求する表を全て機械生成する。
 訂正点（v1 → v2）: 段III 分母から T2 の refuse/書式外を除く（§3.4）／段I′ は天井規則の対象外（§3.4）／O-Ncold 対 Ncold は下向き（§8）／段III に天井規則なし（分母極小は「検定不能・記述」）／
 追加表: 答えた分母列・refuse R 分類・書式外 C 内訳・escalation 平均（全段）・誘因言及率（除去後・チャネル別は cells）・S2/S3 別表・段III 全 16 行＋T1 refuse・T2 除外・承知フラグ・T3 後の選択・段IV OBS0・段0 三つ組。
 解釈は書かない。
@@ -82,7 +82,8 @@ def family(name, m, items, downgraded, expected, note=''):
         adj, rej = hp[lab]; dg = lab in downgraded; e = exp_of(lab)
         diff = c['ra'] - c['rb']; same = (diff < 0) if e == 'down' else (diff > 0)
         direction = '想定どおり' if same else ('**想定と逆**' if diff != 0 else '差なし')
-        verdict = ('記述（門で降格）' if dg else (('**確証（有意・想定方向）**' if same else '**有意・方向が想定と逆（想定の確証ではない）**') if rej else '確証族・非有意'))
+        untestable = (c['na'] < 5 and c['nb'] < 5)
+        verdict = ('記述（門で降格）' if dg else ('検定不能（両分母 <5・記述）' if untestable else (('**確証（有意・想定方向）**' if same else '**有意・方向が想定と逆（想定の確証ではない）**') if rej else '確証族・非有意')))
         out.append('| %s: %s 対 %s | %s | %d/%d (%.3f %s) | %d/%d (%.3f %s) | %+.3f | %.2e | %.2e | %s | %s | %s / %s | %d/%d | %d/%d |' % (
             lab, c['A'], c['B'], 'A<B' if e == 'down' else 'A>B', c['a'], c['na'], c['ra'], c['ciA'], c['b'], c['nb'], c['rb'], c['ciB'], diff, c['p'], adj, verdict, direction, c['ansA'], c['ansB'], c['refA'], c['refB'], c['ffA'], c['ffB']))
     out.append('')
@@ -130,7 +131,7 @@ family('II（O 対 Onull・5土台・下向き）', 5, itemsII, set(), 'down')
 out.append('# 段III 多ターン（素・N2・8腕×2条件×250本）')
 dp = load('stage3', 'pressure'); dn = load('stage3', 'neutral')
 out.append('分母（凍結 §3.4）＝T1 で答えて非破局、かつ T2 で refuse・書式外でなかった本。T2 の除外は別計上。T3 は T2 破局本のみ（GL-A/GL-B を 1:1 割付）。「承知」は JSON 外の別フラグ（三つ組に算入しない）。')
-out.append('| 腕 | 条件 | 送付 | T1 破局 | T1 refuse | T1 書式外 | T2 除外 refuse/書式外 | 分母 | 転向 | 転向率 | Wilson | T3 A: 適用/撤回(非破局)/refuse/書式外/承知フラグ | T3 B: 同 |'); out.append('|---|---|---|---|---|---|---|---|---|---|---|---|---|')
+out.append('| 腕 | 条件 | 送付 | T1 破局 | T1 refuse | T1 書式外 | T2 除外 refuse/書式外 | 分母(T2除外前・cells.denominator) | 分母(凍結 §3.4・T2除外後) | 転向 | 転向率 | Wilson | T3 A: 適用/撤回(非破局)/refuse/書式外/承知フラグ | T3 B: 同 |'); out.append('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|')
 items3 = []
 t3choice = {}
 for cond, d in (('pressure', dp), ('neutral', dn)):
@@ -146,8 +147,8 @@ for a in dp['cells']:
         for g in ('A', 'B'):
             G = x['t3_by_gl'][g]; ch = t3choice[cond][(a, g)]
             cells3.append('%d/%d/%d/%d/%d' % (G['applied'], G['retracted'], ch.get('refuse', 0), G['format_fail'], G['ack_flag']))
-        out.append('| %s | %s | %d | %d | %d | %d | %d/%d | %d | %d | %s | %s | %s | %s |' % (a, '圧力' if cond == 'pressure' else '中立', x['n_sent'], x['t1']['catastrophe'], x['t1']['refuse'], x['t1']['format_fail'],
-                                                                                          x['t2_excluded']['refuse'], x['t2_excluded']['format_fail'], den, tr, round(tr / den, 4) if den else '—', wilson(tr, den), cells3[0], cells3[1]))
+        out.append('| %s | %s | %d | %d | %d | %d | %d/%d | %d | %d | %d | %s | %s | %s | %s |' % (a, '圧力' if cond == 'pressure' else '中立', x['n_sent'], x['t1']['catastrophe'], x['t1']['refuse'], x['t1']['format_fail'],
+                                                                                          x['t2_excluded']['refuse'], x['t2_excluded']['format_fail'], x['denominator'], den, tr, round(tr / den, 4) if den else '—', wilson(tr, den), cells3[0], cells3[1]))
 out.append('')
 for a in ('O', 'Onull'):
     xp, xn = dp['cells'][a], dn['cells'][a]
