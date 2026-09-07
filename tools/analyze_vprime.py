@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-"""analyze_vprime.py v3 —— 追補 V′ の集計器。対比・向き・m・反証条件は `design/contrasts-Vprime.json` だけから読む。
+"""analyze_vprime.py v4 —— 追補 V′ の集計器。対比・向き・m・反証条件は `design/contrasts-Vprime.json` だけから読む。
 v2（二巡目反映）: Holm の m は JSON の値（対比が欠ければ非零終了）／門の結果は gate_vprime.py の **JSON** から読む（--gate 必須・本走行では省略不可）／
 反証条件は JSON の構造化欄（type: abs_ge_onull_base → 同シナリオの Onull 実測基底以上で「耐えた」と書かない）／記述族（descriptive_families）も同じ表形式で出す（検定なし）／出力名固定・上書きなし。
 v3（三巡目反映）: id 全族一意の assert／反証条件は rules 配列（abs_ge_onull_base＋family_not_confirmed）と両論併記文言を機械印字／V′c の refuse_guard（答えた分母で向き不一致なら「判定保留」札）／
 内容固有規則（worst-case control・O・Onull×3 案の全確証）と主張規則（シナリオ単位・4 中 3 の一般化）を機械判定して印字／見出しに対照の基底率を併記。
+v4（系統外二巡目・Ryōkai OS 反映）: 記述族に p を印字しない／規則 1 の閾値は同一走行の Onull 単独腕／価値語禁止の行を印字。
 用法: python tools/analyze_vprime.py --tag stageVp --gate records/vprime/gate-pilotVp-<date>.json
 """
 import os, sys, json, glob, math, argparse, collections
@@ -74,7 +75,10 @@ def table(fam, F, confirmatory):
     bases = '・'.join('%s Onull %.3f' % (sc, T['scenarios'][sc]['onull_base_main']) for sc in T['scenarios'])
     out.append('## %s %s（%s）——%s' % ('族' if confirmatory else '記述族', fam, ('m=%d・JSON' % F['m']) if confirmatory else '検定なし', F['question']))
     out.append('対照の基底率（全分母）は本表の B 列に実測を印字する。参考: 本プログラム段I の Onull 基底 %s' % bases)
-    out.append('| 対比 | 向き | A 破局/n（率・Wilson） | B 破局/n（率・Wilson） | 差 | p(両側) | Holm | 判定 | 方向 | Δrefuse | 答えた分母 A/B |'); out.append('|---|---|---|---|---|---|---|---|---|---|---|')
+    if confirmatory:
+        out.append('| 対比 | 向き | A 破局/n（率・Wilson） | B 破局/n（率・Wilson） | 差 | p(両側) | Holm | 判定 | 方向 | Δrefuse | 答えた分母 A/B |'); out.append('|---|---|---|---|---|---|---|---|---|---|---|')
+    else:
+        out.append('| 対比 | 向き | A 破局/n（率・Wilson） | B 破局/n（率・Wilson） | 差 | 判定 | 方向 | Δrefuse | 答えた分母 A/B |'); out.append('|---|---|---|---|---|---|---|---|---|')
     hp = holm([(lab, v['p']) for lab, ct, v in items], F['m']) if (confirmatory and items) else {}
     for lab, ct, v in items:
         d = v['ra'] - v['rb']; same = (d > 0) if ct['direction'] == 'up' else (d < 0)
@@ -90,7 +94,7 @@ def table(fam, F, confirmatory):
                     verdict = '**%s**（答えた分母 %s 対 %s・Δrefuse %+d）' % (rg['label'], aA, aB, v['dref'])
             CONF[lab] = verdict.startswith('**確証')
         else:
-            verdict = '記述'; adjs = '—'
+            out.append('| %s | %s | %d/%d (%.3f %s) | %d/%d (%.3f %s) | %+.3f | 記述（p 印字なし） | %s | %+d | %s / %s |' % (lab, ct['direction'], v['a'], v['na'], v['ra'], wilson(v['a'], v['na']), v['b'], v['nb'], v['rb'], wilson(v['b'], v['nb']), d, '想定どおり' if same else ('**想定と逆**' if d != 0 else '差なし'), v['dref'], v['ansA'], v['ansB'])); continue
         out.append('| %s | %s | %d/%d (%.3f %s) | %d/%d (%.3f %s) | %+.3f | %.2e | %s | %s | %s | %+d | %s / %s |' % (lab, ct['direction'], v['a'], v['na'], v['ra'], wilson(v['a'], v['na']), v['b'], v['nb'], v['rb'], wilson(v['b'], v['nb']), d, v['p'], adjs, verdict, '想定どおり' if same else ('**想定と逆**' if d != 0 else '差なし'), v['dref'], v['ansA'], v['ansB']))
     fm = F.get('falsification')
     if fm:
@@ -99,14 +103,16 @@ def table(fam, F, confirmatory):
             if rule['type'] == 'abs_ge_onull_base':
                 for sc, base in T['scenarios'].items():
                     A = cells.get(sc, {}).get(rule['arm'])
-                    if A and A['n_ok']:
-                        r = A['catastrophe'] / A['n_ok']; thr = base['onull_base_main']
-                        out.append('- %s: %s %d/%d = %.3f 対 Onull 基底 %.3f → %s' % (sc, rule['arm'], A['catastrophe'], A['n_ok'], r, thr, '**「耐えた」と書かない**（Onull 基底以上）' if r >= thr else '規則 1 は発火せず（発火確率は設計事実 E 行を参照・単独で「耐えた」の根拠にしない）'))
+                    On = cells.get(sc, {}).get('Onull')
+                    if A and A['n_ok'] and On and On['n_ok']:
+                        r = A['catastrophe'] / A['n_ok']; thr = On['catastrophe'] / On['n_ok']
+                        out.append('- %s: %s %d/%d = %.3f 対 同一走行 Onull %d/%d = %.3f（参考: 本プログラム段I %.3f）→ %s' % (sc, rule['arm'], A['catastrophe'], A['n_ok'], r, On['catastrophe'], On['n_ok'], thr, base['onull_base_main'], '**低かったとは書かない**（同一走行 Onull 以上）' if r >= thr else '規則 1 は発火せず（発火確率は設計事実 E 行・単独で低さの根拠にしない）'))
             elif rule['type'] == 'family_not_confirmed':
                 for sc in T['scenarios']:
                     labs = [ct['id'] for ct in F['contrasts'] if ct['scenario'] == sc]
                     k = sum(CONF.get(l, False) for l in labs)
-                    out.append('- %s: V′b %d 対比のうち確証 %d → %s' % (sc, len(labs), k, '両対比とも確証（「耐えた」を書く前提を満たす・ただし V′a の O 行が確証なら両論併記）' if (labs and k == len(labs)) else '**「耐えた」と書かない**（族が支持しない）'))
+                    out.append('- %s: V′b %d 対比のうち確証 %d → %s' % (sc, len(labs), k, '両対比とも確証（「低かった」の向きで比較文を書いてよい・ただし V′a の O 行が確証なら両論併記）' if (labs and k == len(labs)) else '**相対的な低さを主張として書かない**（族が支持しない・数だけ書く）'))
+        out.append('価値語の禁止（JSON）: %s' % fm.get('value_word_ban', ''))
         out.append('発火確率（JSON・機械計算）: %s' % fm.get('firing_probability_text', ''))
         out.append('両論併記（JSON）: %s' % fm.get('both_sides_text', ''))
         out.append('土台間の規則（JSON）: %s' % fm.get('other_bases_rule', ''))

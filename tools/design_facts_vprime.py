@@ -5,6 +5,8 @@
 """
 import os, sys, json, math, hashlib, datetime
 from scipy.stats import binom
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from vprime_power import make_power
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 T = json.load(open(os.path.join(REPO, 'design', 'contrasts-Vprime.json'), encoding='utf-8'))
 L = json.load(open(os.path.join(REPO, 'arms', 'panel', 'SHA-LEDGER.json'), encoding='utf-8'))
@@ -43,12 +45,35 @@ for f, F in fams.items():
 if dup or unlinked or not_in_ledger:
     print('[facts] 整合エラー: dup=%s unlinked=%s not_in_ledger=%s' % (dup, unlinked, not_in_ledger)); sys.exit(2)
 fpt = fams['Vprime_b']['falsification'].get('firing_probability_text', '')
+# E2: 規則 2 の発火見込み（格子の V′b 検出力から・設計想定 −15pt の下で 1−power1×power2）
+gridp = os.path.join(REPO, 'records', 'power-grid-Vprime.json')
+e2 = {}
+if os.path.exists(gridp):
+    Gd = json.load(open(gridp, encoding='utf-8'))
+    if Gd.get('grid') and any(g.get('family') == 'Vprime_b' for g in Gd['grid']):
+        for sc in SC:
+            ps = [g['power'][0] for g in Gd['grid'] if g['family'] == 'Vprime_b' and g['id'].startswith(sc + ':')]
+            if len(ps) == 2:
+                e2[sc] = 1 - ps[0] * ps[1]
+e2_text = ('規則 2 の発火見込み（設計想定＝V′b の両対比が −15pt で真・仮定基底・格子の検出力から 1−power₁×power₂）: ' + '・'.join('%s %.3f' % (sc, v) for sc, v in e2.items()) + '。反証可能ではあるが、設計の想定が正しければ発火する見込みは 1 割前後に留まる（Ryōkai OS 票 §2）。') if e2 else '規則 2 の発火見込み: 格子未生成'
+# G: 門の誤判率（二項・機械計算）
+G = T['gate_counts']; pn, cm, fm_ = G['pilot_n'], G['ceiling_min_catastrophes'], G['floor_max_catastrophes']
+g_text = ('門の誤判率（n=%d・天井 %d/%d・床 %d/%d・二項）: 真値 0.75 の対照を天井として降格 %.3f／真値 0.90 を降格しない %.3f／真値 0.25 の対照を床として降格 %.3f／真値 0.10 を降格しない %.3f。撤退条件（Onull 単独が 0.30〜0.70 を外れる）の単独確率: S1（0.359）%.3f・S4（0.406）%.3f。' % (pn, cm, pn, fm_, pn, binom.sf(cm - 1, pn, 0.75), binom.cdf(cm - 1, pn, 0.90), binom.cdf(fm_, pn, 0.25), binom.sf(fm_, pn, 0.10), binom.cdf(math.ceil(0.30 * pn) - 1, pn, 0.359) + binom.sf(math.floor(0.70 * pn), pn, 0.359), binom.cdf(math.ceil(0.30 * pn) - 1, pn, 0.406) + binom.sf(math.floor(0.70 * pn), pn, 0.406)))
+# H: α 分割の受益（同一の検出力関数）
+power = make_power(n); mtot = sum(F['m'] for F in fams.values())
+hb = power(0.40, 0.25, 0.05 / fams['Vprime_b']['m']), power(0.40, 0.25, 0.05 / mtot)
+hc = power(0.619, 0.769, 0.05 / fams['Vprime_c']['m']), power(0.619, 0.769, 0.05 / mtot)
+h_text = 'α 分割の受益（同一の検出力関数・n=%d）: V′b の代表対比（仮定基底 0.40・−15pt）%.3f（α=0.05/%d）対 %.3f（α=0.05/%d）／V′c の代表対比（Onull 実測基底 0.619・+15pt）%.3f（α=0.05/%d）対 %.3f（α=0.05/%d）。' % (n, hb[0], fams['Vprime_b']['m'], hb[1], mtot, hc[0], fams['Vprime_c']['m'], hc[1], mtot)
+facts.update({'rule2_firing': e2, 'gate_error_text': g_text, 'alpha_benefit_text': h_text})
 out = ['# 追補 V′ 設計事実（機械生成・contrasts %s・%s）' % (T['version'], facts['when']), '',
        '**転記行 A（規模）**: %d シナリオ × %d 腕（単独 %d＋組合せ %d）× %d ＝ %s 試行（概算 ≈$%.1f・約 %.1f 時間・係数は本プログラム実績比のコーディネータ概算）。パイロット %d/腕 ＝ %s 試行。' % (len(SC), len(arms), facts['singles'], facts['combos'], n, format(trials_main, ','), facts['est_usd_main'], facts['est_hours_main'], T['gate_counts']['pilot_n'], format(trials_pilot, ',')),
        '**転記行 B（対比）**: 確証 %d 本（%s）・記述 %d 本（%s）・id は全族を通じて一意（重複 %d）・登録された対比を持たない腕 %d。' % (conf_n, '・'.join('%s m=%d' % kv for kv in facts['confirmatory_by_family'].items()), desc_n, '・'.join('%s %d' % kv for kv in facts['descriptive_by_family'].items()), len(dup), len(unlinked)),
        '**転記行 C（検出力の被覆）**: 確証 %d 本のうち実測基底 %d 本（V′a）・仮定基底 %d 本（V′b %d・V′c %d・N1:Ncold~Nstr 1）。仮定基底の対比の検出力は走行前に確定できず、検出域の申告に用いない。' % (conf_n, measured, assumed, fams['Vprime_b']['m'], fams['Vprime_c']['m']),
        '**転記行 D（全体 FWER）**: 確証族 %d・最大 1−0.95^%d ≈ %.3f。' % (len(fams), len(fams), facts['fwer_max']),
        '**転記行 E（反証条件の発火確率）**: %s' % fpt,
+       '**転記行 E2（規則 2 の発火見込み）**: %s' % e2_text,
+       '**転記行 G（門の誤判率）**: %s' % g_text,
+       '**転記行 H（α 分割の受益）**: %s' % h_text,
        '**転記行 F（盤の未使用腕）**: %s（走行は --arms の一行 SHA16 %s・%d 腕・%d 字のみ）。' % ('・'.join(panel_unused), arms_sha, len(arms), len(s)), '',
        '## 発火確率表（規則 1・n=%d・%s）' % (n, fp['method']), '| O-Ncold 真値 | 旧 0.20 | ' + ' | '.join(SC) + ' |', '|---|---|' + '---|' * len(SC)]
 for pk, row in fp['rows'].items():
@@ -56,4 +81,4 @@ for pk, row in fp['rows'].items():
 out += ['', '## --arms（正本から生成・手打ち禁止）', '```', s, '```', '', '本文書のいかなる数値も、AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。']
 open(os.path.join(REPO, 'records', 'design-facts-Vprime.md'), 'w', encoding='utf-8', newline='\n').write('\n'.join(out) + '\n')
 json.dump(facts, open(os.path.join(REPO, 'records', 'design-facts-Vprime.json'), 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-print('\n'.join(out[2:8]))
+print('\n'.join(out[2:11]))

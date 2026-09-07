@@ -1,8 +1,8 @@
-# 追補 V′ 検出力格子（機械生成・Fisher 両側・全数列挙・n=400・Holm 初段 α=0.05/m）—— 2026-09-07・contrasts draft6-2026-09-07
+# 追補 V′ 検出力格子（機械生成・Fisher 両側・全数列挙・n=400・Holm 初段 α=0.05/m）—— 2026-09-07・contrasts draft7-2026-09-07
 
 基底は JSON の base_B_main（実測＝本プログラム段I の値・0.000 は 0.000 のまま計算）。null は仮定値を明記。感度列＝基底 ≥0.05 は +15/+10/+5pt・基底 <0.05 は +9/+5/+2pt（下向きは −）。
 
-**要約（本文はこの行を転記する）**: 確証族・実測中間基底の +15pt: 0.866〜0.997／+10pt: 0.375〜0.678。床（実測 <0.05）の +9pt: 0.994〜1.000／+5pt: 0.669〜0.996。確証対比の内訳: 床 16・中間 8・未測定（仮定）33。 帯が覆う範囲: 実測基底の 24 本（Vprime_a 24）に対するもの。仮定基底の 33 本（Vprime_a 1・Vprime_b 8・Vprime_c 24）は走行前に検出力を確定できず、検出域の申告に用いない。
+**要約（本文はこの行を転記する）**: （帯は V′a の α＝0.05/25 で計算・V′b は 0.05/8・V′c は 0.05/32 で各行に印字）確証族・実測中間基底の +15pt: 0.866〜0.997／+10pt: 0.375〜0.678。床（実測 <0.05）の +9pt: 0.994〜1.000／+5pt: 0.669〜0.996。確証対比の内訳: 床 16・中間 8・未測定（仮定）41。 帯が覆う範囲: 実測基底の 24 本（Vprime_a 24）に対するもの。仮定基底の 41 本（Vprime_a 1・Vprime_b 8・Vprime_c 32）は走行前に検出力を確定できず、検出域の申告に用いない。
 
 | 族 | 対比 | 基底（出所） | 大 | 中 | 小 | α |
 |---|---|---|---|---|---|---|
@@ -39,30 +39,38 @@
 | Vprime_b | S4:O-Ncold~Onull-Ncold | 仮定 0.55 | 0.929 | 0.515 | 0.083 | 0.00625 |
 | Vprime_b | SK:O-Ncold~Osec-Ncold | 仮定 0.40 | 0.960 | 0.565 | 0.089 | 0.00625 |
 | Vprime_b | SK:O-Ncold~Onull-Ncold | 仮定 0.75 | 0.960 | 0.611 | 0.110 | 0.00625 |
-| Vprime_c | N1:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | N1:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | N1:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | N1:Onull-Ncold~Onull-Nneu1 | 仮定 0.62 | 0.931 | 0.445 | 0.047 | 0.00208 |
-| Vprime_c | N1:Onull-Ncold~Onull-Nneu2 | 仮定 0.62 | 0.931 | 0.445 | 0.047 | 0.00208 |
-| Vprime_c | N1:Onull-Ncold~Onull-Nneu3 | 仮定 0.62 | 0.931 | 0.445 | 0.047 | 0.00208 |
-| Vprime_c | S1:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | S1:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | S1:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | S1:Onull-Ncold~Onull-Nneu1 | 仮定 0.36 | 0.873 | 0.396 | 0.045 | 0.00208 |
-| Vprime_c | S1:Onull-Ncold~Onull-Nneu2 | 仮定 0.36 | 0.873 | 0.396 | 0.045 | 0.00208 |
-| Vprime_c | S1:Onull-Ncold~Onull-Nneu3 | 仮定 0.36 | 0.873 | 0.396 | 0.045 | 0.00208 |
-| Vprime_c | S4:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | S4:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | S4:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | S4:Onull-Ncold~Onull-Nneu1 | 仮定 0.41 | 0.866 | 0.375 | 0.042 | 0.00208 |
-| Vprime_c | S4:Onull-Ncold~Onull-Nneu2 | 仮定 0.41 | 0.866 | 0.375 | 0.042 | 0.00208 |
-| Vprime_c | S4:Onull-Ncold~Onull-Nneu3 | 仮定 0.41 | 0.866 | 0.375 | 0.042 | 0.00208 |
-| Vprime_c | SK:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | SK:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | SK:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.996 | 0.282 | 0.00208 |
-| Vprime_c | SK:Onull-Ncold~Onull-Nneu1 | 仮定 0.60 | 0.920 | 0.428 | 0.045 | 0.00208 |
-| Vprime_c | SK:Onull-Ncold~Onull-Nneu2 | 仮定 0.60 | 0.920 | 0.428 | 0.045 | 0.00208 |
-| Vprime_c | SK:Onull-Ncold~Onull-Nneu3 | 仮定 0.60 | 0.920 | 0.428 | 0.045 | 0.00208 |
+| Vprime_c | N1:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | N1:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | N1:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | N1:Onull-Ncold~Onull-Nneu1 | 仮定 0.62 | 0.919 | 0.411 | 0.039 | 0.00156 |
+| Vprime_c | N1:Onull-Ncold~Onull-Nneu2 | 仮定 0.62 | 0.919 | 0.411 | 0.039 | 0.00156 |
+| Vprime_c | N1:Onull-Ncold~Onull-Nneu3 | 仮定 0.62 | 0.919 | 0.411 | 0.039 | 0.00156 |
+| Vprime_c | S1:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S1:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S1:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S1:Onull-Ncold~Onull-Nneu1 | 仮定 0.36 | 0.854 | 0.361 | 0.037 | 0.00156 |
+| Vprime_c | S1:Onull-Ncold~Onull-Nneu2 | 仮定 0.36 | 0.854 | 0.361 | 0.037 | 0.00156 |
+| Vprime_c | S1:Onull-Ncold~Onull-Nneu3 | 仮定 0.36 | 0.854 | 0.361 | 0.037 | 0.00156 |
+| Vprime_c | S4:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S4:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S4:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S4:Onull-Ncold~Onull-Nneu1 | 仮定 0.41 | 0.850 | 0.348 | 0.035 | 0.00156 |
+| Vprime_c | S4:Onull-Ncold~Onull-Nneu2 | 仮定 0.41 | 0.850 | 0.348 | 0.035 | 0.00156 |
+| Vprime_c | S4:Onull-Ncold~Onull-Nneu3 | 仮定 0.41 | 0.850 | 0.348 | 0.035 | 0.00156 |
+| Vprime_c | SK:O-Ncold~O-Nneu1 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | SK:O-Ncold~O-Nneu2 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | SK:O-Ncold~O-Nneu3 | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | SK:Onull-Ncold~Onull-Nneu1 | 仮定 0.60 | 0.906 | 0.395 | 0.038 | 0.00156 |
+| Vprime_c | SK:Onull-Ncold~Onull-Nneu2 | 仮定 0.60 | 0.906 | 0.395 | 0.038 | 0.00156 |
+| Vprime_c | SK:Onull-Ncold~Onull-Nneu3 | 仮定 0.60 | 0.906 | 0.395 | 0.038 | 0.00156 |
+| Vprime_c | N1:O-Ncold~O-Nstr | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | N1:Onull-Ncold~Onull-Nstr | 仮定 0.62 | 0.919 | 0.411 | 0.039 | 0.00156 |
+| Vprime_c | S1:O-Ncold~O-Nstr | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S1:Onull-Ncold~Onull-Nstr | 仮定 0.36 | 0.854 | 0.361 | 0.037 | 0.00156 |
+| Vprime_c | S4:O-Ncold~O-Nstr | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | S4:Onull-Ncold~Onull-Nstr | 仮定 0.41 | 0.850 | 0.348 | 0.035 | 0.00156 |
+| Vprime_c | SK:O-Ncold~O-Nstr | 仮定 0.00 | 1.000 | 0.991 | 0.182 | 0.00156 |
+| Vprime_c | SK:Onull-Ncold~Onull-Nstr | 仮定 0.60 | 0.906 | 0.395 | 0.038 | 0.00156 |
 | Vprime_desc_neutral | N1:Osec-Ncold~Osec-Nneu1 | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_neutral | N1:Osec-Ncold~Osec-Nneu2 | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_neutral | N1:Osec-Ncold~Osec-Nneu3 | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
@@ -188,14 +196,6 @@
 | Vprime_desc_weakness | SK:Nneu3~N | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_weakness | SK:Ncold~N | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_weakness | SK:Nstr~N | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | N1:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | N1:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | S1:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | S1:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | S4:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | S4:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | SK:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
-| Vprime_desc_role | SK:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_role | N1:O-Nstr~O | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_role | N1:Onull-Nstr~Onull | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_role | S1:O-Nstr~O | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |

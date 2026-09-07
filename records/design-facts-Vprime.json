@@ -1,5 +1,5 @@
 {
- "contrasts_version": "draft6-2026-09-07",
+ "contrasts_version": "draft7-2026-09-07",
  "when": "2026-09-07",
  "scenarios": [
   "N1",
@@ -12,25 +12,25 @@
  "combos": 38,
  "n_per_arm": 400,
  "trials_main": 83200,
- "trials_pilot": 4160,
+ "trials_pilot": 8320,
  "est_hours_main": 23.11111111111111,
  "est_usd_main": 8.32,
- "confirmatory_contrasts": 57,
+ "confirmatory_contrasts": 65,
  "confirmatory_by_family": {
   "Vprime_a": 25,
   "Vprime_b": 8,
-  "Vprime_c": 24
+  "Vprime_c": 32
  },
  "confirmatory_measured_base": 24,
- "confirmatory_assumed_base": 33,
- "descriptive_contrasts": 141,
+ "confirmatory_assumed_base": 41,
+ "descriptive_contrasts": 133,
  "descriptive_by_family": {
   "Vprime_desc_neutral": 48,
   "Vprime_desc_dose": 48,
   "Vprime_desc_Nstr": 5,
   "Vprime_desc_cross": 4,
   "Vprime_desc_weakness": 20,
-  "Vprime_desc_role": 16
+  "Vprime_desc_role": 8
  },
  "duplicate_ids": [],
  "arms_without_contrast": [],
@@ -46,5 +46,13 @@
  "arms_not_in_ledger": [],
  "arms_string_sha16": "5FBA99534207933D",
  "arms_string_len": 465,
- "fwer_max": 0.1426250000000001
+ "fwer_max": 0.1426250000000001,
+ "rule2_firing": {
+  "N1": 0.06320333012098511,
+  "S1": 0.1049109693245438,
+  "S4": 0.10873998950983843,
+  "SK": 0.079004558739314
+ },
+ "gate_error_text": "門の誤判率（n=40・天井 34/40・床 6/40・二項）: 真値 0.75 の対照を天井として降格 0.096／真値 0.90 を降格しない 0.100／真値 0.25 の対照を床として降格 0.096／真値 0.10 を降格しない 0.100。撤退条件（Onull 単独が 0.30〜0.70 を外れる）の単独確率: S1（0.359）0.173・S4（0.406）0.061。",
+ "alpha_benefit_text": "α 分割の受益（同一の検出力関数・n=400）: V′b の代表対比（仮定基底 0.40・−15pt）0.960（α=0.05/8）対 0.868（α=0.05/65）／V′c の代表対比（Onull 実測基底 0.619・+15pt）0.918（α=0.05/32）対 0.884（α=0.05/65）。"
 }

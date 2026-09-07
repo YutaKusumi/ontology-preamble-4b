@@ -4,31 +4,14 @@ Fisher 両側・全数列挙（y 閾値は二分探索）・n は JSON・Holm �
 基底 0.000 は 0.000 のまま計算する（0.01 に丸めない——二巡目 D-12）。感度列: 基底 ≥0.05 は +15/+10/+5pt、基底 <0.05 は +9/+5/+2pt。下向き対比は −15/−10/−5。
 出力: records/power-grid-Vprime.md と同 .json（要約の帯は JSON から機械生成し、本文はそれを転記する）。
 """
-import os, json, datetime
-from scipy.stats import fisher_exact, binom
-import numpy as np
+import os, sys, json, datetime
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 T = json.load(open(os.path.join(REPO, 'design', 'contrasts-Vprime.json'), encoding='utf-8')); n = T['n_per_arm']
 
 
-def power(p0, p1, alpha):
-    px = binom.pmf(np.arange(n + 1), n, p0); py = binom.pmf(np.arange(n + 1), n, p1); cdf = np.cumsum(py); tot = 0.0
-    for x in range(n + 1):
-        if px[x] < 1e-14:
-            continue
-        lo, hi = x, n + 1
-        while lo < hi:
-            mid = (lo + hi) // 2
-            if fisher_exact([[x, n - x], [mid, n - mid]])[1] <= alpha: hi = mid
-            else: lo = mid + 1
-        yh = lo; lo, hi = -1, x - 1
-        while lo < hi:
-            mid = (lo + hi + 1) // 2
-            if fisher_exact([[x, n - x], [mid, n - mid]])[1] <= alpha: lo = mid
-            else: hi = mid - 1
-        yl = lo
-        tot += px[x] * ((1 - cdf[yh - 1] if yh <= n else 0.0) + (cdf[yl] if yl >= 0 else 0.0))
-    return tot
+from vprime_power import make_power
+power = make_power(n)
 
 
 cache = {}; grid = []
@@ -61,7 +44,7 @@ summary['coverage_line'] = cov_line
 stamp = datetime.date.today().isoformat()
 out = ['# 追補 V′ 検出力格子（機械生成・Fisher 両側・全数列挙・n=%d・Holm 初段 α=0.05/m）—— %s・contrasts %s' % (n, stamp, T['version']), '',
        '基底は JSON の base_B_main（実測＝本プログラム段I の値・0.000 は 0.000 のまま計算）。null は仮定値を明記。感度列＝基底 ≥0.05 は +15/+10/+5pt・基底 <0.05 は +9/+5/+2pt（下向きは −）。', '',
-       '**要約（本文はこの行を転記する）**: 確証族・実測中間基底の +15pt: %.3f〜%.3f／+10pt: %.3f〜%.3f。床（実測 <0.05）の +9pt: %.3f〜%.3f／+5pt: %.3f〜%.3f。確証対比の内訳: 床 %d・中間 %d・未測定（仮定）%d。' % (mid15[0], mid15[1], mid10[0], mid10[1], fl9[0], fl9[1], fl5[0], fl5[1], counts['floor'], counts['mid'], counts['assumed']) + ' ' + cov_line, '',
+       '**要約（本文はこの行を転記する）**: （帯は V′a の α＝0.05/25 で計算・V′b は 0.05/8・V′c は 0.05/32 で各行に印字）確証族・実測中間基底の +15pt: %.3f〜%.3f／+10pt: %.3f〜%.3f。床（実測 <0.05）の +9pt: %.3f〜%.3f／+5pt: %.3f〜%.3f。確証対比の内訳: 床 %d・中間 %d・未測定（仮定）%d。' % (mid15[0], mid15[1], mid10[0], mid10[1], fl9[0], fl9[1], fl5[0], fl5[1], counts['floor'], counts['mid'], counts['assumed']) + ' ' + cov_line, '',
        '| 族 | 対比 | 基底（出所） | 大 | 中 | 小 | α |', '|---|---|---|---|---|---|---|']
 for g in grid:
     out.append('| %s | %s | %s | %.3f | %.3f | %.3f | %.5f |' % (g['family'], g['id'], g['base_src'], g['power'][0], g['power'][1], g['power'][2], g['alpha']))
