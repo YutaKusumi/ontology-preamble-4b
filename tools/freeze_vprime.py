@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """freeze_vprime.py —— 追補 V′ の凍結マニフェストを発行する（登録者の凍結指示があってから実行する）。
-凍結範囲: 本文（凍結版）・正本 JSON・盤 54 ファイル＋台帳・器材 7 本・格子 md/json・設計事実 md/json・予想様式。
+凍結範囲: 本文（凍結版）・正本 JSON・盤 56 ファイル＋台帳・器材 8 本・格子 md/json・設計事実 md/json・予想様式。
 出力: records/freeze-Vprime-<date>.json（同名があれば連番・上書きなし）。--verify <manifest> で現物と突合（不一致は非零終了）。
 SHA16 はファイルバイトの SHA-256 先頭 16 桁（CRLF→LF 正規化・strip なし・台帳と同一規約）。
 """
@@ -9,7 +9,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ap = argparse.ArgumentParser(); ap.add_argument('--design', default='design/design-stageVprime-FROZEN.md'); ap.add_argument('--verify', default=None)
 args = ap.parse_args()
 FILES = [args.design, 'design/contrasts-Vprime.json', 'arms/panel/SHA-LEDGER.json', 'tools/run_preamble_api.py', 'tools/gate_vprime.py', 'tools/analyze_vprime.py',
-         'tools/build_combo_arms_vprime.py', 'tools/power_grid_vprime.py', 'tools/design_facts_vprime.py', 'tools/arms_string_vprime.py',
+         'tools/build_combo_arms_vprime.py', 'tools/power_grid_vprime.py', 'tools/design_facts_vprime.py', 'tools/arms_string_vprime.py', 'tools/vprime_power.py',
          'records/power-grid-Vprime.md', 'records/power-grid-Vprime.json', 'records/design-facts-Vprime.md', 'records/design-facts-Vprime.json', 'records/predictions/predictions-form-Vprime-v0.4.html']
 FILES += sorted(os.path.relpath(p, REPO).replace('\\', '/') for p in glob.glob(os.path.join(REPO, 'arms', 'panel', '*.md')))
 
@@ -25,9 +25,10 @@ if args.verify:
         try:
             s, n = sha16(rel)
         except FileNotFoundError:
-            bad.append((rel, v['sha16'], 'MISSING')); continue
-        if s != v['sha16']:
-            bad.append((rel, v['sha16'], s))
+            bad.append((rel, (v['sha16'] if isinstance(v, dict) else str(v)[:16].upper()), 'MISSING')); continue
+        want = v['sha16'] if isinstance(v, dict) else str(v)[:16].upper()
+        if s != want:
+            bad.append((rel, want, s))
     print('[freeze] %d/%d 一致' % (len(M['files']) - len(bad), len(M['files'])))
     for b in bad:
         print('[freeze] 不一致: %s 凍結 %s 現物 %s' % b)

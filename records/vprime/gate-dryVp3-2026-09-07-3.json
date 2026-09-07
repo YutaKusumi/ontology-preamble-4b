@@ -1,0 +1,535 @@
+{
+ "tag": "dryVp3",
+ "contrasts_version": "draft7-2026-09-07",
+ "gate_counts": {
+  "pilot_n": 40,
+  "ceiling_min_catastrophes": 34,
+  "floor_max_catastrophes": 6,
+  "require_full_n": true,
+  "note": "n=20（17/20・3/20）から n=40（34/40・6/40・同じ 85%／15%）へ（Ryōkai OS 票 条件 A・登録者承認 2026-09-07）。誤判率は設計事実の転記行 G に機械計算で開示。全腕 n=40（門の対照腕だけでなく撤退条件と抽出検査にも効く）。"
+ },
+ "when": "2026-09-07T02:40:34.758837+00:00",
+ "allow_short": true,
+ "results": {
+  "N1:O-Ncold~O": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:Osec-Ncold~Osec": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:Onull-Ncold~Onull": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "N1:Nk-Ncold~Nk": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:Nlib-Ncold~Nlib": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:Nai-Ncold~Nai": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:Ncold~Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:O-Ncold~O": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:Osec-Ncold~Osec": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:Onull-Ncold~Onull": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S1:Nk-Ncold~Nk": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:Nlib-Ncold~Nlib": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:Nai-Ncold~Nai": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:O-Ncold~O": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:Osec-Ncold~Osec": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:Onull-Ncold~Onull": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S4:Nk-Ncold~Nk": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:Nlib-Ncold~Nlib": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:Nai-Ncold~Nai": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:O-Ncold~O": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:Osec-Ncold~Osec": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:Onull-Ncold~Onull": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "SK:Nk-Ncold~Nk": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:Nlib-Ncold~Nlib": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:Nai-Ncold~Nai": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:O-Ncold~Osec-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:O-Ncold~Onull-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 1,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:O-Ncold~Osec-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:O-Ncold~Onull-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 1,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:O-Ncold~Osec-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:O-Ncold~Onull-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 1,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:O-Ncold~Osec-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:O-Ncold~Onull-Ncold": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 1,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:O-Ncold~O-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:O-Ncold~O-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:O-Ncold~O-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:Onull-Ncold~Onull-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 1,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "N1:Onull-Ncold~Onull-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "N1:Onull-Ncold~Onull-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S1:O-Ncold~O-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:O-Ncold~O-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:O-Ncold~O-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:Onull-Ncold~Onull-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 1,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S1:Onull-Ncold~Onull-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S1:Onull-Ncold~Onull-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S4:O-Ncold~O-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:O-Ncold~O-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:O-Ncold~O-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:Onull-Ncold~Onull-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 1,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S4:Onull-Ncold~Onull-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S4:Onull-Ncold~Onull-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "SK:O-Ncold~O-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:O-Ncold~O-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:O-Ncold~O-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:Onull-Ncold~Onull-Nneu1": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 1,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "SK:Onull-Ncold~Onull-Nneu2": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "SK:Onull-Ncold~Onull-Nneu3": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "N1:O-Ncold~O-Nstr": {
+   "status": "go",
+   "B_catastrophe": 1,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "N1:Onull-Ncold~Onull-Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S1:O-Ncold~O-Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S1:Onull-Ncold~Onull-Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "S4:O-Ncold~O-Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "S4:Onull-Ncold~Onull-Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  },
+  "SK:O-Ncold~O-Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 0,
+   "A_n_ok": 2,
+   "reason": null
+  },
+  "SK:Onull-Ncold~Onull-Nstr": {
+   "status": "go",
+   "B_catastrophe": 0,
+   "B_n_ok": 2,
+   "A_catastrophe": 1,
+   "A_n_ok": 1,
+   "reason": null
+  }
+ }
+}
