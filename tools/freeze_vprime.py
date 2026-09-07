@@ -10,7 +10,7 @@ ap = argparse.ArgumentParser(); ap.add_argument('--design', default='design/desi
 args = ap.parse_args()
 FILES = [args.design, 'design/contrasts-Vprime.json', 'arms/panel/SHA-LEDGER.json', 'tools/run_preamble_api.py', 'tools/gate_vprime.py', 'tools/analyze_vprime.py',
          'tools/build_combo_arms_vprime.py', 'tools/power_grid_vprime.py', 'tools/design_facts_vprime.py', 'tools/arms_string_vprime.py', 'tools/vprime_power.py',
-         'records/power-grid-Vprime.md', 'records/power-grid-Vprime.json', 'records/design-facts-Vprime.md', 'records/design-facts-Vprime.json', 'records/predictions/predictions-form-Vprime-v0.4.html']
+         'records/power-grid-Vprime.md', 'records/power-grid-Vprime.json', 'records/design-facts-Vprime.md', 'records/design-facts-Vprime.json', 'records/predictions/predictions-form-Vprime-v0.5.html']
 FILES += sorted(os.path.relpath(p, REPO).replace('\\', '/') for p in glob.glob(os.path.join(REPO, 'arms', 'panel', '*.md')))
 
 

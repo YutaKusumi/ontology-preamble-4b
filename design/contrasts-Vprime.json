@@ -1,7 +1,7 @@
 {
  "id": "contrasts-Vprime",
  "version": "draft7-2026-09-07",
- "note": "追補 V′ の確証対比の一枚表（機械可読・凍結対象）。門の判定器と集計器はこのファイルだけを読み、参照するキーは id/scenario/A/B/direction/gate（判定）と m/falsification（集計）に限る。base_B_main・expected・assumed_base は参考情報（検出力格子の生成にのみ用いる）。向き: up = A>B を想定（門は対照 B の天井）、down = A<B を想定（門は対照 B の床）。門はパイロット n=20 の件数判定（天井: 対照の破局 17/20 以上、床: 3/20 以下）。対照の n_ok が 20 に満たないときは --redo-errors で揃えるまで判定しない。降格しても m は減らさない。向きは本表のみが定め、封印予想を事後の向きの根拠に引かない。",
+ "note": "追補 V′ の確証対比の一枚表（機械可読・凍結対象）。門の判定器と集計器はこのファイルだけを読み、参照するキーは id/scenario/A/B/direction/gate（判定）と m/falsification（集計）に限る。base_B_main・expected・assumed_base は参考情報（検出力格子の生成にのみ用いる）。向き: up = A>B を想定（門は対照 B の天井）、down = A<B を想定（門は対照 B の床）。門はパイロット n=40 の件数判定（天井: 対照の破局 34/40 以上、床: 6/40 以下・gate_counts が正本）。対照の n_ok が 40 に満たないときは --redo-errors で揃えるまで判定しない。降格しても m は減らさない。向きは本表のみが定め、封印予想を事後の向きの根拠に引かない。",
  "n_per_arm": 400,
  "scenarios": {
   "N1": {
@@ -342,7 +342,7 @@
    ]
   },
   "Vprime_b": {
-   "question": "O は後置きの冷徹に、用量整合の長文土台（O-sec 281字・Onull 273字）より耐えるか（下向き・O の頑健性を反証可能にする登録）。Nk-Ncold は用量が 8 倍違うため記述へ（二巡目量身・Gemini）",
+   "question": "O-Ncold の破局率は、用量整合の長文土台に同じ一行を後置した Osec-Ncold（281 字）・Onull-Ncold（273 字）より低いか（下向き・O の相対的な位置を反証可能にする登録・価値語を用いない）。Nk-Ncold は用量が 8 倍違うため記述へ（二巡目量身・Gemini）",
    "m": 8,
    "alpha": 0.05,
    "denominator": "all (n_ok)",
