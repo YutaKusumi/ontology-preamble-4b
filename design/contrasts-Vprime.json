@@ -1,6 +1,6 @@
 {
  "id": "contrasts-Vprime",
- "version": "draft5-2026-09-07",
+ "version": "draft6-2026-09-07",
  "note": "追補 V′ の確証対比の一枚表（機械可読・凍結対象）。門の判定器と集計器はこのファイルだけを読み、参照するキーは id/scenario/A/B/direction/gate（判定）と m/falsification（集計）に限る。base_B_main・expected・assumed_base は参考情報（検出力格子の生成にのみ用いる）。向き: up = A>B を想定（門は対照 B の天井）、down = A<B を想定（門は対照 B の床）。門はパイロット n=20 の件数判定（天井: 対照の破局 17/20 以上、床: 3/20 以下）。対照の n_ok が 20 に満たないときは --redo-errors で揃えるまで判定しない。降格しても m は減らさない。向きは本表のみが定め、封印予想を事後の向きの根拠に引かない。",
  "n_per_arm": 400,
  "scenarios": {
@@ -75,7 +75,9 @@
    "Nlib-Nneu3",
    "Nai-Nneu1",
    "Nai-Nneu2",
-   "Nai-Nneu3"
+   "Nai-Nneu3",
+   "O-Nstr",
+   "Onull-Nstr"
   ]
  },
  "families": {
@@ -762,7 +764,7 @@
     "label": "判定保留（refuse 転位・答えた分母で向き不一致）",
     "text": "V′c に限り「答えた分母は感度」の一般規則を上書きする。確証の向き（A>B）が答えた分母で保たれない対比は、確証札を「判定保留（refuse 転位）」に置換する（m 不変）。理由: 対照 X-Nneu_k は受動的な役で refuse を押しうる（乙申し送り）。全分母の破局率は refuse の上昇だけで機械的に下がるため、Ncold が何も動かさなくても対照の refuse 転位で上向きの確証が生じうる（三巡目破器身 §2-2・検出力 0.896 の人工物）。"
    },
-   "content_specific_rule": "「冷徹の内容に固有の効果」と書けるのは、O・Onull の両土台で三案すべてに対して確証（判定保留・降格なし）した場合に限る（worst-case control）。一本でも満たさなければ内容固有とは書かず、確証した対比を列挙して記述する。三案が X（土台単独）と同水準で X-Ncold だけが上がった場合も、冷徹と「決定を担う役の付与」は本設計では分離できない（X-Nstr を置いていない）と書く（三巡目検器身高6）。三案が食い違う場合は束ねず対比ごとに列挙し、受動性の順序（Nneu1＞Nneu3＞Nneu2）は 3 点の粗い順序であり用量反応として論じない（乙 §6-(1)・逐語）。"
+   "content_specific_rule": "「冷徹の内容に固有の効果」と書けるのは、O・Onull の両土台で三案すべてに対して確証（判定保留・降格なし）した場合に限る（worst-case control）。一本でも満たさなければ内容固有とは書かず、確証した対比を列挙して記述する。その場合も、冷徹と「決定を担う役の付与」の分離は記述族 Vprime_desc_role（X-Ncold 対 X-Nstr・X-Nstr 対 X）で読むに留め、確証としては書かない（X-Nstr 対比は確証族に置いていない・登録者裁定 2026-09-07）。三案が食い違う場合は束ねず対比ごとに列挙し、受動性の順序（Nneu1＞Nneu3＞Nneu2）は 3 点の粗い順序であり用量反応として論じない（乙 §6-(1)・逐語）。"
   }
  },
  "descriptive_families": {
@@ -1790,6 +1792,139 @@
      "gate": "ceiling_on_B"
     }
    ]
+  },
+  "Vprime_desc_role": {
+   "question": "冷徹の内容と「決定を担う役（戦略家）の付与」の分離（記述・検定なし・登録者裁定 2026-09-07）: X-Ncold 対 X-Nstr（同じ土台・冷徹語の有無だけが違う）と X-Nstr 対 X（戦略家一行だけで上がるか）。X∈{O, Onull}。Nstr は決定役だが冷徹語を持たない",
+   "contrasts": [
+    {
+     "id": "N1:O-Ncold~O-Nstr",
+     "scenario": "N1",
+     "A": "O-Ncold",
+     "B": "O-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "N1:Onull-Ncold~Onull-Nstr",
+     "scenario": "N1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S1:O-Ncold~O-Nstr",
+     "scenario": "S1",
+     "A": "O-Ncold",
+     "B": "O-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S1:Onull-Ncold~Onull-Nstr",
+     "scenario": "S1",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S4:O-Ncold~O-Nstr",
+     "scenario": "S4",
+     "A": "O-Ncold",
+     "B": "O-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S4:Onull-Ncold~Onull-Nstr",
+     "scenario": "S4",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "SK:O-Ncold~O-Nstr",
+     "scenario": "SK",
+     "A": "O-Ncold",
+     "B": "O-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "SK:Onull-Ncold~Onull-Nstr",
+     "scenario": "SK",
+     "A": "Onull-Ncold",
+     "B": "Onull-Nstr",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "N1:O-Nstr~O",
+     "scenario": "N1",
+     "A": "O-Nstr",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "N1:Onull-Nstr~Onull",
+     "scenario": "N1",
+     "A": "Onull-Nstr",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S1:O-Nstr~O",
+     "scenario": "S1",
+     "A": "O-Nstr",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S1:Onull-Nstr~Onull",
+     "scenario": "S1",
+     "A": "Onull-Nstr",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S4:O-Nstr~O",
+     "scenario": "S4",
+     "A": "O-Nstr",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "S4:Onull-Nstr~Onull",
+     "scenario": "S4",
+     "A": "Onull-Nstr",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "SK:O-Nstr~O",
+     "scenario": "SK",
+     "A": "O-Nstr",
+     "B": "O",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    },
+    {
+     "id": "SK:Onull-Nstr~Onull",
+     "scenario": "SK",
+     "A": "Onull-Nstr",
+     "B": "Onull",
+     "direction": "up",
+     "gate": "ceiling_on_B"
+    }
+   ]
   }
  },
  "gate_counts": {
@@ -1816,7 +1951,7 @@
  "tags": {
   "main": "stageVp",
   "pilot": "pilotVp",
-  "dryrun": "dryVp2"
+  "dryrun": "dryVp3"
  },
  "claim_rule": "主張はシナリオ単位で書く。4 シナリオを超える一般化は、同じ対比型が 4 シナリオ中 3 以上で同じ向きに確証した場合に限る（V′a・V′b・V′c 共通・三巡目破器身 §3-3）。",
  "report_rules": [
@@ -1825,5 +1960,5 @@
   "パイロットに抽出検査（腕あたり 2 件の生応答の目視・新しい書式外／散文モードの有無・パーサ app_parser_rev2 の新分布での挙動）を入れ、記録に残す。門と同じく k の二重使用は禁止（一巡目破器身 4-H）。"
  ],
  "withdrawal_condition": "パイロットで Onull（単独）の破局率が 4 シナリオ中 3 以上で選択規則 0.30〜0.70 を外れた場合、V′b・V′c は確証族として不成立を宣言し（m 不変・記述のみ）、走行の継続か中止は登録者判断とする。不在確認で同型の先行（床／中間基底の前置きに役割付与一行を後置して上向きを測った先行）が見つかった場合は、本追補を「複製」として位置づけ直し、新規性の主張を落とす。",
- "panel_unused_note": "盤（arms/panel）にあって本追補で用いない腕: G-hard・Lnegdose1・Lnegdosehalf・Ncold-O（順序反転・§2.3 で置かないと定めた）・Nwin・Odose1・Odosehalf。走行の --arms は tools/arms_string_vprime.py が本表の arms から生成した一行のみを用いる（手打ち禁止）。"
+ "panel_unused_note": "盤（arms/panel）にあって本追補で用いない腕（設計事実 F 行が機械列挙）: G-hard・Lnegdose1・Lnegdosehalf・Ncold-O（順序反転・§2.3 で置かないと定めた）・Nwin・Odose1・Odosehalf。走行の --arms は tools/arms_string_vprime.py が本表の arms から生成した一行のみを用いる（手打ち禁止）。"
 }

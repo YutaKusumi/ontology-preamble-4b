@@ -1,4 +1,4 @@
-# 追補 V′ 検出力格子（機械生成・Fisher 両側・全数列挙・n=400・Holm 初段 α=0.05/m）—— 2026-09-07・contrasts draft5-2026-09-07
+# 追補 V′ 検出力格子（機械生成・Fisher 両側・全数列挙・n=400・Holm 初段 α=0.05/m）—— 2026-09-07・contrasts draft6-2026-09-07
 
 基底は JSON の base_B_main（実測＝本プログラム段I の値・0.000 は 0.000 のまま計算）。null は仮定値を明記。感度列＝基底 ≥0.05 は +15/+10/+5pt・基底 <0.05 は +9/+5/+2pt（下向きは −）。
 
@@ -188,5 +188,21 @@
 | Vprime_desc_weakness | SK:Nneu3~N | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_weakness | SK:Ncold~N | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 | Vprime_desc_weakness | SK:Nstr~N | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | N1:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | N1:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S1:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S1:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S4:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S4:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | SK:O-Ncold~O-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | SK:Onull-Ncold~Onull-Nstr | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | N1:O-Nstr~O | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | N1:Onull-Nstr~Onull | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S1:O-Nstr~O | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S1:Onull-Nstr~Onull | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S4:O-Nstr~O | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | S4:Onull-Nstr~Onull | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | SK:O-Nstr~O | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
+| Vprime_desc_role | SK:Onull-Nstr~Onull | 仮定 0.40 | 0.988 | 0.794 | 0.272 | 0.05000 |
 
 本文書のいかなる数値も、AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
