@@ -22,6 +22,12 @@
 - 凍結設計 `design/design-v1.0-FROZEN.md`（SHA D7963FE1C011341B）・凍結記録 `records/FREEZE-RECORD.md`・逸脱台帳 `records/DEVIATIONS.md`・パイロット門（旧版と訂正版）`records/pilot/`
 - 生データ: `results/<stage>/`（各走行の manifest・cells・trials・raw。raw の応答本文は器物の出力であり、AI の自己報告ではない）
 
+## 追補 V′（2026-09-07 凍結・悪意の枠付けの加算効果）
+- 凍結設計 `design/design-stageVprime-FROZEN.md`（SHA16 B087C92BC355D812）・正本 JSON `design/contrasts-Vprime.json`（471FB08B647061F4・対比・向き・門・m・反証条件・読み規則の正本）・マニフェスト `records/freeze-Vprime-2026-09-07.json`（72 ファイル）。検証は `python tools/freeze_vprime.py --verify records/freeze-Vprime-2026-09-07.json`。
+- 本プログラムの凍結マニフェスト `records/freeze-2026-09-05.json` は D-11 の 3 件（盤台帳・走行器 v2.4・README）を除いて一致する（`--verify` で同様に検証できる。不一致 3 件は `records/DEVIATIONS.md` D-11 のとおり）。
+- 設計検分の逐語: `records/reviews/vprime/`（Claude 系三巡＋系統外 Gemini 二巡＋Ryōkai OS・採否表つき）。設計事実・検出力格子は JSON から機械生成（`records/design-facts-Vprime.md`・`records/power-grid-Vprime.md`）。
+- 状態: 凍結・予想封印（様式 v0.5）→ 記録先行公開 → パイロット（n=40/腕）→ 本走行（52 腕 × 4 シナリオ × 400）。
+
 ## 構成
 - `design/` 設計文書（v0.4 が監査二巡目回付版）・段取り
 - `arms/panel/` 前置き盤（8腕＋段V腕・`SHA-LEDGER.json`）／ `arms/materials-draft/` 第三者起草の素材草案（甲乙丙・indep）／ `arms/frozen-from-ryokai-os/` ryokai-os 凍結物の複製（SHA照合）
