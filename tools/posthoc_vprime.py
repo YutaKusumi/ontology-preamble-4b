@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-"""posthoc_vprime.py v2 —— 追補 V′ 走行後の機械生成（凍結器材は変更しない・新設）:
+"""posthoc_vprime.py v3 —— 追補 V′ 走行後の機械生成（凍結器材は変更しない・新設）:
 (1) 実測基底での検出力再計算（凍結 §2.5・報告規則: 仮定基底の対比は走行後に実測基底で再計算して併記）——各確証対比の対照 B の実測率を基底に、
     +15/+10/+5pt（床 <0.05 は +9/+5/+2・下向きは −）の検出力を同一の検出力関数（tools/vprime_power.py）で計算し、当該対比の族 α で印字する。
 (2) 封印予想との照合表（登録者 v0.5 とコーディネータ）——帯の的中／外れを機械判定。的中・外れは誰の判断の重みも変えない（予想的中の非転用）。
 用法: python tools/posthoc_vprime.py --tag stageVp
 """
 import os, sys, json, glob, argparse, datetime
+from decimal import Decimal, ROUND_HALF_UP
+def dpt(kA, kB, n): return str((Decimal((kA - kB) * 100) / Decimal(n)).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP))
+def d3(kA, kB, n): return str((Decimal(kA - kB) / Decimal(n)).quantize(Decimal('0.001'), rounding=ROUND_HALF_UP))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vprime_power import make_power
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -19,7 +22,7 @@ stamp = datetime.date.today().isoformat()
 # (1) 実測基底の検出力
 out = ['# 追補 V′ 走行後の機械生成 —— tag %s・contrasts %s・%s' % (args.tag, T['version'], stamp), '',
        '## 1. 実測基底での検出力（凍結格子の仮定基底行を実測で置き換えた併記・同一の検出力関数・n=%d・族 α）' % n,
-       '**凡例（一巡目検分の条件）**: 列「大・中・小」の感度は、実測基底 B が 0.05 以上の行では +15／+10／+5 pt、0.05 未満（床）の行では +9／+5／+2 pt。下向き対比（V′b）は −15／−10／−5 pt（B から引く）。α は当該対比の族の Holm 初段（V′a 0.05/25・V′b 0.05/8・V′c 0.05/32）。凍結格子の帯は V′a の α（0.05/25）で計算したもの。記述族（§1b）は検定を置かないため α=0.05 の参考値。丸め規約: 本文書と報告の pt 差は小数一桁（四捨五入・銀行家丸めを用いない）。',
+       '**凡例（一巡目検分の条件）**: 列「大・中・小」の感度は、実測基底 B が 0.05 以上の行では +15／+10／+5 pt、0.05 未満（床）の行では +9／+5／+2 pt。下向き対比（V′b）は −15／−10／−5 pt（B から引く）。α は当該対比の族の Holm 初段（V′a 0.05/25・V′b 0.05/8・V′c 0.05/32）。凍結格子の帯は V′a の α（0.05/25）で計算したもの。記述族（§1b）は検定を置かないため α=0.05 の参考値。丸め規約（三巡目で統一）: 本文書の実測差は整数件数から Decimal で計算し、pt は小数一桁・率差は小数三桁に四捨五入（.x5 はゼロから遠ざける・浮動小数の減算を経ない）。v2 までは浮動小数から丸めていたため .x5 型が絶対値の小さい側に落ちる行があった（三巡目宝生・28 行）。',
        '| 族 | 対比 | 凍結格子の基底（出所） | 実測基底 B | 大 | 中 | 小 | 実測差 | α |', '|---|---|---|---|---|---|---|---|---|']
 G = json.load(open(os.path.join(REPO, 'records', 'power-grid-Vprime.json'), encoding='utf-8'))['grid']; gi = {g['id']: g for g in G}
 cache = {}
@@ -37,7 +40,7 @@ for fam, F in T['families'].items():
             if key not in cache: cache[key] = power(*key)
             vals.append(cache[key])
         g = gi.get(c['id'], {})
-        out.append('| %s | %s | %s | %.3f | %.3f | %.3f | %.3f | %+.3f | %.5f |' % (fam, c['id'], g.get('base_src', '—'), b, vals[0], vals[1], vals[2], ra - b, a))
+        dd3 = d3(A['catastrophe'], B['catastrophe'], A['n_ok']); out.append('| %s | %s | %s | %.3f | %.3f | %.3f | %.3f | %s%s | %.5f |' % (fam, c['id'], g.get('base_src', '—'), b, vals[0], vals[1], vals[2], '+' if not dd3.startswith('-') else '', dd3, a))
 out.append('')
 # (1b) 記述族の感度（参考・α=0.05・検定なし）
 out += ['## 1b. 記述族の感度（参考・検定なし・α=0.05・同じ梯子）', '| 族 | 対比 | 実測基底 B | 大 | 中 | 小 | 実測差 |', '|---|---|---|---|---|---|---|']
@@ -54,7 +57,7 @@ for fam, F in T.get('descriptive_families', {}).items():
             key = (round(p0, 4), round(p1, 4), round(a, 6))
             if key not in cache: cache[key] = power(*key)
             vals.append(cache[key])
-        out.append('| %s | %s | %.3f | %.3f | %.3f | %.3f | %+.1f pt |' % (fam, c['id'], b, vals[0], vals[1], vals[2], 100 * (ra - b)))
+        dp = dpt(A['catastrophe'], B['catastrophe'], A['n_ok']); out.append('| %s | %s | %.3f | %.3f | %.3f | %.3f | %s%s pt |' % (fam, c['id'], b, vals[0], vals[1], vals[2], '+' if not dp.startswith('-') else '', dp))
 out.append('')
 # (2) 予想照合
 BANDS = [('5%以下', 0, 0.05), ('5%超20%以下', 0.05, 0.20), ('20%超50%以下', 0.20, 0.50), ('50%超80%以下', 0.50, 0.80), ('80%超', 0.80, 1.01)]
