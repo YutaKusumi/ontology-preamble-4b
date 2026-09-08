@@ -26,7 +26,11 @@
 - 凍結設計 `design/design-stageVprime-FROZEN.md`（SHA16 B087C92BC355D812）・正本 JSON `design/contrasts-Vprime.json`（471FB08B647061F4・対比・向き・門・m・反証条件・読み規則の正本）・マニフェスト `records/freeze-Vprime-2026-09-07.json`（72 ファイル）。検証は `python tools/freeze_vprime.py --verify records/freeze-Vprime-2026-09-07.json`。
 - 本プログラムの凍結マニフェスト `records/freeze-2026-09-05.json` は D-11 の 3 件（盤台帳・走行器 v2.4・README）を除いて一致する（`--verify` で同様に検証できる。不一致 3 件は `records/DEVIATIONS.md` D-11 のとおり）。
 - 設計検分の逐語: `records/reviews/vprime/`（Claude 系三巡＋系統外 Gemini 二巡＋Ryōkai OS・採否表つき）。設計事実・検出力格子は JSON から機械生成（`records/design-facts-Vprime.md`・`records/power-grid-Vprime.md`）。
-- 状態: 凍結・予想封印（様式 v0.5）→ 記録先行公開 → パイロット（n=40/腕）→ 本走行（52 腕 × 4 シナリオ × 400）。
+- **結果報告（最終版・2026-09-09 公開）**: [`records/vprime/results-report-Vprime-FINAL-2026-09-09.md`](records/vprime/results-report-Vprime-FINAL-2026-09-09.md)——先頭は「冷徹一行の後置きは 6 土台 × 4 シナリオの 24 セルすべてで破局的選択率を上げた」（V′a 25/25 確証）。O については価値語を用いず数だけ（V′b 7/8 確証・S4 で規則 2 発火）。V′c は内容固有の条件を S1・S4・SK で充足。中立一行は N に対して不活性ではなかった（記述）。
+- 機械集計 `records/vprime/results-Vprime-stageVp.md`（凍結器材 集計器 v4）／走行後の機械生成 `records/vprime/posthoc-Vprime-stageVp-3.md`／門 `records/vprime/gate-pilotVp-2026-09-07.*`／抽出検査／封印予想の照合（的中・外れは判断の重みを変えない）／生データ `results/stageVp/`（cells・trials・raw。raw の応答本文は器物の出力であり AI の自己報告ではない）。
+- 公開前検分（三巡・計 15 票: 新規 Opus 5 × 3／記憶あり Opus 5 × 4・Ryōkai OS・Grok 4.6〔系統外〕× 2 巡・逐語保全と採否表）: `records/reviews/vprime/results/`。検分の数は独立な確認の数ではない。三巡で指摘された誤りはすべて起草者の COI 欄が先に申告した引力の向きにあり、外部の目で捕まって数に戻された（採否表に記帳）。
+- 逸脱台帳 D-13〜D-16（走行後器材の新設・集計器の印字文言・散文数値誤り・凍結文言の欠陥と報告側処置）。
+- 走行: パイロット n=40/腕（8,320 試行）→ 本走行 52 腕 × 4 シナリオ × 400（83,200 試行・api_error 0・書式外 0）。
 
 ## 構成
 - `design/` 設計文書（v0.4 が監査二巡目回付版）・段取り
