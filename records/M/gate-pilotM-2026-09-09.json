@@ -1,0 +1,1153 @@
+{
+ "tag": "pilotM",
+ "contrasts_version": "draft8-2026-09-09",
+ "gate_counts": {
+  "pilot_n": 40,
+  "both_floor_max": 1,
+  "both_ceiling_min": 39,
+  "require_full_n": true,
+  "note": "両側対比: 両腕とも 1/40 以下または 39/40 以上で降格（一巡目器材 B・n=400 の検出域から逆算）。誤判率は設計事実 G′・J′。パイロットで一度だけ判定し両走行に適用。"
+ },
+ "when": "2026-09-09T11:42:21.186024+00:00",
+ "allow_short": false,
+ "results": {
+  "N1:KanF1TS-Ncold~KanF1PS-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:KanF1TK-Ncold~KanF1PK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 1,
+   "A_n_ok": 40,
+   "B_catastrophe": 4,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:KanF1TS-Ncold~KanF1MS-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 1,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:KanF1TK-Ncold~KanF1MK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 1,
+   "A_n_ok": 40,
+   "B_catastrophe": 29,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:KanF1TS-Ncold~Nk-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:KanF1PS-Ncold~Nk-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:AmiF1TS-Ncold~AmiF1PS-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:AmiF1TK-Ncold~AmiF1PK-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 1,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:AmiF1TS-Ncold~AmiF1MS-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:AmiF1TK-Ncold~AmiF1MK-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 1,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:AmiF1TS-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:AmiF1PS-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "S1:KanF1TS-Ncold~KanF1PS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 28,
+   "A_n_ok": 40,
+   "B_catastrophe": 16,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF1TK-Ncold~KanF1PK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 32,
+   "A_n_ok": 40,
+   "B_catastrophe": 23,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF1TS-Ncold~KanF1MS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 28,
+   "A_n_ok": 40,
+   "B_catastrophe": 1,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF1TK-Ncold~KanF1MK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 32,
+   "A_n_ok": 40,
+   "B_catastrophe": 21,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF1TS-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 28,
+   "A_n_ok": 40,
+   "B_catastrophe": 38,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF1PS-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 16,
+   "A_n_ok": 40,
+   "B_catastrophe": 38,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:AmiF1TS-Ncold~AmiF1PS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 22,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:AmiF1TK-Ncold~AmiF1PK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 32,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:AmiF1TS-Ncold~AmiF1MS-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:AmiF1TK-Ncold~AmiF1MK-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:AmiF1TS-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:AmiF1PS-Ncold~AmiF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 22,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:KanF1TS-Ncold~KanF1PS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 23,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:KanF1TK-Ncold~KanF1PK-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:KanF1TS-Ncold~KanF1MS-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:KanF1TK-Ncold~KanF1MK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:KanF1TS-Ncold~Nk-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:KanF1PS-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 23,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:AmiF1TS-Ncold~AmiF1PS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 28,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:AmiF1TK-Ncold~AmiF1PK-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF1TS-Ncold~AmiF1MS-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF1TK-Ncold~AmiF1MK-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF1TS-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF1PS-Ncold~AmiF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 28,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF1TS-Ncold~KanF1PS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 26,
+   "A_n_ok": 40,
+   "B_catastrophe": 26,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF1TK-Ncold~KanF1PK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 29,
+   "A_n_ok": 40,
+   "B_catastrophe": 25,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF1TS-Ncold~KanF1MS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 26,
+   "A_n_ok": 40,
+   "B_catastrophe": 6,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF1TK-Ncold~KanF1MK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 29,
+   "A_n_ok": 40,
+   "B_catastrophe": 2,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF1TS-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 26,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF1PS-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 26,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF1TS-Ncold~AmiF1PS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 35,
+   "A_n_ok": 40,
+   "B_catastrophe": 23,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF1TK-Ncold~AmiF1PK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 32,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF1TS-Ncold~AmiF1MS-Ncold": {
+   "status": "go",
+   "A_catastrophe": 35,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF1TK-Ncold~AmiF1MK-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 1,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF1TS-Ncold~AmiF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 35,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF1PS-Ncold~AmiF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 23,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:DaiF2T0-Ncold~DaiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "N1:DaiF3T0-Ncold~DaiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "N1:DaiF2T0-Ncold~DaiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 35,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:DaiF3T0-Ncold~DaiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 35,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:AmiF2T0-Ncold~AmiF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 24,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:AmiF3T0-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:AmiF2T0-Ncold~AmiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 24,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:AmiF3T0-Ncold~AmiF4T0-Ncold": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:KanF2T0-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 24,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:KanF3T0-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 6,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:KanF2T0-Ncold~KanF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 24,
+   "A_n_ok": 40,
+   "B_catastrophe": 5,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:KanF3T0-Ncold~KanF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 6,
+   "A_n_ok": 40,
+   "B_catastrophe": 5,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:MirF2T0-Ncold~MirF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 4,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:MirF3T0-Ncold~MirF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 4,
+   "A_n_ok": 40,
+   "B_catastrophe": 4,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:MirF2T0-Ncold~MirF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:MirF3T0-Ncold~MirF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 4,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:DaiF2T0-Ncold~DaiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:DaiF3T0-Ncold~DaiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:DaiF2T0-Ncold~DaiF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:DaiF3T0-Ncold~DaiF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:AmiF2T0-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:AmiF3T0-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:AmiF2T0-Ncold~AmiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 35,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:AmiF3T0-Ncold~AmiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 35,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF2T0-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 38,
+   "A_n_ok": 40,
+   "B_catastrophe": 38,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF3T0-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 38,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF2T0-Ncold~KanF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 38,
+   "A_n_ok": 40,
+   "B_catastrophe": 13,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:KanF3T0-Ncold~KanF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 13,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:MirF2T0-Ncold~MirF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:MirF3T0-Ncold~MirF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:MirF2T0-Ncold~MirF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 39,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:MirF3T0-Ncold~MirF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 39,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:DaiF2T0-Ncold~DaiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:DaiF3T0-Ncold~DaiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:DaiF2T0-Ncold~DaiF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:DaiF3T0-Ncold~DaiF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF2T0-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF3T0-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF2T0-Ncold~AmiF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:AmiF3T0-Ncold~AmiF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:KanF2T0-Ncold~Nk-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:KanF3T0-Ncold~Nk-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:KanF2T0-Ncold~KanF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:KanF3T0-Ncold~KanF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:MirF2T0-Ncold~MirF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:MirF3T0-Ncold~MirF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:MirF2T0-Ncold~MirF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S4:MirF3T0-Ncold~MirF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "SK:DaiF2T0-Ncold~DaiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "SK:DaiF3T0-Ncold~DaiF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 9,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:DaiF2T0-Ncold~DaiF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "SK:DaiF3T0-Ncold~DaiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 9,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF2T0-Ncold~AmiF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "SK:AmiF3T0-Ncold~AmiF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 3,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF2T0-Ncold~AmiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 36,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:AmiF3T0-Ncold~AmiF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 3,
+   "A_n_ok": 40,
+   "B_catastrophe": 36,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF2T0-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 31,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF3T0-Ncold~Nk-Ncold": {
+   "status": "go",
+   "A_catastrophe": 3,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF2T0-Ncold~KanF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 31,
+   "A_n_ok": 40,
+   "B_catastrophe": 25,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:KanF3T0-Ncold~KanF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 3,
+   "A_n_ok": 40,
+   "B_catastrophe": 25,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:MirF2T0-Ncold~MirF1T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "SK:MirF3T0-Ncold~MirF1T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 17,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:MirF2T0-Ncold~MirF4T0-Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 39,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "SK:MirF3T0-Ncold~MirF4T0-Ncold": {
+   "status": "go",
+   "A_catastrophe": 17,
+   "A_n_ok": 40,
+   "B_catastrophe": 39,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:sysLAmi~sysLAmi-PS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:sysLAmi~sysLAmi-MS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:sysLAmi~sysLAmi-T0": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:sysLKan~sysLKan-PS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:sysLKan~sysLKan-MS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "N1:sysLKan~sysLKan-T0": {
+   "status": "go",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 3,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:sysLAmi~sysLAmi-PS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "S1:sysLAmi~sysLAmi-MS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "S1:sysLAmi~sysLAmi-T0": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 1,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "S1:sysLKan~sysLKan-PS": {
+   "status": "go",
+   "A_catastrophe": 17,
+   "A_n_ok": 40,
+   "B_catastrophe": 14,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:sysLKan~sysLKan-MS": {
+   "status": "go",
+   "A_catastrophe": 17,
+   "A_n_ok": 40,
+   "B_catastrophe": 27,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:sysLKan~sysLKan-T0": {
+   "status": "go",
+   "A_catastrophe": 17,
+   "A_n_ok": 40,
+   "B_catastrophe": 28,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:sysLAmi~sysLAmi-PS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "S4:sysLAmi~sysLAmi-MS": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "S4:sysLAmi~sysLAmi-T0": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "S4:sysLKan~sysLKan-PS": {
+   "status": "go",
+   "A_catastrophe": 15,
+   "A_n_ok": 40,
+   "B_catastrophe": 7,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:sysLKan~sysLKan-MS": {
+   "status": "go",
+   "A_catastrophe": 15,
+   "A_n_ok": 40,
+   "B_catastrophe": 2,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:sysLKan~sysLKan-T0": {
+   "status": "go",
+   "A_catastrophe": 15,
+   "A_n_ok": 40,
+   "B_catastrophe": 16,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:sysLAmi~sysLAmi-PS": {
+   "status": "go",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 2,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:sysLAmi~sysLAmi-MS": {
+   "status": "go",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 6,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:sysLAmi~sysLAmi-T0": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 40,
+   "B_catastrophe": 0,
+   "B_n_ok": 40,
+   "reason": "床（両腕とも ≤1）"
+  },
+  "SK:sysLKan~sysLKan-PS": {
+   "status": "go",
+   "A_catastrophe": 26,
+   "A_n_ok": 40,
+   "B_catastrophe": 27,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:sysLKan~sysLKan-MS": {
+   "status": "go",
+   "A_catastrophe": 26,
+   "A_n_ok": 40,
+   "B_catastrophe": 36,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:sysLKan~sysLKan-T0": {
+   "status": "go",
+   "A_catastrophe": 26,
+   "A_n_ok": 40,
+   "B_catastrophe": 37,
+   "B_n_ok": 40,
+   "reason": null
+  }
+ },
+ "continuity": {
+  "N1:pilot": {
+   "catastrophe": 0,
+   "n_ok": 40,
+   "fired": false,
+   "consequence": null
+  },
+  "N1:pilot_c": {
+   "A": 37,
+   "B": 40,
+   "diff": 3,
+   "fired": false
+  },
+  "S1:pilot": {
+   "catastrophe": 38,
+   "n_ok": 40,
+   "fired": false,
+   "consequence": null
+  },
+  "S1:pilot_c": {
+   "A": 40,
+   "B": 40,
+   "diff": 0,
+   "fired": false
+  },
+  "S4:pilot": {
+   "catastrophe": 40,
+   "n_ok": 40,
+   "fired": false,
+   "consequence": null
+  },
+  "S4:pilot_c": {
+   "A": 40,
+   "B": 40,
+   "diff": 0,
+   "fired": false
+  },
+  "SK:pilot": {
+   "catastrophe": 40,
+   "n_ok": 40,
+   "fired": false,
+   "consequence": null
+  },
+  "SK:pilot_c": {
+   "A": 40,
+   "B": 40,
+   "diff": 0,
+   "fired": false
+  }
+ }
+}
