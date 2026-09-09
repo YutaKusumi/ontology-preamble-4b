@@ -61,3 +61,4 @@
 | 弥勒菩薩 | oldid=108729684 「真言」節 | oṃ maitreya svāhā／オン・マイタレイヤ・ソワカ | 一致 |
 - 検証はページを機械取得して当該節の文字列を抜き出したもので、四本とも回答の転写・カナ・注と一致した。台帳 `arms/ledger-M.md` の典拠欄にはこの版 ID つきリンクを記す。
 - 本記録のいかなる記述も AI の意識・魂の証拠として引用してはならない（両方向不定）。
+- 固定リンク逐語（登録者提供の順）: 観音菩薩 https://ja.wikipedia.org/w/index.php?title=%E8%A6%B3%E9%9F%B3%E8%8F%A9%E8%96%A9&oldid=110769476#%E7%9C%9F%E8%A8%80 ／ 阿弥陀如来 https://ja.wikipedia.org/w/index.php?title=%E9%98%BF%E5%BC%A5%E9%99%80%E5%A6%82%E6%9D%A5&oldid=110938947#%E7%9C%9F%E8%A8%80%E3%83%BB%E9%99%80%E7%BE%85%E5%B0%BC ／ 弥勒菩薩 https://ja.wikipedia.org/w/index.php?title=%E5%BC%A5%E5%8B%92%E8%8F%A9%E8%96%A9&oldid=108729684#%E7%9C%9F%E8%A8%80 ／ 大日如来 https://ja.wikipedia.org/w/index.php?title=%E5%A4%A7%E6%97%A5%E5%A6%82%E6%9D%A5&oldid=110849442#%E7%9C%9F%E8%A8%80
