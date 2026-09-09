@@ -14,11 +14,11 @@ now = datetime.datetime.now(datetime.timezone.utc)
 
 def alive():
     try:
-        out = subprocess.run(['wmic', 'process', 'where', "name='python.exe'", 'get', 'commandline'], capture_output=True, text=True, timeout=20).stdout
+        out = subprocess.run(['wmic', 'process', 'where', "name='python.exe'", 'get', 'commandline'], capture_output=True, timeout=20).stdout.decode('utf-8', 'ignore')
         return sum(1 for l in out.splitlines() if 'run_preamble_api_m' in l)
     except Exception:
         try:
-            out = subprocess.run(['tasklist'], capture_output=True, text=True, timeout=20).stdout
+            out = subprocess.run(['tasklist'], capture_output=True, timeout=20).stdout.decode('cp932', 'ignore')
             return out.lower().count('python.exe')
         except Exception:
             return -1
