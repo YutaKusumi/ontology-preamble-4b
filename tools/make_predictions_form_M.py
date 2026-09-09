@@ -9,6 +9,8 @@ T = json.load(open(os.path.join(REPO, 'design', 'contrasts-M.json'), encoding='u
 V5 = open(os.path.join(REPO, 'records', 'predictions', 'predictions-form-Vprime-v0.5.html'), encoding='utf-8').read()
 JS = re.search(r'<script>.*?</script>', V5, re.S).group(0)
 JS = JS.replace("form:'predictions-form v0.5 (Vprime)',program:'ontology-preamble-4b/Vprime',contrasts:'draft7-2026-09-07'", "form:'predictions-form v0.6 (M)',program:'ontology-preamble-4b/M',contrasts:'%s'" % T['version']).replace('predictions-Vprime-registrant.json', 'predictions-M-registrant.json')
+JS = JS.replace('for(const k of keys)sorted[k]=o[k];', 'for(const k of keys)sorted[k]=o[k];sorted.preset_applied=presetApplied?PRESET.preset:null;sorted.preset_rule=presetApplied?PRESET.rule:null;sorted.preset_note=presetApplied?PRESET.note:null;sorted.preset_edits=presetApplied?keys.filter(k=>PRESET.values[k]!==undefined&&o[k]!==PRESET.values[k]):null;sorted.preset_sources=presetApplied?PRESET.sources:null;')
+assert 'preset_applied' in JS
 BANDS = ['予想しない', '5%以下', '5%超20%以下', '20%超50%以下', '50%超80%以下', '80%超']; DIR3 = ['予想しない', 'A が B より高い', 'A が B より低い', '差なし（区別できない）']
 CNT = ['予想しない', '0 件', '1〜3 件', '4〜19 件', '20 件以上']
 
@@ -48,7 +50,10 @@ for sc in T['scenarios']:
 H.append('<h2>全体</h2><p>第一走行の確証本数（136 本中）の帯 %s　そのうち第二走行で複製される割合の帯 %s　様式門による一斉保留（いずれかのシナリオ・族で過半）が起きる %s</p>' % (sel('m.all.confirmed_band', ['予想しない', '0 本', '1〜10 本', '11〜40 本', '41〜80 本', '81 本以上']), sel('m.all.replicated_share', ['予想しない', '0〜25%', '25%超50%以下', '50%超75%以下', '75%超']), sel('m.all.mass_style_hold', ['予想しない', '起きる', '起きない'])))
 H.append('<h2>自由記述</h2><textarea rows="4" data-k="free" style="width:100%"></textarea>')
 H.append('<p><b>予想者</b> <input data-k="who" value="登録者" size="16">　<b>日付</b> <input data-k="date" size="12" placeholder="YYYY-MM-DD"></p>')
+PRESET = json.load(open(os.path.join(REPO, 'records', 'predictions', 'preset-prelim-M.json'), encoding='utf-8'))
+H.append('<div class="box"><b>下見から自動入力</b>: 登録者の申告「予想は下見の結果をそのまま反映したもの」に対応する器。下見（prelim・登録外・n=40・2026-09-09）の破局率をそのまま帯に写し、向きは同じ下見の率差（|Δ|≥10 pt）から機械的に決める（`tools/make_predictions_preset_M.py`・出所は生成 JSON の preset_sources に全項目記録）。下見に無い腕（MS・MK・NJ2・F4・Kan 以外の無意味列・長文の置換版・sysO 等）は「予想しない」のまま。参照腕の Onull-Ncold・N・sysN は V′ 実測。自動入力の後に手で直した項目は preset_edits として JSON に残る。的中・外れは誰の判断の重みも変えない。<br><button class="btn" onclick="preset()">下見から自動入力する（%d 項目）</button> <span id="preset_state">（未適用）</span></div>' % len(PRESET['values']))
 H.append('<button class="btn" onclick="gen()">予想JSONを生成してハッシュを表示</button><button class="btn" onclick="dl()">JSONをダウンロード</button>')
+H.append('<script>const PRESET=%s;let presetApplied=false;function preset(){let n=0;for(const k in PRESET.values){const e=document.querySelector("[data-k=\'"+k+"\']");if(e){e.value=PRESET.values[k];n++;}}presetApplied=true;document.getElementById("preset_state").textContent="適用済み（"+n+" 項目・"+PRESET.preset+"）";}</script>' % json.dumps({'preset': PRESET['preset'], 'values': PRESET['values'], 'sources': PRESET['sources'], 'rule': PRESET['rule'], 'note': PRESET['note']}, ensure_ascii=False))
 H.append('<p>SHA-256: <span id="hash">（未生成）</span></p><pre id="out" style="white-space:pre-wrap;font-size:11px"></pre>')
 H.append('<p style="font-size:11px">本様式のいかなる記述も、AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。</p>')
 H.append(JS + '</body></html>')
