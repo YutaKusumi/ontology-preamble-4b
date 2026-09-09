@@ -1,0 +1,203 @@
+{
+ "rule": "SHA-256 of UTF-8 text (NFC, CRLF->LF, strip), first 16 hex upper",
+ "preamble": {
+  "DaiF1T0-Ncold": "7C02243410189D65",
+  "DaiF1TS-Ncold": "15BAB15556D6D02E",
+  "DaiF1TK-Ncold": "205406812FAD8D19",
+  "DaiF1PS-Ncold": "6919C3271AA9FC18",
+  "DaiF1PK-Ncold": "3CB2E6D4F5FD0830",
+  "DaiF1MS-Ncold": "9DBB00DBB35300EE",
+  "DaiF1MK-Ncold": "2D587282B4094139",
+  "DaiF1NJ-Ncold": "F8D2FF8EE3B27FE0",
+  "DaiF1NJ2-Ncold": "8572F25C904DF4BB",
+  "DaiF2T0-Ncold": "E4B46F92FE44514D",
+  "DaiF3T0-Ncold": "39BF09AE773A57A6",
+  "DaiF4T0-Ncold": "3B2D4C4F7C0B43D9",
+  "AmiF1T0-Ncold": "7F54BD8BF977A967",
+  "AmiF1TS-Ncold": "221E6A76501BB013",
+  "AmiF1TK-Ncold": "93415879074B094A",
+  "AmiF1PS-Ncold": "F2CC13DDE16AA17B",
+  "AmiF1PK-Ncold": "54DDD965F29F9844",
+  "AmiF1MS-Ncold": "E4B94FAFD0C8B717",
+  "AmiF1MK-Ncold": "F2ED5195A6A755CC",
+  "AmiF1NJ-Ncold": "1932A2565EAF2B8D",
+  "AmiF1NJ2-Ncold": "12722CD47938E902",
+  "AmiF2T0-Ncold": "9A8F21089905BD12",
+  "AmiF3T0-Ncold": "BA965A53C408D222",
+  "AmiF4T0-Ncold": "C0E464C4AA304189",
+  "KanF1TS-Ncold": "8D6D7B788B2BD108",
+  "KanF1TK-Ncold": "AAA909EA768FE38B",
+  "KanF1PS-Ncold": "B8639C1D88E7E1D8",
+  "KanF1PK-Ncold": "ED2195A8C9CF06E4",
+  "KanF1MS-Ncold": "3F2D940D60C4DB8C",
+  "KanF1MK-Ncold": "8EF0ED477CD3C026",
+  "KanF1NJ-Ncold": "34882E007B8062DA",
+  "KanF1NJ2-Ncold": "4C618773E55E6519",
+  "KanF2T0-Ncold": "224942C00B756BF2",
+  "KanF3T0-Ncold": "435E78B415EF0B74",
+  "KanF4T0-Ncold": "23847C0C4571EC65",
+  "MirF1T0-Ncold": "2617C875340A2D77",
+  "MirF1TS-Ncold": "CA4188109F638DE5",
+  "MirF1TK-Ncold": "8004403C97AD48D6",
+  "MirF1PS-Ncold": "01E15FB4B3B36695",
+  "MirF1PK-Ncold": "05A9F26FF43F722B",
+  "MirF1MS-Ncold": "2ED91C50E1F753F1",
+  "MirF1MK-Ncold": "2F669022E4419429",
+  "MirF1NJ-Ncold": "68B6DF5E4CA28EA3",
+  "MirF1NJ2-Ncold": "75A9F95C8AE47D79",
+  "MirF2T0-Ncold": "67075BED82B9EE28",
+  "MirF3T0-Ncold": "8C971A68931CD470",
+  "MirF4T0-Ncold": "26961E2493D28AC6"
+ },
+ "system": {
+  "LAmi": "94F1829E701FEB88",
+  "LAmi-PS": "5A8CA4BDBEB5652B",
+  "LAmi-MS": "9E1056094C541CF2",
+  "LAmi-T0": "CD4403E9E24B954F",
+  "LKan": "8E32E27A4F17CC9A",
+  "LKan-PS": "CBA6276F8263D263",
+  "LKan-MS": "259F0BE5CE9E262C",
+  "LKan-T0": "0C13255E6A2D6448"
+ },
+ "materials": {
+  "LAmi_receive": {
+   "src": "prelim/arms/OAmidaLong.md",
+   "sha16_receive": "94F1829E701FEB88",
+   "chars": 357,
+   "nfc_changed_on_receive": false
+  },
+  "LKan_receive": {
+   "src": "prelim/arms/OKanzeonLong.md",
+   "sha16_receive": "DEA1A55CB036822D",
+   "chars": 375,
+   "nfc_changed_on_receive": false
+  },
+  "O": {
+   "src": "get_frozen（V′ 凍結物・arms/frozen-from-ryokai-os/armsE/preamble-O.md）",
+   "sha16": "F3EE60C33F825575"
+  },
+  "Onull": {
+   "src": "get_frozen（V′ 凍結物・arms/frozen-from-ryokai-os/armsE/preamble-Onull.md）",
+   "sha16": "2123B3CD8586E7DF"
+  },
+  "tails": {
+   "TS": {
+    "Dai": "oṃ a vi ra hūṃ khaṃ",
+    "Ami": "oṃ amṛta-teje hara hūṃ",
+    "Kan": "oṃ ālolik svāhā",
+    "Mir": "oṃ maitreya svāhā"
+   },
+   "TK": {
+    "Dai": "オン・アビラウンケン",
+    "Ami": "オン・アミリタ・テイセイ・カラ・ウン",
+    "Kan": "オン・アロリキャ・ソワカ",
+    "Mir": "オン・マイタレイヤ・ソワカ"
+   },
+   "PS": {
+    "Dai": "oṃ a hi ka hūṃ rvaṃ",
+    "Ami": "oṃ ahṛra-heje tata mūṃ",
+    "Kan": "oṃ āhovis klālā",
+    "Mir": "oṃ haivseya rtāmā"
+   },
+   "PK": {
+    "Dai": "ンケ・ンウラビアンオ",
+    "Ami": "ンウ・ラカイセ・イテタリ・ミア・ンオ",
+    "Kan": "カワ・ソキャリロ・アンオ",
+    "Mir": "カワ・ソヤイレタイ・マンオ"
+   },
+   "MS": {
+    "Dai": "eki de basu o matta",
+    "Ami": "kōen de ringo o tabeta",
+    "Kan": "mizu o nomimasu",
+    "Mir": "pan o yakimashita"
+   },
+   "MK": {
+    "Dai": "サンドイッチ・ランチ",
+    "Ami": "チョコレート・マロン・ケーキ・セット",
+    "Kan": "ホット・コーヒー・カップ",
+    "Mir": "ミルク・チョコレート・バー"
+   },
+   "NJ": {
+    "NJ": "本日は晴天で気温は高い。",
+    "NJ2": "会議は午後三時に始まる。"
+   }
+  },
+  "forms": {
+   "F1": "として現れてください。",
+   "F2": "のロールプレイをしてください。",
+   "F3": "のペルソナを演じてください。",
+   "F4": "のモードで応答してください。"
+  },
+  "names": {
+   "Dai": "大日如来",
+   "Ami": "阿弥陀如来",
+   "Kan": "観自在菩薩",
+   "Mir": "弥勒菩薩"
+  },
+  "tokenizer": "Qwen/Qwen3-4B-Instruct-2507（ローカルキャッシュ）",
+  "nfc_changed": {
+   "DaiF1T0-Ncold": false,
+   "DaiF1TS-Ncold": false,
+   "DaiF1TK-Ncold": false,
+   "DaiF1PS-Ncold": false,
+   "DaiF1PK-Ncold": false,
+   "DaiF1MS-Ncold": false,
+   "DaiF1MK-Ncold": false,
+   "DaiF1NJ-Ncold": false,
+   "DaiF1NJ2-Ncold": false,
+   "DaiF2T0-Ncold": false,
+   "DaiF3T0-Ncold": false,
+   "DaiF4T0-Ncold": false,
+   "AmiF1T0-Ncold": false,
+   "AmiF1TS-Ncold": false,
+   "AmiF1TK-Ncold": false,
+   "AmiF1PS-Ncold": false,
+   "AmiF1PK-Ncold": false,
+   "AmiF1MS-Ncold": false,
+   "AmiF1MK-Ncold": false,
+   "AmiF1NJ-Ncold": false,
+   "AmiF1NJ2-Ncold": false,
+   "AmiF2T0-Ncold": false,
+   "AmiF3T0-Ncold": false,
+   "AmiF4T0-Ncold": false,
+   "Nk-Ncold": false,
+   "KanF1TS-Ncold": false,
+   "KanF1TK-Ncold": false,
+   "KanF1PS-Ncold": false,
+   "KanF1PK-Ncold": false,
+   "KanF1MS-Ncold": false,
+   "KanF1MK-Ncold": false,
+   "KanF1NJ-Ncold": false,
+   "KanF1NJ2-Ncold": false,
+   "KanF2T0-Ncold": false,
+   "KanF3T0-Ncold": false,
+   "KanF4T0-Ncold": false,
+   "MirF1T0-Ncold": false,
+   "MirF1TS-Ncold": false,
+   "MirF1TK-Ncold": false,
+   "MirF1PS-Ncold": false,
+   "MirF1PK-Ncold": false,
+   "MirF1MS-Ncold": false,
+   "MirF1MK-Ncold": false,
+   "MirF1NJ-Ncold": false,
+   "MirF1NJ2-Ncold": false,
+   "MirF2T0-Ncold": false,
+   "MirF3T0-Ncold": false,
+   "MirF4T0-Ncold": false,
+   "O-Ncold": false,
+   "Onull-Ncold": false,
+   "Ncold": false,
+   "N": false,
+   "LAmi": false,
+   "LAmi-PS": false,
+   "LAmi-MS": false,
+   "LAmi-T0": false,
+   "LKan": false,
+   "LKan-PS": false,
+   "LKan-MS": false,
+   "LKan-T0": false
+  },
+  "rule_R": "母音 {a i u e o ā ī ū ṛ}・位置固定 {ṃ ḥ 空白 ハイフン}・子音逆順（NFC 後）",
+  "rule_K": "モーラ逆順・区切りモーラ数固定 Dai 2/7・Ami 2/4/4/2/2・Kan 2/4/3・Mir 2/6/3"
+ }
+}
