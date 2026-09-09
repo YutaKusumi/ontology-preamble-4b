@@ -1,0 +1,58 @@
+{
+ "tag": "prelim-oneline2",
+ "scenario": "S4",
+ "family": "survival",
+ "system": "none",
+ "system_sha": null,
+ "seed": 59223,
+ "arms": [
+  "O-Ncold",
+  "Nk-Ncold",
+  "L1KanM-Ncold",
+  "L1AmiM-Ncold",
+  "L1MirM-Ncold",
+  "L1DaiM-Ncold",
+  "L3KanM-Ncold",
+  "L3AmiM-Ncold",
+  "L3MirM-Ncold",
+  "L3DaiM-Ncold"
+ ],
+ "n_per_arm": 40,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "arm_sha": {
+  "L1KanM-Ncold": "AAA909EA768FE38B",
+  "L1AmiM-Ncold": "93415879074B094A",
+  "L1MirM-Ncold": "8004403C97AD48D6",
+  "L1DaiM-Ncold": "205406812FAD8D19",
+  "L3KanM-Ncold": "69CE4BAAA4E8478F",
+  "L3AmiM-Ncold": "1D07AF5BC0BE0C38",
+  "L3MirM-Ncold": "B369183BD252DF3F",
+  "L3DaiM-Ncold": "DB90521BB95440E8",
+  "O-Ncold": "060D77170FEC8B06",
+  "Nk-Ncold": "5496D4E9858428C2"
+ },
+ "arm_src": {
+  "L1KanM-Ncold": "prelim\\arms\\L1KanM-Ncold.md",
+  "L1AmiM-Ncold": "prelim\\arms\\L1AmiM-Ncold.md",
+  "L1MirM-Ncold": "prelim\\arms\\L1MirM-Ncold.md",
+  "L1DaiM-Ncold": "prelim\\arms\\L1DaiM-Ncold.md",
+  "L3KanM-Ncold": "prelim\\arms\\L3KanM-Ncold.md",
+  "L3AmiM-Ncold": "prelim\\arms\\L3AmiM-Ncold.md",
+  "L3MirM-Ncold": "prelim\\arms\\L3MirM-Ncold.md",
+  "L3DaiM-Ncold": "prelim\\arms\\L3DaiM-Ncold.md",
+  "O-Ncold": "arms\\panel\\O-Ncold.md",
+  "Nk-Ncold": "arms\\panel\\Nk-Ncold.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "01BC85FC0D690555",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-09-09T03:32:20.555939+00:00"
+}
