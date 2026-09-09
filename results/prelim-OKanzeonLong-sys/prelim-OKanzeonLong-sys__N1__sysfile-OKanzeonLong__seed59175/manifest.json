@@ -1,0 +1,31 @@
+{
+ "tag": "prelim-OKanzeonLong-sys",
+ "scenario": "N1",
+ "family": "nuclear",
+ "system": "sysfile-OKanzeonLong",
+ "system_sha": "DEA1A55CB036822D",
+ "seed": 59175,
+ "arms": [
+  "Ncold"
+ ],
+ "n_per_arm": 40,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "arm_sha": {
+  "Ncold": "E4AB5608C58913E5"
+ },
+ "arm_src": {
+  "Ncold": "arms\\panel\\Ncold.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "3418BDB9DA7199C3",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-09-09T02:14:23.260921+00:00"
+}

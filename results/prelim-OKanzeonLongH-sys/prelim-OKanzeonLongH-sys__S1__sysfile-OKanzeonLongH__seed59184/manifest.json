@@ -1,0 +1,31 @@
+{
+ "tag": "prelim-OKanzeonLongH-sys",
+ "scenario": "S1",
+ "family": "survival",
+ "system": "sysfile-OKanzeonLongH",
+ "system_sha": "5CCBFFAE634B51D6",
+ "seed": 59184,
+ "arms": [
+  "Ncold"
+ ],
+ "n_per_arm": 40,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "arm_sha": {
+  "Ncold": "E4AB5608C58913E5"
+ },
+ "arm_src": {
+  "Ncold": "arms\\panel\\Ncold.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "3418BDB9DA7199C3",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-09-09T02:23:02.864901+00:00"
+}
