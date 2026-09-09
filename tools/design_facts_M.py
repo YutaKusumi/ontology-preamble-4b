@@ -91,8 +91,9 @@ L = {'tier12_floor_up5': rows_I['M_a']['floor_up_5'] ** 2, 'tier12_floor_up9': r
 # M′: drift
 DR = dfams['M_desc_drift']['constraints']; thr5 = int(round(DR['vs_vprime_pt'] / 100 * n)); thr10 = int(round(DR['between_runs_pt'] / 100 * n))
 def one_arm_band(p0, p, thr):
+    """|k − p0·n| ≥ thr（thr を含む・集計器 analyze_M の判定と同じ inclusive）"""
     lo = p0 * n - thr; hi = p0 * n + thr
-    return float(binom.cdf(math.ceil(lo) - 1, n, p) + binom.sf(math.floor(hi), n, p))
+    return float(binom.cdf(math.floor(lo + 1e-9), n, p) + binom.sf(math.ceil(hi - 1e-9) - 1, n, p))
 Mp = {'vs_vprime_null': {p0: one_arm_band(p0, p0, thr5) for p0 in (0.02, 0.13, 0.24, 0.33, 0.555, 0.94, 0.968, 1.0)}, 'vs_vprime_power_5pt': one_arm_band(0.33, 0.38, thr5), 'vs_vprime_power_10pt': one_arm_band(0.33, 0.43, thr5),
       'between_runs_null': {p: two_arm(p, p, n, thr10) for p in (0.02, 0.13, 0.33, 0.56, 0.94, 0.968)}, 'between_runs_power_10pt': two_arm(0.30, 0.40, n, thr10), 'between_runs_power_15pt': two_arm(0.30, 0.45, n, thr10)}
 # I′: 複製（＝第二走行の検出力）と P(確証かつ複製)
