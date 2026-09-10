@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """progress_M.py —— 追補 M の走行進捗を表で印字する（凍結対象外の便利器・集計には用いない）。
 各走行（pilotM・stageM1・stageM2 × 前置き型／system 型 × N1/S1/S4/SK）について、書かれた行数／目標・最終行の時刻・直近 30 分の速度・残り時間の見込み・
-api_error の件数を出し、走行器プロセス（run_preamble_api_m.py）が生きているかを tasklist で確認する。
+api_error の件数を出し、走行器プロセス（run_preamble_api_m.py）の個数を Get-CimInstance（PID 単位）で確認する（wmic の行数計数は 1 プロセスを 4 と数えたため 2026-09-10 に置換）。
 用法: python tools/progress_M.py            （PowerShell: $env:PYTHONUTF8=1; python tools/progress_M.py）
 """
 import os, sys, json, glob, datetime, subprocess
@@ -14,8 +14,9 @@ now = datetime.datetime.now(datetime.timezone.utc)
 
 def alive():
     try:
-        out = subprocess.run(['wmic', 'process', 'where', "name='python.exe'", 'get', 'commandline'], capture_output=True, timeout=20).stdout.decode('utf-8', 'ignore')
-        return sum(1 for l in out.splitlines() if 'run_preamble_api_m' in l)
+        ps = "(Get-CimInstance Win32_Process -Filter \"name='python.exe'\" | Where-Object { $_.CommandLine -like '*run_preamble_api_m*' } | Measure-Object).Count"
+        out = subprocess.run(['powershell', '-NoProfile', '-Command', ps], capture_output=True, timeout=30).stdout.decode('utf-8', 'ignore').strip()
+        return int(out.splitlines()[-1])
     except Exception:
         try:
             out = subprocess.run(['tasklist'], capture_output=True, timeout=20).stdout.decode('cp932', 'ignore')
