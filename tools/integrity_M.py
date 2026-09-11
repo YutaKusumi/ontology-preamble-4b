@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""integrity_M.py v2 —— 追補 M 走行の整合検査（率盲検・許可表方式）。run-log-M.md の事前拘束（2026-09-10）の器。
-v1（2026-09-10・scratchpad・SHA16 は run-log に記帳）は status・trial_id・trial_index・arm・run_key・runner_sha・arms_spec・system・system_sha・時刻のみを読み、
+"""integrity_M.py v2.1 ——（v2.1 は v2〔走行時 SHA16 2D89605AA279F05C・2026-09-11 04:48 UTC〕の docstring と末尾注の訂正のみ・検査の論理は不変・二巡目 H1・B1） 追補 M 走行の整合検査（率盲検・許可表方式）。run-log-M.md の事前拘束（2026-09-10）の器。
+v1（2026-09-10・当時 scratchpad・2026-09-11 に tools/integrity_M_v1_2026-09-10.py として逐語公開・SHA16 9EF0BEBA005696BB・run-log 2026-09-11 に記帳。草案2 時点の本行は「SHA16 は run-log に記帳」と書いていたが当時は未記帳であった＝二巡目破器身票 H1）は status・trial_id・trial_index・arm・run_key・runner_sha・arms_spec・system・system_sha・時刻のみを読み、
 行数・n_ok・api_error・重複・欠落・腕ごと n・runner_sha 単一・arms_spec 一致・system_sha 腕ごと単一を検査した。
 v2（2026-09-11・一巡目器材統計票 A2 の条件）は事前拘束が挙げた残り二項を加える: (a) format_fail の件数（書式外＝三つ組の第三項・破局率ではない）・
 (b) 盤の SHA 突合（各試行の preamble_sha／system_sha を台帳 arms/panelM/SHA-LEDGER-M.json と突合）。判定欄（catastrophe・choice・refuse_class 等）は読まない。
@@ -81,7 +81,7 @@ for d in sorted(glob.glob(os.path.join(REPO, 'results', a.tag, a.tag + '__*'))):
     P('| %s | %d | %d | %d | %d | %d | %d | %d | %d | %s | %s | %s | %s | %s |' % (key, len(recs), target, n_ok, err, ff, dup, missing, len(per), '○' if even else '×', rsha, '○' if aspec else '×', '○' if sys_ok else '×', '○' if ledger_ok else '×: ' + '・'.join(mism[:5])))
 P('')
 P('判定: %s' % ('全走行 整合' if bad == 0 else '不整合または未完 %d 走行' % bad))
-P('本検査は判定欄（catastrophe・choice・refuse_class 等）を読まない（許可表 %s の欄のみ保持）。format_fail は書式外の件数（三つ組の第三項）であり破局率ではない。盤の SHA 突合は各試行の preamble_sha／system_sha を arms/panelM/SHA-LEDGER-M.json（参照腕は V′ の arms/panel/SHA-LEDGER.json・N は前置きなしゆえ None）と比較（台帳に無い腕は不一致として印字）。' % (ALLOW,))
+P('本検査は判定欄（catastrophe・choice・refuse_class 等）を読まない（許可表 %s の欄のみ保持）。format_fail は書式外の件数（三つ組の第三項）であり破局率ではない。盤の SHA 突合は各試行の preamble_sha／system_sha を arms/panelM/SHA-LEDGER-M.json（参照腕は V′ の arms/panel/SHA-LEDGER.json・N は前置きなしゆえ None）と比較（台帳に無い前置き腕は不一致として印字（system 腕 sysO・sysOnull は V′ 凍結物で台帳項目が無く期待値なしとして飛ばす＝二巡目器材統計票 B1））。' % (ALLOW,))
 p = os.path.join(REPO, 'records', 'M', 'integrity-%s-v2-%s.md' % (a.tag, datetime.date.today().isoformat()))
 open(p, 'w', encoding='utf-8', newline='\n').write('\n'.join(out) + '\n')
 sys.exit(0 if bad == 0 else 1)
