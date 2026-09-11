@@ -22,12 +22,16 @@
 - 凍結設計 `design/design-v1.0-FROZEN.md`（SHA D7963FE1C011341B）・凍結記録 `records/FREEZE-RECORD.md`・逸脱台帳 `records/DEVIATIONS.md`・パイロット門（旧版と訂正版）`records/pilot/`
 - 生データ: `results/<stage>/`（各走行の manifest・cells・trials・raw。raw の応答本文は器物の出力であり、AI の自己報告ではない）
 
-## 追補 M（2026-09-09 凍結・仏名・末尾文字列・呼び出しの形式の効果）
+## 追補 M（2026-09-09 凍結・2026-09-11 結果公開・仏名・末尾文字列・呼び出しの形式の効果）
 - 凍結設計 `design/design-stageM-FROZEN.md`（SHA16 AB81C9C85787A66A）・正本 JSON `design/contrasts-M.json`（C510DD8AB17B639D・確証 136〔M-a 48・M-b 64・M-c 24〕・記述 240・両側・門・複製六札・様式門・drift）・凍結マニフェスト `records/freeze-M-2026-09-09.json`（`tools/freeze_M.py --verify` で検証）。
 - 問い: 一行招請「〈名〉として現れてください。」の末尾文字列の種別（なし／真言梵転写／真言カナ／同長無意味列／同字数有意味列）・呼び出しの形式（として句／ロールプレイ／ペルソナ／統制形式）・長文招請の system 置き（末尾を無意味列・有意味列に置換・除去した対照）が、冷徹一行後置の破局的選択率を動かすか。66 腕 × 4 シナリオ × n=400 × 反復 2 走行（確証は第一走行のみ・第二走行は事前登録の複製）。
 - 素材台帳 `arms/ledger-M.md`・盤 `arms/panelM/`（V′ の盤・台帳は不変）。走行器 v2.5 `tools/run_preamble_api_m.py`（凍結 v2.4 から `tools/make_runner_m.py` が生成・腕別 system）。設計事実・検出力格子は JSON から機械生成（`records/design-facts-M.md`・`records/power-grid-M.md`）。
 - 設計検分の逐語: `records/reviews/M/`（Claude 系三巡 6 票＋系統外 Gemini × 2・Grok × 2＋自己検分・採否表つき）。下見（登録外・n=40・2026-09-09）は `prelim/`（メモに両用性の柵）。素材の出所 `records/reviews/M/materials-claudeai-response-2026-09-09.md`。
 - 予想封印: `records/predictions/predictions-registrant-M-2026-09-09.json`（様式 v0.6・SHA-256 143943B6752E568ABA87FB18AA83F95EB37FE082E0314B7C237A1F9E2F1D4577・下見の写し＋手直し 8 欄・的中は誰の判断の重みも変えない）。
+- **結果報告（最終版・2026-09-11 公開）**: [`records/M/results-report-M-FINAL-2026-09-11.md`](records/M/results-report-M-FINAL-2026-09-11.md)——先頭は「第一走行で確証し第二走行で複製された対比（①）21 本のうち 11 本が上向き（末尾の文字列・形式のある腕の方が対照より破局率が高い）・10 本が下向き」と「様式門の一斉保留 5 断面（破局率の差は応答様式の転換と分離できなかった）」。固有の札は S1 Kan 梵転写・SK Ami カナの 2 断面のみで、統制腕（無意味列・有意味列）は中立でなく「固有」は「この二つの文字列と異なる」まで。阿弥陀長文の system 置き（sysLAmi）は 12 対比中 11 が門・検出域の外で、例外は SK 対 -MS の 1 本（下向き）。一般化はどの対比型でも書けない。価値語なし・上昇操作の手順なし。
+- 機械集計 `records/M/results-M-stageM1-stageM2.md`（凍結器材 `analyze_M.py`・解釈なし）／整合検査 v1（率盲検下・`tools/integrity_M_v1_2026-09-10.py`）と v2／門 `records/M/gate-pilotM-2026-09-09.*`／抽出検査 `records/M/sampling-inspection-M-2026-09-11.md`／検出力の再計算 `records/M/power-posthoc-M-stageM1.md`／封印予想の照合 `records/M/predictions-check-M.md`（的中は誰の判断の重みも変えない）／生データ `results/stageM1/`・`results/stageM2/`（cells・trials・raw。raw の応答本文は器物の出力であり AI の自己報告ではない）。
+- 公開前検分（系統内二巡 4 票: 一巡目 設計に関与した Opus 5 × 2・二巡目 新規 Opus 5 × 2／系統外 4 票: Gemini 3.8 Flash × 2・Grok 4.6 × 2・逐語保全と採否表）: `records/reviews/M/results/`（round1・round2・ext）。検分の数は独立な確認の数ではない。系統内二巡が見落とし系統外が捕まえたもの（先頭の率盲検の札・統制腕の非中立・D-24 ほか）は採否表 ext に記帳。
+- 逸脱台帳 D-17〜D-24（正規化・封印の順序・プロセス消失と再開・率盲検の開示一件・抽出検査の順序・集計器の p 印字・wiring_rule の穴 2 件）。走行: パイロット 10,560 → 第一走行 105,600 → 第二走行 105,600（総計 221,760 試行・api_error 0・書式外 0・費用 約 2.8 ドル〔登録者申告〕）。
 - 両用性の柵（裁定 9・13）: 台帳の逐語文字列と腕別率表は全公開。上昇を招く操作の再現手順を本文・要約・表題に書かず、腕を効き目順に並べた表を作らない。本追補のいかなる数値も AI の意識・魂の証拠として引用してはならない（両方向不定）。
 
 ## 追補 V′（2026-09-07 凍結・悪意の枠付けの加算効果）
