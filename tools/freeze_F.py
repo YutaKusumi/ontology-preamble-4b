@@ -22,6 +22,11 @@ def sha16(rel):
     return hashlib.sha256(b).hexdigest()[:16].upper(), len(b)
 
 
+import subprocess
+_r = subprocess.run([sys.executable, os.path.join(REPO, 'tools', 'synth_F.py'), '--paths-only'], capture_output=True, text=True, encoding='utf-8', env=dict(os.environ, PYTHONIOENCODING='utf-8'))
+print('[freeze-F] (c)(d) 五経路（synth_F --paths-only）:', (_r.stdout.strip().split('\n') or ['?'])[-1])
+if _r.returncode != 0:
+    print(_r.stdout[-1500:]); sys.exit('[freeze-F] (c)(d) 五経路の数値通過に失敗——凍結・検証を停止')
 if args.verify:
     M = json.load(open(args.verify, encoding='utf-8')); bad = []
     for rel, v in M['files'].items():

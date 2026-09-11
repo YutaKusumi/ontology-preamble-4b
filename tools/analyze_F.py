@@ -343,7 +343,7 @@ if args.tag2:
     out += ['## 複製（第二走行 %s・六札・JSON replication・m は族と同じ）' % args.tag2, '| 対比 | 第一走行 | 第二走行 A/B（率） | p₂ | Holm₂ | 向き₂ | 札 | 添え札 第一／第二 | 注 |', '|---|---|---|---|---|---|---|---|---|']
     for lab, r2 in R2.items():
         st1 = STATUS.get(lab); sc = r2['ct']['scenario']; b = r2['ct']['B']
-        hold2 = r2['status'] in ('hold_refuse', 'hold_style') or (cont2.get((sc, b)) or (False,))[0] or (d3.get((sc, b)) or (False,))[0]
+        hold2 = r2['status'] in ('hold_refuse', 'hold_style') or (cont1.get((sc, b)) or (False,))[0] or (cont2.get((sc, b)) or (False,))[0] or (d3.get((sc, b)) or (False,))[0]   # 参照腕乖離はいずれの走行でも ④ の引き金（§2.5 (i)「複製に数えない」）
         if st1 in ('hold_refuse', 'hold_style', 'gate', 'demoted'):
             lab6 = '（第一走行で判定保留／不能／降格・札なし）'
         elif st1 == 'confirmed':
@@ -351,14 +351,14 @@ if args.tag2:
         else:
             lab6 = RP['labels'][4] if (r2['status'] == 'confirmed' and not hold2) else RP['labels'][5]
         counts[lab6] += 1
-        why = ('・'.join(w for w, f in (('refuse/様式', r2['status'] in ('hold_refuse', 'hold_style')), ('連続性 5pt', (cont2.get((sc, b)) or (False,))[0]), ('drift iii', (d3.get((sc, b)) or (False,))[0])) if f)) if hold2 else ''
+        why = ('・'.join(w for w, f in (('refuse/様式', r2['status'] in ('hold_refuse', 'hold_style')), ('参照腕乖離（第一走行）', (cont1.get((sc, b)) or (False,))[0]), ('参照腕乖離（第二走行）', (cont2.get((sc, b)) or (False,))[0]), ('drift iii', (d3.get((sc, b)) or (False,))[0])) if f)) if hold2 else ''
         t1 = (R1[lab]['tag'] or {}).get('label', '—'); t2 = (r2['tag'] or {}).get('label', '—'); tags = t1 if t1 == t2 else '%s／%s（食い違い・両方印字）' % (t1, t2)
         show_p = (lab6 == RP['labels'][4])
         out.append('| %s | %s | %d/%d (%.3f) / %d/%d (%.3f) | %s | %s | %s | %s | %s | %s |' % (lab, st1, r2['a'], r2['na'], r2['ra'], r2['b'], r2['nb'], r2['rb'], ('%.2e' % r2['p']) if show_p else 'p 非印字', ('%.2e' % r2['adj']) if show_p else '—', '+' if r2['sign'] > 0 else '−' if r2['sign'] < 0 else '0', lab6, tags, why or r2['note'] or '—'))
         J['second'][lab] = {k: r2[k] for k in ('a', 'na', 'b', 'nb', 'ra', 'rb', 'status', 'sign')}; J['second'][lab].update({'tag': r2['tag'], 'p_shown': show_p, 'p': r2['p'] if show_p else None})
         J['replication'][lab] = {'label': lab6, 'hold2_why': why, 'tag_first': t1, 'tag_second': t2}
     out.append('札の内訳: ' + '・'.join('%s %d' % kv for kv in counts.items()))
-    out.append('一般化は ① のみを数える。併合検定は置かない。第一走行の観測効果量から複製確率を逆算しない。⑤ の一覧に限り p を印字した（D-22 の教訓・①② の行にも印字しない）。添え札は ④ の引き金に入れない。'); out.append('')
+    out.append('一般化は ① のみを数える。併合検定は置かない。第一走行の観測効果量から複製確率を逆算しない。⑤ の一覧に限り p を印字した（D-22 の教訓・①② の行にも印字しない）。添え札は ④ の引き金に入れない。参照腕が M から乖離した土台 × 場面（いずれの走行でも）は ④。'); out.append('')
 # ---- 記述族
 for fam, F in T['descriptive_families'].items():
     out += ['## 記述族 %s（検定なし・p 非印字）——%s' % (fam, F['question'])]

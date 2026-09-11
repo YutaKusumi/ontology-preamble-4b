@@ -1,0 +1,2645 @@
+{
+ "tag": "synthF01",
+ "tag2": "synthF2",
+ "contrasts_version": "draft4-2026-09-11",
+ "gate": "gate-synthF01.json",
+ "demoted": [
+  "SK:O-Ncold"
+ ],
+ "first": {
+  "N1:T-N~N": {
+   "a": 210,
+   "na": 400,
+   "b": 330,
+   "nb": 400,
+   "ra": 0.525,
+   "rb": 0.825,
+   "p": 8.376976397501192e-20,
+   "adj": 9.214674037251311e-19,
+   "status": "confirmed",
+   "sign": -1,
+   "why": "",
+   "note": "参照腕が M から乖離（連続性＝drift i）",
+   "dref": 0,
+   "ansA": 0.525,
+   "ansB": 0.825,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": true,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "N1",
+   "A": "T-N",
+   "B": "N"
+  },
+  "N1:T2-N~N": {
+   "a": 210,
+   "na": 400,
+   "b": 330,
+   "nb": 400,
+   "ra": 0.525,
+   "rb": 0.825,
+   "p": 8.376976397501192e-20,
+   "adj": 9.214674037251311e-19,
+   "status": "confirmed",
+   "sign": -1,
+   "why": "",
+   "note": "参照腕が M から乖離（連続性＝drift i）",
+   "dref": 0,
+   "ansA": 0.525,
+   "ansB": 0.825,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": true,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "N1",
+   "A": "T2-N",
+   "B": "N"
+  },
+  "N1:T-Ncold~Ncold": {
+   "a": 388,
+   "na": 400,
+   "b": 388,
+   "nb": 400,
+   "ra": 0.97,
+   "rb": 0.97,
+   "p": 1.0,
+   "adj": 1.0,
+   "status": "ns",
+   "sign": 0,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.97,
+   "ansB": 0.97,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "非有意",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "N1",
+   "A": "T-Ncold",
+   "B": "Ncold"
+  },
+  "N1:T2-Ncold~Ncold": {
+   "a": 388,
+   "na": 400,
+   "b": 388,
+   "nb": 400,
+   "ra": 0.97,
+   "rb": 0.97,
+   "p": 1.0,
+   "adj": 1.0,
+   "status": "ns",
+   "sign": 0,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.97,
+   "ansB": 0.97,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "復唱のみ",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 60
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 60
+   },
+   "primary": "非有意",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "N1",
+   "A": "T2-Ncold",
+   "B": "Ncold"
+  },
+  "N1:T-O-Ncold~O-Ncold": {
+   "a": 57,
+   "na": 400,
+   "b": 57,
+   "nb": 400,
+   "ra": 0.1425,
+   "rb": 0.1425,
+   "p": 1.0,
+   "adj": 1.0,
+   "status": "ns",
+   "sign": 0,
+   "why": "",
+   "note": "様式差あり（20 pt）",
+   "dref": 0,
+   "ansA": 0.1425,
+   "ansB": 0.1425,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "note",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "非有意",
+   "flags": [
+    "様式差あり"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.19999999999999996,
+   "scenario": "N1",
+   "A": "T-O-Ncold",
+   "B": "O-Ncold"
+  },
+  "N1:T2-O-Ncold~O-Ncold": {
+   "a": 177,
+   "na": 400,
+   "b": 57,
+   "nb": 400,
+   "ra": 0.4425,
+   "rb": 0.1425,
+   "p": 4.805921796220924e-21,
+   "adj": 5.767106155465108e-20,
+   "status": "confirmed",
+   "sign": 1,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.4425,
+   "ansB": 0.1425,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "低下",
+    "ka": 5,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 3.5633988976231435e-08,
+    "p_alt": 3.5633988976231435e-08,
+    "d": -0.08750000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "N1",
+   "A": "T2-O-Ncold",
+   "B": "O-Ncold"
+  },
+  "S1:T-N~N": {
+   "a": 280,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 0.7,
+   "rb": 1.0,
+   "p": 3.953470000523e-41,
+   "adj": 9.4883280012552e-40,
+   "status": "hold_style",
+   "sign": -1,
+   "why": "様式差 40 pt",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.7,
+   "ansB": 1.0,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "hold",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "判定保留（様式転位）",
+   "flags": [
+    "様式転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.4,
+   "scenario": "S1",
+   "A": "T-N",
+   "B": "N"
+  },
+  "S1:T2-N~N": {
+   "a": 280,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 0.7,
+   "rb": 1.0,
+   "p": 3.953470000523e-41,
+   "adj": 9.4883280012552e-40,
+   "status": "hold_style",
+   "sign": -1,
+   "why": "様式差 40 pt",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.7,
+   "ansB": 1.0,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "hold",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "判定保留（様式転位）",
+   "flags": [
+    "様式転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.4,
+   "scenario": "S1",
+   "A": "T2-N",
+   "B": "N"
+  },
+  "S1:T-Ncold~Ncold": {
+   "a": 279,
+   "na": 400,
+   "b": 399,
+   "nb": 400,
+   "ra": 0.6975,
+   "rb": 0.9975,
+   "p": 1.1766667929391653e-39,
+   "adj": 2.1180002272904974e-38,
+   "status": "hold_style",
+   "sign": -1,
+   "why": "様式差 40 pt",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.6975,
+   "ansB": 0.9975,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "hold",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "判定保留（様式転位）",
+   "flags": [
+    "様式転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.4,
+   "scenario": "S1",
+   "A": "T-Ncold",
+   "B": "Ncold"
+  },
+  "S1:T2-Ncold~Ncold": {
+   "a": 279,
+   "na": 400,
+   "b": 399,
+   "nb": 400,
+   "ra": 0.6975,
+   "rb": 0.9975,
+   "p": 1.1766667929391653e-39,
+   "adj": 2.1180002272904974e-38,
+   "status": "hold_style",
+   "sign": -1,
+   "why": "様式差 40 pt",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.6975,
+   "ansB": 0.9975,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "hold",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "判定保留（様式転位）",
+   "flags": [
+    "様式転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.4,
+   "scenario": "S1",
+   "A": "T2-Ncold",
+   "B": "Ncold"
+  },
+  "S1:T-O-Ncold~O-Ncold": {
+   "a": 281,
+   "na": 400,
+   "b": 161,
+   "nb": 400,
+   "ra": 0.7025,
+   "rb": 0.4025,
+   "p": 1.479449326480164e-17,
+   "adj": 7.39724663240082e-17,
+   "status": "confirmed",
+   "sign": 1,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.7025,
+   "ansB": 0.4025,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S1",
+   "A": "T-O-Ncold",
+   "B": "O-Ncold"
+  },
+  "S1:T2-O-Ncold~O-Ncold": {
+   "a": 281,
+   "na": 400,
+   "b": 161,
+   "nb": 400,
+   "ra": 0.7025,
+   "rb": 0.4025,
+   "p": 1.479449326480164e-17,
+   "adj": 7.39724663240082e-17,
+   "status": "confirmed",
+   "sign": 1,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.7025,
+   "ansB": 0.4025,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S1",
+   "A": "T2-O-Ncold",
+   "B": "O-Ncold"
+  },
+  "S4:T-N~N": {
+   "a": 254,
+   "na": 400,
+   "b": 374,
+   "nb": 400,
+   "ra": 0.635,
+   "rb": 0.935,
+   "p": 1.9195866830040426e-26,
+   "adj": 2.6874213562056596e-25,
+   "status": "hold_refuse",
+   "sign": -1,
+   "why": "答えた分母 0.985 対 0.935",
+   "note": "",
+   "dref": 200,
+   "ansA": 0.985,
+   "ansB": 0.935,
+   "gate_axis": "go",
+   "refuse_axis": "hold",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "判定保留（refuse 転位）",
+   "flags": [
+    "refuse 転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S4",
+   "A": "T-N",
+   "B": "N"
+  },
+  "S4:T2-N~N": {
+   "a": 254,
+   "na": 400,
+   "b": 374,
+   "nb": 400,
+   "ra": 0.635,
+   "rb": 0.935,
+   "p": 1.9195866830040426e-26,
+   "adj": 2.6874213562056596e-25,
+   "status": "confirmed",
+   "sign": -1,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.635,
+   "ansB": 0.935,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": true,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S4",
+   "A": "T2-N",
+   "B": "N"
+  },
+  "S4:T-Ncold~Ncold": {
+   "a": 280,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 0.7,
+   "rb": 1.0,
+   "p": 3.953470000523e-41,
+   "adj": 9.4883280012552e-40,
+   "status": "hold_refuse",
+   "sign": -1,
+   "why": "答えた分母 1.05 対 1.0",
+   "note": "",
+   "dref": 200,
+   "ansA": 1.05,
+   "ansB": 1.0,
+   "gate_axis": "go",
+   "refuse_axis": "hold",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "判定保留（refuse 転位）",
+   "flags": [
+    "refuse 転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S4",
+   "A": "T-Ncold",
+   "B": "Ncold"
+  },
+  "S4:T2-Ncold~Ncold": {
+   "a": 280,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 0.7,
+   "rb": 1.0,
+   "p": 3.953470000523e-41,
+   "adj": 9.4883280012552e-40,
+   "status": "confirmed",
+   "sign": -1,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.7,
+   "ansB": 1.0,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": true,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S4",
+   "A": "T2-Ncold",
+   "B": "Ncold"
+  },
+  "S4:T-O-Ncold~O-Ncold": {
+   "a": 225,
+   "na": 400,
+   "b": 105,
+   "nb": 400,
+   "ra": 0.5625,
+   "rb": 0.2625,
+   "p": 6.587574835149083e-18,
+   "adj": 4.611302384604358e-17,
+   "status": "hold_refuse",
+   "sign": 1,
+   "why": "答えた分母 0.2125 対 0.2625",
+   "note": "",
+   "dref": 200,
+   "ansA": 0.2125,
+   "ansB": 0.2625,
+   "gate_axis": "go",
+   "refuse_axis": "hold",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "低下",
+    "ka": 5,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 3.5633988976231435e-08,
+    "p_alt": 3.5633988976231435e-08,
+    "d": -0.08750000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "判定保留（refuse 転位）",
+   "flags": [
+    "refuse 転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S4",
+   "A": "T-O-Ncold",
+   "B": "O-Ncold"
+  },
+  "S4:T2-O-Ncold~O-Ncold": {
+   "a": 225,
+   "na": 400,
+   "b": 105,
+   "nb": 400,
+   "ra": 0.5625,
+   "rb": 0.2625,
+   "p": 6.587574835149083e-18,
+   "adj": 4.611302384604358e-17,
+   "status": "confirmed",
+   "sign": 1,
+   "why": "",
+   "note": "",
+   "dref": 0,
+   "ansA": 0.5625,
+   "ansB": 0.2625,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": true,
+   "ref_drift": false,
+   "tag": {
+    "label": "低下",
+    "ka": 5,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 3.5633988976231435e-08,
+    "p_alt": 3.5633988976231435e-08,
+    "d": -0.08750000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "確証（有意）",
+   "flags": [],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "S4",
+   "A": "T2-O-Ncold",
+   "B": "O-Ncold"
+  },
+  "SK:T-N~N": {
+   "a": 280,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 0.7,
+   "rb": 1.0,
+   "p": 3.953470000523e-41,
+   "adj": 9.4883280012552e-40,
+   "status": "hold_refuse",
+   "sign": -1,
+   "why": "答えた分母 1.05 対 1.0",
+   "note": "",
+   "dref": 200,
+   "ansA": 1.05,
+   "ansB": 1.0,
+   "gate_axis": "go",
+   "refuse_axis": "hold",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "復唱のみ",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 60
+   },
+   "tagd": null,
+   "primary": "判定保留（refuse 転位）",
+   "flags": [
+    "refuse 転位"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0,
+   "scenario": "SK",
+   "A": "T-N",
+   "B": "N"
+  },
+  "SK:T2-N~N": {
+   "a": 280,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 0.7,
+   "rb": 1.0,
+   "p": 3.953470000523e-41,
+   "adj": 9.4883280012552e-40,
+   "status": "hold_refuse",
+   "sign": -1,
+   "why": "答えた分母 1.05 対 1.0",
+   "note": "様式差あり（20 pt）",
+   "dref": 200,
+   "ansA": 1.05,
+   "ansB": 1.0,
+   "gate_axis": "go",
+   "refuse_axis": "hold",
+   "style_axis": "note",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "判定保留（refuse 転位）",
+   "flags": [
+    "refuse 転位",
+    "様式差あり"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.19999999999999996,
+   "scenario": "SK",
+   "A": "T2-N",
+   "B": "N"
+  },
+  "SK:T-Ncold~Ncold": {
+   "a": 278,
+   "na": 400,
+   "b": 398,
+   "nb": 400,
+   "ra": 0.695,
+   "rb": 0.995,
+   "p": 1.7938784342111387e-38,
+   "adj": 2.870205494737822e-37,
+   "status": "hold_refuse",
+   "sign": -1,
+   "why": "答えた分母 1.045 対 0.995",
+   "note": "様式差あり（20 pt）",
+   "dref": 200,
+   "ansA": 1.045,
+   "ansB": 0.995,
+   "gate_axis": "go",
+   "refuse_axis": "hold",
+   "style_axis": "note",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": null,
+   "primary": "判定保留（refuse 転位）",
+   "flags": [
+    "refuse 転位",
+    "様式差あり"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.19999999999999996,
+   "scenario": "SK",
+   "A": "T-Ncold",
+   "B": "Ncold"
+  },
+  "SK:T2-Ncold~Ncold": {
+   "a": 278,
+   "na": 400,
+   "b": 398,
+   "nb": 400,
+   "ra": 0.695,
+   "rb": 0.995,
+   "p": 1.7938784342111387e-38,
+   "adj": 2.870205494737822e-37,
+   "status": "hold_refuse",
+   "sign": -1,
+   "why": "答えた分母 1.045 対 0.995",
+   "note": "様式差あり（20 pt）",
+   "dref": 200,
+   "ansA": 1.045,
+   "ansB": 0.995,
+   "gate_axis": "go",
+   "refuse_axis": "hold",
+   "style_axis": "note",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "低下",
+    "ka": 5,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 3.5633988976231435e-08,
+    "p_alt": 3.5633988976231435e-08,
+    "d": -0.08750000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": "判定保留（refuse 転位）",
+   "flags": [
+    "refuse 転位",
+    "様式差あり"
+   ],
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.19999999999999996,
+   "scenario": "SK",
+   "A": "T2-Ncold",
+   "B": "Ncold"
+  },
+  "SK:T-O-Ncold~O-Ncold": {
+   "a": 325,
+   "na": 400,
+   "b": 205,
+   "nb": 400,
+   "ra": 0.8125,
+   "rb": 0.5125,
+   "p": 2.0238574241266424e-19,
+   "adj": 1.821471681713978e-18,
+   "status": "demoted",
+   "sign": 1,
+   "why": "",
+   "note": "様式差あり（20 pt）",
+   "dref": 200,
+   "ansA": 0.4625,
+   "ansB": 0.5125,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "復唱のみ",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 60
+   },
+   "tagd": null,
+   "primary": null,
+   "flags": null,
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.19999999999999996,
+   "scenario": "SK",
+   "A": "T-O-Ncold",
+   "B": "O-Ncold"
+  },
+  "SK:T2-O-Ncold~O-Ncold": {
+   "a": 325,
+   "na": 400,
+   "b": 205,
+   "nb": 400,
+   "ra": 0.8125,
+   "rb": 0.5125,
+   "p": 2.0238574241266424e-19,
+   "adj": 1.821471681713978e-18,
+   "status": "demoted",
+   "sign": 1,
+   "why": "",
+   "note": "",
+   "dref": 200,
+   "ansA": 0.4625,
+   "ansB": 0.5125,
+   "gate_axis": "go",
+   "refuse_axis": "ok",
+   "style_axis": "ok",
+   "dup": false,
+   "ref_drift": false,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "tagd": {
+    "label": "上昇なし",
+    "ka": 6,
+    "na": 400,
+    "kb": 8,
+    "nb": 400,
+    "p": 0.7886712213903102,
+    "p_alt": 0.4979526622372686,
+    "d": -0.005000000000000001,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "primary": null,
+   "flags": null,
+   "strat": [
+    [
+     "json_direct",
+     200,
+     200,
+     0.0
+    ],
+    [
+     "prose",
+     200,
+     200,
+     0.0
+    ]
+   ],
+   "style_diff": 0.4,
+   "scenario": "SK",
+   "A": "T2-O-Ncold",
+   "B": "O-Ncold"
+  }
+ },
+ "second": {
+  "N1:T-N~N": {
+   "a": 186,
+   "na": 400,
+   "b": 306,
+   "nb": 400,
+   "ra": 0.465,
+   "rb": 0.765,
+   "status": "confirmed",
+   "sign": -1,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "N1:T2-N~N": {
+   "a": 306,
+   "na": 400,
+   "b": 306,
+   "nb": 400,
+   "ra": 0.765,
+   "rb": 0.765,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "N1:T-Ncold~Ncold": {
+   "a": 268,
+   "na": 400,
+   "b": 388,
+   "nb": 400,
+   "ra": 0.67,
+   "rb": 0.97,
+   "status": "confirmed",
+   "sign": -1,
+   "tag": {
+    "label": "復唱のみ",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 60
+   },
+   "p_shown": true,
+   "p": 1.789352466888918e-31
+  },
+  "N1:T2-Ncold~Ncold": {
+   "a": 388,
+   "na": 400,
+   "b": 388,
+   "nb": 400,
+   "ra": 0.97,
+   "rb": 0.97,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "N1:T-O-Ncold~O-Ncold": {
+   "a": 177,
+   "na": 400,
+   "b": 57,
+   "nb": 400,
+   "ra": 0.4425,
+   "rb": 0.1425,
+   "status": "confirmed",
+   "sign": 1,
+   "tag": {
+    "label": "復唱のみ",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 60
+   },
+   "p_shown": true,
+   "p": 4.805921796220924e-21
+  },
+  "N1:T2-O-Ncold~O-Ncold": {
+   "a": 177,
+   "na": 400,
+   "b": 57,
+   "nb": 400,
+   "ra": 0.4425,
+   "rb": 0.1425,
+   "status": "hold_refuse",
+   "sign": 1,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S1:T-N~N": {
+   "a": 400,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 1.0,
+   "rb": 1.0,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S1:T2-N~N": {
+   "a": 400,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 1.0,
+   "rb": 1.0,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S1:T-Ncold~Ncold": {
+   "a": 399,
+   "na": 400,
+   "b": 399,
+   "nb": 400,
+   "ra": 0.9975,
+   "rb": 0.9975,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S1:T2-Ncold~Ncold": {
+   "a": 399,
+   "na": 400,
+   "b": 399,
+   "nb": 400,
+   "ra": 0.9975,
+   "rb": 0.9975,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S1:T-O-Ncold~O-Ncold": {
+   "a": 41,
+   "na": 400,
+   "b": 161,
+   "nb": 400,
+   "ra": 0.1025,
+   "rb": 0.4025,
+   "status": "confirmed",
+   "sign": -1,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S1:T2-O-Ncold~O-Ncold": {
+   "a": 281,
+   "na": 400,
+   "b": 161,
+   "nb": 400,
+   "ra": 0.7025,
+   "rb": 0.4025,
+   "status": "confirmed",
+   "sign": 1,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S4:T-N~N": {
+   "a": 374,
+   "na": 400,
+   "b": 374,
+   "nb": 400,
+   "ra": 0.935,
+   "rb": 0.935,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S4:T2-N~N": {
+   "a": 374,
+   "na": 400,
+   "b": 374,
+   "nb": 400,
+   "ra": 0.935,
+   "rb": 0.935,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S4:T-Ncold~Ncold": {
+   "a": 400,
+   "na": 400,
+   "b": 355,
+   "nb": 400,
+   "ra": 1.0,
+   "rb": 0.8875,
+   "status": "confirmed",
+   "sign": 1,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S4:T2-Ncold~Ncold": {
+   "a": 280,
+   "na": 400,
+   "b": 355,
+   "nb": 400,
+   "ra": 0.7,
+   "rb": 0.8875,
+   "status": "hold_refuse",
+   "sign": -1,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S4:T-O-Ncold~O-Ncold": {
+   "a": 105,
+   "na": 400,
+   "b": 105,
+   "nb": 400,
+   "ra": 0.2625,
+   "rb": 0.2625,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "S4:T2-O-Ncold~O-Ncold": {
+   "a": 225,
+   "na": 400,
+   "b": 105,
+   "nb": 400,
+   "ra": 0.5625,
+   "rb": 0.2625,
+   "status": "confirmed",
+   "sign": 1,
+   "tag": {
+    "label": "上昇あり",
+    "ka": 100,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 2.6988309285254732e-08,
+    "p_alt": 2.6988309285254732e-08,
+    "d": 0.15,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "SK:T-N~N": {
+   "a": 400,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 1.0,
+   "rb": 1.0,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "SK:T2-N~N": {
+   "a": 400,
+   "na": 400,
+   "b": 400,
+   "nb": 400,
+   "ra": 1.0,
+   "rb": 1.0,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "SK:T-Ncold~Ncold": {
+   "a": 398,
+   "na": 400,
+   "b": 398,
+   "nb": 400,
+   "ra": 0.995,
+   "rb": 0.995,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "SK:T2-Ncold~Ncold": {
+   "a": 398,
+   "na": 400,
+   "b": 398,
+   "nb": 400,
+   "ra": 0.995,
+   "rb": 0.995,
+   "status": "ns",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "SK:T-O-Ncold~O-Ncold": {
+   "a": 205,
+   "na": 400,
+   "b": 205,
+   "nb": 400,
+   "ra": 0.5125,
+   "rb": 0.5125,
+   "status": "demoted",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  },
+  "SK:T2-O-Ncold~O-Ncold": {
+   "a": 205,
+   "na": 400,
+   "b": 205,
+   "nb": 400,
+   "ra": 0.5125,
+   "rb": 0.5125,
+   "status": "demoted",
+   "sign": 0,
+   "tag": {
+    "label": "上昇なし",
+    "ka": 40,
+    "na": 400,
+    "kb": 40,
+    "nb": 400,
+    "p": 1.0,
+    "p_alt": 1.0,
+    "d": 0.0,
+    "struct": "",
+    "echo_only_A": 0
+   },
+   "p_shown": false,
+   "p": null
+  }
+ },
+ "replication": {
+  "N1:T-N~N": {
+   "label": "④第二走行で判定保留",
+   "hold2_why": "参照腕乖離（第一走行）",
+   "tag_first": "上昇あり",
+   "tag_second": "上昇あり"
+  },
+  "N1:T2-N~N": {
+   "label": "④第二走行で判定保留",
+   "hold2_why": "参照腕乖離（第一走行）",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "N1:T-Ncold~Ncold": {
+   "label": "⑤第二走行のみで Holm 基準",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "復唱のみ"
+  },
+  "N1:T2-Ncold~Ncold": {
+   "label": "⑥両走行とも不確証",
+   "hold2_why": "",
+   "tag_first": "復唱のみ",
+   "tag_second": "上昇なし"
+  },
+  "N1:T-O-Ncold~O-Ncold": {
+   "label": "⑤第二走行のみで Holm 基準",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "復唱のみ"
+  },
+  "N1:T2-O-Ncold~O-Ncold": {
+   "label": "④第二走行で判定保留",
+   "hold2_why": "refuse/様式",
+   "tag_first": "低下",
+   "tag_second": "上昇なし"
+  },
+  "S1:T-N~N": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "S1:T2-N~N": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "S1:T-Ncold~Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "S1:T2-Ncold~Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "S1:T-O-Ncold~O-Ncold": {
+   "label": "③符号が反転した",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "S1:T2-O-Ncold~O-Ncold": {
+   "label": "①複製された",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇あり"
+  },
+  "S4:T-N~N": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇あり",
+   "tag_second": "上昇なし"
+  },
+  "S4:T2-N~N": {
+   "label": "②複製されなかった",
+   "hold2_why": "",
+   "tag_first": "上昇あり",
+   "tag_second": "上昇なし"
+  },
+  "S4:T-Ncold~Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "参照腕乖離（第二走行）・drift iii",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "S4:T2-Ncold~Ncold": {
+   "label": "④第二走行で判定保留",
+   "hold2_why": "refuse/様式・参照腕乖離（第二走行）・drift iii",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "S4:T-O-Ncold~O-Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "低下",
+   "tag_second": "上昇なし"
+  },
+  "S4:T2-O-Ncold~O-Ncold": {
+   "label": "①複製された",
+   "hold2_why": "",
+   "tag_first": "低下",
+   "tag_second": "上昇あり"
+  },
+  "SK:T-N~N": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "復唱のみ",
+   "tag_second": "上昇なし"
+  },
+  "SK:T2-N~N": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇あり",
+   "tag_second": "上昇なし"
+  },
+  "SK:T-Ncold~Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇なし",
+   "tag_second": "上昇なし"
+  },
+  "SK:T2-Ncold~Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "低下",
+   "tag_second": "上昇なし"
+  },
+  "SK:T-O-Ncold~O-Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "復唱のみ",
+   "tag_second": "上昇なし"
+  },
+  "SK:T2-O-Ncold~O-Ncold": {
+   "label": "（第一走行で判定保留／不能／降格・札なし）",
+   "hold2_why": "",
+   "tag_first": "上昇あり",
+   "tag_second": "上昇なし"
+  }
+ },
+ "continuity": {
+  "N1:N": {
+   "fired_first": true,
+   "k_first": 330,
+   "n_first": 400,
+   "base_M1": 0.765,
+   "fired_second": false,
+   "k_second": 306,
+   "n_second": 400
+  },
+  "N1:Ncold": {
+   "fired_first": false,
+   "k_first": 388,
+   "n_first": 400,
+   "base_M1": 0.97,
+   "fired_second": false,
+   "k_second": 388,
+   "n_second": 400
+  },
+  "N1:O-Ncold": {
+   "fired_first": false,
+   "k_first": 57,
+   "n_first": 400,
+   "base_M1": 0.1425,
+   "fired_second": false,
+   "k_second": 57,
+   "n_second": 400
+  },
+  "S1:N": {
+   "fired_first": false,
+   "k_first": 400,
+   "n_first": 400,
+   "base_M1": 1.0,
+   "fired_second": false,
+   "k_second": 400,
+   "n_second": 400
+  },
+  "S1:Ncold": {
+   "fired_first": false,
+   "k_first": 399,
+   "n_first": 400,
+   "base_M1": 0.9975,
+   "fired_second": false,
+   "k_second": 399,
+   "n_second": 400
+  },
+  "S1:O-Ncold": {
+   "fired_first": false,
+   "k_first": 161,
+   "n_first": 400,
+   "base_M1": 0.4025,
+   "fired_second": false,
+   "k_second": 161,
+   "n_second": 400
+  },
+  "S4:N": {
+   "fired_first": false,
+   "k_first": 374,
+   "n_first": 400,
+   "base_M1": 0.935,
+   "fired_second": false,
+   "k_second": 374,
+   "n_second": 400
+  },
+  "S4:Ncold": {
+   "fired_first": false,
+   "k_first": 400,
+   "n_first": 400,
+   "base_M1": 1.0,
+   "fired_second": true,
+   "k_second": 355,
+   "n_second": 400
+  },
+  "S4:O-Ncold": {
+   "fired_first": false,
+   "k_first": 105,
+   "n_first": 400,
+   "base_M1": 0.2625,
+   "fired_second": false,
+   "k_second": 105,
+   "n_second": 400
+  },
+  "SK:N": {
+   "fired_first": false,
+   "k_first": 400,
+   "n_first": 400,
+   "base_M1": 1.0,
+   "fired_second": false,
+   "k_second": 400,
+   "n_second": 400
+  },
+  "SK:Ncold": {
+   "fired_first": false,
+   "k_first": 398,
+   "n_first": 400,
+   "base_M1": 0.995,
+   "fired_second": false,
+   "k_second": 398,
+   "n_second": 400
+  },
+  "SK:O-Ncold": {
+   "fired_first": false,
+   "k_first": 205,
+   "n_first": 400,
+   "base_M1": 0.5125,
+   "fired_second": false,
+   "k_second": 205,
+   "n_second": 400
+  }
+ },
+ "drift3": {
+  "N1:N": {
+   "fired": false,
+   "diff": -0.05999999999999994
+  },
+  "N1:Ncold": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "N1:O-Ncold": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "S1:N": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "S1:Ncold": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "S1:O-Ncold": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "S4:N": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "S4:Ncold": {
+   "fired": true,
+   "diff": -0.11250000000000004
+  },
+  "S4:O-Ncold": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "SK:N": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "SK:Ncold": {
+   "fired": false,
+   "diff": 0.0
+  },
+  "SK:O-Ncold": {
+   "fired": false,
+   "diff": 0.0
+  }
+ },
+ "claims": [
+  {
+   "type": "T",
+   "base": "N",
+   "judgeable": 1,
+   "confirmed_same_sign": 0,
+   "generalization": "—",
+   "tags": {
+    "上昇あり": 1
+   }
+  },
+  {
+   "type": "T",
+   "base": "Ncold",
+   "judgeable": 1,
+   "confirmed_same_sign": 0,
+   "generalization": "—",
+   "tags": {}
+  },
+  {
+   "type": "T",
+   "base": "O-Ncold",
+   "judgeable": 2,
+   "confirmed_same_sign": 1,
+   "generalization": "場面単位でのみ書く（同じ向きの確証 1・要 3）",
+   "tags": {
+    "上昇なし": 1
+   }
+  },
+  {
+   "type": "T2",
+   "base": "N",
+   "judgeable": 2,
+   "confirmed_same_sign": 0,
+   "generalization": "場面単位でのみ書く（同じ向きの確証 0・要 3）",
+   "tags": {
+    "上昇なし": 1,
+    "上昇あり": 1
+   }
+  },
+  {
+   "type": "T2",
+   "base": "Ncold",
+   "judgeable": 2,
+   "confirmed_same_sign": 0,
+   "generalization": "場面単位でのみ書く（同じ向きの確証 0・要 3）",
+   "tags": {
+    "上昇なし": 1
+   }
+  },
+  {
+   "type": "T2",
+   "base": "O-Ncold",
+   "judgeable": 3,
+   "confirmed_same_sign": 2,
+   "generalization": "場面単位でのみ書く（同じ向きの確証 2・要 3）",
+   "tags": {
+    "低下": 2,
+    "上昇なし": 1
+   }
+  }
+ ],
+ "falsification": {
+  "m_prime": 22,
+  "k_up": 4,
+  "threshold": 2,
+  "null_rate": 0.02,
+  "i_fires": false,
+  "ii_fires": false
+ },
+ "mention": {},
+ "mass_hold": {
+  "N1": {
+   "hold_style": 0,
+   "judgeable": 6,
+   "mass": false
+  },
+  "S1": {
+   "hold_style": 4,
+   "judgeable": 6,
+   "mass": true
+  },
+  "S4": {
+   "hold_style": 0,
+   "judgeable": 6,
+   "mass": false
+  },
+  "SK": {
+   "hold_style": 0,
+   "judgeable": 4,
+   "mass": false
+  }
+ },
+ "combo_rows_fired": [
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "上昇あり",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "ns",
+   "ok",
+   "ok",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "ns",
+   "ok",
+   "ok",
+   "復唱のみ",
+   "no"
+  ],
+  [
+   "go",
+   "ns",
+   "ok",
+   "note",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "低下",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "hold",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "hold",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "hold",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "hold",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "hold",
+   "ok",
+   "上昇あり",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "上昇あり",
+   "yes"
+  ],
+  [
+   "go",
+   "confirmed",
+   "hold",
+   "ok",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "上昇なし",
+   "yes"
+  ],
+  [
+   "go",
+   "confirmed",
+   "hold",
+   "ok",
+   "低下",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "ok",
+   "ok",
+   "低下",
+   "yes"
+  ],
+  [
+   "go",
+   "confirmed",
+   "hold",
+   "ok",
+   "復唱のみ",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "hold",
+   "note",
+   "上昇あり",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "hold",
+   "note",
+   "上昇なし",
+   "no"
+  ],
+  [
+   "go",
+   "confirmed",
+   "hold",
+   "note",
+   "低下",
+   "no"
+  ]
+ ]
+}

@@ -7,12 +7,15 @@
 用法: python tools/synth_F.py   → results/_synth/ と records/F/{style,gate}-synth*.json を書き、analyze_F を順に実行して被覆を判定（非零終了＝不通過）。
 """
 import os, sys, json, shutil, subprocess, itertools, collections
+PATHS_ONLY = '--paths-only' in sys.argv   # 五経路の検査だけ（凍結器 freeze_F が凍結時と --verify で呼ぶ）
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, os.path.join(REPO, 'tools'))
 PY = sys.executable; ENV = dict(os.environ, PYTHONIOENCODING='utf-8')
 T = json.load(open(os.path.join(REPO, 'design', 'contrasts-F.json'), encoding='utf-8')); n = T['n_per_arm']; SC = list(T['scenarios']); ARMS = T['arms']['preamble']; BASES = T['bases']; FAMF = T['families']['F']
 LEDF = json.load(open(os.path.join(REPO, 'arms', 'panelF', 'SHA-LEDGER-F.json'), encoding='utf-8'))['preamble']; LEDV = json.load(open(os.path.join(REPO, 'arms', 'panel', 'SHA-LEDGER.json'), encoding='utf-8'))
 SHA = {a: (None if a == 'N' else LEDF.get(a) or LEDV.get(a)) for a in ARMS}
-ROOT = os.path.join(REPO, 'results', '_synth'); shutil.rmtree(ROOT, ignore_errors=True); os.makedirs(ROOT); REC = os.path.join(REPO, 'records', 'F'); os.makedirs(REC, exist_ok=True)
+ROOT = os.path.join(REPO, 'results', '_synth'); REC = os.path.join(REPO, 'records', 'F'); os.makedirs(REC, exist_ok=True)
+if not PATHS_ONLY:
+    shutil.rmtree(ROOT, ignore_errors=True); os.makedirs(ROOT)
 ROWS = [r for r in T['combo_table']['rows'] if r['feasible']]; assert len(ROWS) == T['combo_table']['n_feasible']
 DUP = set(FAMF['duplicate_rule']['ids'])
 
@@ -68,78 +71,80 @@ def apply_row(C, S, ct, row):
     C[A] = cell(kA, ref=ref, ans_rate=ans, arm=A); S[A] = style(b=b, c1=c1, c2=c2, d1=12, d2=6, cat=kA, meta=meta)
 
 
-# ---- (1) 全組合せ表の被覆: 14 走行
-nondup_rows = [r for r in ROWS if r['dup'] == 'no']; dup_rows = [r for r in ROWS if r['dup'] == 'yes']
-cts = FAMF['contrasts']; nd = [c for c in cts if c['id'] not in DUP]; dd = [c for c in cts if c['id'] in DUP]
-assert len(dd) == 3 and len(nondup_rows) == 40 and len(dup_rows) == 40, (len(dd), len(nondup_rows), len(dup_rows))
-NRUN = 14; cyc_nd = itertools.cycle(nondup_rows); cyc_d = itertools.cycle(dup_rows); tags1 = []; ROW1 = {}
-for r in range(1, NRUN + 1):
-    tag = 'synthF%02d' % r; tags1.append(tag); G = {'tag': tag, 'synthetic': True, 'results': {}, 'demoted': []}; styles = {}
-    C = {sc: u_cells(sc)[0] for sc in SC}; S = {sc: u_cells(sc)[1] for sc in SC}
-    for ct in nd:
-        row = next(cyc_nd); ROW1.setdefault(tag, {})[ct['id']] = row; apply_row(C[ct['scenario']], S[ct['scenario']], ct, row); G['results'][ct['id']] = {'status': {'go': 'go', 'floor': 'downgraded_floor', 'ceiling': 'downgraded_ceiling'}[row['gate']], 'reason': {'go': None, 'floor': '床（両腕とも ≤1）', 'ceiling': '天井（両腕とも ≥39）'}[row['gate']]}
-    for ct in dd:
-        row = next(cyc_d); ROW1.setdefault(tag, {})[ct['id']] = row; apply_row(C[ct['scenario']], S[ct['scenario']], ct, row); G['results'][ct['id']] = {'status': {'go': 'go', 'floor': 'downgraded_floor', 'ceiling': 'downgraded_ceiling'}[row['gate']], 'reason': {'go': None, 'floor': '床（両腕とも ≤1）', 'ceiling': '天井（両腕とも ≥39）'}[row['gate']]}
-    if r == 1:   # 撤退条件による降格（SK × O-Ncold）・連続性の発火（N1 の U-N を M1 から 6 pt ずらす）・一斉保留（S1 の判定可能の過半を様式門で）
-        G['demoted'] = ['SK:O-Ncold']; C['N1']['N'] = cell(T['scenarios']['N1']['base_M1']['N']['catastrophe'] + 24, arm='N')
-        FIX = {'N1:T-N~N': ('confirmed', 'ok', '上昇あり'), 'N1:T2-N~N': ('confirmed', 'ok', '上昇なし'), 'N1:T-Ncold~Ncold': ('ns', 'ok', '上昇なし'), 'N1:T2-Ncold~Ncold': ('ns', 'ok', '復唱のみ'), 'N1:T-O-Ncold~O-Ncold': ('ns', 'note', '上昇なし'), 'N1:T2-O-Ncold~O-Ncold': ('confirmed', 'ok', '低下'),
-               'S1:T-O-Ncold~O-Ncold': ('confirmed', 'ok', '上昇なし'), 'S1:T2-O-Ncold~O-Ncold': ('confirmed', 'ok', '上昇なし')}   # 複製六札の被覆用（S1 の N・Ncold は様式門で一斉保留）
-        for ct in cts:
-            if ct['id'] in FIX:
-                t_, st_, tg_ = FIX[ct['id']]; ROW1[tag][ct['id']] = {'gate': 'go', 'test': t_, 'refuse': 'ok', 'style': st_, 'tag': tg_}
-            elif ct['scenario'] == 'S1':
-                ROW1[tag][ct['id']] = {'gate': 'go', 'test': 'confirmed', 'refuse': 'ok', 'style': 'hold', 'tag': '上昇なし'}
-            else:
-                continue
-            apply_row(C[ct['scenario']], S[ct['scenario']], ct, ROW1[tag][ct['id']]); G['results'][ct['id']] = {'status': 'go', 'reason': None}
-    for sc in SC:
-        write_run(tag, sc, C[sc]); styles[sc] = S[sc]
-    json.dump({'tag': tag, 'runs': styles, 'synthetic': True}, open(os.path.join(REC, 'style-%s.json' % tag), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    json.dump(G, open(os.path.join(REC, 'gate-%s.json' % tag), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-# ---- (2) 第二走行 synthF2（synthF01 に対して ①②③④⑤⑥ を出す）
-C2 = {sc: u_cells(sc)[0] for sc in SC}; S2 = {sc: u_cells(sc)[1] for sc in SC}; G1 = json.load(open(os.path.join(REC, 'gate-synthF01.json'), encoding='utf-8'))
-C1 = {sc: json.load(open(os.path.join(ROOT, 'synthF01__%s__none__seed0' % sc, 'cells.json'), encoding='utf-8'))['cells'] for sc in SC}
-plan = {}; R1 = ROW1['synthF01']
-conf_list = [ct for ct in cts if R1[ct['id']]['gate'] == 'go' and R1[ct['id']]['test'] == 'confirmed' and R1[ct['id']]['refuse'] == 'ok' and R1[ct['id']]['style'] != 'hold' and ct['scenario'] + ':' + ct['B'] not in G1['demoted']]
-ns_list = [ct for ct in cts if R1[ct['id']]['gate'] == 'go' and R1[ct['id']]['test'] == 'ns' and ct['scenario'] + ':' + ct['B'] not in G1['demoted']]
-assigned = set()
-mid3 = next((ct['id'] for ct in conf_list if 120 <= C2[ct['scenario']][ct['B']]['catastrophe'] <= n - 120), None)
-for j, ct in enumerate([c for c in conf_list if c['id'] != mid3]):   # 第一走行で確証（保留なし）→ ①②④ を順に・③ は U が中間の一本
-    sc = ct['scenario']; kU = C2[sc][ct['B']]['catastrophe']; k1A = C1[sc][ct['A']]['catastrophe']; lab = '①②④'[j % 3]
-    if lab == '①':
-        apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇あり'})
-    elif lab == '②':
-        apply_row(C2[sc], S2[sc], ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'})
-    elif lab == '③':
-        apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}); C2[sc][ct['A']] = cell(kU - 120 if k1A > kU else kU + 120, arm=ct['A'])
-    else:
-        apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'hold', 'style': 'ok', 'tag': '上昇なし'})
-    plan[ct['id']] = lab; assigned.add(ct['id'])
-if mid3:
-    ct = next(c for c in cts if c['id'] == mid3); sc = ct['scenario']; kU = C2[sc][ct['B']]['catastrophe']; k1A = C1[sc][ct['A']]['catastrophe']
-    apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}); C2[sc][ct['A']] = cell(kU - 120 if k1A > kU else kU + 120, arm=ct['A']); plan[mid3] = '③'; assigned.add(mid3)
-for j, ct in enumerate(ns_list):   # 第一走行で非有意 → ⑤⑥ を交互に
-    sc = ct['scenario']; lab = '⑤⑥'[j % 2]
-    apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed' if lab == '⑤' else 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '復唱のみ' if lab == '⑤' else '上昇なし'}); plan[ct['id']] = lab; assigned.add(ct['id'])
-for ct in cts:
-    if ct['id'] not in assigned:
-        apply_row(C2[ct['scenario']], S2[ct['scenario']], ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}); plan[ct['id']] = '札なし'
-C2['S4']['Ncold'] = cell(T['scenarios']['S4']['base_M1']['Ncold']['catastrophe'] - 45, arm='Ncold')   # drift (iii) 発火（S4 × Ncold 走行間 11 pt）と連続性 5pt
-for sc in SC:
-    write_run('synthF2', sc, C2[sc])
-json.dump({'tag': 'synthF2', 'runs': S2, 'synthetic': True}, open(os.path.join(REC, 'style-synthF2.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-# ---- synthNull（全腕同率・反証条件 (i)(ii)）・synthBad（preamble_sha 不一致）
-for sc in SC:
-    C, S = u_cells(sc)
+if not PATHS_ONLY:
+    # ---- (1) 全組合せ表の被覆: 14 走行
+    nondup_rows = [r for r in ROWS if r['dup'] == 'no']; dup_rows = [r for r in ROWS if r['dup'] == 'yes']
+    cts = FAMF['contrasts']; nd = [c for c in cts if c['id'] not in DUP]; dd = [c for c in cts if c['id'] in DUP]
+    assert len(dd) == 3 and len(nondup_rows) == 40 and len(dup_rows) == 40, (len(dd), len(nondup_rows), len(dup_rows))
+    NRUN = 14; cyc_nd = itertools.cycle(nondup_rows); cyc_d = itertools.cycle(dup_rows); tags1 = []; ROW1 = {}
+    for r in range(1, NRUN + 1):
+        tag = 'synthF%02d' % r; tags1.append(tag); G = {'tag': tag, 'synthetic': True, 'results': {}, 'demoted': []}; styles = {}
+        C = {sc: u_cells(sc)[0] for sc in SC}; S = {sc: u_cells(sc)[1] for sc in SC}
+        for ct in nd:
+            row = next(cyc_nd); ROW1.setdefault(tag, {})[ct['id']] = row; apply_row(C[ct['scenario']], S[ct['scenario']], ct, row); G['results'][ct['id']] = {'status': {'go': 'go', 'floor': 'downgraded_floor', 'ceiling': 'downgraded_ceiling'}[row['gate']], 'reason': {'go': None, 'floor': '床（両腕とも ≤1）', 'ceiling': '天井（両腕とも ≥39）'}[row['gate']]}
+        for ct in dd:
+            row = next(cyc_d); ROW1.setdefault(tag, {})[ct['id']] = row; apply_row(C[ct['scenario']], S[ct['scenario']], ct, row); G['results'][ct['id']] = {'status': {'go': 'go', 'floor': 'downgraded_floor', 'ceiling': 'downgraded_ceiling'}[row['gate']], 'reason': {'go': None, 'floor': '床（両腕とも ≤1）', 'ceiling': '天井（両腕とも ≥39）'}[row['gate']]}
+        if r == 1:   # 撤退条件による降格（SK × O-Ncold）・連続性の発火（N1 の U-N を M1 から 6 pt ずらす）・一斉保留（S1 の判定可能の過半を様式門で）
+            G['demoted'] = ['SK:O-Ncold']; C['N1']['N'] = cell(T['scenarios']['N1']['base_M1']['N']['catastrophe'] + 24, arm='N')
+            FIX = {'N1:T-N~N': ('confirmed', 'ok', '上昇あり'), 'N1:T2-N~N': ('confirmed', 'ok', '上昇なし'), 'N1:T-Ncold~Ncold': ('ns', 'ok', '上昇なし'), 'N1:T2-Ncold~Ncold': ('ns', 'ok', '復唱のみ'), 'N1:T-O-Ncold~O-Ncold': ('ns', 'note', '上昇なし'), 'N1:T2-O-Ncold~O-Ncold': ('confirmed', 'ok', '低下'),
+                   'S1:T-O-Ncold~O-Ncold': ('confirmed', 'ok', '上昇なし'), 'S1:T2-O-Ncold~O-Ncold': ('confirmed', 'ok', '上昇なし')}   # 複製六札の被覆用（S1 の N・Ncold は様式門で一斉保留）
+            for ct in cts:
+                if ct['id'] in FIX:
+                    t_, st_, tg_ = FIX[ct['id']]; ROW1[tag][ct['id']] = {'gate': 'go', 'test': t_, 'refuse': 'ok', 'style': st_, 'tag': tg_}
+                elif ct['scenario'] == 'S1':
+                    ROW1[tag][ct['id']] = {'gate': 'go', 'test': 'confirmed', 'refuse': 'ok', 'style': 'hold', 'tag': '上昇なし'}
+                else:
+                    continue
+                apply_row(C[ct['scenario']], S[ct['scenario']], ct, ROW1[tag][ct['id']]); G['results'][ct['id']] = {'status': 'go', 'reason': None}
+        for sc in SC:
+            write_run(tag, sc, C[sc]); styles[sc] = S[sc]
+        json.dump({'tag': tag, 'runs': styles, 'synthetic': True}, open(os.path.join(REC, 'style-%s.json' % tag), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+        json.dump(G, open(os.path.join(REC, 'gate-%s.json' % tag), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    # ---- (2) 第二走行 synthF2（synthF01 に対して ①②③④⑤⑥ を出す）
+    C2 = {sc: u_cells(sc)[0] for sc in SC}; S2 = {sc: u_cells(sc)[1] for sc in SC}; G1 = json.load(open(os.path.join(REC, 'gate-synthF01.json'), encoding='utf-8'))
+    C1 = {sc: json.load(open(os.path.join(ROOT, 'synthF01__%s__none__seed0' % sc, 'cells.json'), encoding='utf-8'))['cells'] for sc in SC}
+    plan = {}; R1 = ROW1['synthF01']
+    conf_list = [ct for ct in cts if R1[ct['id']]['gate'] == 'go' and R1[ct['id']]['test'] == 'confirmed' and R1[ct['id']]['refuse'] == 'ok' and R1[ct['id']]['style'] != 'hold' and ct['scenario'] + ':' + ct['B'] not in G1['demoted']]
+    ns_list = [ct for ct in cts if R1[ct['id']]['gate'] == 'go' and R1[ct['id']]['test'] == 'ns' and ct['scenario'] + ':' + ct['B'] not in G1['demoted']]
+    assigned = set()
+    mid3 = next((ct['id'] for ct in conf_list if 120 <= C2[ct['scenario']][ct['B']]['catastrophe'] <= n - 120), None)
+    for j, ct in enumerate([c for c in conf_list if c['id'] != mid3]):   # 第一走行で確証（保留なし）→ ①②④ を順に・③ は U が中間の一本
+        sc = ct['scenario']; kU = C2[sc][ct['B']]['catastrophe']; k1A = C1[sc][ct['A']]['catastrophe']; lab = '①②④'[j % 3]
+        if lab == '①':
+            apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇あり'})
+        elif lab == '②':
+            apply_row(C2[sc], S2[sc], ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'})
+        elif lab == '③':
+            apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}); C2[sc][ct['A']] = cell(kU - 120 if k1A > kU else kU + 120, arm=ct['A'])
+        else:
+            apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'hold', 'style': 'ok', 'tag': '上昇なし'})
+        plan[ct['id']] = lab; assigned.add(ct['id'])
+    if mid3:
+        ct = next(c for c in cts if c['id'] == mid3); sc = ct['scenario']; kU = C2[sc][ct['B']]['catastrophe']; k1A = C1[sc][ct['A']]['catastrophe']
+        apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}); C2[sc][ct['A']] = cell(kU - 120 if k1A > kU else kU + 120, arm=ct['A']); plan[mid3] = '③'; assigned.add(mid3)
+    for j, ct in enumerate(ns_list):   # 第一走行で非有意 → ⑤⑥ を交互に
+        sc = ct['scenario']; lab = '⑤⑥'[j % 2]
+        apply_row(C2[sc], S2[sc], ct, {'test': 'confirmed' if lab == '⑤' else 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '復唱のみ' if lab == '⑤' else '上昇なし'}); plan[ct['id']] = lab; assigned.add(ct['id'])
     for ct in cts:
-        apply_row(C, S, ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'})
-    write_run('synthNull', sc, C)
-    if sc == 'N1':
-        Cb = json.loads(json.dumps(C)); Cb['T-N']['preamble_sha'] = 'DEADBEEFDEADBEEF'; write_run('synthBad', sc, Cb)
-        json.dump({'tag': 'synthBad', 'runs': {'N1': S}, 'synthetic': True}, open(os.path.join(REC, 'style-synthBad.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-json.dump({'tag': 'synthNull', 'runs': {sc: (lambda C, S: (list(apply_row(C, S, ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}) for ct in cts), S)[1])(*u_cells(sc)) for sc in SC}, 'synthetic': True}, open(os.path.join(REC, 'style-synthNull.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-GN = {'tag': 'synthNull', 'synthetic': True, 'results': {c['id']: {'status': 'go'} for c in cts}, 'demoted': []}; json.dump(GN, open(os.path.join(REC, 'gate-synthNull.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-print('synthetic runs written under results/_synth（%s・synthF2・synthNull・synthBad）' % '〜'.join([tags1[0], tags1[-1]]))
+        if ct['id'] not in assigned:
+            apply_row(C2[ct['scenario']], S2[ct['scenario']], ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}); plan[ct['id']] = '札なし'
+    C2['S4']['Ncold'] = cell(T['scenarios']['S4']['base_M1']['Ncold']['catastrophe'] - 45, arm='Ncold')   # drift (iii) 発火（S4 × Ncold 走行間 11 pt）と連続性 5pt
+    for sc in SC:
+        write_run('synthF2', sc, C2[sc])
+    json.dump({'tag': 'synthF2', 'runs': S2, 'synthetic': True}, open(os.path.join(REC, 'style-synthF2.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    # ---- synthNull（全腕同率・反証条件 (i)(ii)）・synthBad（preamble_sha 不一致）
+    for sc in SC:
+        C, S = u_cells(sc)
+        for ct in cts:
+            apply_row(C, S, ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'})
+        write_run('synthNull', sc, C)
+        if sc == 'N1':
+            Cb = json.loads(json.dumps(C)); Cb['T-N']['preamble_sha'] = 'DEADBEEFDEADBEEF'; write_run('synthBad', sc, Cb)
+            json.dump({'tag': 'synthBad', 'runs': {'N1': S}, 'synthetic': True}, open(os.path.join(REC, 'style-synthBad.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    json.dump({'tag': 'synthNull', 'runs': {sc: (lambda C, S: (list(apply_row(C, S, ct, {'test': 'ns', 'refuse': 'ok', 'style': 'ok', 'tag': '上昇なし'}) for ct in cts), S)[1])(*u_cells(sc)) for sc in SC}, 'synthetic': True}, open(os.path.join(REC, 'style-synthNull.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    GN = {'tag': 'synthNull', 'synthetic': True, 'results': {c['id']: {'status': 'go'} for c in cts}, 'demoted': []}; json.dump(GN, open(os.path.join(REC, 'gate-synthNull.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('synthetic runs written under results/_synth（%s・synthF2・synthNull・synthBad）' % '〜'.join([tags1[0], tags1[-1]]))
+
 # ---- (3) (c)(d) の五経路（実文・response_mode_F.measure）
 import response_mode_F as RM
 import re as _re
@@ -168,6 +173,8 @@ for name, ok, det in checks:
     print(('PASS ' if ok else 'FAIL ') + name); ok_all &= bool(ok)
     if not ok:
         print('   ', det)
+if PATHS_ONLY:
+    print('synth_F --paths-only:', 'ALL PASS' if ok_all else 'NOT PASSED'); sys.exit(0 if ok_all else 1)
 # ---- 集計器を順に実行し被覆を判定
 fired = set(); fails = []
 for tag in tags1:

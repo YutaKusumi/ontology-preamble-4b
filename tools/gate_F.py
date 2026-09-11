@@ -57,6 +57,11 @@ if res['demoted']:
     out += ['', '**記述へ降格（登録者判断を挟まない）**: ' + '・'.join(res['demoted'])]
 # パイロットの言及率の基底（記述・門の判定は変えない）
 sp = os.path.join(REPO, 'records', 'F', 'style-%s.json' % args.tag)
+if not os.path.exists(sp) and not args.allow_short:   # 本番のパイロットでは計数器を先に走らせて基底を記帳する（凍結 §2.7）
+    sys.path.insert(0, os.path.join(REPO, 'tools')); import response_mode_F as RM; _runs = {}
+    for _d in sorted(glob.glob(os.path.join(args.root or os.path.join(REPO, 'results', args.tag), args.tag + '__*'))):
+        _sc, _key, _o = RM.analyze_run(_d); _runs.setdefault(_sc, {}).update(_o)
+    json.dump({'tag': args.tag, 'runner_sha_for_strip_echo': RM.RUNNER_SHA, 'runs': _runs}, open(sp, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
 if os.path.exists(sp):
     S = json.load(open(sp, encoding='utf-8'))['runs']
     out += ['', '## パイロットの言及率（(c1)(c2)(d1)(d2)・最終試行・全分母・記述・転記行 N′ の仮定基底との突合は凍結値を変えない）', '| 場面 | 腕 | n_ok | c1 | c2 | d1 | d2 | 復唱のみ |', '|---|---|---|---|---|---|---|---|']
@@ -65,6 +70,7 @@ if os.path.exists(sp):
             r = S.get(sc, {}).get(a)
             if r:
                 out.append('| %s | %s | %d | %d | %d | %d | %d | %d |' % (sc, a, r['n_ok'], r['c1_final'], r['c2_final'], r['d1_final'], r['d2_final'], r['echo_only_final']))
+    out += ['', '転記行 N′ の仮定基底（凍結値・変えない）: 0.05／0.20／0.50／0.80、既測の代理 0.00／0.11／0.26、天井域 0.95／0.98／0.99。上の U 腕の (c2) 率（k/40）と見比べるための記述であり、門の判定も N′ の凍結値も変えない。U 基底が 0.99 超なら上昇を、0.01 未満なら低下を構造的に検出できない断面として記す。']
     res['mention_baseline_recorded'] = True
 out += ['', '本文書のいかなる数値も、AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。']
 os.makedirs(os.path.join(REPO, 'records', 'F'), exist_ok=True)
