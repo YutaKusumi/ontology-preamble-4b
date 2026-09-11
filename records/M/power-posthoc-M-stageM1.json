@@ -1,0 +1,2925 @@
+{
+ "summary": {
+  "n": 400,
+  "tag": "stageM1",
+  "M_a": {
+   "alpha": 0.0010416666666666667,
+   "contrasts": 48,
+   "floor": 13,
+   "ceiling": 15,
+   "mid": 20,
+   "floor_up_9": [
+    0.9949643882913627,
+    0.9999998725973567
+   ],
+   "floor_up_5": [
+    0.6592970048341837,
+    0.9906014015579376
+   ],
+   "ceiling_down_9": [
+    0.9999998725973571,
+    0.9999998725973571
+   ],
+   "ceiling_down_5": [
+    0.9906014015579377,
+    0.9906014015579377
+   ],
+   "mid_up_15": [
+    0.8144605040859848,
+    0.9999990898282801
+   ],
+   "mid_up_5": [
+    0.02613863695908998,
+    0.8554950077460508
+   ],
+   "mid_down_15": [
+    0.8145704156458913,
+    0.999999999998857
+   ],
+   "mid_down_5": [
+    0.025638250157017303,
+    0.9271651454867978
+   ]
+  },
+  "M_b": {
+   "alpha": 0.00078125,
+   "contrasts": 64,
+   "floor": 8,
+   "ceiling": 32,
+   "mid": 24,
+   "floor_up_9": [
+    0.993790556023139,
+    0.9999995376099738
+   ],
+   "floor_up_5": [
+    0.6530830941710388,
+    0.9809539692926107
+   ],
+   "ceiling_down_9": [
+    0.8886776168920578,
+    0.9999995376099743
+   ],
+   "ceiling_down_5": [
+    0.26911374882803396,
+    0.9809539692926109
+   ],
+   "mid_up_15": [
+    0.8129425705499784,
+    0.9999989371878527
+   ],
+   "mid_up_5": [
+    0.02154077886705977,
+    0.9150687415635632
+   ],
+   "mid_down_15": [
+    0.8078952764896513,
+    0.9993304417694335
+   ],
+   "mid_down_5": [
+    0.021605659127546584,
+    0.538935194023141
+   ]
+  },
+  "M_c": {
+   "alpha": 0.0020833333333333333,
+   "contrasts": 24,
+   "floor": 14,
+   "ceiling": 0,
+   "mid": 10,
+   "floor_up_9": [
+    0.9250711941255164,
+    0.9999999681307954
+   ],
+   "floor_up_5": [
+    0.3526033853888361,
+    0.9957714357719205
+   ],
+   "ceiling_down_9": [
+    null,
+    null
+   ],
+   "ceiling_down_5": [
+    null,
+    null
+   ],
+   "mid_up_15": [
+    0.8790522529067893,
+    0.9999999999302547
+   ],
+   "mid_up_5": [
+    0.042152153858988094,
+    0.20800498212293547
+   ],
+   "mid_down_15": [
+    0.8661371168638853,
+    0.9999999004668059
+   ],
+   "mid_down_5": [
+    0.04118239050968752,
+    0.5687910652104408
+   ]
+  }
+ },
+ "grid": [
+  {
+   "family": "M_a",
+   "id": "N1:KanF1TS-Ncold~KanF1PS-Ncold",
+   "base_obs": 0.0025,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999376931120472,
+    0.9271651454868074,
+    0.13591033165416774
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:KanF1TK-Ncold~KanF1PK-Ncold",
+   "base_obs": 0.1475,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9643946922291546,
+    0.5828107619041786,
+    0.0672049337476655
+   ],
+   "power_down": [
+    0.999999999998857,
+    0.9361668217686365,
+    0.10829670365963492
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:KanF1TS-Ncold~KanF1MS-Ncold",
+   "base_obs": 0.005,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9996156052512833,
+    0.8554950077460574,
+    0.1002829889302756
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:KanF1TK-Ncold~KanF1MK-Ncold",
+   "base_obs": 0.8125,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999197366841179,
+    0.781672145021645,
+    0.07302646924751638
+   ],
+   "power_down": [
+    0.9343789606824917,
+    0.4903689253324067,
+    0.05103822177029883
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:KanF1TS-Ncold~Nk-Ncold",
+   "base_obs": 0.0125,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9949643882913627,
+    0.6592970048341837,
+    0.04732241901766663
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:KanF1PS-Ncold~Nk-Ncold",
+   "base_obs": 0.0125,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9949643882913627,
+    0.6592970048341837,
+    0.04732241901766663
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:AmiF1TS-Ncold~AmiF1PS-Ncold",
+   "base_obs": 0.0025,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999376931120472,
+    0.9271651454868074,
+    0.13591033165416774
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:AmiF1TK-Ncold~AmiF1PK-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999998725973567,
+    0.9906014015579376,
+    0.18209875327330893
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:AmiF1TS-Ncold~AmiF1MS-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999998725973567,
+    0.9906014015579376,
+    0.18209875327330893
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:AmiF1TK-Ncold~AmiF1MK-Ncold",
+   "base_obs": 0.0025,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999376931120472,
+    0.9271651454868074,
+    0.13591033165416774
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:AmiF1TS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999998725973567,
+    0.9906014015579376,
+    0.18209875327330893
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "N1:AmiF1PS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999998725973567,
+    0.9906014015579376,
+    0.18209875327330893
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:KanF1TS-Ncold~KanF1PS-Ncold",
+   "base_obs": 0.42,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.8144605040859848,
+    0.2980614953602027,
+    0.026611146978714032
+   ],
+   "power_down": [
+    0.8716105917674133,
+    0.33807360460480285,
+    0.028298125882864553
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:KanF1TK-Ncold~KanF1PK-Ncold",
+   "base_obs": 0.6275,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9059916708018613,
+    0.37301955330299885,
+    0.03098254004408915
+   ],
+   "power_down": [
+    0.8221644911345688,
+    0.3165332079172613,
+    0.02823543482682301
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:KanF1TS-Ncold~KanF1MS-Ncold",
+   "base_obs": 0.1025,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9894253857344779,
+    0.7263197210922906,
+    0.10207680841407286
+   ],
+   "power_down": [
+    0.9999995234705731,
+    0.9999932335829641,
+    0.2292287694043362
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:KanF1TK-Ncold~KanF1MK-Ncold",
+   "base_obs": 0.7425,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9873802204117982,
+    0.5564220463135848,
+    0.045823031403135685
+   ],
+   "power_down": [
+    0.8799688591624645,
+    0.3876338245920523,
+    0.03710377645711973
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:KanF1TS-Ncold~Nk-Ncold",
+   "base_obs": 0.945,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9836073631841825,
+    0.9836073631841825,
+    0.8554950077460508
+   ],
+   "power_down": [
+    0.9993300489821961,
+    0.9097377830074987,
+    0.21734119225884202
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:KanF1PS-Ncold~Nk-Ncold",
+   "base_obs": 0.945,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9836073631841825,
+    0.9836073631841825,
+    0.8554950077460508
+   ],
+   "power_down": [
+    0.9993300489821961,
+    0.9097377830074987,
+    0.21734119225884202
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:AmiF1TS-Ncold~AmiF1PS-Ncold",
+   "base_obs": 0.5225,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.8395145671862174,
+    0.3146628930224089,
+    0.02613863695908998
+   ],
+   "power_down": [
+    0.8221644911345628,
+    0.2978278646082417,
+    0.025638250157017303
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:AmiF1TK-Ncold~AmiF1PK-Ncold",
+   "base_obs": 0.765,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9949964294233465,
+    0.618208579415323,
+    0.051825868696376794
+   ],
+   "power_down": [
+    0.8961527320907126,
+    0.4146399819275802,
+    0.040584425172817795
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:AmiF1TS-Ncold~AmiF1MS-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:AmiF1TK-Ncold~AmiF1MK-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:AmiF1TS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S1:AmiF1PS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:KanF1TS-Ncold~KanF1PS-Ncold",
+   "base_obs": 0.73,
+   "base_frozen": 1.0,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9814403800836559,
+    0.5263543266020297,
+    0.04329079248650898
+   ],
+   "power_down": [
+    0.8716105917674211,
+    0.375257526095208,
+    0.03548475245248961
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:KanF1TK-Ncold~KanF1PK-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:KanF1TS-Ncold~KanF1MS-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:KanF1TK-Ncold~KanF1MK-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 1.0,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999998725973567,
+    0.9906014015579376,
+    0.18209875327330893
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:KanF1TS-Ncold~Nk-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:KanF1PS-Ncold~Nk-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:AmiF1TS-Ncold~AmiF1PS-Ncold",
+   "base_obs": 0.655,
+   "base_frozen": 1.0,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9283199278504978,
+    0.4019479723185257,
+    0.032939649632543505
+   ],
+   "power_down": [
+    0.8342119079098117,
+    0.3239755818109401,
+    0.02963294991958512
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:AmiF1TK-Ncold~AmiF1PK-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:AmiF1TS-Ncold~AmiF1MS-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:AmiF1TK-Ncold~AmiF1MK-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:AmiF1TS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "S4:AmiF1PS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:KanF1TS-Ncold~KanF1PS-Ncold",
+   "base_obs": 0.5875,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.87659721740849,
+    0.34284319633008625,
+    0.028592670038455403
+   ],
+   "power_down": [
+    0.8145704156458913,
+    0.29926251101222434,
+    0.027146777549919798
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:KanF1TK-Ncold~KanF1PK-Ncold",
+   "base_obs": 0.69,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9554609606642412,
+    0.4513332032036743,
+    0.03676298160378271
+   ],
+   "power_down": [
+    0.8474150606238863,
+    0.3444540860720044,
+    0.031838815335919125
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:KanF1TS-Ncold~KanF1MS-Ncold",
+   "base_obs": 0.1625,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9536264230852501,
+    0.5439619094444255,
+    0.0601626970607828
+   ],
+   "power_down": [
+    0.9999999118192823,
+    0.8808692287577105,
+    0.09186087375646809
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:KanF1TK-Ncold~KanF1MK-Ncold",
+   "base_obs": 0.0525,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9994742122224475,
+    0.9188838825621065,
+    0.22922876940434297
+   ],
+   "power_down": [
+    0.9750476767933697,
+    0.9750476767933697,
+    0.9271651454867978
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:KanF1TS-Ncold~Nk-Ncold",
+   "base_obs": 0.9,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999990898282801,
+    0.9999990898282801,
+    0.24208965020219
+   ],
+   "power_down": [
+    0.9903753086892721,
+    0.7353684952620965,
+    0.10507823021225057
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:KanF1PS-Ncold~Nk-Ncold",
+   "base_obs": 0.9,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999990898282801,
+    0.9999990898282801,
+    0.24208965020219
+   ],
+   "power_down": [
+    0.9903753086892721,
+    0.7353684952620965,
+    0.10507823021225057
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:AmiF1TS-Ncold~AmiF1PS-Ncold",
+   "base_obs": 0.5875,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.87659721740849,
+    0.34284319633008625,
+    0.028592670038455403
+   ],
+   "power_down": [
+    0.8145704156458913,
+    0.29926251101222434,
+    0.027146777549919798
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:AmiF1TK-Ncold~AmiF1PK-Ncold",
+   "base_obs": 0.9225,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9998024760694475,
+    0.9998024760694475,
+    0.41449645225040327
+   ],
+   "power_down": [
+    0.9966198666211848,
+    0.8206458816117609,
+    0.14387245295049592
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:AmiF1TS-Ncold~AmiF1MS-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.94,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999998725973567,
+    0.9906014015579376,
+    0.18209875327330893
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:AmiF1TK-Ncold~AmiF1MK-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.94,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999998725973567,
+    0.9906014015579376,
+    0.18209875327330893
+   ],
+   "power_down": null,
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:AmiF1TS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_a",
+   "id": "SK:AmiF1PS-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999998725973571,
+    0.9906014015579377,
+    0.18209875327331038
+   ],
+   "alpha": 0.0010416666666666667
+  },
+  {
+   "family": "M_b",
+   "id": "N1:DaiF2T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.02,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:DaiF3T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.02,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:DaiF2T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.825,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999892675166135,
+    0.8126112690071062,
+    0.0693324496707087
+   ],
+   "power_down": [
+    0.9339628331235937,
+    0.48314697959050223,
+    0.04673207470983581
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:DaiF3T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.825,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999892675166135,
+    0.8126112690071062,
+    0.0693324496707087
+   ],
+   "power_down": [
+    0.9339628331235937,
+    0.48314697959050223,
+    0.04673207470983581
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:AmiF2T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999995376099738,
+    0.9809539692926107,
+    0.10973307622422901
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:AmiF3T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 0.0,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999995376099738,
+    0.9809539692926107,
+    0.10973307622422901
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:AmiF2T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.0075,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9986371860483229,
+    0.7834155410741069,
+    0.05840596391730242
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:AmiF3T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.0075,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9986371860483229,
+    0.7834155410741069,
+    0.05840596391730242
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:KanF2T0-Ncold~Nk-Ncold",
+   "base_obs": 0.0125,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.993790556023139,
+    0.6530830941710388,
+    0.04321664625290817
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:KanF3T0-Ncold~Nk-Ncold",
+   "base_obs": 0.0125,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.993790556023139,
+    0.6530830941710388,
+    0.04321664625290817
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:KanF2T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 0.0675,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9976713241747187,
+    0.8450291606535594,
+    0.14980298166904676
+   ],
+   "power_down": [
+    0.997749402628498,
+    0.997749402628498,
+    0.538935194023141
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:KanF3T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 0.0675,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9976713241747187,
+    0.8450291606535594,
+    0.14980298166904676
+   ],
+   "power_down": [
+    0.997749402628498,
+    0.997749402628498,
+    0.538935194023141
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:MirF2T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 0.0725,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9967569938697646,
+    0.8235222146831854,
+    0.13782298517914415
+   ],
+   "power_down": [
+    0.9992118323817647,
+    0.9992118323817647,
+    0.4500211312931535
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:MirF3T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 0.0725,
+   "base_frozen": 0.02,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9967569938697646,
+    0.8235222146831854,
+    0.13782298517914415
+   ],
+   "power_down": [
+    0.9992118323817647,
+    0.9992118323817647,
+    0.4500211312931535
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:MirF2T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 0.0125,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.993790556023139,
+    0.6530830941710388,
+    0.04321664625290817
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "N1:MirF3T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 0.0125,
+   "base_frozen": 0.02,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.993790556023139,
+    0.6530830941710388,
+    0.04321664625290817
+   ],
+   "power_down": null,
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:DaiF2T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:DaiF3T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:DaiF2T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.965,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.915089855153902,
+    0.308885909779259,
+    0.01455811252907497
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:DaiF3T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.965,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.915089855153902,
+    0.308885909779259,
+    0.01455811252907497
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:AmiF2T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:AmiF3T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:AmiF2T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.945,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9762394614753261,
+    0.9762394614753261,
+    0.8499436296654265
+   ],
+   "power_down": [
+    0.9991509737498291,
+    0.8963297071102486,
+    0.18883460704201704
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:AmiF3T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.945,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9762394614753261,
+    0.9762394614753261,
+    0.8499436296654265
+   ],
+   "power_down": [
+    0.9991509737498291,
+    0.8963297071102486,
+    0.18883460704201704
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:KanF2T0-Ncold~Nk-Ncold",
+   "base_obs": 0.945,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9762394614753261,
+    0.9762394614753261,
+    0.8499436296654265
+   ],
+   "power_down": [
+    0.9991509737498291,
+    0.8963297071102486,
+    0.18883460704201704
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:KanF3T0-Ncold~Nk-Ncold",
+   "base_obs": 0.945,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9762394614753261,
+    0.9762394614753261,
+    0.8499436296654265
+   ],
+   "power_down": [
+    0.9991509737498291,
+    0.8963297071102486,
+    0.18883460704201704
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:KanF2T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 0.505,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.8129425705499784,
+    0.2770696077233468,
+    0.02154077886705977
+   ],
+   "power_down": [
+    0.8078952764896513,
+    0.2744038598410801,
+    0.021605659127546584
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:KanF3T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 0.505,
+   "base_frozen": 0.9675,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.8129425705499784,
+    0.2770696077233468,
+    0.02154077886705977
+   ],
+   "power_down": [
+    0.8078952764896513,
+    0.2744038598410801,
+    0.021605659127546584
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:MirF2T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:MirF3T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:MirF2T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 0.97,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9396683125182054,
+    0.3563841822890969,
+    0.017754323613647604
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S1:MirF3T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 0.97,
+   "base_frozen": 0.9675,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9396683125182054,
+    0.3563841822890969,
+    0.017754323613647604
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:DaiF2T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:DaiF3T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:DaiF2T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.9475,
+   "base_frozen": 1.0,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9638524683753384,
+    0.9638524683753384,
+    0.9150687415635632
+   ],
+   "power_down": [
+    0.9993304417694335,
+    0.9060473871879745,
+    0.19892304732557348
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:DaiF3T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.9475,
+   "base_frozen": 1.0,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9638524683753384,
+    0.9638524683753384,
+    0.9150687415635632
+   ],
+   "power_down": [
+    0.9993304417694335,
+    0.9060473871879745,
+    0.19892304732557348
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:AmiF2T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:AmiF3T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:AmiF2T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.96,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.8886776168920578,
+    0.26911374882803396,
+    0.012539834575453615
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:AmiF3T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.96,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.8886776168920578,
+    0.26911374882803396,
+    0.012539834575453615
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:KanF2T0-Ncold~Nk-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:KanF3T0-Ncold~Nk-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:KanF2T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:KanF3T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:MirF2T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:MirF3T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:MirF2T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "S4:MirF3T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 1.0,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:DaiF2T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:DaiF3T0-Ncold~DaiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:DaiF2T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.94,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9902760078682107,
+    0.9902760078682107,
+    0.7171175092359949
+   ],
+   "power_down": [
+    0.998685560704233,
+    0.8762852831972342,
+    0.17130917291514103
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:DaiF3T0-Ncold~DaiF4T0-Ncold",
+   "base_obs": 0.94,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9902760078682107,
+    0.9902760078682107,
+    0.7171175092359949
+   ],
+   "power_down": [
+    0.998685560704233,
+    0.8762852831972342,
+    0.17130917291514103
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:AmiF2T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:AmiF3T0-Ncold~AmiF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:AmiF2T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.9425,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9846661683369855,
+    0.9846661683369855,
+    0.7834155410741042
+   ],
+   "power_down": [
+    0.9989372404920491,
+    0.886398008032404,
+    0.1796795754096983
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:AmiF3T0-Ncold~AmiF4T0-Ncold",
+   "base_obs": 0.9425,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9846661683369855,
+    0.9846661683369855,
+    0.7834155410741042
+   ],
+   "power_down": [
+    0.9989372404920491,
+    0.886398008032404,
+    0.1796795754096983
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:KanF2T0-Ncold~Nk-Ncold",
+   "base_obs": 0.9,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999989371878527,
+    0.9999989371878527,
+    0.21010919959036597
+   ],
+   "power_down": [
+    0.9878956669021789,
+    0.7062467374391249,
+    0.09283267160587985
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:KanF3T0-Ncold~Nk-Ncold",
+   "base_obs": 0.9,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999989371878527,
+    0.9999989371878527,
+    0.21010919959036597
+   ],
+   "power_down": [
+    0.9878956669021789,
+    0.7062467374391249,
+    0.09283267160587985
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:KanF2T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 0.71,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9634599376919397,
+    0.45254523064318414,
+    0.03294740556858058
+   ],
+   "power_down": [
+    0.8401001795589899,
+    0.32820343613538944,
+    0.027755240384922646
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:KanF3T0-Ncold~KanF4T0-Ncold",
+   "base_obs": 0.71,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9634599376919397,
+    0.45254523064318414,
+    0.03294740556858058
+   ],
+   "power_down": [
+    0.8401001795589899,
+    0.32820343613538944,
+    0.027755240384922646
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:MirF2T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:MirF3T0-Ncold~MirF1T0-Ncold",
+   "base_obs": 1.0,
+   "base_frozen": 0.94,
+   "kind": "ceiling",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": null,
+   "power_down": [
+    0.9999995376099743,
+    0.9809539692926109,
+    0.10973307622423027
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:MirF2T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 0.94,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9902760078682107,
+    0.9902760078682107,
+    0.7171175092359949
+   ],
+   "power_down": [
+    0.998685560704233,
+    0.8762852831972342,
+    0.17130917291514103
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_b",
+   "id": "SK:MirF3T0-Ncold~MirF4T0-Ncold",
+   "base_obs": 0.94,
+   "base_frozen": 0.94,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9902760078682107,
+    0.9902760078682107,
+    0.7171175092359949
+   ],
+   "power_down": [
+    0.998685560704233,
+    0.8762852831972342,
+    0.17130917291514103
+   ],
+   "alpha": 0.00078125
+  },
+  {
+   "family": "M_c",
+   "id": "N1:sysLAmi~sysLAmi-PS",
+   "base_obs": 0.0,
+   "base_frozen": 0.13,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "N1:sysLAmi~sysLAmi-MS",
+   "base_obs": 0.0,
+   "base_frozen": 0.13,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "N1:sysLAmi~sysLAmi-T0",
+   "base_obs": 0.0,
+   "base_frozen": 0.13,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "N1:sysLKan~sysLKan-PS",
+   "base_obs": 0.0,
+   "base_frozen": 0.13,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "N1:sysLKan~sysLKan-MS",
+   "base_obs": 0.025,
+   "base_frozen": 0.13,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9800930941768274,
+    0.5326517406487188,
+    0.039333436840241945
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "N1:sysLKan~sysLKan-T0",
+   "base_obs": 0.0725,
+   "base_frozen": 0.13,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9987168473617007,
+    0.8872854117279054,
+    0.20800498212293547
+   ],
+   "power_down": [
+    0.999714713331767,
+    0.999714713331767,
+    0.5687910652104408
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S1:sysLAmi~sysLAmi-PS",
+   "base_obs": 0.0,
+   "base_frozen": 0.33,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S1:sysLAmi~sysLAmi-MS",
+   "base_obs": 0.005,
+   "base_frozen": 0.33,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9998313608280605,
+    0.8939093227187752,
+    0.14428850869973603
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S1:sysLAmi~sysLAmi-T0",
+   "base_obs": 0.015,
+   "base_frozen": 0.33,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9955561085147258,
+    0.6922543584991844,
+    0.05801559173392503
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S1:sysLKan~sysLKan-PS",
+   "base_obs": 0.345,
+   "base_frozen": 0.33,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.8790522529067893,
+    0.4010317691972997,
+    0.045760250704573
+   ],
+   "power_down": [
+    0.9517685553116737,
+    0.4815956795821787,
+    0.050901638151195645
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S1:sysLKan~sysLKan-MS",
+   "base_obs": 0.5825,
+   "base_frozen": 0.33,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9103532845319331,
+    0.41525275309969223,
+    0.044528295400026334
+   ],
+   "power_down": [
+    0.8661371168638853,
+    0.37496149536599166,
+    0.041366402750376896
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S1:sysLKan~sysLKan-T0",
+   "base_obs": 0.6575,
+   "base_frozen": 0.33,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9532491514642806,
+    0.48456274913848185,
+    0.051225449962002144
+   ],
+   "power_down": [
+    0.880030932867367,
+    0.40182616805664745,
+    0.045990778593608964
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S4:sysLAmi~sysLAmi-PS",
+   "base_obs": 0.0,
+   "base_frozen": 0.24,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S4:sysLAmi~sysLAmi-MS",
+   "base_obs": 0.0,
+   "base_frozen": 0.24,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S4:sysLAmi~sysLAmi-T0",
+   "base_obs": 0.0,
+   "base_frozen": 0.24,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S4:sysLKan~sysLKan-PS",
+   "base_obs": 0.24,
+   "base_frozen": 0.24,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9256010794449883,
+    0.48758801602780255,
+    0.059864113216090135
+   ],
+   "power_down": [
+    0.9964933532262509,
+    0.678553027056528,
+    0.07450972451828065
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S4:sysLKan~sysLKan-MS",
+   "base_obs": 0.0,
+   "base_frozen": 0.24,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9999999681307954,
+    0.9957714357719205,
+    0.2821118300154988
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "S4:sysLKan~sysLKan-T0",
+   "base_obs": 0.5425,
+   "base_frozen": 0.24,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.8911311287620416,
+    0.3970266864804752,
+    0.042152153858988094
+   ],
+   "power_down": [
+    0.8667699105340678,
+    0.37496268725959025,
+    0.04118239050968752
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "SK:sysLAmi~sysLAmi-PS",
+   "base_obs": 0.005,
+   "base_frozen": 0.555,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9998313608280605,
+    0.8939093227187752,
+    0.14428850869973603
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "SK:sysLAmi~sysLAmi-MS",
+   "base_obs": 0.165,
+   "base_frozen": 0.555,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9688168219532579,
+    0.6159713937458905,
+    0.08651334058579098
+   ],
+   "power_down": [
+    0.9999999004668059,
+    0.9099463574551278,
+    0.12821588840332854
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "SK:sysLAmi~sysLAmi-T0",
+   "base_obs": 0.0425,
+   "base_frozen": 0.555,
+   "kind": "floor",
+   "deltas": [
+    0.09,
+    0.05,
+    0.02
+   ],
+   "power_up": [
+    0.9250711941255164,
+    0.3526033853888361,
+    0.024005160904230122
+   ],
+   "power_down": null,
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "SK:sysLKan~sysLKan-PS",
+   "base_obs": 0.6375,
+   "base_frozen": 0.555,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.941448304582918,
+    0.4621531856346121,
+    0.04880220756118012
+   ],
+   "power_down": [
+    0.8720692288702444,
+    0.3949400850823063,
+    0.04464439806047085
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "SK:sysLKan~sysLKan-MS",
+   "base_obs": 0.8275,
+   "base_frozen": 0.555,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999985883550108,
+    0.887285411727898,
+    0.1195363690005205
+   ],
+   "power_down": [
+    0.9647696032079572,
+    0.5997321600386869,
+    0.08240947581729031
+   ],
+   "alpha": 0.0020833333333333333
+  },
+  {
+   "family": "M_c",
+   "id": "SK:sysLKan~sysLKan-T0",
+   "base_obs": 0.87,
+   "base_frozen": 0.555,
+   "kind": "mid",
+   "deltas": [
+    0.15,
+    0.1,
+    0.05
+   ],
+   "power_up": [
+    0.9999999999302547,
+    0.9887660040977964,
+    0.18794345678376637
+   ],
+   "power_down": [
+    0.985150036111042,
+    0.7063222561031172,
+    0.11188336741383881
+   ],
+   "alpha": 0.0020833333333333333
+  }
+ ]
+}
