@@ -1,0 +1,145 @@
+{
+ "tag": "dryF",
+ "contrasts_version": "draft4-2026-09-11",
+ "gate_counts": {
+  "pilot_n": 40,
+  "both_floor_max": 1,
+  "both_ceiling_min": 39,
+  "require_full_n": true,
+  "note": "両側対比: 両腕とも 1/40 以下または 39/40 以上で降格（M と同型）。パイロットで一度だけ判定し両走行に適用。"
+ },
+ "when": "2026-09-11T11:57:06.653547+00:00",
+ "allow_short": true,
+ "results": {
+  "N1:T-N~N": {
+   "status": "downgraded_floor",
+   "A_catastrophe": 0,
+   "A_n_ok": 4,
+   "B_catastrophe": 0,
+   "B_n_ok": 4,
+   "reason": "床（両腕とも ≤0.1）"
+  },
+  "N1:T2-N~N": {
+   "status": "go",
+   "A_catastrophe": 2,
+   "A_n_ok": 5,
+   "B_catastrophe": 0,
+   "B_n_ok": 4,
+   "reason": null
+  },
+  "N1:T-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 1,
+   "A_n_ok": 5,
+   "B_catastrophe": 0,
+   "B_n_ok": 5,
+   "reason": null
+  },
+  "N1:T2-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 1,
+   "A_n_ok": 4,
+   "B_catastrophe": 0,
+   "B_n_ok": 5,
+   "reason": null
+  },
+  "N1:T-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 1,
+   "A_n_ok": 5,
+   "B_catastrophe": 0,
+   "B_n_ok": 5,
+   "reason": null
+  },
+  "N1:T2-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 1,
+   "A_n_ok": 5,
+   "B_catastrophe": 0,
+   "B_n_ok": 5,
+   "reason": null
+  },
+  "S1:T-N~N": {
+   "status": "not_run"
+  },
+  "S1:T2-N~N": {
+   "status": "not_run"
+  },
+  "S1:T-Ncold~Ncold": {
+   "status": "not_run"
+  },
+  "S1:T2-Ncold~Ncold": {
+   "status": "not_run"
+  },
+  "S1:T-O-Ncold~O-Ncold": {
+   "status": "not_run"
+  },
+  "S1:T2-O-Ncold~O-Ncold": {
+   "status": "not_run"
+  },
+  "S4:T-N~N": {
+   "status": "not_run"
+  },
+  "S4:T2-N~N": {
+   "status": "not_run"
+  },
+  "S4:T-Ncold~Ncold": {
+   "status": "not_run"
+  },
+  "S4:T2-Ncold~Ncold": {
+   "status": "not_run"
+  },
+  "S4:T-O-Ncold~O-Ncold": {
+   "status": "not_run"
+  },
+  "S4:T2-O-Ncold~O-Ncold": {
+   "status": "not_run"
+  },
+  "SK:T-N~N": {
+   "status": "not_run"
+  },
+  "SK:T2-N~N": {
+   "status": "not_run"
+  },
+  "SK:T-Ncold~Ncold": {
+   "status": "not_run"
+  },
+  "SK:T2-Ncold~Ncold": {
+   "status": "not_run"
+  },
+  "SK:T-O-Ncold~O-Ncold": {
+   "status": "not_run"
+  },
+  "SK:T2-O-Ncold~O-Ncold": {
+   "status": "not_run"
+  }
+ },
+ "continuity": {
+  "N1:Ncold": {
+   "kind": "校正腕",
+   "catastrophe": 0,
+   "n_ok": 5,
+   "band_pt": 5,
+   "fired": true,
+   "consequence": "当該場面を新 seed で一度だけ再走（--rerun-of で本 json を渡す）"
+  },
+  "N1:O-Ncold": {
+   "kind": "中間域",
+   "catastrophe": 0,
+   "n_ok": 5,
+   "band_pt": 15,
+   "fired": false
+  },
+  "N1:N": {
+   "kind": "中間域",
+   "catastrophe": 0,
+   "n_ok": 4,
+   "band_pt": 15,
+   "fired": true,
+   "consequence": "当該場面を新 seed で一度だけ再走（--rerun-of で本 json を渡す）"
+  }
+ },
+ "rerun_of": null,
+ "demoted": [],
+ "mention_baseline_recorded": true
+}

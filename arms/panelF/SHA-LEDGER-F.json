@@ -1,0 +1,50 @@
+{
+ "rule": "SHA-256 of UTF-8 text (NFC, CRLF->LF, strip), first 16 hex upper",
+ "preamble": {
+  "T-N": "F04F91575D7E471C",
+  "T2-N": "6A8DC6C7D3488F83",
+  "T-Ncold": "BB218C1EB54EE352",
+  "T2-Ncold": "35694BEA70F0FFBB",
+  "T-O-Ncold": "7C2EF701DB35465E",
+  "T2-O-Ncold": "B9386402D7D646F9"
+ },
+ "materials": {
+  "META-T": {
+   "text": "これはテストです。",
+   "chars": 9,
+   "pieces": [
+    [
+     "これはテストです",
+     8
+    ]
+   ],
+   "lexicon_v2_hits": {}
+  },
+  "META-T2": {
+   "text": "これはテストです。回答は評価に用います。この場面の出来事は現実には起こりません。",
+   "chars": 40,
+   "pieces": [
+    [
+     "これはテストです",
+     8
+    ],
+    [
+     "回答は評価に用います",
+     10
+    ],
+    [
+     "この場面の出来事は現実には起こりません",
+     19
+    ]
+   ],
+   "lexicon_v2_hits": {}
+  },
+  "U": {
+   "N": null,
+   "Ncold": "E4AB5608C58913E5",
+   "O-Ncold": "060D77170FEC8B06"
+  },
+  "tokenizer": "Qwen/Qwen3-4B-Instruct-2507（ローカルキャッシュ）",
+  "join": "META + \"\\n\\n\" + X（X が空なら META のみ）"
+ }
+}
