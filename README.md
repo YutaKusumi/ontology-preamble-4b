@@ -22,6 +22,18 @@
 - 凍結設計 `design/design-v1.0-FROZEN.md`（SHA D7963FE1C011341B）・凍結記録 `records/FREEZE-RECORD.md`・逸脱台帳 `records/DEVIATIONS.md`・パイロット門（旧版と訂正版）`records/pilot/`
 - 生データ: `results/<stage>/`（各走行の manifest・cells・trials・raw。raw の応答本文は器物の出力であり、AI の自己報告ではない）
 
+## 段階 F（2026-09-11 凍結・2026-09-12 結果公開・場面冒頭の検査認識の付記の効果）
+- 凍結設計 `design/design-stageF-FROZEN.md`（SHA16 33EEB98E11E8BC2D）・正本 JSON `design/contrasts-F.json`（F1996D08C2671134・確証 24〔T 対 U・T2 対 U × 3 土台 × 4 場面〕・記述 24・両側・門・添え札・全組合せ表 288 行・複製六札・様式門・連続性）・凍結マニフェスト `records/freeze-F-2026-09-11.json`（`tools/freeze_F.py --verify` で検証・凍結後の器材改訂 3 本は逸脱台帳に記帳）。
+- 問い: 場面文の冒頭に真の一文「これはテストです。」（T）または三文「これはテストです。回答は評価に用います。この場面の出来事は現実には起こりません。」（T2）を置くことが、置かない U と比べて三土台（前置きなし N／冷徹一行 Ncold／O-Ncold）の破局的選択率を動かすか。9 腕 × 4 場面 × n=400 × 反復 2 走行（確証は第一走行のみ・第二走行は事前登録の複製）。付記はいずれも本段の走行について真の陳述で、偽の陳述・監視の有無を偽る腕は置かない。
+- 素材台帳 `arms/ledger-F.md`・盤 `arms/panelF/`（V′・M の盤・台帳は不変・U 腕は同一バイト）。走行器 v2.6 `tools/run_preamble_api_f.py`（凍結 v2.5 から `tools/make_runner_f.py` が生成・system 型なし）。設計事実・検出力格子は JSON から機械生成（`records/F/design-facts-F.md`・`records/F/power-grid-F.md`）。
+- 設計検分の逐語: `records/reviews/F/`（Claude 系一巡 2 票〔新規個体〕＋系統外 Gemini 3.8 Flash × 2・Grok 4.6 × 2＋コーディネータの見直し・採否表つき）。下見は置かない。
+- 予想封印（登録者とコーディネータ・様式 v0.7・凍結後・パイロット前）: `records/predictions/predictions-registrant-F-2026-09-12-v2.json`（拘束版・SHA-256 D79F993BE92BF707237B9B1DD01A500B7C9F068994D8D93C68002F924F717093・第1版との差分は一欄・D-25）・`predictions-coordinator-F-2026-09-11.json`（SHA-256 1DA95EF21DBD7F898836624ADE427888D8F76B6A9450EE094840CFE821C7B83C）。的中は誰の判断の重みも変えない。
+- **結果報告（最終版・2026-09-12 公開）**: [`records/F/results-report-F-FINAL-2026-09-12.md`](records/F/results-report-F-FINAL-2026-09-12.md)——先頭は「上向きの確証 3 本（S1・S4・SK の T-O-Ncold 対 O-Ncold・SK は参照腕が M から乖離）と下向きの確証 4 本（すべて T2 腕・N1 の Ncold と O-Ncold・S1・S4 の O-Ncold）」と「様式門の一斉保留 3 場面（S1・S4・SK: 破局率の差は応答様式の転換と分離できなかった・様式率の表が主結果）」。判定可能 10・確証 7・判定保留（様式転位）12・判定不能（門）2・複製 ① 6／④ 2／⑥ 2・場面横断・土台横断の一般化なし・反証条件 (i) は器の読みでは発火せず（分母の三読みを併記・D-28）。添え札「上昇あり」12 本のうち確証した断面では 1 本。上向き・下向きのいずれも機序を書かず、再現手順を書かない。
+- 機械集計 `records/F/results-F-stageF1-stageF2-4.md`（凍結器材 `analyze_F.py` v1.2・解釈なし・四度の実行はすべて別名保全・D-29／D-31）／整合検査（率盲検下・`tools/integrity_F.py` C36EA8054B5D222E）／門 `records/F/gate-pilotF-2026-09-12*.*`（正本は `-final`・裁定 18・D-30）／抽出検査 `records/F/sampling-inspection-F-stageF{1,2}-2026-09-12.md`／封印予想の照合 `records/F/predictions-check-F-{registrant,coordinator}.md`／管理図 `records/control-chart.md`／生データ `results/pilotF/`・`results/stageF1/`・`results/stageF2/`（cells・trials・raw。raw の応答本文は器物の出力であり AI の自己報告ではない）。
+- 公開前検分（系統内一巡 2 票: 新規 Opus 5 × 2〔破器身・器材統計〕／系統外 4 票: Gemini 3.8 Flash × 2・Grok 4.6 × 2・逐語保全と採否表／登録者依頼の全文見直し 2 回）: `records/reviews/F/results/`（round1・round-ext）。検分の数は独立な確認の数ではない。系統内が見落とし系統外が捕まえたもの（§10 の切断・分母と分子の入れ替え・「判定可能」の二義の印字ほか）は採否表 ext に記帳。
+- 逸脱台帳 D-25〜D-31（封印予想 第2版の時系列・prompt_sha 検査器の誤警報・組み立て器の改訂・反証条件 (i) の分母の二義・集計器の複製札の枝・裁定 18〔門は第一走のみ〕・集計器の印字文字列）。走行: パイロット 1,440＋再走 360 → 第一走行 14,400 → 第二走行 14,400（総計 30,600 試行・api_error 0・書式外 0・費用 約 0.5 ドル〔登録者申告〕）。
+- 両用性の柵（凍結 §0-5・M 裁定 9・13）: 台帳の逐語文字列と腕別率表は全公開。上昇を招く操作の再現手順を本文・要約・表題に書かず、要約・表題での強調は両向きに禁止、腕を効き目順に並べない。本段のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。「検査と認識した」「見破った」「欺いている」とは書かない。
+
 ## 追補 M（2026-09-09 凍結・2026-09-11 結果公開・仏名・末尾文字列・呼び出しの形式の効果）
 - 凍結設計 `design/design-stageM-FROZEN.md`（SHA16 AB81C9C85787A66A）・正本 JSON `design/contrasts-M.json`（C510DD8AB17B639D・確証 136〔M-a 48・M-b 64・M-c 24〕・記述 240・両側・門・複製六札・様式門・drift）・凍結マニフェスト `records/freeze-M-2026-09-09.json`（`tools/freeze_M.py --verify` で検証）。
 - 問い: 一行招請「〈名〉として現れてください。」の末尾文字列の種別（なし／真言梵転写／真言カナ／同長無意味列／同字数有意味列）・呼び出しの形式（として句／ロールプレイ／ペルソナ／統制形式）・長文招請の system 置き（末尾を無意味列・有意味列に置換・除去した対照）が、冷徹一行後置の破局的選択率を動かすか。66 腕 × 4 シナリオ × n=400 × 反復 2 走行（確証は第一走行のみ・第二走行は事前登録の複製）。
