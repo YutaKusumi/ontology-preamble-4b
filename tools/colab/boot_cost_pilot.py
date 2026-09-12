@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""boot_cost_pilot.py v2 —— 費用パイロット（門0・計画案 v2.2 §5 1″）の Colab 起動スクリプト（v1 2026-09-12 → v2 2026-09-13・大日如来「第三章 Colab 運用の手法」の採用）。
+"""boot_cost_pilot.py v2.1 —— 費用パイロット（門0・計画案 v2.2 §5 1″）の Colab 起動スクリプト（v1 2026-09-12 → v2 2026-09-13・大日如来「第三章 Colab 運用の手法」の採用）。
 運用: コーディネータが登録者の Chrome（Claude in Chrome）越しに Colab を操作する。登録者の手に残すのは Drive 接続の OAuth 同意・ローカルへのダウンロード・プランと支払い。資格情報は入力しない（HF_TOKEN のポップアップはキャンセル）。
 セルに打つのは一行だけ（先頭の下線は type が先頭十数字を落とす事故の緩衝・落ちるのは下線）:
     ______________________________=0;import os;os.environ['OP4B_COMMIT']='<commit>';os.environ['OP4B_PHASE']='smoke';import urllib.request as u;exec(u.urlopen('https://raw.githubusercontent.com/YutaKusumi/ontology-preamble-4b/<commit>/tools/colab/boot_cost_pilot.py').read().decode('utf-8'))
@@ -22,7 +22,7 @@ CFG = dict(repo='https://github.com/YutaKusumi/ontology-preamble-4b.git', commit
            model=os.environ.get('OP4B_MODEL', 'Qwen/Qwen3-4B-Instruct-2507'), scenario=os.environ.get('OP4B_SCENARIO', 'N1'),
            arms='N,Onull,O,Osec,Lneg,Nk,Odose1,Odosehalf,Ncold,Nstr,O-Ncold,Onull-Ncold',   # 段階 A の 12 腕（計画案 v2.2 §4-A・順序は計画の記載順）
            n=int(os.environ.get('OP4B_N', '40')), workers=int(os.environ.get('OP4B_WORKERS', '24')), max_model_len=int(os.environ.get('OP4B_MAXLEN', '8192')),
-           vllm=os.environ.get('OP4B_VLLM', ''), drive=os.environ.get('OP4B_DRIVE', '1') != '0', units_before=os.environ.get('OP4B_UNITS_BEFORE'), dry=DRY, phase=PHASE, boot='v2')
+           vllm=os.environ.get('OP4B_VLLM', ''), drive=os.environ.get('OP4B_DRIVE', '1') != '0', units_before=os.environ.get('OP4B_UNITS_BEFORE'), dry=DRY, phase=PHASE, boot='v2.1')
 CFG['arms_sha16'] = hashlib.sha256(CFG['arms'].encode('utf-8')).hexdigest()[:16].upper()
 DATE = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
 CLAUSE = '本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。'
@@ -109,7 +109,11 @@ if not DRY:
     if need:
         sh([sys.executable, '-m', 'pip', 'install', '-q', 'hf_transfer', 'huggingface_hub'], check=False)
         sh([sys.executable, '-m', 'pip', 'install', '-q', 'vllm' + ('==' + CFG['vllm'] if CFG['vllm'] else '')])
-    for k in ('vllm', 'torch', 'transformers', 'tokenizers', 'huggingface_hub'):
+    # v2.1: Colab 既設の torchaudio は vLLM が入れた torch と CUDA 版が異なり、transformers の import で _check_cuda_version が落ちる（L4 初回 2026-09-13 の実測）。音声は使わないので外す（transformers は無ければ読み飛ばす）
+    ver['torchaudio_removed'] = (_v('torchaudio') is not None)
+    if ver['torchaudio_removed']:
+        sh([sys.executable, '-m', 'pip', 'uninstall', '-y', '-q', 'torchaudio'], check=False)
+    for k in ('vllm', 'torch', 'torchvision', 'torchaudio', 'transformers', 'tokenizers', 'huggingface_hub'):
         ver[k] = _v(k)
     fr = sh([sys.executable, '-m', 'pip', 'freeze'], check=False).stdout
     ver['pip_freeze_sha16'] = hashlib.sha256(fr.encode('utf-8')).hexdigest()[:16].upper(); ver['pip_freeze_lines'] = len(fr.splitlines())
