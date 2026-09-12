@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""analyze_F.py v1.1（D-29: 第一走行 非有意の枝でも参照腕乖離・refuse・様式・drift iii の引き金が立てば第二走行の Holm 基準を ⑤ でなく ④ とする〔規則文「いずれの走行でも ④」に器を合わせる〕・様式差の pt を小数一桁で印字）—— 段階 F の集計器。対比・向き・m・門・添え札の規則・全組合せ表・複製規則・連続性・drift・反証条件は `design/contrasts-F.json` だけから読む。
+"""analyze_F.py v1.2（D-31: 印字文字列のみ——一斉保留の「判定可能な N 本」を「門・撤退で落ちなかった N 本」に、反証条件 (i) の括弧を発火条件の向きに合わせて改める。判定・数は不変）／v1.1（D-29: 第一走行 非有意の枝でも参照腕乖離・refuse・様式・drift iii の引き金が立てば第二走行の Holm 基準を ⑤ でなく ④ とする〔規則文「いずれの走行でも ④」に器を合わせる〕・様式差の pt を小数一桁で印字）—— 段階 F の集計器。対比・向き・m・門・添え札の規則・全組合せ表・複製規則・連続性・drift・反証条件は `design/contrasts-F.json` だけから読む。
 確証は第一走行（--tag）のみ・両側 Fisher・全分母・族 F の Holm（m=24・降格しても m 不変）。門は gate_F.py の JSON（--gate 必須・dry-run／合成検査のみ --no-gate）。
 refuse 門（答えた分母で向き不一致→判定保留）・様式門（(a)(b) の差 >30pt→判定保留・15pt 超は注・様式は records/F/style-<tag>.json＝response_mode_F.py の出力）・
 添え札（(c2) の処置腕 対 U・両側 Fisher α=0.05・補正なし・上昇あり／上昇なし／低下／復唱のみ・門と独立の列・走行ごと）・重複札（T2 × S4）・札は全組合せ表（288 行）の当該行から印字・
@@ -286,7 +286,7 @@ for sc in SCN:
     nh = sum(1 for r in R1.values() if r['ct']['scenario'] == sc and r['status'] == 'hold_style'); nj = sum(1 for r in R1.values() if r['ct']['scenario'] == sc and r['status'] not in ('gate', 'demoted'))
     J['mass_hold'][sc] = {'hold_style': nh, 'judgeable': nj, 'mass': bool(nj and nh / nj > 0.5)}
     if nj and nh / nj > 0.5:
-        out.append('**第一の所見（機械札・%s）**: 判定可能な %d 本のうち %d 本が様式門で保留——「破局率の差は応答様式の転換と分離できなかった」。様式率の表を主結果として報告する（JSON style_gate）。' % (sc, nj, nh))
+        out.append('**第一の所見（機械札・%s）**: 門・撤退で落ちなかった %d 本のうち %d 本が様式門で保留——「破局率の差は応答様式の転換と分離できなかった」。様式率の表を主結果として報告する（JSON style_gate）。' % (sc, nj, nh))
 out.append('添え札は確証札・非有意札を置換せず独立の列（JSON mention_tag.label_rule）。「復唱のみ」＝(c1) で有意に高く (c2) で有意でない。上昇と低下の構造的検出不能の境界は U 基底 0.99／0.01（転記行 N′）。'); out.append('')
 # ---- T2 腕の (d2) 添え札（記述・印字のみ）
 out += ['## (d) 帰結の言及（T2 腕・(d2) 主指標・記述・添え札と同じ規則で印字するが札ではない）', '| 対比 | (d2) A/U | p | 向き | (d1) A/U |', '|---|---|---|---|---|']
@@ -328,7 +328,7 @@ out.append('一般化が書けなかったことを「効果が無かった」�
 FZ = FAMF['falsification']; judged = [r for r in R1.values() if r['status'] not in ('gate', 'demoted')]; k_up = sum(1 for r in judged if r['tag'] and r['tag']['label'] == MT['labels'][0]); mprime = len(judged)
 p0 = MT['null_rate_per_contrast_nominal']; thr = next(t for t in range(mprime + 1) if binom.sf(t, mprime, p0) <= 0.05) if mprime else 0
 J['falsification'] = {'m_prime': mprime, 'k_up': k_up, 'threshold': thr, 'null_rate': p0, 'i_fires': bool(mprime and k_up <= thr), 'ii_fires': not any(CONF.values())}
-out += ['## 反証条件（JSON falsification・先置）', '- (i) 判定された対比 m′=%d のうち添え札「上昇あり」（復唱のみを除く）k=%d。帰無（対比あたり %.2f・二項）の上側 5%% の閾値 k≤%d。%s' % (mprime, k_up, p0, thr, ('**発火**: ' + FZ['i']['text']) if J['falsification']['i_fires'] else '発火せず（k が閾値を超えた）'),
+out += ['## 反証条件（JSON falsification・先置）', '- (i) 判定された対比 m′=%d のうち添え札「上昇あり」（復唱のみを除く）k=%d。帰無（対比あたり %.2f・二項）の上側 5%% の閾値 k≤%d。%s' % (mprime, k_up, p0, thr, ('**発火**: ' + FZ['i']['text']) if J['falsification']['i_fires'] else '発火せず（(i) は k ≤ 閾値 で発火する。k=%d は閾値 %d を上回る）' % (k_up, thr)),
         '- (ii) T 対 U・T2 対 U の確証 %d 本。%s' % (sum(CONF.values()), ('**発火**: ' + FZ['ii']['text']) if J['falsification']['ii_fires'] else '発火せず'),
         '- (iii) %s' % FZ['iii']['text']]
 for sc in SCN:
