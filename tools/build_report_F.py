@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-"""build_report_F.py v1 —— 段階 F 結果報告の草案を、先置した雛形（records/F/results-report-template-F.md）の節順で機械組み立てする。
+"""build_report_F.py v2（D-27: §2 の一次記録の転記・§3 の全パイロット記録・§9 の実測基底での検出力再計算・§12 の検分票ファイル。判定・札・表には触れない）—— 段階 F 結果報告の草案を、先置した雛形（records/F/results-report-template-F.md）の節順で機械組み立てする。
 表と札はすべて機械出力（analyze_F の md／json・gate_F・integrity_F・power_grid_F・compare_predictions_F・run-log）からの逐語転記。散文中の数は本器が cells.json・style-*.json・機械出力から取得して埋める。
 **起草者が打ち込んだ数**は日付・SHA16／SHA-256（記帳値）・費用の実績（登録者申告）・逸脱番号・雛形の SHA16 に限り、冒頭に一覧を印字する（M v6.1 の規律を継承）。価値語・禁止語を機械走査し検出すれば停止する。
 用法: python tools/build_report_F.py --tag stageF1 --tag2 stageF2 --results records/F/results-F-stageF1-stageF2.md --gate records/F/gate-pilotF-<date>.json --draft 1 [--root results/_synth --usd 0.38]
 """
-import os, re, json, glob, hashlib, datetime, argparse, collections
+import os, re, json, glob, hashlib, datetime, argparse, collections, sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ap = argparse.ArgumentParser(); ap.add_argument('--tag', required=True); ap.add_argument('--tag2', required=True); ap.add_argument('--results', required=True); ap.add_argument('--gate', required=True); ap.add_argument('--draft', type=int, default=1)
-ap.add_argument('--root', default=None); ap.add_argument('--design', default='design/design-stageF-FROZEN.md'); ap.add_argument('--usd', default=None, help='費用の実績（登録者申告・打ち込み数）'); ap.add_argument('--predictions', nargs='*', default=[]); ap.add_argument('--out', default=None)
+ap.add_argument('--root', default=None); ap.add_argument('--design', default='design/design-stageF-FROZEN.md'); ap.add_argument('--usd', default=None, help='費用の実績（登録者申告・打ち込み数）'); ap.add_argument('--predictions', nargs='*', default=[]); ap.add_argument('--out', default=None); ap.add_argument('--kensho', default=None, help='コーディネータが書いた検分票（md）を §12 に逐語挿入')
 a = ap.parse_args()
 sha16 = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
 R = lambda p: open(os.path.join(REPO, p) if not os.path.isabs(p) else p, encoding='utf-8').read()
@@ -71,7 +71,20 @@ for tag in (a.tag, a.tag2):
 intg = {t: sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'integrity-%s-*.md' % t))) for t in (a.tag, a.tag2)}
 intg_line = '／'.join(('%s: ' % t + next((l for l in open(p[-1], encoding='utf-8') if l.startswith('判定:')), '（判定行なし）').strip()) if p else '%s: （整合検査の記録なし）' % t for t, p in intg.items())
 runlog_p = os.path.join(REPO, 'records', 'F', 'run-log-F.md'); runlog = open(runlog_p, encoding='utf-8').read() if os.path.exists(runlog_p) else '（run-log-F.md なし）'
-pre_reg = [l for l in runlog.split('\n') if '事前拘束' in l or '開示' in l]
+pre_reg = [l for l in runlog.split('\n') if l.startswith('- **率盲検の事前拘束')]
+blind_end = [l for l in runlog.split('\n') if '率盲検の終了' in l]
+intg_row = next((l for l in runlog.split('\n') if '整合検査器の公開と SHA16' in l), '')
+intg_sha = (re.search(r'SHA16 ([0-9A-F]{16})', intg_row).group(1) if re.search(r'SHA16 ([0-9A-F]{16})', intg_row) else '〔run-log に記帳なし〕'); intg_when = intg_row.split('|')[1].strip() if intg_row.count('|') >= 2 else '〔 〕'
+import subprocess
+_mans = sorted(glob.glob(os.path.join(REPO, 'records', 'freeze-F-*.json'))); _fv = '〔マニフェストなし〕'
+if _mans:
+    _r = subprocess.run([sys.executable, os.path.join(REPO, 'tools', 'freeze_F.py'), '--verify', _mans[-1]], capture_output=True, text=True, encoding='utf-8', env=dict(os.environ, PYTHONIOENCODING='utf-8'))
+    _m = re.search(r'(\d+)/(\d+) 一致', _r.stdout); _fv = ('%s（%s・不一致 %s）' % (_m.group(0), os.path.basename(_mans[-1]), '・'.join(l.split('不一致: ')[1] for l in _r.stdout.split('\n') if '不一致:' in l) or 'なし')) if _m else '〔verify 失敗〕'
+samp = []
+for t in (a.tag, a.tag2):
+    for f in sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'sampling-inspection-F-%s-*.md' % t))):
+        samp += [t + ': ' + l.lstrip('- ').strip() for l in open(f, encoding='utf-8').read().split('\n') if l.startswith('- 機械分類') or l.startswith('- 目視の所見') or l.startswith('- 応答言語')]
+FJ = J('records/F/design-facts-F.json') if os.path.exists(os.path.join(REPO, 'records', 'F', 'design-facts-F.json')) else {}
 # ---- 組み立て
 O = ['# 段階 F 結果報告 草案%d（機械組み立て・%s・雛形 SHA16 %s・第一走行 %s・第二走行 %s・contrasts %s）' % (a.draft, today, TPL_SHA, a.tag, a.tag2, T['version']), '',
      '- 状態: 草案%d（検分前）。雛形 `records/F/results-report-template-F.md`（%s）の節順で `tools/build_report_F.py` が機械組み立てした。表・札は機械出力の逐語転記、散文の数は一次記録から取得。' % (a.draft, TPL_SHA),
@@ -91,16 +104,16 @@ O += ['## 1. 要約（族 F・機械集計からの転記）', '', '| 族 | m | 
       '| F（T 対 U・T2 対 U） | %d | %d | %d（上向き %d・下向き %d） | %d | %d／%d／%d／%d | %s | analyze_F |' % (T['families']['F']['m'], judgeable, n_conf, len(up_conf), len(dn_conf), n_rep1, st_count['gate'], st_count['hold_refuse'], st_count['hold_style'], st_count['demoted'], '・'.join('%s %d' % kv for kv in tags_conf.items()) or '—'), '',
       'F では %d 本が判定可能で、%d 本が同じ向きで確証し（上向き %d・下向き %d）、うち %d 本が第二走行で複製された（札 ①）。添え札の内訳は %s。' % (judgeable, n_conf, len(up_conf), len(dn_conf), n_rep1, '・'.join('%s %d' % kv for kv in tags_conf.items()) or '（確証なし）'), '']
 # 2
-O += ['## 2. 走行の事実', '', '- 器材: 走行器 v2.6 runner_sha %s・引数文字列 SHA16 %s（design-facts-F）・凍結マニフェスト `tools/freeze_F.py --verify` の結果〔起草者記入: n/N〕・整合検査器〔SHA16・run-log 記帳日時〕。' % ('・'.join(sorted(x or '—' for x in runner_sha)), (J('records/F/design-facts-F.json').get('arms_string_sha16') if os.path.exists(os.path.join(REPO, 'records', 'F', 'design-facts-F.json')) else '〔 〕')),
+O += ['## 2. 走行の事実', '', '- 器材: 走行器 v2.6 runner_sha %s・引数文字列 SHA16 %s（design-facts-F）・凍結マニフェスト `tools/freeze_F.py --verify` の結果 %s・整合検査器 `tools/integrity_F.py` SHA16 %s（run-log 記帳 %s UTC・第一走行の前）。' % ('・'.join(sorted(x or '—' for x in runner_sha)), FJ.get('arms_string_sha16', '〔 〕'), _fv, intg_sha, intg_when),
       '- 走行（UTC・trials の timestamp から）: 第一走行 %s %s〜%s（%s 試行）／第二走行 %s %s〜%s（%s 試行）。〔中断と再開は run-log-F.md から転記〕' % (a.tag, t_first.get(a.tag, '—')[:16], t_last.get(a.tag, '—')[:16], format(n_trials[a.tag], ','), a.tag2, t_first.get(a.tag2, '—')[:16], t_last.get(a.tag2, '—')[:16], format(n_trials[a.tag2], ',')),
-      '- 整合: %s。api_error %d／%d・書式外 %d／%d。抽出検査: 〔sampling-inspection-F の記録を転記〕。' % (intg_line, api_err[a.tag], api_err[a.tag2], ff_tot[a.tag], ff_tot[a.tag2]),
-      '- 率盲検の事前拘束と開示（run-log-F.md）: ' + (' ／ '.join(l.strip() for l in pre_reg) if pre_reg else '〔該当行なし〕'),
-      '- 費用と時間: 費用 %s（登録者申告・打ち込み数）。凍結時の見積り（転記行 A）は目安であり実績に置換する。' % (('約 %s ドル' % a.usd) if a.usd else '〔登録者申告待ち〕'), '']
+      '- 整合: %s。api_error %d／%d・書式外 %d／%d。抽出検査（判定欄と率を印字しない標本の目視・逐語転記）: %s' % (intg_line, api_err[a.tag], api_err[a.tag2], ff_tot[a.tag], ff_tot[a.tag2], ' ／ '.join(samp) or '〔記録なし〕'),
+      '- 率盲検の事前拘束（run-log-F.md・凍結前に記帳・逐語）: ' + (pre_reg[0].lstrip('- ').strip() if pre_reg else '〔該当行なし〕') + ' **履行**: ' + (('・'.join(l.strip().strip('|').strip() for l in blind_end)) if blind_end else '〔終了の記帳なし〕'),
+      '- 費用と時間: 費用 %s（登録者申告・打ち込み数）。凍結時の見積り（転記行 A・M 実績比）は約 %.2f ドル・壁時計 %.1f 時間で、実績は二走行の壁時計 %.2f 時間（trials の timestamp から・パイロットと再走を含まない）。見積りは目安であり実績に置換する。' % (('約 %s ドル' % a.usd) if a.usd else '〔登録者申告待ち〕', FJ.get('usd_total', float('nan')), FJ.get('hours_total_wall', float('nan')), sum((datetime.datetime.fromisoformat(t_last[t]) - datetime.datetime.fromisoformat(t_first[t])).total_seconds() / 3600 for t in (a.tag, a.tag2) if t in t_first)), '']
 if a.usd:
     TYPED.append('費用の実績 約 %s ドル（登録者申告）' % a.usd)
 # 3
 O += ['## 3. 門と保留（結果の前に）', '', '- 門（パイロット n=40・両腕とも ≤1/40 または ≥39/40 → 判定不能）: GO %d・床 %d・天井 %d・未走行 %d（%s）。' % (gc['go'], gc['downgraded_floor'], gc['downgraded_ceiling'], gc['not_run'], os.path.basename(a.gate)),
-      '- 撤退条件（パイロット）: 発火 %s／記述へ降格 %s。' % ('・'.join(k for k, v in gate.get('continuity', {}).items() if v.get('fired')) or 'なし', '・'.join(gate.get('demoted') or []) or 'なし'),
+      '- 撤退条件（パイロット・全記録を時系列で）: ' + ' → '.join('%s: 発火 %s／記述へ降格 %s%s' % (os.path.basename(g), '・'.join('%s %d/%d' % (k, v['catastrophe'], v['n_ok']) for k, v in json.load(open(g, encoding='utf-8')).get('continuity', {}).items() if v.get('fired')) or 'なし', '・'.join(json.load(open(g, encoding='utf-8')).get('demoted') or []) or 'なし', '（再走 --rerun-of %s）' % os.path.basename(json.load(open(g, encoding='utf-8')).get('rerun_of') or '') if json.load(open(g, encoding='utf-8')).get('rerun_of') else '') for g in sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'gate-pilotF-*.json')))) + '。両走行に適用した門の正本は %s。' % os.path.basename(a.gate),
       section(res_md, '連続性条件'), '',
       '- refuse 門（判定保留）: %s。' % ('・'.join(k for k, v in F1.items() if v['status'] == 'hold_refuse') or 'なし'),
       '- 様式門（判定保留）: %s。注（15 pt 超 30 pt 以下）: %s。層別可能な対比: %s。' % ('・'.join(k for k, v in F1.items() if v['status'] == 'hold_style') or 'なし', '・'.join(k for k, v in F1.items() if v['style_axis'] == 'note') or 'なし', '・'.join('%s（%s）' % (k, '・'.join('%s %d/%d %+.3f' % tuple(s) for s in v['strat'])) for k, v in F1.items() if v['strat']) or 'なし（O-Ncold は層別不能）'),
@@ -144,7 +157,19 @@ O += ['## 8. 三つ組（腕別・場面別・両走行・台帳順・機械集�
 for sc in SC:
     O += [section(res_md, '%s 三つ組（第一走行）' % sc), '', section(res_md, '%s 三つ組（第二走行）' % sc), '']
 # 9
-O += ['## 9. 検出力（実測基底での再計算）・封印予想の照合', '', '- 実測基底での再計算: 〔power_grid を第一走行の U 腕の実測で再計算した表——凍結の格子は base_M1 で、本走行の U 基底との差は §4 の基底率表〕。']
+O += ['## 9. 検出力（実測基底での再計算）・封印予想の照合', '', '- 実測基底での再計算（同一の検出力関数 `vprime_power.make_power`・n=400・両側 Fisher・α=0.05/24・基底＝第一走行の U 腕の実測・床 <0.05 は上枝 +9/+5/+2・天井 >0.95 は下枝 −9/−5/−2・中間は両枝 ±15/±9/±5）:', '', '| 対比 | 実測基底（第一走行 U） | 凍結の基底（M1） | 種別 | 上枝 大/中/小 | 下枝 大/中/小 |', '|---|---|---|---|---|---|']
+sys.path.insert(0, os.path.join(REPO, 'tools')); from vprime_power import make_power; _pw = make_power(400); _cache = {}
+def _p(p0, p1):
+    k = (round(p0, 4), round(min(max(p1, 0.0), 1.0), 4))
+    if k not in _cache:
+        _cache[k] = _pw(k[0], k[1], 0.05 / 24)
+    return _cache[k]
+for k, v in F1.items():
+    b = v['rb']; kind = 'floor' if b < 0.05 else 'ceiling' if b > 0.95 else 'mid'; ds = (0.09, 0.05, 0.02) if kind != 'mid' else (0.15, 0.09, 0.05)
+    up = '/'.join('%.3f' % _p(b, b + d) for d in ds) if kind != 'ceiling' else '—'; dn = '/'.join('%.3f' % _p(b, b - d) for d in ds) if kind != 'floor' else '—'
+    m1 = next(c['base_B_M1'] for c in T['families']['F']['contrasts'] if c['id'] == k)
+    O.append('| %s | %.4f | %.4f | %s | %s | %s |' % (k, b, m1, kind, up, dn))
+O.append('')
 for p in a.predictions:
     O.append('- ' + open(p, encoding='utf-8').read().split('\n')[0].lstrip('# ') + ': ' + '／'.join(l.strip('| ').replace(' | ', '・') for l in open(p, encoding='utf-8').read().split('\n') if l.startswith('| ') and not l.startswith('| 種別')))
 O += ['- 帯の的中は誰の判断の重みも変えない。U 腕の帯は既測の写しで別枠。', '']
@@ -160,7 +185,7 @@ O += ['## 11. 読み条項の適用と限界・確認していないこと', '',
       '- 果たさないこと（凍結 §4 の再掲）: ' + section(design, '4. 果たさないこと', '## ').split('\n', 1)[-1].strip(),
       '- 走行差は系の雑音として扱い、プロンプトの側に意味づけしない。',
       '- **確認していないこと**（空欄不可）: 判定器の妥当性は段IV の 4B 一場面の値しか持たない／言及率 (c1)(c2)(d1)(d2) は語彙の機械計数であり内容の判定ではない（言い換えは除けず、英語語幹は処置腕の訳出を拾いやすい）／付記の位置効果・文言の摂動・多段ターン・思考モードは測っていない／様式 (a)(b) は先頭文字と語彙の機械判定であり内容の判定ではない／抽出検査は書式の目視であり判定の妥当性の検査ではない／〔起草者が追加〕。', '']
-O += ['## 12. 検分票（kensho・コーディネータ・草案%d）' % a.draft, '', '- 対象: 本草案。', '- 段階: 事後適用（率の閲覧後・雛形は率の閲覧前に先置〔SHA16 %s〕）。' % TPL_SHA, '- 凍結物の同定: 〔freeze-F・contrasts・盤・台帳・門・封印予想の SHA〕。', '- 盲検の状態: 率盲検の事前拘束（§2）・添え札の判定は機械。', '- 敵対的検分: 〔分母・基底率・出典ピン留め・ライセンス化の検査結果〕。', '- 系統の内訳: 〔 〕。', '- COI 記録: 凍結 §0 の (a)(b)(c) の向き・置いた印〔番号のみ〕。', '- 判定: 〔確定／保留／登録者裁定要〕。', '- 本検分が確認していないこと: 〔必ず 1 項目以上〕。', '']
+O += ['## 12. 検分票（kensho・コーディネータ・草案%d）' % a.draft, ''] + ([open(a.kensho, encoding='utf-8').read().rstrip('\n'), ''] if a.kensho else []) + ([] if a.kensho else [ '- 対象: 本草案。', '- 段階: 事後適用（率の閲覧後・雛形は率の閲覧前に先置〔SHA16 %s〕）。' % TPL_SHA, '- 凍結物の同定: 〔freeze-F・contrasts・盤・台帳・門・封印予想の SHA〕。', '- 盲検の状態: 率盲検の事前拘束（§2）・添え札の判定は機械。', '- 敵対的検分: 〔分母・基底率・出典ピン留め・ライセンス化の検査結果〕。', '- 系統の内訳: 〔 〕。', '- COI 記録: 凍結 §0 の (a)(b)(c) の向き・置いた印〔番号のみ〕。', '- 判定: 〔確定／保留／登録者裁定要〕。', '- 本検分が確認していないこと: 〔必ず 1 項目以上〕。', ''])
 O += ['---', '', '**起草者が打ち込んだ数の一覧**: ' + '・'.join(TYPED) + '。これ以外の数は機械出力からの逐語転記または一次記録からの機械取得である。', '', '本報告のいかなる数値も、AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。']
 txt = '\n'.join(O) + '\n'
 hits = [(w, i + 1) for i, l in enumerate(O) if not (l.startswith('要約文は') or '書かない' in l or l.startswith('- 果たさないこと') or '「見破った」' in l or '「欺いている」' in l or TRAILER in l or '「行儀よくなった」' in l) for w in BAN if w in l]
