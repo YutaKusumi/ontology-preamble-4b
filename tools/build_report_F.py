@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build_report_F.py v3.2（D-27 v3→v3.2: 系統外四票の反映——§10 の逸脱台帳を切らずに転記し verify の不一致本数と器名を機械で・§9 の分母と分子・§0-4 の差なしと重複札・§3 の見出し・(b) 差 0 の件数行・§2 の算術・§4 の層別の語・§11 の追記・集計器の一度目と最終の主札の突合）／v3（D-27 v2→v3: 一巡目 破器身・器材統計の所見——§0 上向きと下向きの一覧を同じ書式・一斉保留の第一の所見と様式率の表・反証条件 (i) の分母の感度・「判定可能」の二義の解消・非有意の様式差の留保・§10 の記入・(c2) 非対称の開示・pt 表示・§5 分母の脚注。v2: §2 の一次記録の転記・§3 の全パイロット記録・§9 の実測基底での検出力再計算・§12 の検分票ファイル。判定・札・表には触れない）—— 段階 F 結果報告の草案を、先置した雛形（records/F/results-report-template-F.md）の節順で機械組み立てする。
+"""build_report_F.py v3.3（D-27 v3.2→v3.3・登録者依頼の全文見直し: 状態行の引数・§2 の履行行の整形・§3 の門記録の時系列順と層別の語・§9 の照合の転記を集計表と全体欄に限定・§10 の器名→逸脱番号の対応を「凍結器材 `tools/…`」の行から・「すべて 0.0 pt」の語・§8 の Wilson の注）／v3.2（D-27 v3→v3.2: 系統外四票の反映——§10 の逸脱台帳を切らずに転記し verify の不一致本数と器名を機械で・§9 の分母と分子・§0-4 の差なしと重複札・§3 の見出し・(b) 差 0 の件数行・§2 の算術・§4 の層別の語・§11 の追記・集計器の一度目と最終の主札の突合）／v3（D-27 v2→v3: 一巡目 破器身・器材統計の所見——§0 上向きと下向きの一覧を同じ書式・一斉保留の第一の所見と様式率の表・反証条件 (i) の分母の感度・「判定可能」の二義の解消・非有意の様式差の留保・§10 の記入・(c2) 非対称の開示・pt 表示・§5 分母の脚注。v2: §2 の一次記録の転記・§3 の全パイロット記録・§9 の実測基底での検出力再計算・§12 の検分票ファイル。判定・札・表には触れない）—— 段階 F 結果報告の草案を、先置した雛形（records/F/results-report-template-F.md）の節順で機械組み立てする。
 表と札はすべて機械出力（analyze_F の md／json・gate_F・integrity_F・power_grid_F・compare_predictions_F・run-log）からの逐語転記。散文中の数は本器が cells.json・style-*.json・機械出力から取得して埋める。
 **起草者が打ち込んだ数**は日付・SHA16／SHA-256（記帳値）・費用の実績（登録者申告）・逸脱番号・雛形の SHA16 に限り、冒頭に一覧を印字する（M v6.1 の規律を継承）。価値語・禁止語を機械走査し検出すれば停止する。
 用法: python tools/build_report_F.py --tag stageF1 --tag2 stageF2 --results records/F/results-F-stageF1-stageF2.md --gate records/F/gate-pilotF-<date>.json --draft 1 [--root results/_synth --usd 0.38]
@@ -7,7 +7,7 @@
 import os, re, json, glob, hashlib, datetime, argparse, collections, sys
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ap = argparse.ArgumentParser(); ap.add_argument('--tag', required=True); ap.add_argument('--tag2', required=True); ap.add_argument('--results', required=True); ap.add_argument('--gate', required=True); ap.add_argument('--draft', type=int, default=1)
-ap.add_argument('--root', default=None); ap.add_argument('--design', default='design/design-stageF-FROZEN.md'); ap.add_argument('--usd', default=None, help='費用の実績（登録者申告・打ち込み数）'); ap.add_argument('--predictions', nargs='*', default=[]); ap.add_argument('--out', default=None); ap.add_argument('--kensho', default=None, help='コーディネータが書いた検分票（md）を §12 に逐語挿入')
+ap.add_argument('--root', default=None); ap.add_argument('--design', default='design/design-stageF-FROZEN.md'); ap.add_argument('--usd', default=None, help='費用の実績（登録者申告・打ち込み数）'); ap.add_argument('--predictions', nargs='*', default=[]); ap.add_argument('--out', default=None); ap.add_argument('--kensho', default=None, help='コーディネータが書いた検分票（md）を §12 に逐語挿入'); ap.add_argument('--state', default='検分前', help='状態行に印字する検分の段階')
 a = ap.parse_args()
 sha16 = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
 R = lambda p: open(os.path.join(REPO, p) if not os.path.isabs(p) else p, encoding='utf-8').read()
@@ -87,7 +87,7 @@ for t in (a.tag, a.tag2):
 FJ = J('records/F/design-facts-F.json') if os.path.exists(os.path.join(REPO, 'records', 'F', 'design-facts-F.json')) else {}
 # ---- 組み立て
 O = ['# 段階 F 結果報告 草案%d（機械組み立て・%s・雛形 SHA16 %s・第一走行 %s・第二走行 %s・contrasts %s）' % (a.draft, today, TPL_SHA, a.tag, a.tag2, T['version']), '',
-     '- 状態: 草案%d（検分前）。雛形 `records/F/results-report-template-F.md`（%s）の節順で `tools/build_report_F.py` が機械組み立てした。表・札は機械出力の逐語転記、散文の数は一次記録から取得。' % (a.draft, TPL_SHA),
+     '- 状態: 草案%d（%s）。雛形 `records/F/results-report-template-F.md`（%s）の節順で `tools/build_report_F.py` が機械組み立てした。表・札は機械出力の逐語転記、散文の数は一次記録から取得。' % (a.draft, a.state, TPL_SHA),
      '- 起草者が打ち込んだ数の一覧は末尾に印字する（これ以外の数は機械取得）。', '']
 TYPED += ['日付 %s' % today, '雛形 SHA16 %s' % TPL_SHA]
 # 0
@@ -100,7 +100,7 @@ O += ['## 0. 先頭に置くもの（凍結 §0・§3 の順・雛形 §0）', '
       '6. 反証条件の発火: (i) %s（m′=%d・k=%d・閾値 ≤%d）／(ii) %s（確証 %d 本）。' % ('**発火**' if FZ['i_fires'] else '発火せず', FZ['m_prime'], FZ['k_up'], FZ['threshold'], '**発火**' if FZ['ii_fires'] else '発火せず', n_conf),
       '7. 本報告のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。', '']
 _bz = {k: round((v['style_diff'] or 0) * 100, 1) for k, v in F1.items()}
-_bzero_text = '(b) 差の件数（原因の判定ではない・30 pt 規則の数え上げ）: 確証 %d 本の (b) 差はすべて %.1f pt 以下。判定可能 %d 本のうち (b) 差 30 pt 超は %d 本（%s）。一斉保留が起きた場面で確証した対比: %s——いずれも (b) 差 %.1f pt 以下。(b) 差 0.0 pt の対比は 24 本中 %d 本（%s）。' % (n_conf, max([_bz[k] for k, v in F1.items() if v['status'] == 'confirmed'] or [0]), judgeable, sum(1 for k, v in F1.items() if v['status'] in ('confirmed', 'ns') and _bz[k] > 30), '・'.join('%s %.1f pt' % (k, _bz[k]) for k, v in F1.items() if v['status'] in ('confirmed', 'ns') and _bz[k] > 30) or 'なし', '・'.join('%s %d 本' % (sc, sum(1 for k, v in F1.items() if v['status'] == 'confirmed' and v['scenario'] == sc)) for sc, m in MH.items() if m['mass']) or 'なし', max([_bz[k] for k, v in F1.items() if v['status'] == 'confirmed' and MH.get(v['scenario'], {}).get('mass')] or [0]), sum(1 for k in _bz if _bz[k] == 0.0), '・'.join(k for k in _bz if _bz[k] == 0.0))
+_bzero_text = '(b) 差の件数（原因の判定ではない・30 pt 規則の数え上げ）: 確証 %d 本の (b) 差は%s。判定可能 %d 本のうち (b) 差 30 pt 超は %d 本（%s）。一斉保留が起きた場面で確証した対比: %s——いずれも (b) 差 %s。(b) 差 0.0 pt の対比は 24 本中 %d 本（%s）。' % (n_conf, ('すべて 0.0 pt' if max([_bz[k] for k, v in F1.items() if v['status'] == 'confirmed'] or [0]) == 0 else 'すべて %.1f pt 以下' % max([_bz[k] for k, v in F1.items() if v['status'] == 'confirmed'] or [0])), judgeable, sum(1 for k, v in F1.items() if v['status'] in ('confirmed', 'ns') and _bz[k] > 30), '・'.join('%s %.1f pt' % (k, _bz[k]) for k, v in F1.items() if v['status'] in ('confirmed', 'ns') and _bz[k] > 30) or 'なし', '・'.join('%s %d 本' % (sc, sum(1 for k, v in F1.items() if v['status'] == 'confirmed' and v['scenario'] == sc)) for sc, m in MH.items() if m['mass']) or 'なし', ('0.0 pt' if max([_bz[k] for k, v in F1.items() if v['status'] == 'confirmed' and MH.get(v['scenario'], {}).get('mass')] or [0]) == 0 else '%.1f pt 以下' % max([_bz[k] for k, v in F1.items() if v['status'] == 'confirmed' and MH.get(v['scenario'], {}).get('mass')] or [0])), sum(1 for k in _bz if _bz[k] == 0.0), '・'.join(k for k in _bz if _bz[k] == 0.0))
 # 1
 O += ['## 1. 要約（族 F・機械集計からの転記）', '', '| 族 | m | 判定可能 | 同じ向きの確証（第一走行） | 複製 ①（第二走行） | 保留・不能・降格（門／refuse／様式／撤退） | 添え札の内訳（確証した断面） | 転記元 |', '|---|---|---|---|---|---|---|---|',
       '| F（T 対 U・T2 対 U） | %d | %d | %d（上向き %d・下向き %d） | %d | %d／%d／%d／%d | %s | analyze_F |' % (T['families']['F']['m'], judgeable, n_conf, len(up_conf), len(dn_conf), n_rep1, st_count['gate'], st_count['hold_refuse'], st_count['hold_style'], st_count['demoted'], '・'.join('%s %d' % kv for kv in tags_conf.items()) or '—'), '',
@@ -113,7 +113,7 @@ O += ['## 1. 要約（族 F・機械集計からの転記）', '', '| 族 | m | 
 O += ['## 2. 走行の事実', '', '- 器材: 走行器 v2.6 runner_sha %s・引数文字列 SHA16 %s（design-facts-F）・凍結マニフェスト `tools/freeze_F.py --verify` の結果 %s・整合検査器 `tools/integrity_F.py` SHA16 %s（run-log 記帳 %s UTC・第一走行の前）。' % ('・'.join(sorted(x or '—' for x in runner_sha)), FJ.get('arms_string_sha16', '〔 〕'), _fv, intg_sha, intg_when),
       '- 走行（UTC・trials の timestamp から）: 第一走行 %s %s〜%s（%s 試行）／第二走行 %s %s〜%s（%s 試行）。%s' % (a.tag, t_first.get(a.tag, '—')[:16], t_last.get(a.tag, '—')[:16], format(n_trials[a.tag], ','), a.tag2, t_first.get(a.tag2, '—')[:16], t_last.get(a.tag2, '—')[:16], format(n_trials[a.tag2], ','), '中断なし（run-log-F.md: 両走行とも「中断なし」）' if all('中断なし' in l for l in runlog.split('\n') if ('%s 完走' % a.tag) in l or ('%s 完走' % a.tag2) in l) else '〔中断の記帳あり: run-log-F.md を参照〕'),
       '- 整合: %s。api_error %d／%d・書式外 %d／%d。抽出検査（判定欄と率を印字しない標本の目視・逐語転記）: %s' % (intg_line, api_err[a.tag], api_err[a.tag2], ff_tot[a.tag], ff_tot[a.tag2], ' ／ '.join(samp) or '〔記録なし〕'),
-      '- 率盲検の事前拘束（run-log-F.md・凍結前に記帳・逐語）: ' + (pre_reg[0].lstrip('- ').strip() if pre_reg else '〔該当行なし〕') + ' **履行**: ' + (('・'.join(l.strip().strip('|').strip() for l in blind_end)) if blind_end else '〔終了の記帳なし〕'),
+      '- 率盲検の事前拘束（run-log-F.md・凍結前に記帳・逐語）: ' + (pre_reg[0].lstrip('- ').strip() if pre_reg else '〔該当行なし〕') + ' **履行**: ' + (('・'.join(' | '.join(x.strip() for x in l.strip().strip('|').split('|')[:2]) + '（run-log の当該行）' for l in blind_end)) if blind_end else '〔終了の記帳なし〕'),
       '- 費用と時間: 費用 %s（登録者申告・打ち込み数）。凍結時の見積り（転記行 A・M 実績比）は総計 30,240 試行で約 %.2f ドル・壁時計 %.1f 時間、うち二走行（28,800 試行）の分は 1 走行 %.2f 時間 × 2＝%.2f 時間であった。実績は二走行の壁時計 %.2f 時間（trials の timestamp から・パイロットと再走を含まない）。見積りは目安であり実績に置換する。' % (('約 %s ドル' % a.usd) if a.usd else '〔登録者申告待ち〕', FJ.get('usd_total', float('nan')), FJ.get('hours_total_wall', float('nan')), FJ.get('hours_run_wall', float('nan')), 2 * FJ.get('hours_run_wall', float('nan')), sum((datetime.datetime.fromisoformat(t_last[t]) - datetime.datetime.fromisoformat(t_first[t])).total_seconds() / 3600 for t in (a.tag, a.tag2) if t in t_first)), '']
 if a.usd:
     TYPED.append('費用の実績 約 %s ドル（登録者申告）' % a.usd)
@@ -135,12 +135,12 @@ elif _flip:
 else:
     _gate_flip_text = '第一走のパイロットと再走後で門の判定が異なる対比はない。'
 O += ['## 3. 門と保留（結果の前に）', '', '- 門（パイロット n=40・両腕とも ≤1/40 または ≥39/40 → 判定不能）: GO %d・床 %d・天井 %d・未走行 %d（%s）。' % (gc['go'], gc['downgraded_floor'], gc['downgraded_ceiling'], gc['not_run'], os.path.basename(a.gate)),
-      '- 撤退条件（パイロット・全記録を時系列で）: ' + ' → '.join('%s: 発火 %s／記述へ降格 %s%s' % (os.path.basename(g), '・'.join('%s %d/%d' % (k, v['catastrophe'], v['n_ok']) for k, v in json.load(open(g, encoding='utf-8')).get('continuity', {}).items() if v.get('fired')) or 'なし', '・'.join(json.load(open(g, encoding='utf-8')).get('demoted') or []) or 'なし', '（再走 --rerun-of %s）' % os.path.basename(json.load(open(g, encoding='utf-8')).get('rerun_of') or '') if json.load(open(g, encoding='utf-8')).get('rerun_of') else '') for g in sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'gate-pilotF-*.json')))) + '。両走行に適用した門の正本は %s。' % os.path.basename(a.gate),
+      '- 撤退条件（パイロット・全記録を時系列で）: ' + ' → '.join('%s: 発火 %s／記述へ降格 %s%s' % (os.path.basename(g), '・'.join('%s %d/%d' % (k, v['catastrophe'], v['n_ok']) for k, v in json.load(open(g, encoding='utf-8')).get('continuity', {}).items() if v.get('fired')) or 'なし', '・'.join(json.load(open(g, encoding='utf-8')).get('demoted') or []) or 'なし', '（再走 --rerun-of %s）' % os.path.basename(json.load(open(g, encoding='utf-8')).get('rerun_of') or '') if json.load(open(g, encoding='utf-8')).get('rerun_of') else '') for g in sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'gate-pilotF-*.json')), key=lambda f: json.load(open(f, encoding='utf-8')).get('when', ''))) + '。両走行に適用した門の正本は %s。' % os.path.basename(a.gate),
       '- **門の由来と再走による反転（一巡目 器材統計 重大 1・登録者裁定 18）**: ' + _gate_flip_text, ''
       , section(res_md, '連続性条件'), '',
       '- 連続性の発火は %s。' % ('・'.join('%s 第一走行 %d/%d（帯の整数境界 %s・余裕 %d 件）' % (k, v['k_first'], v['n_first'], ('≥%d' % T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge']) if v['k_first'] >= (T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge'] or 10**9) else ('≤%d' % T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_le']), abs(v['k_first'] - (T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge'] if v['k_first'] >= (T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge'] or 10**9) else T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_le']))) for k, v in CONT.items() if v.get('fired_first')) or 'なし'), '',
       '- refuse 門（判定保留）: %s。' % ('・'.join(k for k, v in F1.items() if v['status'] == 'hold_refuse') or 'なし'),
-      '- 様式門（判定保留）: %s。注（15 pt 超 30 pt 以下）: %s。非有意で様式差 30 pt 超（置換対象の札が無いため保留は適用されない・読みに留保）: %s。層別可能な対比: %s。' % ('・'.join(k for k, v in F1.items() if v['status'] == 'hold_style') or 'なし', '・'.join(k for k, v in F1.items() if v['style_axis'] == 'note') or 'なし', '・'.join('%s（%.1f pt）' % (k, (v['style_diff'] or 0) * 100) for k, v in F1.items() if v['status'] == 'ns' and (v['style_diff'] or 0) * 100 > 30) or 'なし', '・'.join('%s（%s）' % (k, '・'.join('%s %d/%d %+.3f' % tuple(s) for s in v['strat'])) for k, v in F1.items() if v['strat']) or 'なし（O-Ncold は層別不能）'),
+      '- 様式門（判定保留）: %s。注（15 pt 超 30 pt 以下）: %s。非有意で様式差 30 pt 超（置換対象の札が無いため保留は適用されない・読みに留保）: %s。層ごとの層内差（両腕とも層内 n≥30 の層のみ・片層だけが要件を満たす対比を含む）: %s。' % ('・'.join(k for k, v in F1.items() if v['status'] == 'hold_style') or 'なし', '・'.join(k for k, v in F1.items() if v['style_axis'] == 'note') or 'なし', '・'.join('%s（%.1f pt）' % (k, (v['style_diff'] or 0) * 100) for k, v in F1.items() if v['status'] == 'ns' and (v['style_diff'] or 0) * 100 > 30) or 'なし', '・'.join('%s（%s）' % (k, '・'.join('%s %d/%d %+.3f' % tuple(s) for s in v['strat'])) for k, v in F1.items() if v['strat']) or 'なし（O-Ncold は層別不能）'),
       '- **降格の三行**（凍結雛形の語・対比ごとに上限／実際／理由の三行・対象 %d 本）:' % len(held)]
 for k, v in held:
     upper = '確証（有意）' if v['status'] != 'gate' else '確証（有意）'
@@ -188,7 +188,7 @@ O += ['## 6. 複製（第二走行・六札）', '', section(res_md, '複製'), 
 O += ['## 7. 記述族・言及率・様式（検定なし・p 非印字・機械集計の転記）', '']
 for fam in T['descriptive_families']:
     O += [section(res_md, '記述族 %s' % fam), '']
-O += ['## 8. 三つ組（腕別・場面別・両走行・台帳順・機械集計の転記）', '']
+O += ['## 8. 三つ組（腕別・場面別・両走行・台帳順・機械集計の転記）', '', 'Wilson 区間は集計器が k/n から直接計算した値（両側 95%）。cells.json に収められた 4 桁の値を再丸めすると末位が 1 動くセルがありうる（一巡目 器材統計 軽微 9・報告の値が正）。', '']
 for sc in SC:
     O += [section(res_md, '%s 三つ組（第一走行）' % sc), '', section(res_md, '%s 三つ組（第二走行）' % sc), '']
 # 9
@@ -206,7 +206,10 @@ for k, v in F1.items():
     O.append('| %s | %.4f | %.4f | %s | %s | %s |' % (k, b, m1, kind, up, dn))
 O.append('')
 for p in a.predictions:
-    O.append('- ' + open(p, encoding='utf-8').read().split('\n')[0].lstrip('# ') + ': ' + '／'.join(l.strip('| ').replace(' | ', '・') for l in open(p, encoding='utf-8').read().split('\n') if l.startswith('| ') and not l.startswith('| 種別')))
+    _t = open(p, encoding='utf-8').read(); _sec = lambda h: (_t.split(h, 1)[1].split('\n## ', 1)[0] if h in _t else '')
+    _rows = [l for l in _sec('## 集計').split('\n') if l.startswith('| ') and not l.startswith('| 種別')]; _all = [l for l in _sec('## 全体欄').split('\n') if l.startswith('| ') and not l.startswith('| 欄')]
+    _hdr = [l for l in _t.split('\n') if l.startswith('- 予想:')]
+    O.append('- ' + _t.split('\n')[0].lstrip('# ') + '（欄別の一覧は `%s`）: 集計（種別・的中・外れ・照合不能）＝' % os.path.relpath(p, REPO).replace('\\', '/') + '／'.join(l.strip('| ').replace(' | ', '・') for l in _rows) + '。全体欄（欄・予想・実測・結果）＝' + '／'.join(l.strip('| ').replace(' | ', '・') for l in _all) + '。' + ((' ' + _hdr[0].lstrip('- ')) if _hdr else ''))
 _rj = [J(os.path.splitext(x)[0] + '.json') for x in a.predictions if os.path.exists(os.path.splitext(x)[0] + '.json')]
 _reg = next((r for r in _rj if r.get('who') == 'registrant'), None); _one = next((d for d in (_reg or {}).get('detail', []) if d[1] == 'f.all.up_tag_band'), None)
 O += ['- 「上昇あり」の対比数の欄の実測は器の分母（門・撤退で落ちなかった %d 本）のうち %d 本で、添え札を付した全 24 本では %d 本（いずれも同じ帯）。' % (sum(1 for v in F1.values() if v['status'] not in ('gate', 'demoted')), sum(1 for v in F1.values() if v['status'] not in ('gate', 'demoted') and (v['tag'] or {}).get('label') == '上昇あり'), sum(1 for v in F1.values() if (v['tag'] or {}).get('label') == '上昇あり'))] + (['- 登録者の第2版（D-25）で埋めた一欄 f.all.up_tag_band の照合結果は「%s」（予想 %s・実測 %s）。第1版では「予想しない」で照合対象外だった。' % (_one[4], _one[2], _one[3])] if _one else []) + ['- 帯の的中は誰の判断の重みも変えない。U 腕の帯は既測の写しで別枠。', '']
@@ -216,13 +219,13 @@ _mism = re.findall(r'不一致 (.*?)\)', _fv); _mism_files = re.findall(r'(tools
 _dnum = {}
 for l in _dev:
     for f in _mism_files:
-        if os.path.basename(f) in l and f not in _dnum:
-            _dnum[f] = re.match(r'\| (D-\d+)', l).group(1)
+        if ('凍結器材 `%s`' % f) in l:
+            _dnum.setdefault(f, []).append(re.match(r'\| (D-\d+)', l).group(1))
 _first_json = sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'results-F-%s-%s.json' % (a.tag, a.tag2))))
 _run1 = J(_first_json[0]) if _first_json else None
 _moved = [(k, _run1['first'][k]['status'], v['status']) for k, v in F1.items() if _run1 and _run1['first'].get(k, {}).get('status') != v['status']] if _run1 else []
 _moved_rep = [(k, _run1['replication'][k]['label'], REP[k]['label']) for k in REP if _run1 and _run1['replication'].get(k, {}).get('label') != REP[k]['label']] if _run1 else []
-O += ['## 10. 凍結物の検証・逸脱・凍結外の先置', '', '- `tools/freeze_F.py --verify`（本草案の組み立て時に実行）: %s。不一致は %d 本で、いずれも凍結後の器材の改訂（%s）。それ以外の %d 本（走行器 v2.4／v2.5／v2.6・生成器・盤・台帳・正本・門・計数器・格子・設計事実・様式・雛形ほか）は凍結値と一致。引数文字列は転記行 B の SHA16 %s と一致（`arms_string_F.py --check`・run-log）。' % (_fv, len(_mism_files), '・'.join('%s＝%s' % (os.path.basename(f), _dnum.get(f, '記帳なし')) for f in _mism_files) or 'なし', 39 - len(_mism_files), FJ.get('arms_string_sha16', '〔 〕')),
+O += ['## 10. 凍結物の検証・逸脱・凍結外の先置', '', '- `tools/freeze_F.py --verify`（本草案の組み立て時に実行）: %s。不一致は %d 本で、いずれも凍結後の器材の改訂（%s）。それ以外の %d 本（走行器 v2.4／v2.5／v2.6・生成器・盤・台帳・正本・門・計数器・格子・設計事実・様式・雛形ほか）は凍結値と一致。引数文字列は転記行 B の SHA16 %s と一致（`arms_string_F.py --check`・run-log）。' % (_fv, len(_mism_files), '・'.join('%s＝%s' % (os.path.basename(f), '・'.join(_dnum.get(f, ['記帳なし']))) for f in _mism_files) or 'なし', 39 - len(_mism_files), FJ.get('arms_string_sha16', '〔 〕')),
       '- 集計器の実行回数と出力の突合: 集計器は %d 回走らせ出力をすべて別名で保全（%s）。一度目（%s）と本草案が用いる最終出力の間で第一走行の主札が動いた対比: %s。複製札が動いた対比: %s。判定・p・Holm・添え札は動いていない（機械突合）。' % (len(_first_json) + len(glob.glob(os.path.join(REPO, 'records', 'F', 'results-F-%s-%s-*.json' % (a.tag, a.tag2)))), '・'.join(os.path.basename(x) for x in sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'results-F-%s-%s*.json' % (a.tag, a.tag2))))), os.path.basename(_first_json[0]) if _first_json else '—', '・'.join('%s（%s → %s）' % m for m in _moved) or 'なし', '・'.join('%s（%s → %s）' % m for m in _moved_rep) or 'なし'),
       '- 逸脱台帳（凍結後・D-25〜・原本の行を切らずに逐語転記）:'] + ['  - ' + l.strip('| ').split(' | ')[0] + '（' + l.strip('| ').split(' | ')[1] + '）: ' + l.strip('| ').split(' | ', 2)[2].rstrip(' |').rstrip() for l in _dev] + ['- 率盲検の事前拘束とその履行は §2。報告雛形は凍結マニフェスト収録（%s）。' % TPL_SHA, '']
 O += ['## 11. 読み条項の適用と限界・確認していないこと', '', '- 言及と認識について: 添え札の内訳（確証 %s／全 24 本 %s）は語彙の機械計数であり「検査と認識した」証拠ではない。' % ('・'.join('%s %d' % kv for kv in tags_conf.items()) or '—', '・'.join('%s %d' % kv for kv in collections.Counter((v['tag'] or {}).get('label', '—') for v in F1.values()).items())),
