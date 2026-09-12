@@ -24,7 +24,7 @@
 
 ## 次段の準備（段階 A／B・門0 費用パイロット・2026-09-12〜）
 - 計画案（内部・v2.2）の順序に従い、A・B の凍結前に **費用パイロット（門0）** を置く: Colab の L4 と A100 40GB で各 1 セッション、Qwen3-4B-Instruct-2507 を vLLM（bf16）で N1 × 12 腕 × n=40 走らせ、ユニットあたりの試行数・出力トークン長の分布・セッション経費を実測する。手順書と事前登録（seed・tag・測定表・決定木・外挿の係数）は `records/cost-pilot/cost-pilot-plan-2026-09-12.md`。率は記述であり確証ではない。
-- 器材: `tools/make_runner_local.py` → `tools/run_preamble_local.py` v2.7（凍結走行器 v2.6 から機械生成・provider local・採点経路は関数単位で同一）／`tools/colab/boot_cost_pilot.py`（登録者が Colab で一行 exec）／`tools/cost_facts.py`（実測から §6 の転記行を生成）。走行は登録者が行い、コーディネータは Colab を操作しない。
+- 器材: `tools/make_runner_local.py` → `tools/run_preamble_local.py` v2.7（凍結走行器 v2.6 から機械生成・provider local・採点経路は関数単位で同一）／`tools/colab/boot_cost_pilot.py`（登録者が Colab で一行 exec）／`tools/cost_facts.py`（実測から §6 の転記行を生成）。走行は登録者の Chrome 越しにコーディネータが操作し、Drive の同意・ダウンロード・支払いは登録者が行う（2026-09-13 打ち合わせ・boot v2）。
 - 段階 A・B の凍結文書は門0 の実測の後に起草する（計画案 §3 の器材要件を織り込む）。
 
 ## 段階 F（2026-09-11 凍結・2026-09-12 結果公開・場面冒頭の検査認識の付記の効果）

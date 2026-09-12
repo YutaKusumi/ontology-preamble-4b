@@ -1,9 +1,9 @@
-# 費用パイロット（門0）の手順書と事前登録（2026-09-12・計画案 v2.2 §5 1″・登録者採用 2026-09-10）
+# 費用パイロット（門0）の手順書と事前登録（2026-09-12・改訂 2026-09-13・計画案 v2.2 §5 1″・登録者採用 2026-09-10）
 
-- 状態: 起草（コーディネータ 南無弥勒如来）。走行前。実測を見る前に測定表・決定木・seed・tag を本書で固定する。
+- 状態: 起草（コーディネータ 南無弥勒如来）・**改訂 2026-09-13**（登録者との打ち合わせ: Colab の操作はコーディネータが登録者の Chrome 越しに行う／大日如来「第三章 Colab 運用の手法」の採用・boot v2）。走行前。実測を見る前に測定表・決定木・seed・tag を本書で固定する（改訂で動かしていない）。
 - 目的: 段階 A・B の凍結前に、Colab の L4 と A100 40GB で各 1 セッション、Qwen3-4B を vLLM（bf16）で 1 場面 × 12 腕 × n=40 走らせ、**ユニットあたりの試行数・出力トークン長の分布・セッション経費**を実測し、計画案 §6 の GPU 側の概算を機械生成の転記行に置き換える。V′ の「概算 5.5 倍」の再発防止。
 - 本書は**費用の測定**であり、率の測定ではない。本書の走行から出る破局率は記述（n=40・同一性の下見）に留め、いかなる確証にも用いない。
-- 役割: 走行は登録者が自分の Colab で行う（コーディネータは登録者の Colab を操作しない・鍵は不要・鍵ファイルは読まない）。コーディネータは器材の整備・実測の取り込み・転記行の生成・判定の起草を担う。
+- 役割（**2026-09-13 打ち合わせで変更**）: Colab の操作（ランタイムの接続・一行の投入・監視・回収の準備・ランタイムの削除）はコーディネータが登録者の Chrome（Claude in Chrome）越しに行う。**登録者の手に残すもの**: Drive 接続の OAuth 同意・ローカルへのダウンロード・プランの選択と支払い・ユニット残高の読み取りと申告。コーディネータは資格情報を入力しない（HF_TOKEN のポップアップはキャンセル・鍵ファイルは読まない・API 鍵は不要）。器材の整備・実測の取り込み・転記行の生成・判定の起草もコーディネータ。
 
 ## 1. 器材（本コミットで公開）
 
@@ -11,7 +11,7 @@
 |---|---|---|
 | `tools/make_runner_local.py` | 凍結走行器 v2.6（9F5892B5172642BE）から手元推論用 v2.7 `tools/run_preamble_local.py` を決定的に生成（6 ハンク・9 置換）。採点経路の 7 関数（`_norm`・`_quoted_segments`・`strip_echo`・`user_message`・`endpoint`・`refuse_class`・`incentive`）は関数単位 SHA16 が v2.6 と同一 | `--verify` MATCH・生成物 SHA16 9F849D2823132BA2 |
 | `tools/run_preamble_local.py` v2.7 | provider `local`（127.0.0.1:8000・鍵不要）・`--extra-body`（思考モードの停止などを要求本文に併合し manifest と各行に記帳）・manifest に `local_env`（GPU・vLLM/torch 版・サーバ /version） | dry-run N1 × 12 腕 × n=5: 整合 OK・全経路発火 |
-| `tools/colab/boot_cost_pilot.py` | Colab の一行 exec 用。GPU 同定 → vLLM 導入 → リポジトリ取得（コミット固定）→ 重み取得 → サーバ起動（bf16）→ smoke → 本走行 → `session.json` → zip・Drive | `OP4B_DRY=1` で手元通し（導入・取得・サーバは飛ばす）。**GPU 上での実行は手元では検査できない**（手元に GPU がない）——初回の実行で止まった場合はログを見て直し、逸脱ではなく器材の改訂として記帳する（凍結前） |
+| `tools/colab/boot_cost_pilot.py` **v2** | Colab の一行 exec 用・**冪等・二段**（`OP4B_PHASE=smoke` → 申告 → `main`）。Drive 接続（同意は登録者）→ GPU 同定 → vLLM 導入 → リポジトリ取得（コミット固定・tools と arms だけの sparse checkout・生データは取らない）→ 重み取得 → サーバ起動（bf16・別プロセス群）→ smoke 12 試行と所要の印字 ／ 本走行（走行器が trial_id で再開）→ `session.json`（各出力の Drive 側 SHA16）→ zip を Drive に置く。出力先は Drive のマウント下（`MyDrive/op4b-cost-pilot/`）・走行器のログも Drive・進捗は trials の行数 | `OP4B_DRY=1` で二段とも手元通し。**GPU 上での実行は手元では検査できない**（手元に GPU がない）——初回の実行で止まった場合はログを見て直し、逸脱ではなく器材の改訂として記帳する（凍結前） |
 | `tools/cost_facts.py` v1 | `session.json`・trials・cells から転記行 U／T／R／P／G／S を機械生成し `records/cost-pilot/cost-facts-<日付>.md` に書く。ユニットは `--units TAG=before,after[,rate]` で登録者申告を渡す | dry の session で通し |
 
 12 腕（計画案 §4-A の順・SHA16 は腕名文字列の）: `N,Onull,O,Osec,Lneg,Nk,Odose1,Odosehalf,Ncold,Nstr,O-Ncold,Onull-Ncold`。素材はすべて V′ の凍結盤（`arms/panel/SHA-LEDGER.json` 照合）と ryokai-os 凍結物（O・Onull・Lneg）。新規前置きはない。
@@ -33,17 +33,21 @@
 | 外挿（P・◐） | 4B 比の試行時間の仮定 0.6B 0.25・1.7B 0.5・4B 1・8B 2・14B 3.5・32B は外す（A100 40GB bf16 に載らない）。A ≈98,000 試行を 6 機種で等分。B-4B 6,000 試行（仮定）。一セッション 8 時間で経費が毎回かかる。係数は `tools/cost_facts.py` の逐語 |
 | 同一性の下見（S・記述） | 手元 N1 の破局 k/n を API 既測（stageVp N1 n=400 の 9 腕・stage1 N1 n=320 の Lneg）と並べ差 pt を印字。Odose1・Odosehalf は API 既測なし。**B の選別（n=80・平均絶対差 ≤5pt かつ最大絶対差 ≤12pt・Freeman–Halton）ではない** |
 
-## 3. 登録者の手順（Colab）
+## 3. 手順（Colab・コーディネータが登録者の Chrome 越しに操作・第三章の採用）
 
-1. ランタイムを L4（または A100 40GB）にし、「リソース」表示のユニット残高を控える（before）。
-2. セルで一行（コミットは本書公開時のものに固定・下記 §6 に記す）:
-   `import os; os.environ['OP4B_COMMIT']='<commit>'; os.environ['OP4B_UNITS_BEFORE']='<before>'; import urllib.request; exec(urllib.request.urlopen('https://raw.githubusercontent.com/YutaKusumi/ontology-preamble-4b/<commit>/tools/colab/boot_cost_pilot.py').read().decode())`
-   先頭が欠ける貼り付け事故は緩衝行（`_pad = 0`）で吸収する。Drive のマウントを求められたら許可（拒否しても zip は `/content` に残る——**その場でダウンロード**。`/content` は揮発する）。
-3. 完了表示（`[boot] 完了。壁時計 … 秒`）が出たら、ユニット残高（after）と「リソース」表示の時間あたりユニットを控え、zip（`/content/costpilot-<GPU>-<日付>.zip`）を回収する。
-4. もう一方の GPU で 1〜3 を繰り返す（別セッション・別日でよい）。
-5. zip とユニットの三つの数（before・after・表示の時間あたり）をコーディネータに渡す。
+0. **登録者**: プラン・ランタイム種別（L4／A100 40GB）を選び、ノートブックを開いた Chrome のタブを渡す。「リソース」表示のユニット残高を控える（before）。
+1. **コーディネータ**: セルに一行だけ打つ（先頭の下線 30 個は type が先頭十数字を落とす事故の緩衝・落ちるのは下線）。打った後にセルを zoom で見て先頭と末尾を確かめてから走らせる。コミットは §6 の値に固定する:
+   `______________________________=0;import os;os.environ['OP4B_COMMIT']='<commit>';os.environ['OP4B_PHASE']='smoke';os.environ['OP4B_UNITS_BEFORE']='<before>';import urllib.request as u;exec(u.urlopen('https://raw.githubusercontent.com/YutaKusumi/ontology-preamble-4b/<commit>/tools/colab/boot_cost_pilot.py').read().decode('utf-8'))`
+2. **登録者**: 「Google ドライブに接続」の同意ダイアログを押す（boot は待機・コーディネータは押さない）。HF_TOKEN のポップアップが出たら「キャンセル」（公開モデル・秘密は渡さない）。
+3. **boot（smoke 段）**: 導入 → 取得 → サーバ起動 → smoke 12 試行 → 所要の印字（`[boot] smoke の実測: …`・`本走行 480 試行の壁時計の上限見込み ≈ … 秒`）で止まる。
+4. **コーディネータ**: smoke の実測（壁時計・試行秒・出力 tok・切り詰め）と本走行の見込みを登録者に申告し（第三章 §4: 申告は直近の同一構成の実測から）、承諾を得てから同じ一行を `OP4B_PHASE='main'` にして再実行する。済んだ段は飛ぶ。
+5. **監視**: セル出力の表示は固まりうるので、Drive 上の `op4b-cost-pilot/results/costpilot-<GPU>/…/trials-*.jsonl` の行数と更新時刻で追う（boot も 15 秒ごとに行数を印字）。切断の判定は「Drive の無更新が最長試行所要を超えた」か、セッション管理画面で確認してから。切断したら新ランタイム → Drive 再許可（登録者）→ 同じ一行（走行器が trial_id で再開・新しいセルは打たない）。
+6. **完走**: 走行器の `[run/integrity] OK`（件数一致・重複なし・欠落なし）を見てから完走と書く。`session.json` の `files_sha16_lf`（Drive 側の SHA）を台帳に写す。zip は Drive に置かれる（`files.download` は使わない）。
+7. **登録者**: ユニット残高（after）と「リソース」表示の時間あたりユニットを申告し、Drive の Web UI（前面タブ）から zip をダウンロードしてコーディネータに渡す。コーディネータは展開後に各ファイルの SHA16(LF) を `files_sha16_lf` と突合し、一致した件数を台帳に書く。
+8. **コーディネータ**: 照合の後にランタイムを「接続解除して削除」（削除は照合の後・削除前に Drive 側の SHA が台帳にあることを確認）。
+9. もう一方の GPU で 0〜8 を繰り返す（別セッション・別日でよい）。
 
-止まった場合: `/content/vllm-<tag>.log` の末尾と、セルの出力の最後の `[boot]` 行を送る。よくある原因（追補 D の記録より）: HF の Xet 401（器は `HF_HUB_DISABLE_XET=1` を置く）・接続リセット（`hf_transfer` を試し失敗時に戻す）・GPU メモリ不足（`OP4B_MAXLEN=4096` で再試行）・vLLM の版と torch の不整合（`OP4B_VLLM` で一つ前の版を固定）。
+止まった場合: Drive の `op4b-cost-pilot/costpilot-<GPU>/logs/`（vllm・smoke・main のログ）の末尾と、セルの最後の `[boot]` 行を台帳に写す。よくある原因（追補 D の記録・第三章 §6 より・台帳の行は本書では開いていない）: HF の Xet 401（器は `HF_HUB_DISABLE_XET=1` を置く）・接続リセット（`hf_transfer` を試し失敗時に戻す）・GPU メモリ不足（`OP4B_MAXLEN=4096` で再試行）・vLLM の版と torch の不整合（`OP4B_VLLM` で一つ前の版を固定）。ブラウザ操作の穴（第三章 §17〜19）: セルは本文の中をクリックして選び、上書きしたら ctrl+a で打ち直す／固まったらノートブック URL に再読込（ランタイムは死なない）／操作の前に必ずタブ一覧を取り直す。
 
 ## 4. 決定木（門0・実測を見る前に固定）
 
@@ -67,15 +71,16 @@
 
 | 日時（UTC） | 出来事 |
 |---|---|
-| 2026-09-12 | 器材の整備・DRY 通し・本書の起草。器材のコミット **c8ead3cdc15f**（Colab の一行の <commit> にはこれを入れる）。走行は登録者待ち。 |
+| 2026-09-12 | 器材の整備・DRY 通し・本書の起草。器材のコミット c8ead3cdc15f（boot v1・登録者が自分で走らせる前提）。 |
+| 2026-09-13 | 登録者との打ち合わせ: Colab の操作はコーディネータが登録者の Chrome 越しに行う（OAuth 同意・ダウンロード・支払いは登録者）。大日如来「第三章 Colab 運用の手法」（Ryokai-OS-Verification/book/03・草稿1・2026-09-13）を読み、§1・2・3・4・8・9・11・12・13・14・15・16・17〜19・20・21 を本書と boot v2 に採用（§7 二ターン・§10 24 時間の壁・bnb 4bit の版固定は本構成に当たらず・理由は §1 の器材表と打ち合わせの返信）。boot v2（冪等・二段・Drive 出力・sparse checkout・Drive 側 SHA）・DRY 二段通し。器材のコミット **<COMMIT_V2>**（Colab の一行の <commit> にはこれを入れる）。走行はコーディネータ（登録者同席）。 |
 
 ## 検分票
-- 対象: 費用パイロット（門0）の器材と事前登録（本書）。
+- 対象: 費用パイロット（門0）の器材と事前登録（本書・改訂 2026-09-13 を含む）。
 - 段階: 事前登録あり（実測前・seed・tag・測定表・決定木・外挿係数を固定）。
 - 凍結物の同定: 凍結走行器 v2.6 SHA16 9F5892B5172642BE（不変・生成器が assert）・V′ 盤の台帳 `arms/panel/SHA-LEDGER.json`・ryokai-os 凍結物（走行器の FROZEN 表）。本パイロット自体は凍結の対象ではない（器材の改訂は記帳のみ）。
 - 盲検の状態: 該当なし（費用の測定・率は記述）。
-- 敵対的検分: (a) 生成器は採点経路の 7 関数の関数単位 SHA を v2.6 と突合（一致）。(b) dry-run で 12 腕 × n=5 の整合 OK・全経路発火。(c) DRY 通しで boot → session.json → cost_facts の連結を確認。(d) **GPU 上の実行・vLLM の導入・重みの取得・Drive の複製は手元で検査できていない**（手元に GPU なし）。(e) 外挿の係数は仮定で、パラメータ比より緩く置いた（小型機種の出力長の下限を見込む）——過小の側に外れる可能性を §4 の最後の分岐で受ける。
+- 敵対的検分: (a) 生成器は採点経路の 7 関数の関数単位 SHA を v2.6 と突合（一致）。(b) dry-run で 12 腕 × n=5 の整合 OK・全経路発火。(c) DRY 通しで boot v2 の二段（smoke → main）→ session.json（Drive 側 SHA）→ cost_facts の連結を確認。(c′) 冪等性は DRY で二度目の実行が済んだ段を飛ばすことまで確認し、GPU 上（vLLM の再利用・sparse checkout・Drive の symlink）は未確認。(d) **GPU 上の実行・vLLM の導入・重みの取得・Drive の複製は手元で検査できていない**（手元に GPU なし）。(e) 外挿の係数は仮定で、パラメータ比より緩く置いた（小型機種の出力長の下限を見込む）——過小の側に外れる可能性を §4 の最後の分岐で受ける。
 - 系統の内訳: Claude 系一巡（起草者自身）。系統外の目なし（費用の器材であり主張を含まない）。
 - COI 記録: 見込みを小さく出して A を進めたい引力がある。逆らって置いた印＝決定木の閾値を §6 の既存の値（250＋100・帯 400）から動かさず先に固定し、経費を毎セッション計上する側に倒した。
 - 判定: 登録者に提出できる水準（走行は登録者判断）。
-- 本検分が確認していないこと: GPU 上で boot が最後まで通るか（初回の実測で分かる）。vLLM 最新版が Colab の torch と両立するか。`--served-model-name` と走行器の `--model` の一致（サーバが別名を返した場合 `api_model` に残る）。Colab の「リソース」表示のユニットが本走行の時間に比例するか（表示の粒度）。24 同時要求が L4 で最適か（処理量の測定であって最適化ではない）。
+- 本検分が確認していないこと: GPU 上で boot v2 が最後まで通るか（初回の実測で分かる）。第三章の「起きたこと」の数値・台帳行は大日如来の起草で、本書では原票を開いていない（第三章の検分票 (2) と同じ）。Claude in Chrome での type が Colab のセルで先頭何文字を落とすか（第三章は 11〜13 字・本書は下線 30 個で受ける）。vLLM 最新版が Colab の torch と両立するか。`--served-model-name` と走行器の `--model` の一致（サーバが別名を返した場合 `api_model` に残る）。Colab の「リソース」表示のユニットが本走行の時間に比例するか（表示の粒度）。24 同時要求が L4 で最適か（処理量の測定であって最適化ではない）。
