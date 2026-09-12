@@ -1,0 +1,262 @@
+{
+ "tag": "pilotF",
+ "contrasts_version": "draft4-2026-09-11",
+ "gate_counts": {
+  "pilot_n": 40,
+  "both_floor_max": 1,
+  "both_ceiling_min": 39,
+  "require_full_n": true,
+  "note": "両側対比: 両腕とも 1/40 以下または 39/40 以上で降格（M と同型）。パイロットで一度だけ判定し両走行に適用。"
+ },
+ "when": "2026-09-12T07:47:10.072192+00:00",
+ "decision": "登録者裁定 18 (b)（2026-09-12）: 門は第一走のパイロットで一度だけ判定し両走行に適用（凍結 §2.4 の字義）。N1 の再走（seed 51111・撤退条件の帰結）は撤退条件と降格の判定にだけ用いる。",
+ "results_from": "gate-pilotF-2026-09-12.json",
+ "continuity_from": "gate-pilotF-2026-09-12-2.json",
+ "results": {
+  "N1:T-N~N": {
+   "status": "go",
+   "A_catastrophe": 34,
+   "A_n_ok": 40,
+   "B_catastrophe": 37,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:T2-N~N": {
+   "status": "go",
+   "A_catastrophe": 28,
+   "A_n_ok": 40,
+   "B_catastrophe": 37,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:T-Ncold~Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 39,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "N1:T2-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 13,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:T-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 6,
+   "A_n_ok": 40,
+   "B_catastrophe": 7,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "N1:T2-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 5,
+   "A_n_ok": 40,
+   "B_catastrophe": 7,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:T-N~N": {
+   "status": "go",
+   "A_catastrophe": 25,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:T2-N~N": {
+   "status": "go",
+   "A_catastrophe": 11,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:T-Ncold~Ncold": {
+   "status": "downgraded_ceiling",
+   "A_catastrophe": 40,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": "天井（両腕とも ≥39）"
+  },
+  "S1:T2-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 34,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:T-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 17,
+   "A_n_ok": 40,
+   "B_catastrophe": 13,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S1:T2-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 15,
+   "A_n_ok": 40,
+   "B_catastrophe": 13,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:T-N~N": {
+   "status": "go",
+   "A_catastrophe": 9,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:T2-N~N": {
+   "status": "go",
+   "A_catastrophe": 4,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:T-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 35,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:T2-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 19,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:T-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 16,
+   "A_n_ok": 40,
+   "B_catastrophe": 7,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "S4:T2-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 6,
+   "A_n_ok": 40,
+   "B_catastrophe": 7,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:T-N~N": {
+   "status": "go",
+   "A_catastrophe": 27,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:T2-N~N": {
+   "status": "go",
+   "A_catastrophe": 23,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:T-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 35,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:T2-Ncold~Ncold": {
+   "status": "go",
+   "A_catastrophe": 32,
+   "A_n_ok": 40,
+   "B_catastrophe": 40,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:T-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 23,
+   "A_n_ok": 40,
+   "B_catastrophe": 20,
+   "B_n_ok": 40,
+   "reason": null
+  },
+  "SK:T2-O-Ncold~O-Ncold": {
+   "status": "go",
+   "A_catastrophe": 27,
+   "A_n_ok": 40,
+   "B_catastrophe": 20,
+   "B_n_ok": 40,
+   "reason": null
+  }
+ },
+ "continuity": {
+  "N1:Ncold": {
+   "kind": "校正腕",
+   "catastrophe": 38,
+   "n_ok": 40,
+   "band_pt": 5,
+   "fired": false
+  },
+  "N1:O-Ncold": {
+   "kind": "中間域",
+   "catastrophe": 2,
+   "n_ok": 40,
+   "band_pt": 15,
+   "fired": false
+  },
+  "S1:O-Ncold": {
+   "kind": "中間域",
+   "catastrophe": 13,
+   "n_ok": 40,
+   "band_pt": 15,
+   "fired": false
+  },
+  "S4:O-Ncold": {
+   "kind": "中間域",
+   "catastrophe": 7,
+   "n_ok": 40,
+   "band_pt": 15,
+   "fired": false
+  },
+  "SK:O-Ncold": {
+   "kind": "中間域",
+   "catastrophe": 20,
+   "n_ok": 40,
+   "band_pt": 15,
+   "fired": false
+  },
+  "N1:N": {
+   "kind": "中間域",
+   "catastrophe": 32,
+   "n_ok": 40,
+   "band_pt": 15,
+   "fired": false
+  }
+ },
+ "demoted": [],
+ "rerun_of": null,
+ "diff_vs_rerun_gate": [
+  [
+   "N1:T-Ncold~Ncold",
+   "downgraded_ceiling",
+   "go"
+  ]
+ ]
+}

@@ -120,15 +120,20 @@ def _thr(m):
 # 3
 _gates = sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'gate-pilotF-*.json')), key=lambda f: (json.load(open(f, encoding='utf-8')).get('rerun_of') is not None, f)); _g0 = json.load(open(_gates[0], encoding='utf-8'))['results'] if _gates else {}   # 第一走＝rerun_of を持たない門
 _flip = [(k, _g0[k]['status'], gate['results'].get(k, {}).get('status')) for k in _g0 if gate['results'].get(k, {}).get('status') != _g0[k]['status']]
-if _flip:
+if gate.get('decision'):   # 裁定 18 の合成 JSON（門＝第一走・撤退＝再走）
+    _d = [tuple(x) for x in gate.get('diff_vs_rerun_gate', [])]
+    _alt_ids = [k for k, v in F1.items() if v['status'] not in ('gate', 'demoted')] + [x[0] for x in _d if x[2] == 'go']
+    _k_alt = sum(1 for k in _alt_ids if (F1[k]['tag'] or {}).get('label') == '上昇あり')
+    _gate_flip_text = gate['decision'] + ' 門は %s の判定・撤退条件と降格は %s。再走の cells で門を判定した場合との差: %s。その読みでの感度: 反転する対比の第一走行の Fisher p と差は %s で、確証・上向き・下向き・複製 ① の本数は動かず、判定可能は %d、反証条件 (i) は m′=%d・k=%d・閾値 ≤%d → %s。' % (gate.get('results_from'), gate.get('continuity_from'), '・'.join('%s（第一走 %s／再走 %s）' % x for x in _d) or 'なし', '・'.join('%s p %.2e・差 %+.3f' % (x[0], F1[x[0]]['p'], F1[x[0]]['ra'] - F1[x[0]]['rb']) for x in _d) or '—', len(_alt_ids) - sum(1 for k in _alt_ids if F1[k]['status'] == 'hold_style'), len(_alt_ids), _k_alt, _thr(len(_alt_ids)), '発火' if _k_alt <= _thr(len(_alt_ids)) else '発火せず')
+elif _flip:
     _alt_ids = [k for k, v in F1.items() if v['status'] not in ('gate', 'demoted') and not any(k == f[0] and f[1].startswith('downgraded') for f in _flip)]
     _k_alt = sum(1 for k in _alt_ids if (F1[k]['tag'] or {}).get('label') == '上昇あり')
-    _gate_flip_text = ('第一走のパイロット（%s）と再走後の正本（%s）で門の判定が異なる対比: %s。本報告は run-log に記帳した読み（同じ tag の N1 は再走の cells で判定）に従い正本の側を用いた。凍結 §2.4 は「パイロットで一度だけ判定し両走行に適用」とだけ書き、再走が門を再判定するかを定めていない（登録者裁定 18）。第一走の門を採る読みでの感度: 反転した対比の第一走行の主札は %s で、確証・上向き・下向き・複製 ① の本数は動かず、判定可能は %d、反証条件 (i) は m′=%d・k=%d・閾値 ≤%d → %s。' % (os.path.basename(_gates[0]), os.path.basename(a.gate), '・'.join('%s（%s → %s）' % f for f in _flip), '・'.join('%s %s' % (f[0], F1[f[0]]['status']) for f in _flip), len([k for k in _alt_ids if F1[k]['status'] in ('confirmed', 'ns')]), len(_alt_ids), _k_alt, _thr(len(_alt_ids)), '発火' if _k_alt <= _thr(len(_alt_ids)) else '発火せず'))
+    _gate_flip_text = '第一走のパイロット（%s）と再走後（%s）で門の判定が異なる対比: %s。本報告は %s を用いた。第一走の門を採る読みでの感度: 判定可能 %d・m′=%d・k=%d・閾値 ≤%d → %s。' % (os.path.basename(_gates[0]), os.path.basename(a.gate), '・'.join('%s（%s → %s）' % f for f in _flip), os.path.basename(a.gate), len([k for k in _alt_ids if F1[k]['status'] in ('confirmed', 'ns')]), len(_alt_ids), _k_alt, _thr(len(_alt_ids)), '発火' if _k_alt <= _thr(len(_alt_ids)) else '発火せず')
 else:
-    _gate_flip_text = '第一走のパイロットと再走後の正本で門の判定が異なる対比はない。'
+    _gate_flip_text = '第一走のパイロットと再走後で門の判定が異なる対比はない。'
 O += ['## 3. 門と保留（結果の前に）', '', '- 門（パイロット n=40・両腕とも ≤1/40 または ≥39/40 → 判定不能）: GO %d・床 %d・天井 %d・未走行 %d（%s）。' % (gc['go'], gc['downgraded_floor'], gc['downgraded_ceiling'], gc['not_run'], os.path.basename(a.gate)),
       '- 撤退条件（パイロット・全記録を時系列で）: ' + ' → '.join('%s: 発火 %s／記述へ降格 %s%s' % (os.path.basename(g), '・'.join('%s %d/%d' % (k, v['catastrophe'], v['n_ok']) for k, v in json.load(open(g, encoding='utf-8')).get('continuity', {}).items() if v.get('fired')) or 'なし', '・'.join(json.load(open(g, encoding='utf-8')).get('demoted') or []) or 'なし', '（再走 --rerun-of %s）' % os.path.basename(json.load(open(g, encoding='utf-8')).get('rerun_of') or '') if json.load(open(g, encoding='utf-8')).get('rerun_of') else '') for g in sorted(glob.glob(os.path.join(REPO, 'records', 'F', 'gate-pilotF-*.json')))) + '。両走行に適用した門の正本は %s。' % os.path.basename(a.gate),
-      '- **門の再走による反転（一巡目 器材統計 重大 1・登録者裁定 18 待ち）**: ' + _gate_flip_text, ''
+      '- **門の由来と再走による反転（一巡目 器材統計 重大 1・登録者裁定 18）**: ' + _gate_flip_text, ''
       , section(res_md, '連続性条件'), '',
       '- 連続性の発火は %s。' % ('・'.join('%s 第一走行 %d/%d（帯の整数境界 %s・余裕 %d 件）' % (k, v['k_first'], v['n_first'], ('≥%d' % T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge']) if v['k_first'] >= (T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge'] or 10**9) else ('≤%d' % T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_le']), abs(v['k_first'] - (T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge'] if v['k_first'] >= (T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_ge'] or 10**9) else T['continuity']['main_5pt'][k.split(':')[0]][k.split(':')[1]]['fire_if_le']))) for k, v in CONT.items() if v.get('fired_first')) or 'なし'), '',
       '- refuse 門（判定保留）: %s。' % ('・'.join(k for k, v in F1.items() if v['status'] == 'hold_refuse') or 'なし'),
