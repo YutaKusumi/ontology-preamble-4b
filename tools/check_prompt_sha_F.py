@@ -25,11 +25,7 @@ for d in sorted(glob.glob(os.path.join(a.root or os.path.join(REPO, 'results', a
             continue
         r = json.loads(l); t = arm_text(r['arm']); um = (t + '\n\n' + ST + INST) if t else (ST + INST); s = sha16(um)
         mk = 'T2' if r['arm'].startswith('T2-') else 'T' if r['arm'].startswith('T-') else None
-        ok = (s == r['prompt_sha']) and (mk is None or um.startswith(META[mk] + '\n\n')) and (mk is not None or not (um.startswith(META['T'] + '
-
-') or um.startswith(META['T2'] + '
-
-')))   # D-26: 場面文自体が「これは」で始まる S4 で誤警報したため META の逐語で判定
+        ok = (s == r['prompt_sha']) and (mk is None or um.startswith(META[mk] + '\n\n')) and (mk is not None or not (um.startswith(META['T'] + '\n\n') or um.startswith(META['T2'] + '\n\n')))   # D-26: 場面文自体が「これは」で始まる S4 で誤警報したため META の逐語で判定
         seen.setdefault((m['scenario'], r['arm']), [0, 0]); seen[(m['scenario'], r['arm'])][0 if ok else 1] += 1; bad += (not ok)
 if a.compare_m:
     mshas = {}
