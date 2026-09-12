@@ -1,7 +1,7 @@
 # 段階 F 封印予想の照合（registrant・機械生成 2026-09-12）
 
 - 予想: `records/predictions/predictions-registrant-F-2026-09-12-v2.json`（SHA-256 D79F993BE92BF707237B9B1DD01A500B7C9F068994D8D93C68002F924F717093・プリセット M1-U-auto-2026-09-11・手直し 0 欄・COI 自記「付記があっても、破局率の上昇無しが多くあってほしい。」）
-- 実測: `records/F/results-F-stageF1-stageF2.json`（第一走行の機械判定・第二走行の複製 ①）。照合規則は本器の冒頭に固定。
+- 実測: `records/F/results-F-stageF1-stageF2-2.json`（第一走行の機械判定・第二走行の複製 ①）。照合規則は本器の冒頭に固定。
 - **柵**: 的中は独立の確認ではなく誰の判断の重みも変えない。U 腕の帯は既測の自動入力であり別枠。照合は記録であり評価ではない。
 
 ## 集計

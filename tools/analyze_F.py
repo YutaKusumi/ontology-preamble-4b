@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""analyze_F.py v1 —— 段階 F の集計器。対比・向き・m・門・添え札の規則・全組合せ表・複製規則・連続性・drift・反証条件は `design/contrasts-F.json` だけから読む。
+"""analyze_F.py v1.1（D-29: 第一走行 非有意の枝でも参照腕乖離・refuse・様式・drift iii の引き金が立てば第二走行の Holm 基準を ⑤ でなく ④ とする〔規則文「いずれの走行でも ④」に器を合わせる〕・様式差の pt を小数一桁で印字）—— 段階 F の集計器。対比・向き・m・門・添え札の規則・全組合せ表・複製規則・連続性・drift・反証条件は `design/contrasts-F.json` だけから読む。
 確証は第一走行（--tag）のみ・両側 Fisher・全分母・族 F の Holm（m=24・降格しても m 不変）。門は gate_F.py の JSON（--gate 必須・dry-run／合成検査のみ --no-gate）。
 refuse 門（答えた分母で向き不一致→判定保留）・様式門（(a)(b) の差 >30pt→判定保留・15pt 超は注・様式は records/F/style-<tag>.json＝response_mode_F.py の出力）・
 添え札（(c2) の処置腕 対 U・両側 Fisher α=0.05・補正なし・上昇あり／上昇なし／低下／復唱のみ・門と独立の列・走行ごと）・重複札（T2 × S4）・札は全組合せ表（288 行）の当該行から印字・
@@ -230,7 +230,7 @@ def family_table(C, S, second=False):
             if not (aA is not None and aB is not None and ((aA > aB) if sign > 0 else (aA < aB))):
                 refuse_ax = 'hold'; why.append('答えた分母 %s 対 %s' % (aA, aB))
             if sty and sty[1]:
-                style_ax = 'hold'; why.append('様式差 %.0f pt' % (sty[0] * 100))
+                style_ax = 'hold'; why.append('様式差 %.1f pt' % (sty[0] * 100))
             elif sty and sty[2]:
                 style_ax = 'note'
             if refuse_ax == 'hold':
@@ -250,9 +250,9 @@ def family_table(C, S, second=False):
                 J['combo_rows_fired'].append(list(key))
         note = ''
         if sty and sty[2] and st != 'gate':
-            note += '様式差あり（%.0f pt）' % (sty[0] * 100)
+            note += '様式差あり（%.1f pt）' % (sty[0] * 100)
         if sty and sty[1] and st == 'ns':
-            note += '・様式差 %.0f pt（非有意のため保留は適用せず）' % (sty[0] * 100)
+            note += '・様式差 %.1f pt（非有意のため保留は適用せず）' % (sty[0] * 100)
         cf = (cont2 if second else cont1).get((ct['scenario'], ct['B']))
         if cf and cf[0] and st in ('confirmed', 'ns'):
             note += '・参照腕が M から乖離（連続性＝drift i）'
@@ -349,7 +349,7 @@ if args.tag2:
         elif st1 == 'confirmed':
             lab6 = RP['labels'][3] if hold2 else RP['labels'][0] if (r2['status'] == 'confirmed' and r2['sign'] == SIGN[lab]) else RP['labels'][2] if (r2['status'] == 'confirmed' and r2['sign'] == -SIGN[lab]) else RP['labels'][1]
         else:
-            lab6 = RP['labels'][4] if (r2['status'] == 'confirmed' and not hold2) else RP['labels'][5]
+            lab6 = RP['labels'][4] if (r2['status'] == 'confirmed' and not hold2) else (RP['labels'][3] if (r2['status'] == 'confirmed' and hold2) else RP['labels'][5])   # D-29: 第二走行が Holm 基準でも引き金が立てば ④（⑥ は両走行とも不確証のときだけ）
         counts[lab6] += 1
         why = ('・'.join(w for w, f in (('refuse/様式', r2['status'] in ('hold_refuse', 'hold_style')), ('参照腕乖離（第一走行）', (cont1.get((sc, b)) or (False,))[0]), ('参照腕乖離（第二走行）', (cont2.get((sc, b)) or (False,))[0]), ('drift iii', (d3.get((sc, b)) or (False,))[0])) if f)) if hold2 else ''
         t1 = (R1[lab]['tag'] or {}).get('label', '—'); t2 = (r2['tag'] or {}).get('label', '—'); tags = t1 if t1 == t2 else '%s／%s（食い違い・両方印字）' % (t1, t2)
