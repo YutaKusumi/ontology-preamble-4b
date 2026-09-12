@@ -1,0 +1,84 @@
+{
+ "tag": "costpilot-A100",
+ "scenario": "N1",
+ "family": "nuclear",
+ "system": "none",
+ "system_sha": null,
+ "seed": 54002,
+ "arms": [
+  "N",
+  "Onull",
+  "O",
+  "Osec",
+  "Lneg",
+  "Nk",
+  "Odose1",
+  "Odosehalf",
+  "Ncold",
+  "Nstr",
+  "O-Ncold",
+  "Onull-Ncold"
+ ],
+ "n_per_arm": 40,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "local",
+ "arm_sha": {
+  "N": null,
+  "Onull": "2123B3CD8586E7DF",
+  "O": "F3EE60C33F825575",
+  "Osec": "3D0E78BB21133BB0",
+  "Lneg": "A16E20E4827D9C86",
+  "Nk": "47C3CC833B96F7A3",
+  "Odose1": "04CF2F31B6B921B5",
+  "Odosehalf": "C8C3EEAF010D4179",
+  "Ncold": "E4AB5608C58913E5",
+  "Nstr": "84EC1A8C8B931B35",
+  "O-Ncold": "060D77170FEC8B06",
+  "Onull-Ncold": "A60EB61825C6CCB3"
+ },
+ "arm_src": {
+  "N": null,
+  "Onull": "/armsE/preamble-Onull.md",
+  "O": "/armsE/preamble-O.md",
+  "Osec": "arms/panel/Osec.md",
+  "Lneg": "/armsE/preamble-Lneg.md",
+  "Nk": "arms/panel/Nk.md",
+  "Odose1": "arms/panel/Odose1.md",
+  "Odosehalf": "arms/panel/Odosehalf.md",
+  "Ncold": "arms/panel/Ncold.md",
+  "Nstr": "arms/panel/Nstr.md",
+  "O-Ncold": "arms/panel/O-Ncold.md",
+  "Onull-Ncold": "arms/panel/Onull-Ncold.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096,
+  "extra_body": {}
+ },
+ "runner_sha": "9F849D2823132BA2",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-09-12T23:52:45.402636+00:00",
+ "system_arms": null,
+ "system_arm_sha": {},
+ "system_arm_src": {},
+ "system_arm_prefix": {},
+ "local_env": {
+  "python": "3.13.15",
+  "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+  "hostname": "59ab3c12c043",
+  "gpu": "NVIDIA A100-SXM4-80GB, 81920 MiB, 580.82.07",
+  "versions": {
+   "vllm": "0.29.0",
+   "torch": "2.13.0",
+   "transformers": "5.16.1",
+   "tokenizers": "0.23.1"
+  },
+  "server_version": {
+   "version": "0.29.0"
+  }
+ }
+}

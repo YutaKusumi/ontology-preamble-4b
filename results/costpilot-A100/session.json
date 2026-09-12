@@ -1,0 +1,363 @@
+{
+ "tag": "costpilot-A100",
+ "boot": "v2",
+ "date_utc": "2026-09-12",
+ "gpu": "NVIDIA A100-SXM4-80GB, 81920 MiB, 580.82.07",
+ "gpu_key": "A100",
+ "seed": 54002,
+ "cfg": {
+  "repo": "https://github.com/YutaKusumi/ontology-preamble-4b.git",
+  "commit": "28077c3f0562",
+  "model": "Qwen/Qwen3-4B-Instruct-2507",
+  "scenario": "N1",
+  "arms": "N,Onull,O,Osec,Lneg,Nk,Odose1,Odosehalf,Ncold,Nstr,O-Ncold,Onull-Ncold",
+  "n": 40,
+  "workers": 24,
+  "max_model_len": 8192,
+  "vllm": "",
+  "drive": true,
+  "units_before": "741.82",
+  "dry": false,
+  "phase": "main",
+  "boot": "v2.2",
+  "arms_sha16": "9340E09D603A9FA5"
+ },
+ "versions": {
+  "torchaudio_removed": false,
+  "vllm": "0.29.0",
+  "torch": "2.13.0",
+  "torchvision": "0.28.0",
+  "torchaudio": null,
+  "transformers": "5.16.1",
+  "tokenizers": "0.23.1",
+  "huggingface_hub": "1.29.0",
+  "pip_freeze_sha16": "A924C84619A579E4",
+  "pip_freeze_lines": 789
+ },
+ "repo_head": "28077c3f0562269afc4bcf90f891423a830ead1c",
+ "runner_sha16": "9F849D2823132BA2",
+ "model_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "model_bytes": 8060917568,
+ "gpu_mem_after_load": null,
+ "timeline_s": {
+  "gpu": 0.0,
+  "pip": 1.5,
+  "clone": 1.5,
+  "download": 1.8,
+  "server_ready": 1.8,
+  "smoke": 508.3,
+  "main": 91.9
+ },
+ "runs": [
+  {
+   "started": "2026-09-12T23:43:26Z",
+   "phase": "smoke",
+   "timeline_s": {
+    "gpu": 27.9,
+    "pip": 201.9,
+    "clone": 203.3,
+    "download": 251.8,
+    "server_ready": 493.2,
+    "smoke": 508.3
+   },
+   "log": [
+    {
+     "k": "gpu",
+     "t": 27.9,
+     "at": "2026-09-12T23:43:26Z",
+     "gpu": "NVIDIA A100-SXM4-80GB, 81920 MiB, 580.82.07",
+     "seed": 54002,
+     "tag": "costpilot-A100",
+     "persist": "/content/drive/MyDrive/op4b-cost-pilot"
+    },
+    {
+     "k": "pip",
+     "t": 201.9,
+     "at": "2026-09-12T23:46:20Z",
+     "installed": true,
+     "vllm": "0.29.0",
+     "torch": "2.13.0"
+    },
+    {
+     "k": "clone",
+     "t": 203.3,
+     "at": "2026-09-12T23:46:22Z",
+     "head": "28077c3f0562",
+     "runner_sha16": "9F849D2823132BA2",
+     "results": "/content/drive/MyDrive/op4b-cost-pilot/results"
+    },
+    {
+     "k": "download",
+     "t": 251.8,
+     "at": "2026-09-12T23:47:10Z",
+     "model": "Qwen/Qwen3-4B-Instruct-2507",
+     "rev": "cdbee75f17c0",
+     "gib": 7.51
+    },
+    {
+     "k": "server_ready",
+     "t": 493.2,
+     "at": "2026-09-12T23:51:11Z",
+     "reused": false,
+     "gpu_mem": "72804 MiB, 81920 MiB"
+    },
+    {
+     "k": "smoke",
+     "t": 508.3,
+     "at": "2026-09-12T23:51:26Z",
+     "rc": 0,
+     "seconds": 15.0,
+     "trials": 12,
+     "ok": 12,
+     "api_error": 0,
+     "sec_med": 4.8,
+     "sec_max": 5.8,
+     "gen_med": 570,
+     "gen_p90": 672,
+     "gen_max": 702,
+     "truncated": 0,
+     "loop": 0,
+     "format_fail": 0
+    }
+   ]
+  },
+  {
+   "started": "2026-09-12T23:52:43Z",
+   "phase": "main",
+   "timeline_s": {
+    "gpu": 0.0,
+    "pip": 1.5,
+    "clone": 1.5,
+    "download": 1.8,
+    "server_ready": 1.8,
+    "main": 91.9
+   },
+   "log": [
+    {
+     "k": "gpu",
+     "t": 0.0,
+     "at": "2026-09-12T23:52:43Z",
+     "gpu": "NVIDIA A100-SXM4-80GB, 81920 MiB, 580.82.07",
+     "seed": 54002,
+     "tag": "costpilot-A100",
+     "persist": "/content/drive/MyDrive/op4b-cost-pilot"
+    },
+    {
+     "k": "pip",
+     "t": 1.5,
+     "at": "2026-09-12T23:52:44Z",
+     "installed": "",
+     "vllm": "0.29.0",
+     "torch": "2.13.0"
+    },
+    {
+     "k": "clone",
+     "t": 1.5,
+     "at": "2026-09-12T23:52:44Z",
+     "head": "28077c3f0562",
+     "runner_sha16": "9F849D2823132BA2",
+     "results": "/content/drive/MyDrive/op4b-cost-pilot/results"
+    },
+    {
+     "k": "download",
+     "t": 1.8,
+     "at": "2026-09-12T23:52:45Z",
+     "model": "Qwen/Qwen3-4B-Instruct-2507",
+     "rev": "cdbee75f17c0",
+     "gib": 7.51
+    },
+    {
+     "k": "server_ready",
+     "t": 1.8,
+     "at": "2026-09-12T23:52:45Z",
+     "reused": true
+    },
+    {
+     "k": "main",
+     "t": 91.9,
+     "at": "2026-09-12T23:54:15Z",
+     "rc": 0,
+     "seconds": 90.0,
+     "resumed_from": 0,
+     "trials": 480,
+     "ok": 480,
+     "api_error": 0,
+     "sec_med": 4.4,
+     "sec_max": 8.2,
+     "gen_med": 482,
+     "gen_p90": 665,
+     "gen_max": 901,
+     "truncated": 0,
+     "loop": 0,
+     "format_fail": 0
+    }
+   ]
+  }
+ ],
+ "log": [
+  {
+   "k": "gpu",
+   "t": 27.9,
+   "at": "2026-09-12T23:43:26Z",
+   "gpu": "NVIDIA A100-SXM4-80GB, 81920 MiB, 580.82.07",
+   "seed": 54002,
+   "tag": "costpilot-A100",
+   "persist": "/content/drive/MyDrive/op4b-cost-pilot"
+  },
+  {
+   "k": "pip",
+   "t": 201.9,
+   "at": "2026-09-12T23:46:20Z",
+   "installed": true,
+   "vllm": "0.29.0",
+   "torch": "2.13.0"
+  },
+  {
+   "k": "clone",
+   "t": 203.3,
+   "at": "2026-09-12T23:46:22Z",
+   "head": "28077c3f0562",
+   "runner_sha16": "9F849D2823132BA2",
+   "results": "/content/drive/MyDrive/op4b-cost-pilot/results"
+  },
+  {
+   "k": "download",
+   "t": 251.8,
+   "at": "2026-09-12T23:47:10Z",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "rev": "cdbee75f17c0",
+   "gib": 7.51
+  },
+  {
+   "k": "server_ready",
+   "t": 493.2,
+   "at": "2026-09-12T23:51:11Z",
+   "reused": false,
+   "gpu_mem": "72804 MiB, 81920 MiB"
+  },
+  {
+   "k": "smoke",
+   "t": 508.3,
+   "at": "2026-09-12T23:51:26Z",
+   "rc": 0,
+   "seconds": 15.0,
+   "trials": 12,
+   "ok": 12,
+   "api_error": 0,
+   "sec_med": 4.8,
+   "sec_max": 5.8,
+   "gen_med": 570,
+   "gen_p90": 672,
+   "gen_max": 702,
+   "truncated": 0,
+   "loop": 0,
+   "format_fail": 0
+  },
+  {
+   "k": "gpu",
+   "t": 0.0,
+   "at": "2026-09-12T23:52:43Z",
+   "gpu": "NVIDIA A100-SXM4-80GB, 81920 MiB, 580.82.07",
+   "seed": 54002,
+   "tag": "costpilot-A100",
+   "persist": "/content/drive/MyDrive/op4b-cost-pilot"
+  },
+  {
+   "k": "pip",
+   "t": 1.5,
+   "at": "2026-09-12T23:52:44Z",
+   "installed": "",
+   "vllm": "0.29.0",
+   "torch": "2.13.0"
+  },
+  {
+   "k": "clone",
+   "t": 1.5,
+   "at": "2026-09-12T23:52:44Z",
+   "head": "28077c3f0562",
+   "runner_sha16": "9F849D2823132BA2",
+   "results": "/content/drive/MyDrive/op4b-cost-pilot/results"
+  },
+  {
+   "k": "download",
+   "t": 1.8,
+   "at": "2026-09-12T23:52:45Z",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "rev": "cdbee75f17c0",
+   "gib": 7.51
+  },
+  {
+   "k": "server_ready",
+   "t": 1.8,
+   "at": "2026-09-12T23:52:45Z",
+   "reused": true
+  },
+  {
+   "k": "main",
+   "t": 91.9,
+   "at": "2026-09-12T23:54:15Z",
+   "rc": 0,
+   "seconds": 90.0,
+   "resumed_from": 0,
+   "trials": 480,
+   "ok": 480,
+   "api_error": 0,
+   "sec_med": 4.4,
+   "sec_max": 8.2,
+   "gen_med": 482,
+   "gen_p90": 665,
+   "gen_max": 901,
+   "truncated": 0,
+   "loop": 0,
+   "format_fail": 0
+  }
+ ],
+ "run_key": "costpilot-A100__N1__none__seed54002",
+ "run_dir": "results/costpilot-A100/costpilot-A100__N1__none__seed54002",
+ "persist": "/content/drive/MyDrive/op4b-cost-pilot",
+ "base": "/content/drive/MyDrive/op4b-cost-pilot",
+ "main_rc": 0,
+ "smoke_rc": null,
+ "files_sha16_lf": {
+  "costpilot-A100/costpilot-A100__N1__none__seed54002/cells.json": {
+   "sha16_lf": "6473EF86346D37CA",
+   "bytes": 29517
+  },
+  "costpilot-A100/costpilot-A100__N1__none__seed54002/manifest.json": {
+   "sha16_lf": "566152F68FAC9263",
+   "bytes": 1894
+  },
+  "costpilot-A100/costpilot-A100__N1__none__seed54002/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": {
+   "sha16_lf": "3301A658E6E8517E",
+   "bytes": 1086185
+  },
+  "costpilot-A100/costpilot-A100__N1__none__seed54002/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": {
+   "sha16_lf": "D07F0A5EAB569D69",
+   "bytes": 914040
+  },
+  "_smoke/costpilot-A100__N1__none__seed54002/cells.json": {
+   "sha16_lf": "DB124DA21CCC5DFE",
+   "bytes": 28165
+  },
+  "_smoke/costpilot-A100__N1__none__seed54002/manifest.json": {
+   "sha16_lf": "756BAFBD7DE3BEAF",
+   "bytes": 1896
+  },
+  "_smoke/costpilot-A100__N1__none__seed54002/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": {
+   "sha16_lf": "5106F430E0459079",
+   "bytes": 29161
+  },
+  "_smoke/costpilot-A100__N1__none__seed54002/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": {
+   "sha16_lf": "BD8629691C3B07EE",
+   "bytes": 22788
+  }
+ },
+ "units": {
+  "before": "741.82",
+  "after": null,
+  "rate_display": null,
+  "note": "登録者が Colab の「リソース」表示から申告する（before／after／表示の時間あたりユニット）。器は測れない。"
+ },
+ "wall_total_s": 91.9,
+ "clause": "本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。"
+}

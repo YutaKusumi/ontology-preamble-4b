@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""cost_facts.py v1.1 —— 費用パイロット（門0・計画案 v2.2 §5 1″）の実測から §6 の転記行を機械生成する（2026-09-12）。
+"""cost_facts.py v1.2 —— 費用パイロット（門0・計画案 v2.2 §5 1″）の実測から §6 の転記行を機械生成する（2026-09-12）。
 入力: results/costpilot-*/session.json（boot_cost_pilot.py が書く）と当該 run_dir の trials-*.jsonl・cells.json。ユニットは登録者申告（`--units TAG=before,after[,rate]` で上書き・session.json の units 欄が空なら「申告待ち」と印字）。
 出力: records/cost-pilot/cost-facts-<date>.md（転記行 U〔セッション〕・T〔トークン〕・R〔処理量〕・P〔段階 A/B への外挿・仮定つき ◐〕・G〔門0 の判定〕・S〔同一性の下見・記述〕）。
 規則: 打ち込んだ数は登録者申告のユニットのみ。外挿の係数は本ファイルに逐語で置き ◐ を付す。率は記述であり確証ではない。
@@ -48,11 +48,25 @@ for sp in sorted(glob.glob(os.path.join(ROOT, a.glob))):
     gen = sorted(r.get('gen_tokens') or 0 for r in ok); pt = sorted(r.get('prompt_tokens') or 0 for r in ok); sec = sorted(r.get('seconds') or 0 for r in ok)
     q = lambda xs, p: (xs[min(len(xs) - 1, int(p * len(xs)))] if xs else None)
     tl = S.get('timeline_s', {}); main_s = next((x.get('seconds') for x in S.get('log', []) if x.get('k') == 'main'), None)
-    setup_s = tl.get('server_ready')   # 起動から待機完了まで（導入・取得・起動を含む）
+    # v1.2: boot v2 は再実行・二段で runs を持つ。経費の各区間は runs 全体の最大（導入・取得・起動は初回にしか起きない）、壁時計は最初の run の開始から最後の run の終了まで
+    runs = S.get('runs') or [dict(started=S.get('date_utc'), timeline_s=tl)]
+    def _iv(t, a, b):
+        return max(0.0, (t.get(b) or 0) - (t.get(a) or 0)) if (t.get(b) is not None and t.get(a) is not None) else 0.0
+    iv = {k: max(_iv(r.get('timeline_s', {}), a, b) for r in runs) for k, (a, b) in {'pip': ('gpu', 'pip'), 'download': ('clone', 'download'), 'server': ('download', 'server_ready')}.items()}
+    setup_s = iv['pip'] + iv['download'] + iv['server'] + max(_iv(r.get('timeline_s', {}), 'pip', 'clone') for r in runs)
+    import datetime as _dt
+    def _p(x):
+        try:
+            return _dt.datetime.strptime(x, '%Y-%m-%dT%H:%M:%SZ')
+        except Exception:
+            return None
+    _st = [(_p(r.get('started')), max([0.0] + [float(v) for v in (r.get('timeline_s') or {}).values()])) for r in runs]
+    _st = [(a, b) for a, b in _st if a]
+    wall_session_h = ((max(a + _dt.timedelta(seconds=b) for a, b in _st) - min(a for a, _ in _st)).total_seconds() / 3600) if _st else None
     u = units_cli.get(S['tag']) or {k: (float(v) if v not in (None, '') else None) for k, v in (S.get('units') or {}).items() if k in ('before', 'after', 'rate_display')}
     used = (u['before'] - u['after']) if (u.get('before') is not None and u.get('after') is not None) else None
-    wall_h = (S.get('wall_total_s') or 0) / 3600
-    sessions.append(dict(S=S, rows=rows, ok=ok, cells=cells, gen=gen, pt=pt, sec=sec, q=q, main_s=main_s, setup_s=setup_s, u=u, used=used, wall_h=wall_h,
+    wall_h = wall_session_h if wall_session_h else (S.get('wall_total_s') or 0) / 3600
+    sessions.append(dict(S=S, rows=rows, ok=ok, cells=cells, gen=gen, pt=pt, sec=sec, q=q, main_s=main_s, setup_s=setup_s, iv=iv, u=u, used=used, wall_h=wall_h,
                          trials=len(rows), n_err=sum(1 for r in rows if r.get('status') == 'api_error'), n_trunc=sum(1 for r in ok if r.get('truncated')),
                          n_fail=sum(1 for r in ok if r.get('format_fail')), n_loop=sum(1 for r in ok if r.get('loop_flag')),
                          tph=(len(rows) / (main_s / 3600) if main_s else None),
@@ -63,12 +77,12 @@ if not sessions:
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
 O = ['# 費用パイロット（門0）の実測と転記行（機械生成・`tools/cost_facts.py` v1.1・%s UTC）' % now, '',
      '- 入力: ' + '・'.join('`%s`' % os.path.relpath(os.path.join(ROOT, s['S']['run_dir']), ROOT).replace('\\', '/') for s in sessions) + '。ユニットの数は登録者申告（器は測れない）。外挿の係数は ◐（仮定・本器の逐語）。率は記述であり確証ではない。', '',
-     '## U. セッション（環境と経費）', '', '| tag | GPU | vLLM／torch | 重み rev | 取得 GiB | 導入 s | 取得 s | 起動待ち s | 経費合計 s（起動〜待機完了） | 本走行 s | 壁時計合計 h | HEAD | 走行器 |', '|---|---|---|---|---|---|---|---|---|---|---|---|---|']
+     '## U. セッション（環境と経費）', '', '| tag | GPU | vLLM／torch | 重み rev | 取得 GiB | 導入 s | 取得 s | 起動待ち s | 経費合計 s（各区間の runs 最大の和） | 本走行 s | 壁時計 h（最初の run 開始〜最後の run 終了） | HEAD | 走行器 |', '|---|---|---|---|---|---|---|---|---|---|---|---|---|']
 for s in sessions:
     S = s['S']; tl = S.get('timeline_s', {}); v = S.get('versions') or {}
     O.append('| %s | %s | %s／%s | %s | %s | %s | %s | %s | %s | %s | %.2f | %s | %s |' % (
         S['tag'], S.get('gpu', '').split(',')[0], v.get('vllm'), v.get('torch'), (S.get('model_rev') or '')[:12], pct((S.get('model_bytes') or 0) / 2**30, 2),
-        pct((tl.get('pip') or 0) - (tl.get('gpu') or 0), 0), pct((tl.get('download') or 0) - (tl.get('clone') or 0), 0), pct((tl.get('server_ready') or 0) - (tl.get('download') or 0), 0),
+        pct(s['iv']['pip'], 0), pct(s['iv']['download'], 0), pct(s['iv']['server'], 0),
         pct(s['setup_s'], 0), pct(s['main_s'], 0), s['wall_h'], (S.get('repo_head') or '')[:12], S.get('runner_sha16')))
 O += ['', '## T. トークン長と応答の状態（本走行・腕をまとめて）', '', '| tag | 試行 | api_error | 書式外 | 切り詰め | ループ | prompt tok 中央値 | 出力 tok 中央値／p90／最大 | 試行秒 中央値／p90 |', '|---|---|---|---|---|---|---|---|---|']
 for s in sessions:
