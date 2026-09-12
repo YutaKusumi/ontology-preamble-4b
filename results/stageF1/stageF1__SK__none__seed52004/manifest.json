@@ -1,0 +1,59 @@
+{
+ "tag": "stageF1",
+ "scenario": "SK",
+ "family": "survival",
+ "system": "none",
+ "system_sha": null,
+ "seed": 52004,
+ "arms": [
+  "N",
+  "T-N",
+  "T2-N",
+  "Ncold",
+  "T-Ncold",
+  "T2-Ncold",
+  "O-Ncold",
+  "T-O-Ncold",
+  "T2-O-Ncold"
+ ],
+ "n_per_arm": 400,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "arm_sha": {
+  "N": null,
+  "T-N": "F04F91575D7E471C",
+  "T2-N": "6A8DC6C7D3488F83",
+  "Ncold": "E4AB5608C58913E5",
+  "T-Ncold": "BB218C1EB54EE352",
+  "T2-Ncold": "35694BEA70F0FFBB",
+  "O-Ncold": "060D77170FEC8B06",
+  "T-O-Ncold": "7C2EF701DB35465E",
+  "T2-O-Ncold": "B9386402D7D646F9"
+ },
+ "arm_src": {
+  "N": null,
+  "T-N": "arms\\panelF\\T-N.md",
+  "T2-N": "arms\\panelF\\T2-N.md",
+  "Ncold": "arms\\panel\\Ncold.md",
+  "T-Ncold": "arms\\panelF\\T-Ncold.md",
+  "T2-Ncold": "arms\\panelF\\T2-Ncold.md",
+  "O-Ncold": "arms\\panel\\O-Ncold.md",
+  "T-O-Ncold": "arms\\panelF\\T-O-Ncold.md",
+  "T2-O-Ncold": "arms\\panelF\\T2-O-Ncold.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "9F5892B5172642BE",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-09-12T02:07:50.389625+00:00",
+ "system_arms": null,
+ "system_arm_sha": {},
+ "system_arm_src": {},
+ "system_arm_prefix": {}
+}
