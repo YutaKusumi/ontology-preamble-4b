@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""identity_screen_A.py v1 —— 門0.5 同一性選別（凍結前・正本 identity_screen・登録者裁定 D7・2026-09-13）。
+"""identity_screen_A.py v1.1 —— 門0.5 同一性選別（凍結前・正本 identity_screen・登録者裁定 D7・2026-09-13）。
+v1.1（2026-09-14・実装検分の採否表 P78）: dry-run の走行は読み出しで拒む（--allow-dry は検査用の口・印を付ける）。
 入力: 手元スタック（vLLM bf16・L4）の走行 results/<tags.identity>/（4B-2507 × N1 × arms_run × n=identity_n・seed は seeds.identity）と、正本の API 既測 bases_4B2507_api。
 主判定: compared_arms × indicators（破局・refuse・書式外・分母は n_ok）の絶対差（pt）n_differences 個の相加平均が mean_pt 以下、かつ最大絶対差が max_pt 以下で合格（どちらかを超えたら不合格）。分数で厳密に比べる。
 補助（合否を動かさない）: 腕ごとの Freeman–Halton 正確検定（二行 × 四列＝書式外／refuse／破局／その他の答え・排他・優先順は書式外→refuse→破局→その他）を多変量超幾何の MC（B=aux.mc_B・
@@ -17,7 +18,7 @@ from scipy.stats import chi2
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v1'
+VERSION = 'v1.1'
 COLS = ('format_out', 'refuse', 'catastrophe', 'other')
 
 
@@ -53,13 +54,17 @@ def fh_mc_p(table, B, rng):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(); ap.add_argument('--tag', default=None); ap.add_argument('--root', default=None); ap.add_argument('--contrasts', default=None)
-    ap.add_argument('--B', type=int, default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true'); ap.add_argument('--allow-incomplete', action='store_true')
+    ap.add_argument('--B', type=int, default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true'); ap.add_argument('--allow-incomplete', action='store_true'); ap.add_argument('--allow-dry', action='store_true')
     a = ap.parse_args()
     T = runs_A.load_T(a.contrasts); S = T['identity_screen']; tag = a.tag or T['tags']['identity']; ANCHOR = next(m['key'] for m in T['models'] if m['anchor'])
     OUT = a.out or os.path.join(REPO, 'records', 'A', 'identity-screen-A')
     if (os.path.exists(OUT + '.json') or os.path.exists(OUT + '.md')) and not a.force:
         sys.exit('出力が既にある（上書きしない・--force で置き換え）: %s' % OUT)
-    idx = runs_A.index_runs(T, tag, a.root); key = (ANCHOR, S['scenario'])
+    try:
+        idx = runs_A.index_runs(T, tag, a.root, allow_dry=a.allow_dry)
+    except RuntimeError as ex:
+        sys.exit('読み出しで止まった（%s）' % ex)
+    key = (ANCHOR, S['scenario'])
     if key not in idx:
         sys.exit('門0.5 の走行が無い: %s × %s（tag %s）' % (ANCHOR, S['scenario'], tag))
     rec = idx[key]; seed_ok = rec['seed'] == T['seeds']['identity']
@@ -84,7 +89,7 @@ if __name__ == '__main__':
         aux.append({'arm': arm, 'table': table, 'p_mc': fh_mc_p(table, B, np.random.default_rng([S['aux']['seed'], i]))})
     stat = float(-2.0 * sum(np.log(x['p_mc']) for x in aux)); p_comb = float(chi2.sf(stat, 2 * len(aux)))
     R = {'kind': 'identity_screen_A', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'tag': tag, 'root': a.root, 'run_key': rec['run_key'],
-         'seed': rec['seed'], 'seed_registered': seed_ok, 'model': rec['manifest'].get('model'), 'contrasts_sha16': runs_A.sha16_file(a.contrasts or runs_A.CPATH), 'dev_marks': [x for x, on in (('allow_incomplete', bool(short)), ('small_B', a.B is not None)) if on],
+         'seed': rec['seed'], 'seed_registered': seed_ok, 'model': rec['manifest'].get('model'), 'contrasts_sha16': runs_A.sha16_file(a.contrasts or runs_A.CPATH), 'dev_marks': [x for x, on in (('allow_incomplete', bool(short)), ('small_B', a.B is not None), ('allow_dry', a.allow_dry)) if on] + list(rec.get('dry_marks') or []),
          'verdict': verdict, 'mean_abs_diff_pt': float(mean), 'max_abs_diff_pt': float(mx), 'mean_pt': S['mean_pt'], 'max_pt': S['max_pt'],
          'diffs': [dict(x, abs_diff_pt=float(x['abs_diff_pt'])) for x in diffs], 'aux': {'B': B, 'per_arm': aux, 'fisher_stat': stat, 'fisher_df': 2 * len(aux), 'p_combined': p_comb, 'affects_verdict': S['aux']['affects_verdict']},
          'local_counts': EX, 'short_arms': short, 'consequence': S['pass'] if verdict == 'pass' else S['fail'], 'no_constant_change': S['no_constant_change'], 'null_fail_ref': S['null_fail_ref'], 'detection_ref': S['detection_ref'],

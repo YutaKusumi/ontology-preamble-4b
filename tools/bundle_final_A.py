@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""bundle_final_A.py v1 —— 段階 A 設計草案7（凍結候補の二つ目）の凍結前の最終検分用 bundle を機械連結する（2026-09-14・bundle_prefreeze_A.py の型・登録者決定: 手順5 を凍結前の最終検分とする）。
+"""bundle_final_A.py v1.1 —— 段階 A 設計草案8（凍結候補の三つ目）の凍結前の最終検分用 bundle を機械連結する（2026-09-14・bundle_prefreeze_A.py の型・登録者決定: 手順5 を凍結前の最終検分とする）。
+v1.1（2026-09-14）: 草案8 と、実装検分の反映の事前登録・確かめ・記録・再現の検査の記録・反映の確かめの器を部品に加えた。
 部品は逐語（LF 正規化）で、各部品の SHA16 と字数を見出しに印字する。内部の計画案は含めない。系統外（Gemini・Grok）と claude.ai の Claude に同じものを渡す。
 貼付の上限に合わせて、部品の境目で複数の部に分ける（--max-chars・部品は割らない・一つの部品が上限を超えるときはその部品だけで一部にする）。各部の冒頭に全部の目次と SHA16 を置く。
 部品が欠けていれば止まる（--allow-missing は検査用で、欠けを目次に印字する）。
@@ -11,12 +12,12 @@ import os, sys, hashlib, datetime, argparse
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUTD = os.path.join(REPO, 'records', 'reviews', 'A', 'final')
 PARTS = [('依頼文（凍結前の最終検分）', 'records/reviews/A/final/review-request-A-final.md'),
-         ('段階 A 設計草案7（凍結候補の二つ目）', 'design/design-stageA-draft7.md'),
-         ('草案7 の原稿（正本のキー参照）', 'design/design-stageA-draft7.src.md'),
+         ('段階 A 設計草案8（凍結候補の三つ目）', 'design/design-stageA-draft8.md'),
+         ('草案8 の原稿（正本のキー参照）', 'design/design-stageA-draft8.src.md'),
          ('報告雛形 A（組み立て）', 'records/A/results-report-template-A.md'),
          ('報告雛形 A の原稿', 'records/A/results-report-template-A.src.md'),
          ('運用の解釈の一覧（登録者の確認待ち）', 'records/A/tooling-interpretations-A.md'),
-         ('本文の数の機械検査（草案7）', 'records/A/numbers-lint-draft7A.md'),
+         ('本文の数の機械検査（草案8）', 'records/A/numbers-lint-draft8A.md'),
          ('本文の数の機械検査（雛形）', 'records/A/numbers-lint-template-A.md'),
          ('設計事実 A（転記行 A〜O の出所）', 'records/A/design-facts-A.md'),
          ('正本 contrasts-A.json', 'design/contrasts-A.json'),
@@ -30,10 +31,14 @@ PARTS = [('依頼文（凍結前の最終検分）', 'records/reviews/A/final/re
          ('手順4 実装検分の事前登録', 'records/reviews/A/draft7-impl/preregistration-impl-review-A.md'),
          ('手順4 検分者 1 の票（逐語）', 'records/reviews/A/draft7-impl/reviewer-1/review.md'),
          ('手順4 検分者 2 の票（逐語）', 'records/reviews/A/draft7-impl/reviewer-2/review.md'),
-         ('手順4 の採否表（反映の記録）', 'records/reviews/A/draft7-impl/adoption-table-impl-A.md')] + \
+         ('手順4 の採否表（P75〜P104・裁定 D16〜D25）', 'records/reviews/A/draft7-impl/adoption-table-impl-A.md'),
+         ('手順4 再現の検査の記録（W33〜W76）', 'records/reviews/A/draft7-impl/verification-impl-A.md'),
+         ('手順4 反映の事前登録', 'records/reviews/A/draft7-impl/preregistration-reflection-impl-A.md'),
+         ('手順4 反映の確かめ（機械生成）', 'records/reviews/A/draft7-impl/verification-reflection-impl-A.md'),
+         ('手順4 反映の記録', 'records/reviews/A/draft7-impl/reflection-impl-A.md')] + \
         [(t, 'tools/' + t) for t in ('confirm_A.py', 'bands_A.py', 'runs_A.py', 'zaxis_A.py', 'firth.py', 'analyze_A.py', 'gate_A.py', 'calib_band_A.py', 'identity_screen_A.py', 'control_chart_A.py',
                                     'response_mode_A.py', 'integrity_A.py', 'sample_inspection_A.py', 'judge_fragments_A.py', 'build_report_A.py', 'report_lint.py', 'freeze_A.py', 'build_draftA.py',
-                                    'numbers_lint.py', 'make_contrasts_A.py', 'power_grid_A.py', 'design_facts_A.py', 'colab/boot_stageA.py', 'synth_A.py', 'synth_gates_A.py', 'firth_check_A.py', 'firth_check_A.R')]
+                                    'numbers_lint.py', 'make_contrasts_A.py', 'power_grid_A.py', 'design_facts_A.py', 'colab/boot_stageA.py', 'synth_A.py', 'synth_gates_A.py', 'firth_check_A.py', 'firth_check_A.R', 'verify_reflection_impl_A.py')]
 LANG = {'.py': 'python', '.json': 'json', '.R': 'r'}
 CLAUSE = '本 bundle のいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
 
@@ -59,7 +64,7 @@ if missing:
     toc += ['', '- 欠けている部品（検査用の組み立て）: %s' % '・'.join(missing)]
 os.makedirs(OUTD, exist_ok=True)
 for k, P in enumerate(parts, 1):
-    L = ['# 段階 A 凍結前の最終検分 bundle 第 %d 部／全 %d 部（機械連結・`tools/bundle_final_A.py` v1・%s UTC）' % (k, len(parts), stamp), '',
+    L = ['# 段階 A 凍結前の最終検分 bundle 第 %d 部／全 %d 部（機械連結・`tools/bundle_final_A.py` v1.1・%s UTC）' % (k, len(parts), stamp), '',
          '- 部品は逐語（LF 正規化）。見出しの SHA16 はファイルバイトの SHA-256 先頭 16 桁（CRLF→LF 正規化）。全部の目次は下の表。', '', '## 目次（全部）', ''] + toc + ['']
     for it in P:
         fence = '````' if '```' in it['text'] else '```'

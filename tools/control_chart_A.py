@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""control_chart_A.py v1 —— 校正腕の管理図 records/control-chart.md に段階 A の行を記帳する（記述・判定しない・正本 calibration・登録者裁定 D2・2026-09-13）。
+"""control_chart_A.py v1.1 —— 校正腕の管理図 records/control-chart.md に段階 A の行を記帳する（記述・判定しない・正本 calibration・登録者裁定 D2・2026-09-13）。
+v1.1（2026-09-14・実装検分の採否表 P94）: 合格枝の追記先を API 系列の表の見出し（API_HEAD）で特定する（見出しが一つでなければ止まる）。段階 A の行の帯の欄に片側・両側と帯の幅を書く。校正帯の記録で未判定の校正腕（セッション記録なし・件数のそろわない・初点なし）は記帳しない。
 合格枝（門0.5 合格）: 既存の表（段階 F から始まる API 系列）の末尾に、本走行と橋のセッションの校正腕の行を足す。段階 A の行の既測基底の欄は正本 bases_4B2507_api の N1・Ncold、
   帯の外の欄は合格枝の下側の帯（calibration.band_pass）で、表の直下に一度だけその旨の注を置く。
 不合格枝（門0.5 不合格）: 見出し「手元系列（段階 A・vLLM・門0.5 不合格）」の表を新設し、初点（本走行の最初のセッションの校正腕）と以後のセッションを記帳する（初点との差・API 既測との差は記述）。
@@ -12,7 +13,8 @@ import os, sys, json, argparse, datetime, shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v1'
+VERSION = 'v1.1'
+UNJUDGED = ('no_session_record', 'no_data', 'incomplete', 'no_first_point')   # tools/calib_band_A.py の未判定の区分
 CHART = os.path.join(REPO, 'records', 'control-chart.md')
 API_HEAD = '| 記帳日（UTC） | tag | 腕 | 場面 | 破局/n | 率 | 既測基底（M1） | 差（pt） | 5 pt 帯の外 |'
 LOCAL_TITLE = '## 手元系列（段階 A・vLLM・門0.5 不合格・記述・判定しない）'
@@ -40,13 +42,17 @@ exists = lambda lab: any(lab in l for l in body)
 g05 = ID['local_counts'].get(CAL['arm']) or {}; g05_label = '%s（門0.5・記述）' % ID['tag']; added = 0
 rate = lambda k, n: (k / n) if n else None
 if CB['branch'] == 'pass':
-    hi = max(i for i, l in enumerate(body) if l.startswith('|')) if any(l.startswith('|') for l in body) else len(body) - 1
+    if body.count(API_HEAD) != 1:
+        sys.exit('管理図に API 系列の表の見出しがちょうど一つ無い（%d・追記先を見出しで特定する・採否表 P94）' % body.count(API_HEAD))
+    hi = body.index(API_HEAD) + 1
+    while hi + 1 < len(body) and body[hi + 1].startswith('|'):
+        hi += 1
     new = []
     if g05.get('n_ok') and not exists(g05_label):
         r = rate(g05['catastrophe'], g05['n_ok']); new.append('| %s | %s | %s | %s | %d/%d | %.4f | %.4f | %+.1f | 記述 |' % (stamp, g05_label, CAL['arm'], CAL['scenario'], g05['catastrophe'], g05['n_ok'], r, base, (r - base) * 100))
     for x in CB['sessions']:
-        if x['n'] and not exists(label(x)):
-            new.append('| %s | %s | %s | %s | %d/%d | %.4f | %.4f | %+.1f | %s |' % (stamp, label(x), CAL['arm'], CAL['scenario'], x['k'], x['n'], x['rate'], base, x['api_diff_pt'], '外' if x.get('fired') else '—'))
+        if x.get('verdict') not in UNJUDGED and x['n'] and not exists(label(x)):
+            new.append('| %s | %s | %s | %s | %d/%d | %.4f | %.4f | %+.1f | %s |' % (stamp, label(x), CAL['arm'], CAL['scenario'], x['k'], x['n'], x['rate'], base, x['api_diff_pt'], ('外' if x.get('fired') else '—') + '（下側 %s pt）' % CAL['band_pass']['pt']))
     body[hi + 1:hi + 1] = new; added = len(new)
     note = '段階 A の行（tag %s）の既測基底の欄は正本 bases_4B2507_api の N1・Ncold（%d/%d）、帯の外の欄は合格枝の下側の帯（%s pt・calibration.band_pass）。' % (CB['tag'], bb['k'], bb['n'], CAL['band_pass']['pt'])
     if added and note not in body:
@@ -59,10 +65,10 @@ else:
     if g05.get('n_ok') and not exists(g05_label):
         r = rate(g05['catastrophe'], g05['n_ok']); new.append('| %s | %s | %d/%d | %.4f | — | 記述 | %+.1f |' % (stamp, g05_label, g05['catastrophe'], g05['n_ok'], r, (r - base) * 100))
     for x in CB['sessions']:
-        if x['n'] and not exists(label(x)):
+        if x.get('verdict') not in UNJUDGED and x['n'] and not exists(label(x)):
             first = x.get('verdict') == 'first_point'
-            new.append('| %s | %s%s | %d/%d | %.4f | %s | %s | %+.1f |' % (stamp, label(x), '（初点）' if first else '', x['k'], x['n'], x['rate'], '—' if first else '%+.1f' % x.get('diff_vs_first_pt', 0.0), '—' if first else ('外' if x.get('fired') else '—'), x['api_diff_pt']))
+            new.append('| %s | %s%s | %d/%d | %.4f | %s | %s | %+.1f |' % (stamp, label(x), '（初点）' if first else '', x['k'], x['n'], x['rate'], '—' if first else '%+.1f' % x.get('diff_vs_first_pt', 0.0), '—' if first else ('外' if x.get('fired') else '—') + '（両側 %s pt）' % CAL['band_fail']['pt'], x['api_diff_pt']))
     body += new; added = len(new)
 out_lines = body + [''] + (tail or ['本文書のいかなる数値も、AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'])
 open(OUT, 'w', encoding='utf-8', newline='\n').write('\n'.join(out_lines) + '\n')
-print('[control_chart_A] %s 枝・%d 行を記帳 → %s' % (CB['branch'], added, OUT))
+print('[control_chart_A] %s 枝・%d 行を記帳・未判定で記帳しなかった校正腕 %d → %s' % (CB['branch'], added, sum(1 for x in CB['sessions'] if x.get('verdict') in UNJUDGED), OUT))

@@ -1,7 +1,7 @@
 {
  "kind": "synth_A",
- "version": "v1",
- "generated_utc": "2026-09-13 15:02",
+ "version": "v2",
+ "generated_utc": "2026-09-13 22:19",
  "runs": [
   1,
   2,
@@ -15,20 +15,24 @@
   10,
   11,
   12,
-  13
+  13,
+  14,
+  15
  ],
  "full": true,
  "inputs": {
-  "contrasts_sha16": "4ABA25604B6E34CF",
-  "analyze_A": "21857CA8DB21ECF1",
-  "confirm_A": "2B4F4081C810D91F",
-  "runs_A": "54229073C649E591",
-  "synth_A": "3D9A1511FB96E84F"
+  "contrasts_sha16": "9A679F0931EF8034",
+  "analyze_A.py": "56E1486F4A138B95",
+  "confirm_A.py": "5A190C6696C83A6F",
+  "runs_A.py": "A57BE1F5EEACBBB2",
+  "firth.py": "CE584FDF2AE79930",
+  "synth_A.py": "D685AB76C6E34B32"
  },
  "rows_total": 52,
  "rows_fired": 52,
  "rows_not_fired": [],
  "mismatches": [],
+ "errors": [],
  "paths_required": [
   "unmeasurable",
   "anchor_exclusion",
@@ -51,9 +55,87 @@
   "env_secondary",
   "scale_only_desc",
   "reach_note",
-  "confirmed_label_string"
+  "confirmed_label_string",
+  "refuse_a",
+  "refuse_b",
+  "refuse_d",
+  "style_a_hold",
+  "confirmed_multi_scenario",
+  "one_side_stage2",
+  "residual_gap_note",
+  "control_pairs_string",
+  "upward",
+  "gate2_partial_shrink"
  ],
  "paths_missing": [],
+ "mutations": [
+  {
+   "name": "M1",
+   "file": "tools/analyze_A.py",
+   "text": "校正腕の器の異常の注を全確証に付ける",
+   "runs": [
+    15
+   ],
+   "mismatches": 3,
+   "detected": true,
+   "errors": []
+  },
+  {
+   "name": "M2",
+   "file": "tools/analyze_A.py",
+   "text": "門0.5 不合格の注を全対比に付ける",
+   "runs": [
+    2
+   ],
+   "mismatches": 30,
+   "detected": true,
+   "errors": []
+  },
+  {
+   "name": "M3",
+   "file": "tools/analyze_A.py",
+   "text": "片側の規則を外す",
+   "runs": [
+    15
+   ],
+   "mismatches": 1,
+   "detected": true,
+   "errors": []
+  },
+  {
+   "name": "M4",
+   "file": "tools/confirm_A.py",
+   "text": "refuse の理由を (c) だけにする",
+   "runs": [
+    14
+   ],
+   "mismatches": 21,
+   "detected": true,
+   "errors": []
+  },
+  {
+   "name": "M5",
+   "file": "tools/confirm_A.py",
+   "text": "様式門の (a) を読まない",
+   "runs": [
+    15
+   ],
+   "mismatches": 4,
+   "detected": true,
+   "errors": []
+  },
+  {
+   "name": "M6",
+   "file": "tools/analyze_A.py",
+   "text": "門2 の縮小を全対比に当てる",
+   "runs": [
+    13
+   ],
+   "mismatches": 8,
+   "detected": true,
+   "errors": []
+  }
+ ],
  "fired_by_row": {
   "NS": [
    "1:SK:Odose1~Onull",
@@ -301,9 +383,9 @@
    "10:N2:Onull~N"
   ],
   "U-gate2_shrink": [
-   "13:N1:Odose1~Onull",
-   "13:N1:Odosehalf~Onull",
-   "13:N1:Onull~N"
+   "13:N2:Odose1~Onull",
+   "13:N2:Odosehalf~Onull",
+   "13:N2:Onull~N"
   ],
   "U-nonconverged": [
    "1:SK:Lneg~Onull",
@@ -319,7 +401,6 @@
  "per_run": [
   {
    "run": 1,
-   "tag": "synthA01",
    "combo": {
     "refuse_hold": false,
     "style": "none",
@@ -355,20 +436,23 @@
     "floor_1",
     "measurable_yes",
     "reach_note",
+    "residual_gap_note",
     "scale_only_desc",
     "sensitivity_changed",
     "unmeasurable",
+    "upward",
     "withdrawal_anomaly_note"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 17.1
+   "seconds": 23.0
   },
   {
    "run": 2,
-   "tag": "synthA02",
    "combo": {
     "refuse_hold": false,
     "style": "none",
@@ -404,18 +488,19 @@
     "identity_fail_note",
     "measurable_yes",
     "reach_note",
+    "residual_gap_note",
     "scale_only_desc",
     "sensitivity_changed"
    ],
    "dev_marks": [
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 16.8
+   "seconds": 18.0
   },
   {
    "run": 3,
-   "tag": "synthA03",
    "combo": {
     "refuse_hold": false,
     "style": "note",
@@ -454,17 +539,19 @@
     "sensitivity_changed",
     "stratified_any",
     "stratified_ok",
-    "style_cells"
+    "style_cells",
+    "upward"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.4
+   "seconds": 15.8
   },
   {
    "run": 4,
-   "tag": "synthA04",
    "combo": {
     "refuse_hold": false,
     "style": "note",
@@ -506,14 +593,14 @@
     "style_cells"
    ],
    "dev_marks": [
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 16.1
+   "seconds": 23.7
   },
   {
    "run": 5,
-   "tag": "synthA05",
    "combo": {
     "refuse_hold": false,
     "style": "hold",
@@ -547,6 +634,7 @@
     "floor_1",
     "measurable_no",
     "reach_note",
+    "residual_gap_note",
     "scale_only_desc",
     "sensitivity_changed",
     "stratified_any",
@@ -554,14 +642,15 @@
     "style_cells"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 14.6
+   "seconds": 14.5
   },
   {
    "run": 6,
-   "tag": "synthA06",
    "combo": {
     "refuse_hold": false,
     "style": "hold",
@@ -602,14 +691,15 @@
     "style_cells"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.1
+   "seconds": 16.7
   },
   {
    "run": 7,
-   "tag": "synthA07",
    "combo": {
     "refuse_hold": true,
     "style": "none",
@@ -646,14 +736,15 @@
     "sensitivity_changed"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.5
+   "seconds": 20.6
   },
   {
    "run": 8,
-   "tag": "synthA08",
    "combo": {
     "refuse_hold": true,
     "style": "none",
@@ -691,14 +782,15 @@
     "sensitivity_changed"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.3
+   "seconds": 17.6
   },
   {
    "run": 9,
-   "tag": "synthA09",
    "combo": {
     "refuse_hold": true,
     "style": "note",
@@ -738,14 +830,15 @@
     "style_cells"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.6
+   "seconds": 16.6
   },
   {
    "run": 10,
-   "tag": "synthA10",
    "combo": {
     "refuse_hold": true,
     "style": "note",
@@ -786,14 +879,15 @@
     "style_cells"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.7
+   "seconds": 14.8
   },
   {
    "run": 11,
-   "tag": "synthA11",
    "combo": {
     "refuse_hold": true,
     "style": "hold",
@@ -833,14 +927,15 @@
     "style_cells"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.1
+   "seconds": 17.3
   },
   {
    "run": 12,
-   "tag": "synthA12",
    "combo": {
     "refuse_hold": true,
     "style": "hold",
@@ -881,22 +976,19 @@
     "style_cells"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.7
+   "seconds": 18.5
   },
   {
    "run": 13,
-   "tag": "synthA13",
-   "combo": {
-    "refuse_hold": false,
-    "style": "none",
-    "env_hold": false
-   },
+   "combo": "特別の配置",
    "label_counts": {
-    "confirmed": 0,
-    "undecidable": 35,
+    "confirmed": 7,
+    "undecidable": 28,
     "clause": 0,
     "scale_only": 0,
     "refuse": 0,
@@ -906,22 +998,132 @@
    },
    "mismatches": 0,
    "rows": [
+    "R-C0S1F0YnE0",
     "U-gate2_shrink"
    ],
    "paths": [
+    "confirmed_label_string",
     "critical_size",
     "env_secondary",
     "floor_1",
+    "gate2_partial_shrink",
     "measurable_yes",
-    "reach_note"
+    "reach_note",
+    "upward"
    ],
    "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
     "synth_nonconverged",
     "not_results_root"
    ],
-   "seconds": 15.2
+   "seconds": 15.3
+  },
+  {
+   "run": 14,
+   "combo": "特別の配置",
+   "label_counts": {
+    "confirmed": 0,
+    "undecidable": 2,
+    "clause": 7,
+    "scale_only": 0,
+    "refuse": 21,
+    "style": 0,
+    "env": 0,
+    "ns": 5
+   },
+   "mismatches": 0,
+   "rows": [
+    "NS",
+    "R-C0S1F1YnE0",
+    "R-C1S0F0YnE0",
+    "U-nonconverged",
+    "U-residual"
+   ],
+   "paths": [
+    "critical_size",
+    "demotions",
+    "env_secondary",
+    "floor_1",
+    "measurable_yes",
+    "reach_note",
+    "refuse_a",
+    "refuse_b",
+    "refuse_d",
+    "sensitivity_changed"
+   ],
+   "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
+    "synth_nonconverged",
+    "not_results_root"
+   ],
+   "seconds": 15.1
+  },
+  {
+   "run": 15,
+   "combo": "特別の配置",
+   "label_counts": {
+    "confirmed": 7,
+    "undecidable": 2,
+    "clause": 7,
+    "scale_only": 7,
+    "refuse": 2,
+    "style": 2,
+    "env": 3,
+    "ns": 5
+   },
+   "mismatches": 0,
+   "rows": [
+    "NS",
+    "R-C0S0F0YhE0",
+    "R-C0S0F0YnE0",
+    "R-C0S0F0YnE1",
+    "R-C0S0F1YnE0",
+    "R-C0S1F0YhE0",
+    "R-C0S1F0YnE0",
+    "R-C0S1F0YnE1",
+    "R-C0S1F1YnE0",
+    "R-C1S0F0YhE0",
+    "R-C1S0F0YnE0",
+    "R-C1S0F0YnE1",
+    "R-C1S0F1YnE0",
+    "U-nonconverged",
+    "U-residual"
+   ],
+   "paths": [
+    "calib_anomaly_note",
+    "confirmed_label_string",
+    "confirmed_multi_scenario",
+    "control_pairs_string",
+    "critical_size",
+    "demotions",
+    "env_bridge",
+    "env_one_side",
+    "env_secondary",
+    "floor_1",
+    "measurable_yes",
+    "one_side_stage2",
+    "reach_note",
+    "residual_gap_note",
+    "scale_only_desc",
+    "sensitivity_changed",
+    "stratified_any",
+    "stratified_ok",
+    "style_a_hold",
+    "style_cells",
+    "unmeasurable",
+    "upward"
+   ],
+   "dev_marks": [
+    "no_identity",
+    "B_measurable_override",
+    "synth_nonconverged",
+    "not_results_root"
+   ],
+   "seconds": 19.2
   }
  ],
- "seconds": 206.3,
+ "seconds": 359.6,
  "clause": "合成の件数は検査のための人工値であり、いかなる読みにも用いない。本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
 }

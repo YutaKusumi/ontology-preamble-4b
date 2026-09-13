@@ -179,4 +179,9 @@
   - 系統外の目。
   - 検分者 1 の F-28 の例の数値そのもの（W66 は食い違いがありうることだけを確かめた）。
 
+## 追記（2026-09-14）登録者の裁定と反映の記録
+
+- 登録者は D16〜D25 を推奨どおり承認した（2026-09-14）。承認した文言は正本 `design/contrasts-A.json` の `registrant_decisions_D16_D25` が指すキーと、草案8 §5 に置いた。
+- 反映の事前登録: `records/reviews/A/draft7-impl/preregistration-reflection-impl-A.md`（一部は事後と開示）。反映の確かめ: `records/reviews/A/draft7-impl/verification-reflection-impl-A.md`（機械生成）。反映の記録（採否表の文言から離れた箇所・自己修正・COI）: `records/reviews/A/draft7-impl/reflection-impl-A.md`。
+
 本記録のいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。

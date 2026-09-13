@@ -1,6 +1,7 @@
-# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` v3.1・2026-09-13 14:55 UTC）
+# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` v3.2・2026-09-13 21:48 UTC）
 
-- 入力: contrasts-A.json SHA16 4ABA25604B6E34CF・hf-models-A.json SHA16 D012DE529678C4EE・firth.py v2（SHA16 95724C778A00438B）・confirm_A.py v1.1（SHA16 2B4F4081C810D91F）・zaxis_A.py SHA16 7CEA376E48C38575・power_grid_A.py SHA16 32F6F2A3236F21C6・bands_A.py SHA16 BFF15C1D51957E26
+- 入力: contrasts-A.json SHA16 9A679F0931EF8034・hf-models-A.json SHA16 D012DE529678C4EE・firth.py v2.1（SHA16 CE584FDF2AE79930）・confirm_A.py v1.2（SHA16 5A190C6696C83A6F）・zaxis_A.py SHA16 7CEA376E48C38575・power_grid_A.py SHA16 999C42D98851F7A4・bands_A.py SHA16 BFF15C1D51957E26
+- 当てはめの打ち切り（登録者裁定 D18・confirm_A と共通）: {"gtol": 1e-12, "tol": 1e-14, "max_iter": 5000}
 - z（実パラメータ数から）: 0.6B -1.9093・1.7B -0.8492・4B 0.0000・8B 0.7111・14B 1.3006・32B 2.0974・z_span（32B−4B）2.0974
 - seed 20260913・節ごとの子ストリーム {"D": 1, "DR": 2, "DS": 3, "R": 4, "DC": 5, "DO": 6, "N": 7, "PS": 8, "N_detection": 9}・節ごとの B {"D": 2000, "DR": 1000, "DS": 1000, "R": 2000, "N": 20000, "DC": 2000, "DO": 500, "PS": 1000000}・水準 α=0.05／Holm 初段 α/35（正規の臨界 1.9600／3.1888）・Holm の後段の臨界 α/35 で 3.189・α/34 で 3.180・α/31 で 3.154・α/26 で 3.102・α/16 で 2.955・α/2 で 2.241・α/1 で 1.960・検閲の整数境界（n=200）X ≤ 9 または X ≥ 191
 - 札 草案4＝名目有意（または初段）∧ 解釈条項の非発火。札 D1＝それに加えて pt 差の傾きが同じ水準で立ち β₃ と同じ向き（初段では p* ≤ α/m と同じ・登録者裁定 D10 の p* の Holm でも初段の値は同じ）。尺度依存＝初段で β₃ が立ち解釈条項は発火せず pt 差の傾きが条件を満たさない。真の pt 差の傾きは切り詰めた後の処置と対照の率の差を z に OLS で回帰した値（pt／z）。

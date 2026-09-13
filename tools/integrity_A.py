@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""integrity_A.py v1 —— 段階 A の走行の整合検査（率盲検・許可表方式・正本 integrity_check・2026-09-13・登録者裁定 D9 の三つ目の手順）。
+"""integrity_A.py v1.1 —— 段階 A の走行の整合検査（率盲検・許可表方式・正本 integrity_check・2026-09-13・登録者裁定 D9 の三つ目の手順）。
+v1.1（2026-09-14・実装検分の採否表 P90・P92）: 校正腕の seed はセッション記録の相・機種・セッション番号から組んだ値と突合する（seed から解いて組み直す検査をやめる）。パイロットの再走の seed は撤退条件のセル（4B-2507 × N1）だけに許す。local_env は GPU の型と vLLM の版の欄の実在で見る。行の dry_run を許可表に入れ、dry-run の走行を問題として印字する（dry-run の相を除く）。
 判定欄（catastrophe・choice・refuse_class・incentive 等）は読まない。trials から許可した欄（ALLOW）だけを取り出し、manifest と正本の登録（腕・n・seed・機種・走行器・要求の設定）と突合する。
 相（tag から正本 tags で決める・--phase で上書き）ごとの期待:
   identity＝4B-2507 × N1 × arms.preamble × identity_n・seeds.identity／pilot＝全機種 × 全場面 × arms.preamble × pilot_n・seeds.pilot（再走は＋rerun_offset）／
@@ -16,8 +17,8 @@ import os, sys, json, argparse, datetime, collections
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v1'
-ALLOW = ('status', 'trial_id', 'trial_index', 'arm', 'run_key', 'runner_sha', 'arms_spec', 'preamble_sha', 'format_fail', 'seed', 'model', 'sampling', 'tag', 'scenario', 'timestamp', 'timestamp_end')
+VERSION = 'v1.1'
+ALLOW = ('status', 'trial_id', 'trial_index', 'arm', 'run_key', 'runner_sha', 'arms_spec', 'preamble_sha', 'format_fail', 'seed', 'model', 'sampling', 'tag', 'scenario', 'timestamp', 'timestamp_end', 'dry_run')
 
 ap = argparse.ArgumentParser(); ap.add_argument('--tag', required=True); ap.add_argument('--phase', default=None); ap.add_argument('--root', default=None); ap.add_argument('--contrasts', default=None)
 ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true')
@@ -34,7 +35,8 @@ def expected(mk, sc):
     if PHASE == 'identity':
         return (ARMS, T['identity_n'], {S['identity']}) if (mk, sc) == (ANCHOR, T['identity_screen']['scenario']) else None
     if PHASE == 'pilot':
-        s0 = S['pilot'].get(mk, {}).get(sc); return (ARMS, T['pilot_n'], {s0, s0 + S['rerun_offset']}) if s0 else None
+        s0 = S['pilot'].get(mk, {}).get(sc)   # 再走の seed は撤退条件のセルだけ（採否表 P92）
+        return (ARMS, T['pilot_n'], {s0} | ({s0 + S['rerun_offset']} if (mk, sc) == (ANCHOR, T['calibration']['scenario']) else set())) if s0 else None
     if PHASE == 'main':
         s0 = S['main'].get(mk, {}).get(sc); return (ARMS, T['n_per_arm'], {s0}) if s0 else None
     if PHASE == 'anchor_rerun':
@@ -58,19 +60,23 @@ OUT = a.out or os.path.join(REPO, 'records', 'A', 'integrity-%s-%s' % (a.tag, da
 if (os.path.exists(OUT + '.md') or os.path.exists(OUT + '.json')) and not a.force:
     sys.exit('出力が既にある（上書きしない・--force で置き換え）: %s' % OUT)
 rows = []; bad = 0
-for recs in runs_A.index_runs(T, a.tag, a.root, allow_multi=True).values():
+CALSEED = {r['run_key']: r for r in runs_A.calibration_runs_by_session(T, a.root, allow_dry=True)} if PHASE == 'calibration' else {}
+for recs in runs_A.index_runs(T, a.tag, a.root, allow_multi=True, allow_dry=True).values():
     for rec in recs:
         m = rec['manifest']; mk = rec['model']; sc = rec['scenario']; exp = expected(mk, sc); problems = []
         recs_t = list(runs_A.iter_jsonl(rec['trials_path'], ALLOW))
+        if PHASE != 'dryrun' and (rec.get('dry_marks') or any(r.get('dry_run') for r in recs_t)):
+            problems.append('dry-run の走行（%s）' % '・'.join(rec.get('dry_marks') or ['trials.dry_run']))
         if exp is None:
             problems.append('登録に無い機種 × 場面（相 %s）' % PHASE); arms, n, seeds = sorted({r['arm'] for r in recs_t}), None, None
         else:
             arms, n, seeds = exp
-        if PHASE == 'calibration':
-            try:
-                owner, ph, num, sess = runs_A.decode_calibration_seed(T, rec['seed'])
-            except RuntimeError as e:
-                problems.append(str(e))
+        if PHASE == 'calibration':   # セッション記録から組んだ seed と突合する（採否表 P90）
+            cs = CALSEED.get(rec['run_key'])
+            if cs is None or cs['session_rec'] is None:
+                problems.append('校正腕の走行を指すセッション記録が無い')
+            elif not cs['seed_ok']:
+                problems.append('seed %d がセッション記録から組んだ値 %d と違う' % (rec['seed'], cs['expected_seed']))
         elif seeds is not None and rec['seed'] not in seeds:
             problems.append('seed %d が登録と違う' % rec['seed'])
         ids = [r['trial_id'] for r in recs_t]; dup = len(ids) - len(set(ids)); idx = sorted({r['trial_index'] for r in recs_t})
@@ -87,7 +93,8 @@ for recs in runs_A.index_runs(T, a.tag, a.root, allow_multi=True).values():
         model_ok = m.get('model') == MIDS.get(mk) and all(r['model'] == m.get('model') for r in recs_t)
         samp = [r['sampling'] for r in recs_t[:1]] + [m.get('sampling')]
         samp_ok = True if PHASE == 'api_rerun' else all(x == want_sampling(mk) for x in samp)
-        env = m.get('local_env') or {}; env_ok = True if PHASE == 'api_rerun' else bool(env.get('gpu') and env.get('versions'))
+        env = m.get('local_env') or {}; vers = env.get('versions') if isinstance(env.get('versions'), dict) else {}   # GPU の型と vLLM の版の欄の実在（採否表 P92）
+        env_ok = True if PHASE == 'api_rerun' else bool(isinstance(env.get('gpu'), str) and env['gpu'].strip() and '不可' not in env['gpu'] and vers.get('vllm'))
         checks = {'rows': target is None or len(recs_t) == target, 'api_error': err == 0, 'duplicates': dup == 0, 'missing_index': missing_idx == 0, 'per_arm_even': even, 'runner_sha': runner_ok,
                   'arms_spec': aspec_ok, 'preamble_sha': not mism, 'model': model_ok, 'sampling': samp_ok, 'local_env': env_ok}
         ok = all(checks.values()) and not problems

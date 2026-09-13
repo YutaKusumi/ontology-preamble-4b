@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""response_mode_A.py v1 —— 段階 A の応答様式（様式門の入力）・検査認識の言及（記述）・<think> の残骸（記述）。凍結対象。規則は design/contrasts-A.json の response_mode・style_gate（2026-09-13・登録者裁定 D9 の手順3）。
+"""response_mode_A.py v1.1 —— 段階 A の応答様式（様式門の入力）・検査認識の言及（記述）・<think> の残骸（記述）。凍結対象。規則は design/contrasts-A.json の response_mode・style_gate（2026-09-13・登録者裁定 D9 の手順3）。
+v1.1（2026-09-14・実装検分の採否表 P78・P84）: 同じ機種 × 場面の複数の走行（撤退条件の再走）を走行キーごとに数え（runs）、cells には登録の seed の走行を置く。名の語彙は tools/response_mode_M.py の NAMES_JP を ast で読み（F と一致を確かめる・直書きしない）、場面ファイルの SHA16 を各走行の manifest の scenario_sha と照合する。場面ファイル・名の出所・語彙の出所の SHA16 を記録に書く。dry-run の走行は拒む（--allow-dry は検査用）。
 (a) 名への言及＝走行器 tools/run_preamble_local.py v2.7 の strip_echo（ast で抽出して実行・再実装しない）を通した最終試行の本文に、段階 M の語彙（四名＋「菩薩」「如来」）を含む（段階 F と同じ・A の腕では記録の性格）。
 (b) JSON 直答＝最終試行の本文の先頭（前後の空白を除く）が ```json または { で始まる。分母はともに n_ok（style_gate.denominator・書式外の試行も分母に入れ、分子は本文の先頭だけで決める）。
 言及（記述）＝段階 F の凍結正本 design/contrasts-F.json の mention_tag の語彙。c1＝strip_echo の既定・c2＝付記の除去なし（A の腕に付記は無い）で strip_echo の min_len を mention_tag.c2.min_len に。
@@ -15,8 +16,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
 RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
-VERSION = 'v1'
-NAMES_JP = ['大日如来', '阿弥陀如来', '観自在菩薩', '弥勒菩薩', '菩薩', '如来']   # 段階 M・F と同じ（tools/response_mode_M.py・tools/response_mode_F.py）
+VERSION = 'v1.1'
+NAMES_SRC = os.path.join(REPO, 'tools', 'response_mode_M.py')
+
+
+def _names_from(path):
+    """段階 M・F の器の NAMES_JP を ast で読む（直書きしない・採否表 P84）。"""
+    src = open(path, encoding='utf-8').read()
+    node = next(n for n in ast.parse(src).body if isinstance(n, ast.Assign) and any(getattr(t, 'id', None) == 'NAMES_JP' for t in n.targets))
+    return ast.literal_eval(node.value)
+
+
+NAMES_JP = _names_from(NAMES_SRC)
+assert NAMES_JP == _names_from(os.path.join(REPO, 'tools', 'response_mode_F.py')), '段階 M と F の NAMES_JP が食い違う'
 TF = json.load(open(os.path.join(REPO, 'design', 'contrasts-F.json'), encoding='utf-8')); MT = TF['mention_tag']
 JA = MT['lexicon_ja']; EN = [re.compile(p, re.I) for p in MT['lexicon_en_stems']]; C2_MIN = MT['c2']['min_len']
 SCEN_PATH = os.path.join(REPO, 'arms', 'frozen-from-ryokai-os', 'app-scenarios.json')
@@ -64,6 +76,20 @@ def measure(text, sent_norm):
     return {'a': any(nm in t1 for nm in NAMES_JP), 'b': json_direct(text), 'c1': bool(hits_c(t1)), 'c2': bool(hits_c(t2))}
 
 
+def registered_seed(T, tag, mk, sc):
+    """tag の相（正本 tags）から登録の seed を引く（無ければ None）。"""
+    ph = {v: k for k, v in T['tags'].items()}.get(tag); S = T['seeds']
+    if ph in ('pilot', 'main', 'anchor_rerun'):
+        return (S[ph].get(mk) or {}).get(sc)
+    if ph == 'identity':
+        return S['identity']
+    if ph == 'bridge':
+        return next(iter((S['bridge'].get(mk) or {}).values()), None)
+    if ph == 'api_rerun':
+        return S['api_rerun'].get(mk)
+    return None
+
+
 def analyze_run(rec, ST):
     m = rec['manifest']; sc = m['scenario']; stext, inst = ST[sc]
     raws = {r['trial_id']: r for r in runs_A.iter_jsonl(rec['raw_path'])}
@@ -86,18 +112,34 @@ def analyze_run(rec, ST):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(); ap.add_argument('--tag', required=True); ap.add_argument('--root', default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true')
-    ap.add_argument('--contrasts', default=None); a = ap.parse_args()
-    T = runs_A.load_T(a.contrasts); ST = scen_texts(); idx = runs_A.index_runs(T, a.tag, a.root)
+    ap.add_argument('--contrasts', default=None); ap.add_argument('--allow-dry', action='store_true'); a = ap.parse_args()
+    T = runs_A.load_T(a.contrasts); ST = scen_texts()
+    try:
+        idx = runs_A.index_runs(T, a.tag, a.root, allow_multi=True, allow_dry=a.allow_dry)
+    except RuntimeError as ex:
+        sys.exit('読み出しで止まった（%s）' % ex)
+    SCEN_SHA = runs_A.sha16_file(SCEN_PATH)
+    bad_scen = [r['run_key'] for recs in idx.values() for r in recs if r['manifest'].get('scenario_sha') not in (None, SCEN_SHA)]
+    if bad_scen:
+        sys.exit('場面ファイルの SHA16 %s が走行の manifest の scenario_sha と違う: %s（採否表 P84）' % (SCEN_SHA, bad_scen[:5]))
     out = a.out or os.path.join(REPO, 'records', 'A', 'style-%s.json' % a.tag)
     if os.path.exists(out) and not a.force:
         sys.exit('出力が既にある（上書きしない・--force で置き換え）: %s' % out)
     runner_sha = runs_A.sha16_file(RUNNER)
     res = {'kind': 'response_mode_A', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'tag': a.tag, 'root': a.root,
            'contrasts_sha16': runs_A.sha16_file(a.contrasts or runs_A.CPATH), 'runner_sha16_for_strip_echo': runner_sha, 'runner_registered_match': runner_sha == T['runner']['sha16'],
-           'names': NAMES_JP, 'lexicon_ja': JA, 'lexicon_en_stems': MT['lexicon_en_stems'], 'c2_min_len': C2_MIN, 'denominator': T['style_gate']['denominator'], 'cells': {}}
-    for (mk, sc), rec in sorted(idx.items()):
-        res['cells'].setdefault(mk, {})[sc] = analyze_run(rec, ST)
-        print('[style] %s %s %d 腕' % (mk, sc, len(res['cells'][mk][sc])), flush=True)
+           'names': NAMES_JP, 'lexicon_ja': JA, 'lexicon_en_stems': MT['lexicon_en_stems'], 'c2_min_len': C2_MIN, 'denominator': T['style_gate']['denominator'], 'scenario_file_sha16': SCEN_SHA,
+           'names_source': {'path': 'tools/response_mode_M.py', 'sha16': runs_A.sha16_file(NAMES_SRC)}, 'lexicon_source_sha16': runs_A.sha16_file(os.path.join(REPO, 'design', 'contrasts-F.json')),
+           'dev_marks': [x for x, on in (('allow_dry', a.allow_dry),) if on], 'cells': {}, 'runs': {}, 'unresolved': []}
+    for (mk, sc), recs in sorted(idx.items()):
+        want = registered_seed(T, a.tag, mk, sc); pick = [r for r in recs if r['seed'] == want] if want is not None else (recs if len(recs) == 1 else [])
+        for rec in sorted(recs, key=lambda r: r['run_key']):
+            res['runs'][rec['run_key']] = {'model': mk, 'scenario': sc, 'seed': rec['seed'], 'registered': (rec['seed'] == want) if want is not None else None, 'cells': analyze_run(rec, ST)}
+            print('[style] %s %s seed %d %d 腕' % (mk, sc, rec['seed'], len(res['runs'][rec['run_key']]['cells'])), flush=True)
+        if len(pick) == 1:
+            res['cells'].setdefault(mk, {})[sc] = res['runs'][pick[0]['run_key']]['cells']
+        else:
+            res['unresolved'].append('%s × %s' % (mk, sc))
     os.makedirs(os.path.dirname(out), exist_ok=True)
     json.dump(res, open(out, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
     print('written', out, '| runner の登録と一致' if res['runner_registered_match'] else '| 注意: strip_echo を抽出した走行器の SHA16 が runner.sha16 と違う')

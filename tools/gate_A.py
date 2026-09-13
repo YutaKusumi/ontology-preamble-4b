@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""gate_A.py v1 —— 段階 A のパイロットの門（2026-09-13・登録者裁定 D9 の三つ目の手順・D12 (b)(d)）。規則は design/contrasts-A.json の gate2・calibration.withdrawal・unmeasurable・environment_band・style_gate だけから読む。
+"""gate_A.py v1.1 —— 段階 A のパイロットの門（2026-09-13・登録者裁定 D9 の三つ目の手順・D12 (b)(d)）。規則は design/contrasts-A.json の gate2・calibration.withdrawal・unmeasurable・environment_band・style_gate だけから読む。
+v1.1（2026-09-14・実装検分の採否表 P78・P91・P92・登録者裁定 D16）: 再走の seed は撤退条件のセル（4B-2507 × N1）だけに許す。再走の n_ok が零は rerun_no_data（合格に数えない）。門2 の縮小では残らない場面（shrink_scenarios）を記録に書く（その場面の対比だけを判定不能にする）。dry-run の走行は拒む（--allow-dry は検査用）。
 検閲は tools/confirm_A.py（Rules と整数の比較）、帯の判定と期待誤保留数は tools/bands_A.py（格子の転記行 I・M と同じ関数）。
 - 門2（gate2.unit_rule）: 場面ごとに傾きの族の対比をパイロットの破局数と n_ok で両腕条件の検閲に掛け、残存規模が min_sizes 以上の対比が一本以上ある場面を「残る場面」と数え、
   min_scenarios 未満なら族を縮小（判定不能の枠として m を消費）。門はパイロットで一度（gate2.once・本走行で引き直さない）。
@@ -19,11 +20,11 @@ import runs_A
 import bands_A
 import confirm_A
 REPO = runs_A.REPO
-VERSION = 'v1'
+VERSION = 'v1.1'
 ZERO = dict(n=0, n_ok=0, api_error=0, cat=0, refuse=0, ff=0, loop=0, trunc=0, unmeas=0)
 
 ap = argparse.ArgumentParser(); ap.add_argument('--tag', default=None); ap.add_argument('--root', default=None); ap.add_argument('--contrasts', default=None)
-ap.add_argument('--identity', required=True); ap.add_argument('--style', default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true'); ap.add_argument('--allow-incomplete', action='store_true')
+ap.add_argument('--identity', required=True); ap.add_argument('--style', default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true'); ap.add_argument('--allow-incomplete', action='store_true'); ap.add_argument('--allow-dry', action='store_true')
 a = ap.parse_args()
 T = runs_A.load_T(a.contrasts); R = confirm_A.Rules(T); tag = a.tag or T['tags']['pilot']; SIZES = T['sizes']; SC = T['scenarios']; ARMS = T['arms']['preamble']
 ANCHOR = next(m['key'] for m in T['models'] if m['anchor']); FAM = T['families']['A_slope']; G2 = T['gate2']; CAL = T['calibration']; WD = CAL['withdrawal']; S = T['seeds']; EB = T['environment_band']; BR = T['bridge']
@@ -36,14 +37,18 @@ if ID.get('kind') != 'identity_screen_A':
 BRANCH = ID['verdict']
 
 # ---- 走行（登録の seed と再走の seed）
-IDXM = runs_A.index_runs(T, tag, a.root, allow_multi=True); REG = {}; RERUN = {}; missing = []; unknown = []
+try:
+    IDXM = runs_A.index_runs(T, tag, a.root, allow_multi=True, allow_dry=a.allow_dry)
+except RuntimeError as ex:
+    sys.exit('読み出しで止まった（%s）' % ex)
+REG = {}; RERUN = {}; missing = []; unknown = []
 for m in T['models']:
     for sc in SC:
         recs = IDXM.get((m['key'], sc), []); s0 = S['pilot'][m['key']][sc]
         for r in recs:
             if r['seed'] == s0:
                 REG[(m['key'], sc)] = r
-            elif r['seed'] == s0 + S['rerun_offset']:
+            elif r['seed'] == s0 + S['rerun_offset'] and (m['key'], sc) == (ANCHOR, CAL['scenario']):   # 再走の seed は撤退条件のセルだけ（採否表 P92）
                 RERUN[(m['key'], sc)] = r
             else:
                 unknown.append(r['run_key'])
@@ -99,7 +104,11 @@ elif not W0['fired']:
 elif (ANCHOR, CAL['scenario']) not in RERUN:
     WSTATUS, WANOM = 'rerun_required', False
 else:
-    W1 = wd_eval(runs_A.cell_counts(RERUN[(ANCHOR, CAL['scenario'])]['trials_path']).get(CAL['arm'], ZERO)); WANOM = bool(W1['fired']); WSTATUS = 'anomaly' if WANOM else 'rerun_pass'
+    W1 = wd_eval(runs_A.cell_counts(RERUN[(ANCHOR, CAL['scenario'])]['trials_path']).get(CAL['arm'], ZERO))
+    if W1['fired'] is None:   # 再走の n_ok が零は合格に数えない（採否表 P91）
+        WSTATUS, WANOM = 'rerun_no_data', False
+    else:
+        WANOM = bool(W1['fired']); WSTATUS = 'anomaly' if WANOM else 'rerun_pass'
 
 # ---- 測定不能（記述）
 UT = Fraction(str(T['unmeasurable']['threshold'])); UM = []
@@ -141,15 +150,15 @@ if a.style:
 RES = {'kind': 'gate_A', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'tag': tag, 'root': a.root, 'identity_verdict': BRANCH,
        'inputs': {'contrasts_sha16': runs_A.sha16_file(a.contrasts or runs_A.CPATH), 'identity_sha16': runs_A.sha16_file(a.identity), 'style_sha16': runs_A.sha16_file(a.style) if a.style else None,
                   'gate_A': runs_A.sha16_file(os.path.abspath(__file__)), 'bands_A': runs_A.sha16_file(os.path.join(REPO, 'tools', 'bands_A.py')), 'confirm_A': runs_A.sha16_file(os.path.join(REPO, 'tools', 'confirm_A.py'))},
-       'missing': missing, 'dev_marks': ['allow_incomplete'] if missing else [],
-       'gate2': {'shrink': SHRINK, 'remaining_scenarios': REMAIN, 'min_sizes': G2['min_sizes'], 'min_scenarios': G2['min_scenarios'], 'per_scenario': per_sc, 'rule': G2['unit_rule']},
+       'missing': missing, 'dev_marks': [x for x, on in (('allow_incomplete', bool(missing)), ('allow_dry', a.allow_dry)) if on] + sorted({mk_ for r_ in list(REG.values()) + list(RERUN.values()) for mk_ in (r_.get('dry_marks') or [])}),
+       'gate2': {'shrink': SHRINK, 'remaining_scenarios': REMAIN, 'shrink_scenarios': [sc for sc in SC if sc not in REMAIN] if SHRINK else [], 'rule_shrink': G2['rule'], 'min_sizes': G2['min_sizes'], 'min_scenarios': G2['min_scenarios'], 'per_scenario': per_sc, 'rule': G2['unit_rule']},
        'withdrawal': {'branch': BRANCH, 'band_pt': WD['band_pt'], 'first': W0, 'rerun': W1, 'status': WSTATUS, 'anomaly': WANOM, 'consequence': WD['rerun']},
        'unmeasurable_pilot': UM, 'unmeasurable_share_by_model': UM_SHARE, 'env_band_recheck': ENV, 'style_pilot': STYLE,
        'clause': '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'}
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 json.dump(RES, open(OUT + '.json', 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1, default=float)
 M = ['# 段階 A パイロットの門（機械生成・`tools/gate_A.py` %s・%s UTC）' % (VERSION, RES['generated_utc']), '', '- tag %s・門0.5 の判定 %s・入力 %s・足りない走行 %s' % (tag, BRANCH, json.dumps(RES['inputs'], ensure_ascii=False), '・'.join(missing) or 'なし'), '',
-     '## 門2', '', '- **族の縮小: %s**（残る場面 %d／閾値 %d 未満で縮小: %s）' % ('あり' if SHRINK else 'なし', len(REMAIN), G2['min_scenarios'], '・'.join(REMAIN) or 'なし'), '- 規則: %s' % G2['unit_rule'], '',
+     '## 門2', '', '- **族の縮小: %s**（残る場面 %d／閾値 %d 未満で縮小: %s）' % ('あり' if SHRINK else 'なし', len(REMAIN), G2['min_scenarios'], '・'.join(REMAIN) or 'なし'), '- 規則: %s' % G2['unit_rule'], '- 縮小の範囲: %s' % G2['rule'], '',
      '| 場面 | 残る | 対比ごとの残存規模数 |', '|---|---|---|']
 M += ['| %s | %s | %s |' % (sc, '残る' if per_sc[sc]['remains'] else '—', '・'.join('%s %d' % (x['id'].split(':', 1)[1], x['kept_n']) for x in per_sc[sc]['contrasts'])) for sc in SC]
 M += ['', '## 撤退条件（%s・帯 %s pt・下側・超）' % ('合格枝' if BRANCH == 'pass' else '不合格枝', WD['band_pt']), '', '- 判定: **%s**・器の異常: %s' % (WSTATUS, 'あり' if WANOM else 'なし'),

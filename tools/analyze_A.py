@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""analyze_A.py v1 —— 段階 A の集計器（2026-09-13・登録者裁定 D9 の三つ目の手順）。規則・定数・定型文は design/contrasts-A.json だけから読み、確証の判定は tools/confirm_A.py の関数で行う（格子・合成検査と同じ関数・二重実装をしない）。
+"""analyze_A.py v2 —— 段階 A の集計器（2026-09-13・登録者裁定 D9 の三つ目の手順）。規則・定数・定型文は design/contrasts-A.json だけから読み、確証の判定は tools/confirm_A.py の関数で行う（格子・合成検査と同じ関数・二重実装をしない）。
+v2（2026-09-14・実装検分の採否表 P78・P85〜P89・P91・登録者裁定 D16・D18・D20・D22・D25）: 門0.5 と校正帯の記録を必須にし（欠けは検査用の口だけ）、入力の記録の印・正本の SHA16・やり直し待ち・逸脱を読んで印と記録の不足に伝える。セッション記録の無い走行キーでは止まる（sessions.missing_rule）。様式の記録のセルの欠けと n_ok の食い違いで止まる。門0.5 不合格の注を記述族の Ncold−N にも付ける。残存規模の非連続と端の欠けに注（読み条項 (xii)）。対照どうしの差（読み条項 (v)）。上向きの確証（report_rules.upward_rule）。門2 の縮小は残らない場面の対比だけ（shrink_idx）。環境の副次解析の当てはめの打ち切りは firth_check.python_control。錨反復と橋の n_ok が零の腕は no_data として記録の不足に数える。dry-run の走行は拒む（--allow-dry は検査用）。
 入力（取り決め）:
  - 本走行 results/<tags.main>/・錨反復 results/<tags.anchor_rerun>/・橋 results/<tags.bridge>/・API 再走行 results/<tags.api_rerun>/（門0.5 合格時のみ）・セッション記録 results/sessions-A/（環境値）。読み出しは tools/runs_A.py。
  - --style: tools/response_mode_A.py の出力（kind response_mode_A・cells[機種][場面][腕] の n_ok・a_final・b_final・strata）。
@@ -12,7 +13,7 @@
 → 札の全組合せ表の行 id の突合（表に無ければ停止）→ 感度閾値の札 → 測れた効果種（confirm_A.measurable_effect_types）→ 床持続と記述族（p を印字しない）・散文層の副次終点（札を変えない）
 → 注（門0.5 不合格・器の異常）→ 定型文（print_strings）。
 出力: records/A/analysis-<tag>.json と同 .md（既存は --force なしでは上書きしない）。
-合成検査の口: --synth-nonconverged（対比 id を非収束として扱う）は root が results 以外のときだけ受け付ける。検査用: --no-gate・--no-style・--allow-incomplete（印を出力に残す）。
+合成検査の口: --synth-nonconverged（対比 id を非収束として扱う）は root が results 以外のときだけ受け付ける。検査用: --no-gate・--no-style・--no-identity・--no-calib・--allow-incomplete・--allow-missing-sessions・--allow-dry・--B-measurable（印を出力に残す）。
 用法: python tools/analyze_A.py --tag stageA --gate records/A/gate-pilotA.json --identity records/A/identity-screen-A.json --calib records/A/calib-stageA.json
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
@@ -26,13 +27,14 @@ import confirm_A
 import firth
 from zaxis_A import z_sizes
 REPO = runs_A.REPO
-VERSION = 'v1'
+VERSION = 'v2'
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--tag', default=None); ap.add_argument('--root', default=None); ap.add_argument('--contrasts', default=None)
 ap.add_argument('--style', default=None); ap.add_argument('--no-style', action='store_true')
 ap.add_argument('--gate', default=None); ap.add_argument('--no-gate', action='store_true')
 ap.add_argument('--identity', default=None); ap.add_argument('--calib', default=None)
+ap.add_argument('--no-identity', action='store_true'); ap.add_argument('--no-calib', action='store_true'); ap.add_argument('--allow-missing-sessions', action='store_true'); ap.add_argument('--allow-dry', action='store_true')
 ap.add_argument('--facts', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.json'))
 ap.add_argument('--anchor-tag', default=None); ap.add_argument('--bridge-tag', default=None); ap.add_argument('--api-tag', default=None)
 ap.add_argument('--B-measurable', type=int, default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true')
@@ -51,7 +53,9 @@ if SYN_NC and real_root:
 OUT = a.out or os.path.join(REPO, 'records', 'A', 'analysis-%s' % tag)
 if (os.path.exists(OUT + '.json') or os.path.exists(OUT + '.md')) and not a.force:
     sys.exit('出力が既にある（上書きしない・--force で置き換え）: %s' % OUT)
-dev_marks = [x for x, on in (('no_gate', a.no_gate), ('no_style', a.no_style), ('allow_incomplete', a.allow_incomplete), ('synth_nonconverged', bool(SYN_NC)), ('not_results_root', not real_root)) if on]
+dev_marks = [x for x, on in (('no_gate', a.no_gate), ('no_style', a.no_style), ('no_identity', a.no_identity), ('no_calib', a.no_calib), ('allow_incomplete', a.allow_incomplete),
+                              ('allow_missing_sessions', a.allow_missing_sessions), ('allow_dry', a.allow_dry), ('B_measurable_override', a.B_measurable is not None), ('synth_nonconverged', bool(SYN_NC)),
+                              ('not_results_root', not real_root)) if on]
 missing = []
 fr = lambda k, n: Fraction(int(k), int(n))
 ZERO = dict(n=0, n_ok=0, api_error=0, cat=0, refuse=0, ff=0, loop=0, trunc=0, unmeas=0)
@@ -76,8 +80,21 @@ elif not a.gate:
 else:
     G = load_rec(a.gate, 'gate_A')
 GATE2 = bool(G and G['gate2']['shrink']); WD_ANOM = bool(G and (G.get('withdrawal') or {}).get('anomaly'))
-ID = load_rec(a.identity, 'identity_screen_A') if a.identity else None; ID_VERDICT = ID['verdict'] if ID else None
-CB = load_rec(a.calib, 'calib_band_A') if a.calib else None; ANOM_RK = set((CB or {}).get('anomaly_run_keys') or [])
+REMAIN = list(G['gate2'].get('remaining_scenarios') or []) if G else list(SC); WD_STATUS = (G.get('withdrawal') or {}).get('status') if G else None
+if a.no_identity:
+    ID = None
+elif not a.identity:
+    sys.exit('--identity（tools/identity_screen_A.py の出力）が要る（--no-identity は検査用・採否表 P85）')
+else:
+    ID = load_rec(a.identity, 'identity_screen_A')
+ID_VERDICT = ID['verdict'] if ID else None
+if a.no_calib:
+    CB = None
+elif not a.calib:
+    sys.exit('--calib（tools/calib_band_A.py の出力）が要る（--no-calib は検査用・採否表 P85）')
+else:
+    CB = load_rec(a.calib, 'calib_band_A')
+ANOM_RK = set((CB or {}).get('anomaly_run_keys') or [])
 SPATH = a.style or os.path.join(REPO, 'records', 'A', 'style-%s.json' % tag)
 if a.no_style:
     STY = None
@@ -86,6 +103,22 @@ elif not os.path.exists(SPATH):
 else:
     STY = load_rec(SPATH, 'response_mode_A')
 FACTS = runs_A.read_json(a.facts) if a.facts and os.path.exists(a.facts) else None
+CSHA = runs_A.sha16_file(CPATH); INREC = {}
+for _nm, _rec in (('gate', G), ('identity', ID), ('calib', CB), ('style', STY)):
+    if _rec is None:
+        continue
+    _sha = (_rec.get('inputs') or {}).get('contrasts_sha16') or _rec.get('contrasts_sha16')   # 様式と門0.5 の記録は最上位に置く
+    if _sha is not None and _sha != CSHA:
+        sys.exit('入力の記録 %s の正本 SHA16 %s が現在の正本 %s と違う（採否表 P85）' % (_nm, _sha, CSHA))
+    INREC[_nm] = {'version': _rec.get('version'), 'contrasts_sha16': _sha, 'dev_marks': _rec.get('dev_marks') or []}
+IN_MARKS = sorted({'%s:%s' % (nm, m) for nm, v in INREC.items() for m in v['dev_marks']})
+if IN_MARKS:
+    dev_marks.append('input_dev_marks')
+CALIB_OPEN = {k: list((CB or {}).get(k) or []) for k in ('retry_waiting', 'incomplete', 'deviations', 'missing_session_records', 'seed_mismatch')}
+if any(CALIB_OPEN.values()):
+    missing.append('校正帯の記録に未決の項（%s）' % '・'.join('%s %d' % (k, len(v)) for k, v in CALIB_OPEN.items() if v))
+if G is not None and WD_STATUS not in ('pass', 'rerun_pass', 'anomaly'):
+    missing.append('撤退条件の判定が %s' % WD_STATUS)
 
 
 def sty(s, sc, arm):
@@ -96,11 +129,25 @@ def sty(s, sc, arm):
 
 
 # ---- 本走行の件数
-C, IDX = runs_A.counts_by(T, tag, a.root)
+def counts_or_exit(tg):
+    try:
+        return runs_A.counts_by(T, tg, a.root, allow_dry=a.allow_dry)
+    except RuntimeError as ex:
+        sys.exit('読み出しで止まった（%s）' % ex)
+
+
+C, IDX = counts_or_exit(tag)
 for s in SIZES + [ANCHOR_MODEL]:
     for sc in SC:
         if (s, sc) not in IDX:
             missing.append('本走行 %s × %s' % (s, sc))
+if STY is not None:   # 様式の記録のセルの欠けと件数の食い違いで止まる（採否表 P87）
+    if STY.get('tag') not in (None, tag):
+        sys.exit('様式の記録の tag %s が集計の tag %s と違う（採否表 P87）' % (STY.get('tag'), tag))
+    bad_sty = ['%s × %s × %s（%s）' % (s, sc, arm, 'セルが無い' if sty(s, sc, arm) is None else 'n_ok %s・試行 %d' % (sty(s, sc, arm).get('n_ok'), c['n_ok']))
+               for (s, sc, arm), c in sorted(C.items()) if sty(s, sc, arm) is None or sty(s, sc, arm).get('n_ok') != c['n_ok']]
+    if bad_sty:
+        sys.exit('様式の記録が試行の件数と合わない %d セル（採否表 P87）: %s' % (len(bad_sty), '・'.join(bad_sty[:10])))
 
 
 def cnt(s, sc, arm, D=None):
@@ -120,7 +167,7 @@ for s in SIZES + [ANCHOR_MODEL]:
 # ---- 錨帯（anchor_band.compare・超・除外単位は規模 × 場面）
 ATAG = a.anchor_tag or TAGS['anchor_rerun']; AB = T['anchor_band']; ABAND = Fraction(AB['band_pt'], 100); ANCH_EX = {}; anchor_rows = []
 if runs_A.run_dirs(ATAG, a.root):
-    C2, IDX2 = runs_A.counts_by(T, ATAG, a.root)
+    C2, IDX2 = counts_or_exit(ATAG)
     for s in AB['models']:
         for sc in AB['scenarios']:
             if (s, sc) not in IDX2:
@@ -131,7 +178,9 @@ if runs_A.run_dirs(ATAG, a.root):
                 if c1['n_ok'] and c2['n_ok']:
                     d = fr(c1['cat'], c1['n_ok']) - fr(c2['cat'], c2['n_ok']); row = {'diff_pt': float(d * 100), 'over': abs(d) > ABAND}
                 else:
-                    row = {'diff_pt': None, 'over': False, 'note': '分母が零'}
+                    row = {'diff_pt': None, 'over': None, 'status': 'no_data', 'note': '分母が零（no_data・帯を超えないに数えない・採否表 P91）'}
+                    if not c2['n_ok']:
+                        missing.append('錨反復 %s × %s × %s の n_ok が零' % (s, sc, arm))
                 row.update(model=s, scenario=sc, arm=arm, main=[c1['cat'], c1['n_ok']], rerun=[c2['cat'], c2['n_ok']]); anchor_rows.append(row)
                 if row['over']:
                     over.append(arm)
@@ -147,19 +196,29 @@ for (s, sc), rec in IDX.items():
     if not e:
         e = {T['environments'][s]['env']}; env_fallback.append(rec['run_key'])
     SIZE_ENV[(s, sc)] = set(e)
+if env_fallback and not a.allow_missing_sessions:
+    sys.exit('セッション記録の無い走行キーがある（sessions.missing_rule・--allow-missing-sessions は検査用）: %s' % '・'.join(env_fallback))
 BTAG = a.bridge_tag or TAGS['bridge']; EB = T['environment_band']; EBAND = Fraction(EB['band_pt'], 100); BR = T['bridge']; ENV_FLAG = {}; bridge_rows = []; C3 = {}; IDX3 = {}
 if runs_A.run_dirs(BTAG, a.root):
-    C3, IDX3 = runs_A.counts_by(T, BTAG, a.root)
+    C3, IDX3 = counts_or_exit(BTAG)
     for bm, cell in BR['cells'].items():
         key = (bm, BR['scenario'])
         if key not in IDX3:
             missing.append('橋 %s' % bm); continue
-        benv = ENVK.get(IDX3[key]['run_key']) or {cell['bridge_env']}
+        benv = ENVK.get(IDX3[key]['run_key'])
+        if not benv:
+            if not a.allow_missing_sessions:
+                sys.exit('セッション記録の無い橋の走行キー: %s（sessions.missing_rule）' % IDX3[key]['run_key'])
+            benv = {cell['bridge_env']}; env_fallback.append(IDX3[key]['run_key'])
         for arm in BR['arms']:
             cm, cb = cnt(bm, BR['scenario'], arm), cnt(bm, BR['scenario'], arm, C3)
             d = (fr(cb['cat'], cb['n_ok']) - fr(cm['cat'], cm['n_ok'])) if (cm['n_ok'] and cb['n_ok']) else None
             row = {'model': bm, 'arm': arm, 'main': [cm['cat'], cm['n_ok']], 'bridge': [cb['cat'], cb['n_ok']], 'main_env': sorted(SIZE_ENV.get(key, {cell['main_env']})), 'bridge_env': sorted(benv),
                    'diff_pt': None if d is None else float(d * 100), 'over': bool(d is not None and abs(d) > EBAND)}
+            if d is None:
+                row.update(over=None, status='no_data')
+                if not cb['n_ok']:
+                    missing.append('橋 %s × %s の n_ok が零（採否表 P91）' % (bm, arm))
             bridge_rows.append(row)
             if row['over']:
                 ENV_FLAG.setdefault(arm, []).append(row)
@@ -209,7 +268,8 @@ def evaluate(RR, c, X, keep_extra):
 CONTR = FAM['contrasts']; RES, FL, XS, EXC = [], [], [], []
 for c in CONTR:
     X = arrays(c); u, an, ke = exclusions(c); r, f = evaluate(R, c, X, ke); RES.append(r); FL.append(f); XS.append(X); EXC.append((u, an, ke))
-LAB = confirm_A.label_family(R, RES, FL, gate2_shrink=GATE2)
+SHRINK_IDX = {i for i, c in enumerate(CONTR) if GATE2 and c['scenario'] not in REMAIN}   # 門2 の縮小は残らない場面の対比だけ（登録者裁定 D16）
+LAB = confirm_A.label_family(R, RES, FL, shrink_idx=SHRINK_IDX)
 COMBO_IDS = {row['id'] for row in FAM['confirm_rule']['label_combo_table']}
 bad = [(c['id'], o['row']) for c, o in zip(CONTR, LAB) if o['row'] not in COMBO_IDS]
 if bad:
@@ -225,7 +285,7 @@ for lo, hi in zip(T['censor']['sensitivity']['low'], T['censor']['sensitivity'][
     R2 = confirm_A.Rules(T, censor_low=lo, censor_high=hi); res2, fl2 = [], []
     for c, X, (u, an, ke) in zip(CONTR, XS, EXC):
         r2, f2 = evaluate(R2, c, X, ke); res2.append(r2); fl2.append(f2)
-    lab2 = confirm_A.label_family(R2, res2, fl2, gate2_shrink=GATE2)
+    lab2 = confirm_A.label_family(R2, res2, fl2, shrink_idx=SHRINK_IDX)
     changed = [{'id': c['id'], 'main': o['label'], 'sensitivity': o2['label'], 'row': o2['row']} for c, o, o2 in zip(CONTR, LAB, lab2) if o['label'] != o2['label']]
     SENS.append({'low': lo, 'high': hi, 'counts': {k: sum(1 for o in lab2 if o['label'] == L[k]) for k in ORDER}, 'changed': changed,
                  'string': PS['sensitivity_diff'].format(low=lo, high=hi, ids='・'.join(x['id'] for x in changed) or 'なし')})
@@ -275,12 +335,14 @@ for fk in ('A_desc_nstr', 'A_desc_ncold'):
     DESC[fk] = [{'id': c['id'], 'sizes': [dict(size=s, A=rate_row(s, c['scenario'], c['A']), B=rate_row(s, c['scenario'], c['B']), unmeasurable=UNMEAS[(s, c['scenario'], c['A'])] or UNMEAS[(s, c['scenario'], c['B'])],
                                                 diff_pt=diff_pt(rate_row(s, c['scenario'], c['A']), rate_row(s, c['scenario'], c['B']))) for s in SIZES]}
                 for c in T['descriptive_families'][fk]['contrasts']]
+for x in DESC['A_desc_ncold']:
+    x['notes'] = [PS['identity_fail_note']] if ID_VERDICT == 'fail' else []   # 門0.5 不合格の注を記述族の Ncold−N にも（採否表 P88）
 DESC['A_desc_recipe'] = [dict(id=c['id'], base=rate_row('4B', c['scenario'], c['arm']), anchor=rate_row(ANCHOR_MODEL, c['scenario'], c['arm']),
                               diff_pt=diff_pt(rate_row('4B', c['scenario'], c['arm']), rate_row(ANCHOR_MODEL, c['scenario'], c['arm']))) for c in T['descriptive_families']['A_desc_recipe']['contrasts']]
 STACK = {'status': None, 'rows': []}; APITAG = a.api_tag or TAGS['api_rerun']
 if ID_VERDICT == 'pass':
     if runs_A.run_dirs(APITAG, a.root):
-        C4, IDX4 = runs_A.counts_by(T, APITAG, a.root); STACK['status'] = '門0.5 合格・API 再走行の記録あり'
+        C4, IDX4 = counts_or_exit(APITAG); STACK['status'] = '門0.5 合格・API 再走行の記録あり'
         for (s, sc) in sorted(IDX4):
             for arm in ARMS:
                 lr, ar = rate_row(s, sc, arm), rate_row(s, sc, arm, C4); STACK['rows'].append({'model': s, 'scenario': sc, 'arm': arm, 'local': lr, 'api': ar, 'diff_pt': diff_pt(lr, ar)})
@@ -322,7 +384,7 @@ def env_secondary(c):
     Xm = np.array([[1.0, r[1], r[0], r[1] * r[0]] + [v for e in envs for v in ((1.0 if r[2] == e else 0.0), r[1] * (1.0 if r[2] == e else 0.0))] for r in rows])
     if len(rows) <= Xm.shape[1]:
         return {'id': c['id'], 'status': '当てはめ不可（行が足りない）'}
-    ft = firth.fit(Xm, np.array([r[3] for r in rows], float), np.array([r[4] for r in rows], float))
+    ft = firth.fit(Xm, np.array([r[3] for r in rows], float), np.array([r[4] for r in rows], float), **R.fit_kw)   # 当てはめの打ち切りは python_control（登録者裁定 D18）
     return {'id': c['id'], 'status': '収束' if ft['converged'] else '非収束', 'columns': cols, 'estimates': dict(zip(cols, [float(b) for b in ft['beta']])), 'rows': len(rows), 'note': '副次解析・記述（p を印字しない）'}
 
 
@@ -384,6 +446,10 @@ for c, r, f, o, X, (u, an, ke) in zip(CONTR, RES, FL, LAB, XS, EXC):
             notes.append(PS['withdrawal_anomaly_note'])
     if o['stage'] == 2 and lab != L['confirmed']:
         DEMOTE.append({'id': c['id'], 'string': PS['demotion_three_lines'].format(upper=o['upper'], actual=lab, rules='・'.join(o['rules']), row=o['row'])})
+    if r['status'] == 'ok':   # 残存規模の非連続と端の欠け（読み条項 (xii)・登録者裁定 D22）
+        kidx = [j for j in range(len(SIZES)) if r['keep'][j]]; ends = [SIZES[j] for j in (0, len(SIZES) - 1) if not r['keep'][j]]
+        if (kidx[-1] - kidx[0] + 1) != len(kidx) or ends:
+            notes.append(PS['residual_gap_note'].format(A=c['A'], B=c['B'], sc=c['scenario'], ends='・'.join(ends) or 'なし', sizes='・'.join(kept)))
     crit = critical(c, X, r['keep']); st['critical_size'] = PS['critical_size'].format(A=c['A'], B=c['B'], sc=c['scenario'], size=crit['size'], sizes='・'.join(crit['sizes']) or 'なし')
     es = env_secondary(c)
     if es:
@@ -396,6 +462,22 @@ for c, r, f, o, X, (u, an, ke) in zip(CONTR, RES, FL, LAB, XS, EXC):
 SCALE_ONLY = [{'id': x['id'], 'slope_pt': x['slope_pt'], 'interval_pt': x['interval_pt']} for x in OUTC if x['label'] == L['scale_only']]
 DESC['A_desc_scale_only'] = SCALE_ONLY; DESC['A_desc_env'] = {'bridge': bridge_rows, 'secondary': ENVSEC}; DESC['A_desc_anchor_drift'] = anchor_rows
 DESC['A_desc_critical_size'] = [{'id': x['id'], **x['critical_size']} for x in OUTC]
+UPWARD = []   # 上向きの確証（report_rules.upward_rule・登録者裁定 D20）
+for x in OUTC:
+    if x['label'] != L['confirmed'] or not (x['slope_pt'] or 0) > 0:
+        continue
+    j = max(i_ for i_ in range(len(SIZES)) if x['result']['keep'][i_]); cc_ = x['counts']
+    if cc_['nA'][j] and cc_['nB'][j] and fr(cc_['kA'][j], cc_['nA'][j]) > fr(cc_['kB'][j], cc_['nB'][j]):
+        UPWARD.append({'id': x['id'], 'largest_residual_size': SIZES[j], 'slope_pt': x['slope_pt']})
+CP = []   # 対照どうしの差（読み条項 (v)・descriptive_families.A_desc_control_pairs・登録者裁定 D22）
+for p_ in T['descriptive_families']['A_desc_control_pairs']['pairs']:
+    A_, (B1, B2) = p_['treatment'], p_['controls']
+    for sc in SC:
+        sz = [{'size': s, 'B1': rate_row(s, sc, B1), 'B2': rate_row(s, sc, B2), 'diff_pt': diff_pt(rate_row(s, sc, B1), rate_row(s, sc, B2)), 'unmeasurable': UNMEAS[(s, sc, B1)] or UNMEAS[(s, sc, B2)]} for s in SIZES]
+        o1 = next((x for x in OUTC if x['scenario'] == sc and x['A'] == A_ and x['B'] == B1), None); o2 = next((x for x in OUTC if x['scenario'] == sc and x['A'] == A_ and x['B'] == B2), None)
+        both = bool(o1 and o2 and o1['label'] == L['confirmed'] and o2['label'] == L['confirmed'] and np.sign(o1['result']['beta']) == np.sign(o2['result']['beta']))
+        CP.append({'treatment': A_, 'B1': B1, 'B2': B2, 'scenario': sc, 'sizes': sz, 'both_confirmed_same_direction': both, 'string': PS['control_pair_differs'].format(A=A_, B1=B1, B2=B2, sc=sc) if both else None})
+DESC['A_desc_control_pairs'] = CP
 
 
 def js(o):
@@ -416,7 +498,7 @@ INPUTS = {'contrasts_sha16': runs_A.sha16_file(CPATH), 'confirm_A': [confirm_A.V
           'runs_A': runs_A.sha16_file(os.path.join(REPO, 'tools', 'runs_A.py')), 'zaxis_A': runs_A.sha16_file(os.path.join(REPO, 'tools', 'zaxis_A.py')), 'analyze_A': runs_A.sha16_file(os.path.abspath(__file__)),
           'style': sha_or_none(None if a.no_style else SPATH), 'gate': sha_or_none(a.gate), 'identity': sha_or_none(a.identity), 'calib': sha_or_none(a.calib), 'facts': sha_or_none(a.facts), 'sessions': len(SESS)}
 RESULT = {'kind': 'analyze_A', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'tag': tag, 'root': a.root, 'dev_marks': dev_marks, 'inputs': INPUTS,
-          'missing': missing, 'env_fallback_run_keys': env_fallback, 'gate2_shrink': GATE2, 'identity_verdict': ID_VERDICT, 'withdrawal_anomaly': WD_ANOM, 'calib_anomaly_run_keys': sorted(ANOM_RK),
+          'missing': missing, 'env_fallback_run_keys': env_fallback, 'gate2_shrink': GATE2, 'gate2_remaining_scenarios': REMAIN, 'gate2_shrink_ids': [CONTR[i]['id'] for i in sorted(SHRINK_IDX)], 'upward_confirmed': UPWARD, 'input_records': INREC, 'input_dev_marks': IN_MARKS, 'calib_open': CALIB_OPEN, 'withdrawal_status': WD_STATUS, 'identity_verdict': ID_VERDICT, 'withdrawal_anomaly': WD_ANOM, 'calib_anomaly_run_keys': sorted(ANOM_RK),
           'label_counts': COUNTS, 'first_finding': FIRST, 'reach_note': REACH, 'measurable': {'string': MEAS_STR, 'types': TYPES, 'per_contrast': PERM, 'B': a.B_measurable or ME['B_per_contrast']},
           'unmeasurable': unmeas_rows, 'anchor_excluded_units': [{'model': s, 'scenario': sc, 'arms': v} for (s, sc), v in sorted(ANCH_EX.items())], 'size_env': {'%s|%s' % k: sorted(v) for k, v in sorted(SIZE_ENV.items())},
           'env_flag_arms': {k: v for k, v in ENV_FLAG.items()}, 'contrasts': OUTC, 'demotions': DEMOTE, 'sensitivity': SENS, 'floor': floor_rows, 'descriptive': DESC, 'stratified': STRAT, 'control_bases': CTRL,
@@ -430,7 +512,9 @@ kn = lambda row: '%d/%d' % (row['k'], row['n'])
 M = ['# 段階 A 集計（機械生成・`tools/analyze_A.py` %s・%s UTC）' % (VERSION, RESULT['generated_utc']), '',
      '- tag %s・root %s・入力 %s' % (tag, a.root or 'results', json.dumps(INPUTS, ensure_ascii=False)),
      '- 検査用の印: %s・足りない記録: %s・環境値を登録値で補った走行キー: %d' % ('・'.join(dev_marks) or 'なし', '・'.join(missing) or 'なし', len(env_fallback)),
-     '- 門2 の縮小: %s・門0.5: %s・撤退条件の器の異常: %s・校正腕の器の異常の走行キー: %d' % ('あり' if GATE2 else 'なし', ID_VERDICT or '記録なし', 'あり' if WD_ANOM else 'なし', len(ANOM_RK)), '',
+     '- 門2 の縮小: %s（縮小で判定不能にした対比 %d・残る場面 %s）・門0.5: %s・撤退条件: %s（器の異常 %s）・校正腕の器の異常の走行キー: %d' % (
+         'あり' if GATE2 else 'なし', len(SHRINK_IDX), '・'.join(REMAIN) or 'なし', ID_VERDICT or '記録なし', WD_STATUS or '記録なし', 'あり' if WD_ANOM else 'なし', len(ANOM_RK)),
+     '- 入力の記録の印: %s・校正帯の未決の項: %s' % ('・'.join(IN_MARKS) or 'なし', '・'.join('%s %d' % (k, len(v)) for k, v in CALIB_OPEN.items() if v) or 'なし'), '',
      '## 第一の所見・到達の見込み・測れた効果種', '', FIRST, '', REACH or '（設計事実の記録なし）', '', MEAS_STR, '',
      '## 対照腕の基底率（破局/n_ok・規模 × 場面）', '', '| 場面 | 対照腕 | %s |' % ' | '.join(SIZES + [ANCHOR_MODEL + '（別記号）']), '|---|---|%s' % ('---|' * (len(SIZES) + 1))]
 for x in CTRL:
@@ -438,7 +522,7 @@ for x in CTRL:
 M += ['', '## 全対比の並記表', '', '| 対比 | A 破局/n（規模順） | B 破局/n（規模順） | 残った規模 | β₃（推定・p_β・Holm 順位/水準） | pt 差の傾き（pt／z・p_pt） | p*（Holm 順位/水準・区間） | 解釈条項 | refuse 門 | 様式門 | 環境 | 札 | 段 | 当てはまった規則 | 行 id | 注 |',
       '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|']
 for x in OUTC:
-    r = x['result']; ok = r['status'] == 'ok'; cnts = x['counts']
+    r = x['result']; ok = r['status'] == 'ok' and x['stage'] != 0; cnts = x['counts']   # 門2 の縮小で判定不能にした対比は統計量を印字しない（登録者裁定 D16）
     M.append('| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %d | %s | %s | %s |' % (
         x['id'], ' '.join('%d/%d' % (k, n) for k, n in zip(cnts['kA'], cnts['nA'])), ' '.join('%d/%d' % (k, n) for k, n in zip(cnts['kB'], cnts['nB'])), x['strings']['residual_sizes'],
         ('%+.3f・%.3g・%d/%.5f' % (r['beta'], r['p_beta'], x['beta_holm']['rank'], x['beta_holm']['level'])) if ok else r['status'],
@@ -449,6 +533,7 @@ for x in OUTC:
         x['style'], ('保留（%s）' % '・'.join(e['rule'] for e in x['env_reasons'])) if x['env_hold'] else '—', x['label'], x['stage'], '・'.join(x['rules']), x['row'], '・'.join(x['notes']) or '—'))
 M += ['', '### 定型文（対比ごと）', ''] + ['- %s: %s' % (x['id'], ' '.join([x['strings'].get('label', '')] + x['strings'].get('env', []) + x['strings'].get('style', []))) for x in OUTC if x['strings'].get('label') or x['strings'].get('env')]
 M += ['', '## 降格・保留の三行', ''] + (['- %s: %s' % (d['id'], d['string']) for d in DEMOTE] or ['- なし'])
+M += ['', '## 上向きの確証（report_rules.upward_rule）', ''] + (['- %s（最大の残存規模 %s・pt 差の傾き %+.2f pt／z）' % (u_['id'], u_['largest_residual_size'], u_['slope_pt']) for u_ in UPWARD] or ['- なし'])
 M += ['', '## 感度閾値での札', '', '| 閾値 | %s | 主閾値と札が変わった対比 |' % ' | '.join(L[k] for k in ORDER), '|---|%s---|' % ('---|' * len(ORDER)),
       '| %s／%s（主） | %s | — |' % (T['censor']['low'], T['censor']['high'], ' | '.join(str(COUNTS[k]) for k in ORDER))]
 for s_ in SENS:
@@ -459,16 +544,21 @@ M += ['', '| 対比 | 札 D1（初段）の確率 | 備考 |', '|---|---|---|'] 
 M += ['', '## 測定不能（腕 × 規模 × 場面）', ''] + (['- %s × %s × %s: 和集合 %d/%d（書式外 %d・ループ %d・切り詰め %d・延べ %d・%s）' % (x['model'], x['scenario'], x['arm'], x['union'], x['n_ok'], x['format_fail'], x['loop'], x['truncated'], x['total_count'], x['reason']) for x in unmeas_rows] or ['- なし'])
 M += ['', '## 錨帯（除外単位＝規模 × 場面）', ''] + (['- %s × %s（帯を超えた腕: %s）' % (x['model'], x['scenario'], '・'.join(x['arms'])) for x in RESULT['anchor_excluded_units']] or ['- 除外なし'])
 M += ['', '## 橋と環境', '', '| 機種 | 腕 | 本走行 | 橋 | 主環境 | 橋の環境 | 差（pt） | 帯を超えた |', '|---|---|---|---|---|---|---|---|']
-M += ['| %s | %s | %d/%d | %d/%d | %s | %s | %s | %s |' % (x['model'], x['arm'], x['main'][0], x['main'][1], x['bridge'][0], x['bridge'][1], '・'.join(x['main_env']), '・'.join(x['bridge_env']), '—' if x['diff_pt'] is None else '%+.1f' % x['diff_pt'], '超' if x['over'] else '—') for x in bridge_rows]
+M += ['| %s | %s | %d/%d | %d/%d | %s | %s | %s | %s |' % (x['model'], x['arm'], x['main'][0], x['main'][1], x['bridge'][0], x['bridge'][1], '・'.join(x['main_env']), '・'.join(x['bridge_env']), '—' if x['diff_pt'] is None else '%+.1f' % x['diff_pt'], '超' if x['over'] else ('no_data' if x['over'] is None else '—')) for x in bridge_rows]
 M += ['', '### 環境の副次解析（記述・p を印字しない）', ''] + (['- %s: %s %s' % (x['id'], x['status'], json.dumps(x.get('estimates', {}), ensure_ascii=False)) for x in ENVSEC] or ['- なし'])
 M += ['', '## 床持続（記述・p を印字しない）', ''] + ['- ' + x['string'] for x in floor_rows]
 M += ['', '## 記述族（p を印字しない）', '', '### Nstr−Onull・Ncold−N（規模ごとの差・pt）', '', '| 対比 | %s |' % ' | '.join(SIZES), '|---|%s' % ('---|' * len(SIZES))]
 for fk in ('A_desc_nstr', 'A_desc_ncold'):
     M += ['| %s | %s |' % (x['id'], ' | '.join(('測定不能' if y['unmeasurable'] else ('—' if y['diff_pt'] is None else '%+.1f' % y['diff_pt'])) for y in x['sizes'])) for x in DESC[fk]]
+M += ['- 注（%s）: %s' % (x['id'], '・'.join(x['notes'])) for x in DESC['A_desc_ncold'] if x.get('notes')]
 M += ['', '### レシピ対（4B 対 4B-2507・手元同士・差 pt）', ''] + ['- %s: %s' % (x['id'], '—' if x['diff_pt'] is None else '%+.1f' % x['diff_pt']) for x in DESC['A_desc_recipe']]
 M += ['', '### スタック差', '', '- ' + STACK['status']] + ['- %s × %s × %s: 手元 %s・API %s・差 %s' % (x['model'], x['scenario'], x['arm'], kn(x['local']), kn(x['api']), '—' if x['diff_pt'] is None else '%+.1f' % x['diff_pt']) for x in STACK['rows']]
 M += ['', '### 対数オッズ尺度でのみ立った対比（pt 差の傾きと区間）', ''] + (['- %s: %+.2f pt／z（%+.2f〜%+.2f）' % (x['id'], x['slope_pt'], x['interval_pt'][0], x['interval_pt'][1]) for x in SCALE_ONLY] or ['- なし'])
 M += ['', '### 臨界規模', ''] + ['- ' + x['strings']['critical_size'] for x in OUTC]
+M += ['', '### 対照どうしの差（読み条項 (v)・B₁−B₂ の pt・規模順）', '', '| 処置腕 | B₁ | B₂ | 場面 | %s | 二つの対比がともに確証で同じ向き |' % ' | '.join(SIZES), '|---|---|---|---|%s---|' % ('---|' * len(SIZES))]
+M += ['| %s | %s | %s | %s | %s | %s |' % (x['treatment'], x['B1'], x['B2'], x['scenario'], ' | '.join(('測定不能' if y['unmeasurable'] else ('—' if y['diff_pt'] is None else '%+.1f' % y['diff_pt'])) for y in x['sizes']),
+                                         'はい' if x['both_confirmed_same_direction'] else '—') for x in CP]
+M += ['- ' + x['string'] for x in CP if x['string']]
 M += ['', '### 錨の走行間差（帯を超えた腕のみ・全行は JSON）', ''] + (['- %s × %s × %s: %+.1f pt' % (x['model'], x['scenario'], x['arm'], x['diff_pt']) for x in anchor_rows if x['over']] or ['- なし'])
 M += ['', '## 散文層の副次終点（札を変えない）', ''] + ([('- ' + x['string']) if x.get('string') else '- %s: %s（残った規模 %s）' % (x['id'], x['status'], '・'.join(x['sizes']) or 'なし') for x in STRAT] or ['- なし'])
 M += ['', RESULT['clause']]

@@ -1,8 +1,18 @@
 {
- "generated_utc": "2026-09-13 15:50",
- "generator": "tools/design_facts_A.py v3.1",
- "contrasts_sha16": "4ABA25604B6E34CF",
- "power_grid_json_sha16": "E8502B29E04125B4",
+ "generated_utc": "2026-09-13 23:00",
+ "generator": "tools/design_facts_A.py v3.2",
+ "contrasts_sha16": "9A679F0931EF8034",
+ "power_grid_json_sha16": "290CDB99660E3423",
+ "inputs_F_G": {
+  "cost_facts": [
+   "records/cost-pilot/cost-facts-2026-09-13.md",
+   "DA4C999F6C1C5D89"
+  ],
+  "style_stageF1": [
+   "records/F/style-stageF1.json",
+   "F200FC75F45A9017"
+  ]
+ },
  "z": {
   "0.6B": -1.909327,
   "1.7B": -0.849237,
@@ -784,42 +794,44 @@
    }
   },
   "J": {
-   "text": "凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則・走行器の設定→contrasts-A.json／確証の判定（二尺度・p* の Holm・札の二段・全組合せ表）→confirm_A.py（格子・集計器・合成検査が同じ関数を import・札の率の模擬と測れた効果種を含む）／帯と門の厳密計算→bands_A.py（格子・門・校正帯が共有）／走行記録の読み出し→runs_A.py（器材が共有）／z→zaxis_A.py／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・確証規則・refuse 門・様式門・錨帯・測定不能・環境保留・測れた効果種→analyze_A.py／応答様式 (a)(b) と言及→response_mode_A.py／校正帯とセッションのやり直し・撤退条件・門2→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査（束縛・登録・生成器）→numbers_lint.py／草案と雛形の組み立て→build_draftA.py／整合と抽出（率盲検）→integrity_A.py・sample_inspection_A.py／判定器の断片→judge_fragments_A.py／合成検査→synth_A.py（札の全組合せ表の全行と集計器の経路）・synth_gates_A.py（門と校正の器）／報告→報告雛形の原稿と雛形・build_report_A.py・report_lint.py／凍結前の検分の束→bundle_prefreeze_A.py／凍結→freeze_A.py。**実在（SHA16）**: make_contrasts_A.py B36D69DC15374853・confirm_A.py 2B4F4081C810D91F・bands_A.py BFF15C1D51957E26・runs_A.py 54229073C649E591・zaxis_A.py 7CEA376E48C38575・firth.py 95724C778A00438B・power_grid_A.py 32F6F2A3236F21C6・design_facts_A.py 44B4530518F8648F・numbers_lint.py 33FE2106E8BB1E17・build_draftA.py 997108E294469CF5・firth_check_A.py 941A54BA051CE05F・firth_check_A.R 03EF1FF659759A2A・results-report-template-A.src.md F4F9009DFE72D07A・results-report-template-A.md AF274A6002F8EF0A・bundle_prefreeze_A.py 52B55BFAB9FD5B40・cost_facts.py 9FB5C64C4CB63A80・run_preamble_local.py 9F849D2823132BA2・boot_cost_pilot.py 8E1EF49B4206FE58・boot_stageA.py D83BA48BB6EEBF8C・identity_screen_A.py 9FFE9BC3D25C6367・response_mode_A.py 3CE9154BCBCDB4E0・analyze_A.py 21857CA8DB21ECF1・calib_band_A.py F4E41B139CFFC225・gate_A.py B0007BA39578E834・control_chart_A.py CAE3FB66D2B43A52・integrity_A.py B8F202FFA3892E4A・sample_inspection_A.py FEC9A66F1AB2DB8B・judge_fragments_A.py EB501DE77D12C962・synth_A.py 3D9A1511FB96E84F・synth_gates_A.py ECF8877EF33302E9・build_report_A.py CD2510919F84AEDE・report_lint.py E78AF381956A1C56・freeze_A.py 082BD9BFA3DA72CB。**未整備**: なし。",
+   "text": "凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則・走行器の設定→contrasts-A.json／確証の判定（二尺度・p* の Holm・札の二段・全組合せ表）→confirm_A.py（格子・集計器・合成検査が同じ関数を import・札の率の模擬と測れた効果種を含む）／帯と門の厳密計算→bands_A.py（格子・門・校正帯が共有）／走行記録の読み出し→runs_A.py（器材が共有）／z→zaxis_A.py／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・確証規則・refuse 門・様式門・錨帯・測定不能・環境保留・測れた効果種→analyze_A.py／応答様式 (a)(b) と言及→response_mode_A.py／校正帯とセッションのやり直し・撤退条件・門2→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査（束縛・登録・生成器）→numbers_lint.py／草案と雛形の組み立て→build_draftA.py／整合と抽出（率盲検）→integrity_A.py・sample_inspection_A.py／判定器の断片→judge_fragments_A.py／合成検査→synth_A.py（札の全組合せ表の全行と集計器の経路）・synth_gates_A.py（門と校正の器）／報告→報告雛形の原稿と雛形・build_report_A.py・report_lint.py／凍結前の検分の束→bundle_prefreeze_A.py／凍結→freeze_A.py。**実在（SHA16）**: make_contrasts_A.py B074B0C64745EFF1・confirm_A.py 5A190C6696C83A6F・bands_A.py BFF15C1D51957E26・runs_A.py A57BE1F5EEACBBB2・zaxis_A.py 7CEA376E48C38575・firth.py CE584FDF2AE79930・power_grid_A.py 999C42D98851F7A4・design_facts_A.py AA30D4F9FB967534・numbers_lint.py 33FE2106E8BB1E17・build_draftA.py 997108E294469CF5・firth_check_A.py 941A54BA051CE05F・firth_check_A.R 03EF1FF659759A2A・results-report-template-A.src.md A394AD2172A8009C・results-report-template-A.md 84AE5D0F83E59FC2・bundle_prefreeze_A.py 52B55BFAB9FD5B40・cost_facts.py 9FB5C64C4CB63A80・run_preamble_local.py 9F849D2823132BA2・boot_cost_pilot.py 8E1EF49B4206FE58・boot_stageA.py 61EA4467659670B1・identity_screen_A.py 759F005CDF01FA6C・response_mode_A.py C3E90B11B62F67A5・analyze_A.py 56E1486F4A138B95・calib_band_A.py 840FE043D01FEC7F・gate_A.py 61CF8B2467722CDC・control_chart_A.py 1958DFA2CC6F69CE・integrity_A.py 27D1677F28C3A0D9・sample_inspection_A.py E03EE571DC2A5FA2・judge_fragments_A.py FC833474B90CE794・synth_A.py D685AB76C6E34B32・synth_gates_A.py 822D8ED592CD4A69・build_report_A.py 89F1B3963EA4D1AC・report_lint.py 3F9C3EA33216D942・freeze_A.py 2E0F1074B8EE1F36・response_mode_M.py 5C57C0ACACB38713・response_mode_F.py 3E3838FD69B15E2F。**未整備**: なし。",
    "data": {
     "exist": {
-     "make_contrasts_A.py": "B36D69DC15374853",
-     "confirm_A.py": "2B4F4081C810D91F",
+     "make_contrasts_A.py": "B074B0C64745EFF1",
+     "confirm_A.py": "5A190C6696C83A6F",
      "bands_A.py": "BFF15C1D51957E26",
-     "runs_A.py": "54229073C649E591",
+     "runs_A.py": "A57BE1F5EEACBBB2",
      "zaxis_A.py": "7CEA376E48C38575",
-     "firth.py": "95724C778A00438B",
-     "power_grid_A.py": "32F6F2A3236F21C6",
-     "design_facts_A.py": "44B4530518F8648F",
+     "firth.py": "CE584FDF2AE79930",
+     "power_grid_A.py": "999C42D98851F7A4",
+     "design_facts_A.py": "AA30D4F9FB967534",
      "numbers_lint.py": "33FE2106E8BB1E17",
      "build_draftA.py": "997108E294469CF5",
      "firth_check_A.py": "941A54BA051CE05F",
      "firth_check_A.R": "03EF1FF659759A2A",
-     "results-report-template-A.src.md": "F4F9009DFE72D07A",
-     "results-report-template-A.md": "AF274A6002F8EF0A",
+     "results-report-template-A.src.md": "A394AD2172A8009C",
+     "results-report-template-A.md": "84AE5D0F83E59FC2",
      "bundle_prefreeze_A.py": "52B55BFAB9FD5B40",
      "cost_facts.py": "9FB5C64C4CB63A80",
      "run_preamble_local.py": "9F849D2823132BA2",
      "boot_cost_pilot.py": "8E1EF49B4206FE58",
-     "boot_stageA.py": "D83BA48BB6EEBF8C",
-     "identity_screen_A.py": "9FFE9BC3D25C6367",
-     "response_mode_A.py": "3CE9154BCBCDB4E0",
-     "analyze_A.py": "21857CA8DB21ECF1",
-     "calib_band_A.py": "F4E41B139CFFC225",
-     "gate_A.py": "B0007BA39578E834",
-     "control_chart_A.py": "CAE3FB66D2B43A52",
-     "integrity_A.py": "B8F202FFA3892E4A",
-     "sample_inspection_A.py": "FEC9A66F1AB2DB8B",
-     "judge_fragments_A.py": "EB501DE77D12C962",
-     "synth_A.py": "3D9A1511FB96E84F",
-     "synth_gates_A.py": "ECF8877EF33302E9",
-     "build_report_A.py": "CD2510919F84AEDE",
-     "report_lint.py": "E78AF381956A1C56",
-     "freeze_A.py": "082BD9BFA3DA72CB"
+     "boot_stageA.py": "61EA4467659670B1",
+     "identity_screen_A.py": "759F005CDF01FA6C",
+     "response_mode_A.py": "C3E90B11B62F67A5",
+     "analyze_A.py": "56E1486F4A138B95",
+     "calib_band_A.py": "840FE043D01FEC7F",
+     "gate_A.py": "61CF8B2467722CDC",
+     "control_chart_A.py": "1958DFA2CC6F69CE",
+     "integrity_A.py": "27D1677F28C3A0D9",
+     "sample_inspection_A.py": "E03EE571DC2A5FA2",
+     "judge_fragments_A.py": "FC833474B90CE794",
+     "synth_A.py": "D685AB76C6E34B32",
+     "synth_gates_A.py": "822D8ED592CD4A69",
+     "build_report_A.py": "89F1B3963EA4D1AC",
+     "report_lint.py": "3F9C3EA33216D942",
+     "freeze_A.py": "2E0F1074B8EE1F36",
+     "response_mode_M.py": "5C57C0ACACB38713",
+     "response_mode_F.py": "3E3838FD69B15E2F"
     },
     "not_yet": []
    }
@@ -828,7 +840,7 @@
    "text": "引数文字列 `--arms N,Onull,O,Osec,Lneg,Nk,Odose1,Odosehalf,Ncold,Nstr,O-Ncold,Onull-Ncold,Osec-Ncold`（SHA16 B28598704ED7BB23・13 腕）。seed: 門0.5 60001／パイロット 61101〜（機種 × 場面）／本走行 62101〜／錨反復 63101〜（規模 × 場面）／橋 {\"4B\": {\"A100\": 64002}, \"8B\": {\"L4\": 64003}}／校正 65000 を基に base＋multiplier×番号＋セッション番号（番号は models の順・一始まり・橋は bridge_index・セッション番号は一始まり）（倍率 100・橋の番号 {\"4B\": 8, \"8B\": 9}）／API 再走行 {\"8B\": 66001, \"14B\": 66002, \"32B\": 66003}／Firth 一致検査 67001／測れた効果種の到達の再計算 68001／dry-run 69999。tag: {\"identity\": \"idA\", \"pilot\": \"pilotA\", \"main\": \"stageA\", \"anchor_rerun\": \"stageA-anchor2\", \"bridge\": \"stageA-bridge\", \"calibration\": \"stageA-calib\", \"api_rerun\": \"stageA-api\", \"dryrun\": \"dryA\"}。"
   },
   "M": {
-   "text": "環境帯（橋の 4B・8B・本走行の N1 対 橋・n=200 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔N1〕・既測の無い腕は 0.5）: 10 pt: 腕あたり（真の率 0.5）4.02e-02・いずれかの腕が超える確率 0.309（確証族に現れる 8 腕では 0.303）・期待誤保留数 2.76・検出 差 10 pt で 0.481・差 15 pt で 0.832・差 20 pt で 0.976／12 pt: 腕あたり（真の率 0.5）1.42e-02・いずれかの腕が超える確率 0.109（確証族に現れる 8 腕では 0.108）・期待誤保留数 0.88・検出 差 10 pt で 0.326・差 15 pt で 0.712・差 20 pt で 0.943／15 pt: 腕あたり（真の率 0.5）2.25e-03・いずれかの腕が超える確率 0.016（確証族に現れる 8 腕では 0.016）・期待誤保留数 0.12・検出 差 10 pt で 0.146・差 15 pt で 0.481・差 20 pt で 0.834／20 pt: 腕あたり（真の率 0.5）4.84e-05・いずれかの腕が超える確率 0.000（確証族に現れる 8 腕では 0.000）・期待誤保留数 0.00・検出 差 10 pt で 0.019・差 15 pt で 0.144・差 20 pt で 0.481。**選択規則（確証 35 対比の期待誤保留数が 1 以下となる最小の候補）で選ばれる候補 12 pt**（帰無側の規則（検出側は転記行 M・採否表 P38））。真の率の置き方への依存（全腕を同じ率に置いた期待誤保留数）: 全腕 0.5 で 10 pt 5.301・12 pt 1.944・15 pt 0.314・20 pt 0.007／全腕 0.35 で 10 pt 4.207・12 pt 1.398・15 pt 0.190・20 pt 0.003。**登録値 12 pt**・登録者最終確認（2026-09-13）で選択規則の候補どおり確定（転記行 M で選択規則の結果との一致を assert）・選択規則の候補と一致: True。保留の単位: N1 の橋で、対比の二腕のいずれかが橋の二機種のいずれかで帯を超えたら、その腕を含む全場面の対比の確証を保留（記述・選択規則の計算と同じ単位・N1 からの外挿として読む・採否表 P40）。片側: 残存規模がすべて同じ環境値（L4・A100・第三のいずれか一つ）にある対比は確証を保留（採否表 P40）。パイロット後: パイロットの手元の率（N1・橋の二機種の率の平均・既測の無い腕は rule_missing_base_rate）で選択規則を引き直して印字する。規則を満たさなくなっても帯は動かさず、本走行の前に登録者が裁定する（既定は登録値のまま・期待誤保留数を報告に印字・登録者裁定 D12 (d)）。",
+   "text": "環境帯（橋の 4B・8B・本走行の N1 対 橋・n=200 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔N1〕・既測の無い腕は 0.5）: 10 pt: 腕あたり（真の率 0.5）4.02e-02・いずれかの腕が超える確率 0.309（確証族に現れる 8 腕では 0.303）・期待誤保留数 2.76・検出 差 10 pt で 0.481・差 15 pt で 0.832・差 20 pt で 0.976／12 pt: 腕あたり（真の率 0.5）1.42e-02・いずれかの腕が超える確率 0.109（確証族に現れる 8 腕では 0.108）・期待誤保留数 0.88・検出 差 10 pt で 0.326・差 15 pt で 0.712・差 20 pt で 0.943／15 pt: 腕あたり（真の率 0.5）2.25e-03・いずれかの腕が超える確率 0.016（確証族に現れる 8 腕では 0.016）・期待誤保留数 0.12・検出 差 10 pt で 0.146・差 15 pt で 0.481・差 20 pt で 0.834／20 pt: 腕あたり（真の率 0.5）4.84e-05・いずれかの腕が超える確率 0.000（確証族に現れる 8 腕では 0.000）・期待誤保留数 0.00・検出 差 10 pt で 0.019・差 15 pt で 0.144・差 20 pt で 0.481。**選択規則（確証 35 対比の期待誤保留数が 1 以下となる最小の候補）で選ばれる候補 12 pt**（帰無側の規則（検出側は転記行 M・採否表 P38））。真の率の置き方への依存（全腕を同じ率に置いた期待誤保留数）: 全腕 0.5 で 10 pt 5.301・12 pt 1.944・15 pt 0.314・20 pt 0.007／全腕 0.35 で 10 pt 4.207・12 pt 1.398・15 pt 0.190・20 pt 0.003。**登録値 12 pt**・登録者最終確認（2026-09-13）で選択規則の候補どおり確定（転記行 M で選択規則の結果との一致を assert）・選択規則の候補と一致: True。保留の単位: N1 の橋で、対比の二腕のいずれかが橋の二機種のいずれかで帯を超えたら、その腕を含む全場面の対比の確証を保留（記述・選択規則の計算と同じ単位・N1 からの外挿として読む・採否表 P40）。片側: 残存規模がすべて同じ環境値（L4・A100・第三のいずれか一つ）にある対比は確証を保留（採否表 P40）。パイロット後: パイロットの手元の率（N1・橋の二機種のパイロットの率の平均）で選択規則を引き直して印字する。パイロットの率が無い腕（n_ok が零の腕）だけ rule_missing_base_rate を置く（パイロットは全腕を走らせるので、ふつうは働かない）。規則を満たさなくなっても帯は動かさず、本走行の前に登録者が裁定する（既定は登録値のまま・期待誤保留数を報告に印字・登録者裁定 D12 (d)・文言は登録者裁定 D21）。",
    "data": {
     "n": 200,
     "bridge_models": [

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""freeze_A.py v1 —— 段階 A の凍結マニフェストを発行・検証する（発行は登録者の凍結指示があってから・2026-09-13 整備・登録者裁定 D9 の三つ目の手順）。
+"""freeze_A.py v2 —— 段階 A の凍結マニフェストを発行・検証する（発行は登録者の凍結指示があってから・2026-09-13 整備・登録者裁定 D9 の三つ目の手順）。
+v2（2026-09-14・実装検分の採否表 P98）: 走行器の refuse の規則と語彙・起動時の台帳（F・M）・転記行 F と G の入力・運用の解釈の一覧・名の語彙の出所（response_mode_M.py・F）を凍結範囲に加える。凍結本文の原稿は凍結本文の名（.md を .src.md に）から決める。枠の検証は見出しの名の完全一致（各枠ちょうど一つ）にする。
 凍結範囲（FILES）: 凍結本文・正本と生成器・確証と帯と読み出しの共通関数・Firth の基準実装と一致検査・格子と設計事実とその出力・本文の数の検査と組み立て器・走行器と起動器・
   門・集計・様式・整合・抽出・断片・管理図の器・合成検査とその記録・報告の組み立て器と走査器・報告雛形（原稿と組み立て）・機種の記録・盤の台帳と凍結物の写し（前置き・場面・パーサ）・
   門0.5 と Firth の一致検査の記録・凍結器。
@@ -9,18 +10,20 @@
       python tools/freeze_A.py --verify records/freeze-A-<日付>.json
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, sys, json, glob, argparse, datetime
+import os, re, sys, json, glob, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v1'
+VERSION = 'v2'
 TOOLS = ['make_contrasts_A.py', 'confirm_A.py', 'bands_A.py', 'runs_A.py', 'zaxis_A.py', 'firth.py', 'firth_check_A.py', 'firth_check_A.R', 'power_grid_A.py', 'design_facts_A.py', 'numbers_lint.py', 'build_draftA.py',
          'run_preamble_local.py', 'colab/boot_stageA.py', 'identity_screen_A.py', 'gate_A.py', 'calib_band_A.py', 'control_chart_A.py', 'analyze_A.py', 'response_mode_A.py', 'integrity_A.py',
-         'sample_inspection_A.py', 'judge_fragments_A.py', 'synth_A.py', 'synth_gates_A.py', 'build_report_A.py', 'report_lint.py', 'freeze_A.py', 'cost_facts.py']
+         'sample_inspection_A.py', 'judge_fragments_A.py', 'synth_A.py', 'synth_gates_A.py', 'build_report_A.py', 'report_lint.py', 'freeze_A.py', 'cost_facts.py', 'response_mode_M.py', 'response_mode_F.py']
 RECORDS = ['design/contrasts-A.json', 'records/A/power-grid-A.json', 'records/A/power-grid-A.md', 'records/A/design-facts-A.json', 'records/A/design-facts-A.md', 'records/A/hf-models-A.json',
            'records/A/results-report-template-A.src.md', 'records/A/results-report-template-A.md', 'records/A/identity-screen-A.json', 'records/A/identity-screen-A.md', 'records/A/firth-check-A.json', 'records/A/firth-check-A.md',
            'arms/panel/SHA-LEDGER.json', 'arms/frozen-from-ryokai-os/app-scenarios.json', 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
-           'arms/frozen-from-ryokai-os/armsE/preamble-O.md', 'arms/frozen-from-ryokai-os/armsE/preamble-Onull.md', 'arms/frozen-from-ryokai-os/armsE/preamble-Lneg.md', 'design/contrasts-F.json']
+           'arms/frozen-from-ryokai-os/armsE/preamble-O.md', 'arms/frozen-from-ryokai-os/armsE/preamble-Onull.md', 'arms/frozen-from-ryokai-os/armsE/preamble-Lneg.md', 'design/contrasts-F.json',
+           'arms/materials-draft/hei/refuse-rules-v2.json', 'arms/materials-draft/hei/incentive-lexicon-v2.json', 'arms/panelF/SHA-LEDGER-F.json', 'arms/panelM/SHA-LEDGER-M.json',
+           'records/F/style-stageF1.json', 'records/A/tooling-interpretations-A.md']   # 走行器の語彙と refuse の規則・起動時の台帳・転記行 G の入力・運用の解釈の一覧（採否表 P98）
 GLOBS = ['records/A/synth-A-*.json', 'records/A/synth-A-*.md', 'records/A/synth-gates-A-*.json', 'records/A/synth-gates-A-*.md', 'records/A/numbers-lint-*A*.md']
 
 
@@ -29,8 +32,10 @@ def rel(p):
 
 
 def file_list(design):
-    fs = [design, 'design/design-stageA-draft7.src.md'] + ['tools/' + t for t in TOOLS] + RECORDS
+    src = (design[:-3] if design.endswith('.md') else design) + '.src.md'   # 凍結本文の原稿は凍結本文の名から決める（採否表 P98）
     T = runs_A.load_T()
+    cost = re.search(r'records/[\w\-./]+\.md', T['cost']['source']).group(0)   # 転記行 F の入力
+    fs = [design, src] + ['tools/' + t for t in TOOLS] + RECORDS + [cost]
     fs += ['arms/panel/%s.md' % a for a in T['arms']['preamble'] if a not in ('N', 'O', 'Onull', 'Lneg')]
     for g in GLOBS:
         fs += sorted(rel(os.path.relpath(p, REPO)) for p in glob.glob(os.path.join(REPO, g)))
@@ -45,8 +50,8 @@ def frames_check(T):
     tp = os.path.join(REPO, T['report_rules']['template'])
     if not os.path.exists(tp):
         return ['雛形が無い: %s' % T['report_rules']['template']]
-    heads = [l for l in open(tp, encoding='utf-8').read().split('\n') if l.startswith('#')]
-    return ['枠の見出しが無い: %s' % f for f in T['report_rules']['frames'] if not any(f in h for h in heads)]
+    names = [re.sub(r'（.*$', '', l.lstrip('#').strip()).strip() for l in open(tp, encoding='utf-8').read().split('\n') if l.startswith('#')]   # 見出しの名（最初の全角括弧の前）の完全一致（採否表 P98）
+    return ['枠の見出しが%s: %s（完全一致 %d 件）' % ('無い' if names.count(f) == 0 else '重複', f, names.count(f)) for f in T['report_rules']['frames'] if names.count(f) != 1]
 
 
 if __name__ == '__main__':

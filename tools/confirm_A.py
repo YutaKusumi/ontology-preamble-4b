@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""confirm_A.py v1.1 —— 段階 A の確証の判定の共通関数（凍結前検分の採否表 P3・P9〜P14・登録者裁定 D1・D10・D11・2026-09-13）。
+"""confirm_A.py v1.2 —— 段階 A の確証の判定の共通関数（凍結前検分の採否表 P3・P9〜P14・登録者裁定 D1・D10・D11・2026-09-13）。
+v1.2（2026-09-14・登録者裁定 D16・D18・手順4 の採否表 P99・P100）: 門2 の縮小を残らない場面の対比だけに当てる口（shrink_idx）・縮小した対比の p は判定不能の値で Holm に入れる・p* の不一致の値と判定不能の p を正本から読む・β₃ の PPLRT と refuse 門の再フィットの打ち切りを firth_check.python_control にそろえる・自己検査に第一適合の順の独立の照合を足す。
 v1.1（登録者裁定 D9 の手順3）: 札の率の模擬（simulate_cell・card_tally・card_summary）と既測基底の行の処置の率・余地のある向き（reach_treatment・reach_direction）を格子から移し、測れた効果種（measurable_effect_types・登録者裁定 D11）を置く。格子（転記行 D）と集計器が同じ関数で数える。判定の論理（contrast 以下）は v1 と同じ。
 格子（power_grid_A）・集計器（analyze_A）・合成検査（synth_A）・正本の生成器（make_contrasts_A の札の全組合せ表）が同じ関数を import する（二重実装をしない）。
 - contrast(): 両腕条件の検閲（整数演算・超）→ 残存規模で β₃ の Firth PPLRT・解釈条項・pt 差の傾き（重み付き最小二乗・連続性補正・固定効果型の se・正規近似）→ p*＝max(p_β, p_pt)（向きが不一致なら 1）。
@@ -19,7 +20,7 @@ from scipy.stats import norm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import firth
 from firth import slope_rows
-VERSION = 'v1.1'
+VERSION = 'v1.2'
 LABEL_KEYS = ('undecidable', 'ns', 'clause', 'scale_only', 'refuse', 'style', 'env', 'confirmed')
 STAGE0_REASONS = ('gate2_shrink', 'residual', 'nonconverged')
 STYLE_STATES = ('none', 'note', 'hold')
@@ -36,6 +37,8 @@ class Rules:
         self.labels = CR['labels']
         G = F['refuse_gate']; self.ref_min_ok = G['answered_min_n_ok']; self.ref_min_sizes = G['min_sizes']; self.ref_drift = Fraction(G['refuse_drift_pt'], 100)
         S = T['style_gate']; self.style_hold = Fraction(S['hold_pt'], 100); self.style_note = Fraction(S['note_pt'], 100)
+        self.p_star_mismatch = float(PS['p_star_if_mismatch']); self.p_undecidable = float(F['model']['p_undecidable'])
+        PC = T['firth_check']['python_control']; self.fit_kw = {'gtol': PC['gtol'], 'tol': PC['tol'], 'max_iter': PC['max_iter']}   # v1.2: 登録者裁定 D18
 
 
 def _lt(k, n, thr):
@@ -58,7 +61,7 @@ def contrast(R, zs, kc, kt, nc, nt, extra_keep=None):
     if kept < R.min_sizes:
         return dict(base, status='undecidable', reason='residual')
     idx = np.where(keep)[0]
-    X, y, m = slope_rows(zs[idx], kc[idx], kt[idx], nc[idx], nt[idx]); r = firth.pplrt(X, y, 3, m)
+    X, y, m = slope_rows(zs[idx], kc[idx], kt[idx], nc[idx], nt[idx]); r = firth.pplrt(X, y, 3, m, **R.fit_kw)
     if not r['converged']:
         return dict(base, status='nonconverged', reason='nonconverged')
     satB = int((lowc | highc)[idx].sum()); satA = int((lowt | hight)[idx].sum())
@@ -68,7 +71,7 @@ def contrast(R, zs, kc, kt, nc, nt, extra_keep=None):
     slope = float((w * (zz - zb) * d).sum() / sxx); se = math.sqrt(1.0 / sxx); zpt = slope / se; p_pt = float(2.0 * norm.sf(abs(zpt)))
     sb = float(np.sign(r['beta'])); same = (float(np.sign(slope)) == sb) and sb != 0.0
     return dict(base, status='ok', idx=idx.tolist(), p_beta=float(r['p']), beta=float(r['beta']), stat=float(r['stat']), sat_A=satA, sat_B=satB,
-                clause=(satA >= R.clause_min or satB >= R.clause_min), slope=slope, se=se, z_pt=zpt, p_pt=p_pt, same=same, p_star=(max(float(r['p']), p_pt) if same else 1.0))
+                clause=(satA >= R.clause_min or satB >= R.clause_min), slope=slope, se=se, z_pt=zpt, p_pt=p_pt, same=same, p_star=(max(float(r['p']), p_pt) if same else R.p_star_mismatch))
 
 
 def holm(p, alpha):
@@ -90,7 +93,7 @@ def refuse_gate(R, zs, kc, kt, rc, rt, nc, nt, res):
     if len(j) < R.ref_min_sizes:
         out['reasons'].append('d')
     else:
-        X, y, m = slope_rows(zs[j], kc[j], kt[j], ac[j], at[j]); ra = firth.pplrt(X, y, 3, m)
+        X, y, m = slope_rows(zs[j], kc[j], kt[j], ac[j], at[j]); ra = firth.pplrt(X, y, 3, m, **R.fit_kw)
         if not ra['converged']:
             out['reasons'].append('d')
         else:
@@ -238,17 +241,19 @@ def measurable_effect_types(R, T, zs, z_center, zspan, rows, B=None, seed=None):
     return per, types
 
 
-def label_family(R, results, flags=None, gate2_shrink=False):
+def label_family(R, results, flags=None, gate2_shrink=False, shrink_idx=None):
     """results: 登録順の contrast() の戻り値（長さ m）。flags: 対比ごとの dict（refuse_hold・style〔none/note/hold〕・env_hold・env_reasons）。
     戻り値: 対比ごとの dict（label・stage・row・rules・upper・beta_holm〔棄却・順位・水準〕・star_holm〔同〕・interval_pt）。"""
     m = R.m; assert len(results) == m, ('m は固定', len(results), m); L = R.labels
     flags = flags or [{} for _ in results]
-    pb = [r['p_beta'] if r.get('status') == 'ok' else 1.0 for r in results]; ps = [r['p_star'] if r.get('status') == 'ok' else 1.0 for r in results]
+    shrink = set(range(len(results))) if gate2_shrink else set(shrink_idx or ())   # v1.2: 登録者裁定 D16（縮小は残らない場面の対比だけ・集計器が shrink_idx を渡す）
+    pb = [r['p_beta'] if (r.get('status') == 'ok' and i not in shrink) else R.p_undecidable for i, r in enumerate(results)]
+    ps = [r['p_star'] if (r.get('status') == 'ok' and i not in shrink) else R.p_undecidable for i, r in enumerate(results)]
     rb, kb, lb = holm(pb, R.alpha); rs, ks, ls = holm(ps, R.alpha); out = []
     for i, (r, f) in enumerate(zip(results, flags)):
         o = {'beta_holm': {'rejected': bool(rb[i]), 'rank': int(kb[i]), 'level': float(lb[i])}, 'star_holm': {'rejected': bool(rs[i]), 'rank': int(ks[i]), 'level': float(ls[i])}}
-        if gate2_shrink or r.get('status') != 'ok':
-            reason = 'gate2_shrink' if gate2_shrink else r.get('reason', 'residual')
+        if i in shrink or r.get('status') != 'ok':
+            reason = 'gate2_shrink' if i in shrink else r.get('reason', 'residual')
             o.update(label=L['undecidable'], stage=0, row=row_id(0, reason=reason), rules=[reason], upper=None)
         elif not rb[i]:
             o.update(label=L['ns'], stage=1, row='NS', rules=['beta_not_rejected'], upper=None)
@@ -256,7 +261,7 @@ def label_family(R, results, flags=None, gate2_shrink=False):
             style = f.get('style', 'none'); lab, applied = _stage2(bool(r['clause']), bool(rs[i]), bool(f.get('refuse_hold')), style, bool(f.get('env_hold')), L)
             o.update(label=lab, stage=2, row=row_id(2, clause=bool(r['clause']), star=bool(rs[i]), refuse=bool(f.get('refuse_hold')), style=style, env=bool(f.get('env_hold'))),
                      rules=applied + (['style_gate_note'] if style == 'note' else []), upper=L['confirmed'])
-        if r.get('status') == 'ok':
+        if r.get('status') == 'ok' and i not in shrink:
             o['interval_pt'] = interval(R, r['slope'], r['se'], float(ls[i])); o['slope_pt'] = R.scale * r['slope']
         out.append(o)
     return out
@@ -311,6 +316,19 @@ def _selftest():
     per5, types5 = measurable_effect_types(R, T, zs, zc5, zsp5, rows5, B=3, seed=7)
     assert len(per5) == 3 and per5[1]['p_card_D1_first'] == 0.0 and set(types5) == {'e0', 'e1'} and reach_direction(0.2) == 1.0 and reach_direction(0.5) == -1.0, (per5, types5)
     lines.append('5 simulate_cell・measurable_effect_types: 同じ乱数で同じ結果・4B の点が外れた対比は零・余地のある向きの境')
+    # 6. v1.2: 正本から読む定数・門2 の縮小を残らない場面の対比だけに当てる（登録者裁定 D16）・第一適合の順を正本の stage2_first_match から独立に組んで照合（手順4 の採否表 P100）
+    assert R.p_star_mismatch == float(T['families']['A_slope']['confirm_rule']['pt_slope']['p_star_if_mismatch']) and R.p_undecidable == float(T['families']['A_slope']['model']['p_undecidable'])
+    assert set(R.fit_kw) == {'gtol', 'tol', 'max_iter'} and R.fit_kw['gtol'] == T['firth_check']['python_control']['gtol'], R.fit_kw
+    res6 = [{'status': 'undecidable', 'reason': 'residual', 'kept': 0, 'keep': [], 'censored': []} for _ in range(R.m)]
+    res6[0] = dict(base_ok, p_beta=1e-9, p_star=1e-9); res6[1] = dict(base_ok, p_beta=1e-10, p_star=1e-10)
+    o6 = label_family(R, res6, [{} for _ in range(R.m)], shrink_idx={1})
+    assert o6[1]['row'] == 'U-gate2_shrink' and o6[0]['stage'] == 2 and o6[0]['beta_holm']['rank'] == 1 and 'interval_pt' not in o6[1], (o6[0], o6[1])
+    first = T['families']['A_slope']['confirm_rule']['label_stages']['stage2_first_match']; oracle_n = 0
+    for clause, star, refuse, style, env in itertools.product((False, True), (True, False), (False, True), STYLE_STATES, (False, True)):
+        on = {'interpretation_clause': clause, 'iut_not_rejected': not star, 'refuse_gate': refuse, 'style_gate_hold': style == 'hold', 'environment_hold': env, 'none': True}
+        want = next(x['label'] for x in first if on[x['rule'].split('（')[0]])
+        row = next(r_ for r_ in rows if r_['id'] == row_id(2, clause=clause, star=star, refuse=refuse, style=style, env=env)); assert row['label'] == want, (row, want); oracle_n += 1
+    lines.append('6 v1.2: 正本の定数・当てはめの打ち切り・門2 の縮小を一対比だけに当てた札と Holm・第一適合の順を正本から独立に組んだ照合 %d 組' % oracle_n)
     print('confirm_A.py %s SELFTEST PASS' % VERSION); print('\n'.join(lines))
 
 

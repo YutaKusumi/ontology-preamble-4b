@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""power_grid_A.py v3.1 —— 段階 A の検出力格子・実サイズ・帯と門の発火率（転記行 D・E・G・H・I・M・N・O の元）を design/contrasts-A.json・records/A/hf-models-A.json と tools/confirm_A.py・tools/zaxis_A.py・tools/firth.py v2 から機械生成する（2026-09-13）。
+"""power_grid_A.py v3.2 —— 段階 A の検出力格子・実サイズ・帯と門の発火率（転記行 D・E・G・H・I・M・N・O の元）を design/contrasts-A.json・records/A/hf-models-A.json と tools/confirm_A.py・tools/zaxis_A.py・tools/firth.py v2.1 から機械生成する（2026-09-13）。
+v3.2（2026-09-14・登録者裁定 D18）: 当てはめの打ち切りは confirm_A v1.2 が firth_check.python_control で行う（格子の算法は v3.1 と同じ）。入力に打ち切りの設定を記帳する。
 v3.1（2026-09-13・登録者裁定 D9 の手順3・D11）: 札の率の模擬（run_cell の中身）と既測基底の行の処置の率・余地のある向きを tools/confirm_A.py v1.1 の simulate_cell・reach_treatment・reach_direction に、帯と門の厳密計算（pmf・diff_tail・lower_tail・一標本の下側の整数境界・環境帯の期待誤保留数）を tools/bands_A.py に移した（集計器の測れた効果種・門と校正帯の器と同じ関数・乱数の消費順と数値は v3 と同じ）。
 v3 の変更（凍結前検分・七票の採否表 P18〜P30・登録者裁定 D10・D12・D13）:
  - 判定は tools/confirm_A.py の contrast()・refuse_gate() を import（格子と集計器が同じ関数・P3）。z は tools/zaxis_A.py。札 D1（初段）＝p* ≤ α/m（β₃ と pt 差の傾きがともに初段の水準で立ち同じ向き。裁定 D10 の p* の Holm でも初段の値は同じ）。
@@ -369,9 +370,9 @@ if a.md_only:
     R = json.load(open(a.out + '.json', encoding='utf-8'))
 else:
     t0 = time.time()
-    R = {'version': 'v3.1', 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'quick': a.quick,
+    R = {'version': 'v3.2', 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'quick': a.quick,
          'inputs': {'contrasts_sha16': sha_file(CPATH), 'hf_models_sha16': sha_file(HPATH), 'firth_version': firth.VERSION, 'firth_sha16': sha_file(os.path.join(REPO, 'tools', 'firth.py')),
-                    'confirm_version': confirm_A.VERSION, 'confirm_sha16': sha_file(os.path.join(REPO, 'tools', 'confirm_A.py')), 'zaxis_sha16': sha_file(os.path.join(REPO, 'tools', 'zaxis_A.py')), 'bands_sha16': sha_file(os.path.join(REPO, 'tools', 'bands_A.py')), 'power_grid_sha16': sha_file(os.path.abspath(__file__))},
+                    'confirm_version': confirm_A.VERSION, 'confirm_sha16': sha_file(os.path.join(REPO, 'tools', 'confirm_A.py')), 'zaxis_sha16': sha_file(os.path.join(REPO, 'tools', 'zaxis_A.py')), 'bands_sha16': sha_file(os.path.join(REPO, 'tools', 'bands_A.py')), 'fit_control': RULES.fit_kw, 'power_grid_sha16': sha_file(os.path.abspath(__file__))},
          'z': {k: Z[k] for k in SIZES}, 'z_span_32B_4B': zspan, 'seed': a.seed, 'streams': {'D': 1, 'DR': 2, 'DS': 3, 'R': 4, 'DC': 5, 'DO': 6, 'N': 7, 'PS': 8, 'N_detection': 9},
          'B': {'D': a.B, 'DR': a.B_real, 'DS': a.B_sens, 'R': a.B_refuse, 'N': a.B_identity, 'DC': a.B_clean, 'DO': a.B_odose, 'PS': a.B_size},
          'levels': {'alpha': ALPHA, 'holm_m': HOLM_M, 'z_nominal': z_nom, 'z_holm_first': z_h1, 'holm_later': [{'step_denominator': j, 'z': float(norm.isf(ALPHA / j / 2))} for j in (HOLM_M, HOLM_M - 1, HOLM_M - 4, HOLM_M - 9, HOLM_M - 19, 2, 1)]},
@@ -388,6 +389,7 @@ ci = lambda v: '—' if (v is None or v[0] is None) else '%.3f〜%.3f' % tuple(v
 L = ['# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` %s・%s UTC%s）' % (R['version'], R['generated_utc'], '・**quick（検査用の小さな B）**' if R.get('quick') else ''), '',
      '- 入力: contrasts-A.json SHA16 %s・hf-models-A.json SHA16 %s・firth.py %s（SHA16 %s）・confirm_A.py %s（SHA16 %s）・zaxis_A.py SHA16 %s・power_grid_A.py SHA16 %s・bands_A.py SHA16 %s' % (
          R['inputs']['contrasts_sha16'], R['inputs']['hf_models_sha16'], R['inputs']['firth_version'], R['inputs']['firth_sha16'], R['inputs']['confirm_version'], R['inputs']['confirm_sha16'], R['inputs']['zaxis_sha16'], R['inputs']['power_grid_sha16'], R['inputs'].get('bands_sha16')),
+     '- 当てはめの打ち切り（登録者裁定 D18・confirm_A と共通）: %s' % json.dumps(R['inputs'].get('fit_control')),
      '- z（実パラメータ数から）: %s・z_span（32B−4B）%.4f' % ('・'.join('%s %.4f' % (k, v) for k, v in R['z'].items()), R['z_span_32B_4B']),
      '- seed %d・節ごとの子ストリーム %s・節ごとの B %s・水準 α=%.2f／Holm 初段 α/%d（正規の臨界 %.4f／%.4f）・Holm の後段の臨界 %s・検閲の整数境界（n=%d）X ≤ %d または X ≥ %d' % (
          R['seed'], json.dumps(R['streams']), json.dumps(R['B']), R['levels']['alpha'], R['levels']['holm_m'], R['levels']['z_nominal'], R['levels']['z_holm_first'], '・'.join('α/%d で %.3f' % (x['step_denominator'], x['z']) for x in R['levels']['holm_later']), n, R['censor_integer_bounds_n200']['low_if_le'], R['censor_integer_bounds_n200']['high_if_ge']),
@@ -438,4 +440,4 @@ L += ['', '- 棄却域 k≤%d（CP 片側上限 <0.05・その境界での実サ
       '## M. 環境帯（厳密・超・候補と選択規則・真の率の置き方への依存）', '', json.dumps(R['M'], ensure_ascii=False), '', '## JV. 判定器の方向別の誤判定率の規模間の差の推定の幅', '', json.dumps(R['JV'], ensure_ascii=False), '',
       '本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。']
 open(a.out + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
-print('[power_grid_A v3.1] written %s.{json,md} | D rows %d | DR %d | DC %d | DO %d | elapsed %s s' % (a.out, len(R['D']), len(R['DR']), len(R['DC']), len(R['DO']), R.get('elapsed_s')))
+print('[power_grid_A v3.2] written %s.{json,md} | D rows %d | DR %d | DC %d | DO %d | elapsed %s s' % (a.out, len(R['D']), len(R['DR']), len(R['DC']), len(R['DO']), R.get('elapsed_s')))

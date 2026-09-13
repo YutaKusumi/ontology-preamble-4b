@@ -14,7 +14,7 @@ import numpy as np
 from scipy.special import expit
 from scipy.stats import chi2
 
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・登録者裁定 D18）: pplrt が当てはめの打ち切り（gtol・tol・max_iter など）を fit に受け渡す。算法は v2 と同じ
 
 
 def _state(X, y, m, beta):
@@ -85,9 +85,9 @@ def firth_fit(X, y, m=None):
     return fit(X, y, m)
 
 
-def pplrt(X, y, idx, m=None):
-    """係数 idx の PPLRT（両側・χ²₁）。戻り値 dict: beta・stat・p（非収束なら None）・converged・beta_all・ll_full・ll_restricted。"""
-    rf = fit(X, y, m); rr = fit(X, y, m, fixed={idx: 0.0})
+def pplrt(X, y, idx, m=None, **fit_kw):
+    """係数 idx の PPLRT（両側・χ²₁）。fit_kw は fit の打ち切り（gtol・tol・max_iter）。戻り値 dict: beta・stat・p（非収束なら None）・converged・beta_all・ll_full・ll_restricted。"""
+    rf = fit(X, y, m, **fit_kw); rr = fit(X, y, m, fixed={idx: 0.0}, **fit_kw)
     ok = bool(rf['converged'] and rr['converged'] and np.isfinite(rf['ll']) and np.isfinite(rr['ll']))
     if ok:
         stat = max(0.0, 2.0 * (rf['ll'] - rr['ll'])); p = float(chi2.sf(stat, 1))
