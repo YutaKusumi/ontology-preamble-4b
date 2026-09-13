@@ -75,7 +75,7 @@ for sp in sorted(glob.glob(os.path.join(ROOT, a.glob))):
 if not sessions:
     sys.exit('session.json が見つからない: %s' % a.glob)
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
-O = ['# 費用パイロット（門0）の実測と転記行（機械生成・`tools/cost_facts.py` v1.1・%s UTC）' % now, '',
+O = ['# 費用パイロット（門0）の実測と転記行（機械生成・`tools/cost_facts.py` v1.2・%s UTC）' % now, '',
      '- 入力: ' + '・'.join('`%s`' % os.path.relpath(os.path.join(ROOT, s['S']['run_dir']), ROOT).replace('\\', '/') for s in sessions) + '。ユニットの数は登録者申告（器は測れない）。外挿の係数は ◐（仮定・本器の逐語）。率は記述であり確証ではない。', '',
      '## U. セッション（環境と経費）', '', '| tag | GPU | vLLM／torch | 重み rev | 取得 GiB | 導入 s | 取得 s | 起動待ち s | 経費合計 s（各区間の runs 最大の和） | 本走行 s | 壁時計 h（最初の run 開始〜最後の run 終了） | HEAD | 走行器 |', '|---|---|---|---|---|---|---|---|---|---|---|---|---|']
 for s in sessions:

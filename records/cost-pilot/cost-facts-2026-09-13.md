@@ -1,4 +1,4 @@
-# 費用パイロット（門0）の実測と転記行（機械生成・`tools/cost_facts.py` v1.1・2026-09-13 00:02 UTC）
+# 費用パイロット（門0）の実測と転記行（機械生成・`tools/cost_facts.py` v1.2・2026-09-13 04:41 UTC）
 
 - 入力: `results/costpilot-A100/costpilot-A100__N1__none__seed54002`・`results/costpilot-L4/costpilot-L4__N1__none__seed54001`。ユニットの数は登録者申告（器は測れない）。外挿の係数は ◐（仮定・本器の逐語）。率は記述であり確証ではない。
 
