@@ -74,7 +74,7 @@ censor = {'type': 'both_arm_condition', 'low': 0.05, 'high': 0.95, 'unit': '場�
 style_gate = {'hold_pt': 30, 'note_pt': 15, 'strict': True, 'unit': '対比 × 場面・規模ごと', 'numerator': '(a) 名への言及／(b) JSON 直答の該当試行', 'denominator': 'n_ok', 'applies_to': 'confirmed_only',
               'text': '(a)(b) の差が 30 pt 超で判定保留・15 pt 超で注（「超」は 30.0 を含まない）。確証札にのみ作用。層別（散文層）の再検定を副次終点として先置。'}
 unmeasurable = {'threshold': 0.30, 'numerator': 'format_fail ∪ loop_flag ∪ truncated（和集合・重複は一度）', 'denominator': 'n_ok', 'unit': '腕 × 規模 × 場面', 'text': '30% 超で測定不能として記述に降格し検閲セルと同じく外す（m は消費）。延べも併記。'}
-anchor_band = {'arms': ['Onull', 'O-Ncold'], 'scenarios': SC, 'runs': 2, 'band_pt_default': 10, 'band_decided_by': '転記行 H（n=200 の帰無発火率）を見て凍結前に決める', 'exclusion_unit': '規模 × 場面（当該場面の全対比からその規模の点を外す）', 'chain': '除外後に残存 3 規模未満なら判定不能（m 消費）'}
+anchor_band = {'arms': ['Onull', 'O-Ncold'], 'scenarios': SC, 'runs': 2, 'band_pt': 12, 'band_decided_by': '転記行 H（n=200 の帰無発火率・10 pt は真の率 0.5 で 0.050・12 pt で 0.019・15 pt で 0.002）を見て登録者確認 2026-09-13 で 12 pt に決定', 'exclusion_unit': '規模 × 場面（当該場面の全対比からその規模の点を外す）', 'chain': '除外後に残存 3 規模未満なら判定不能（m 消費）'}
 calib = {'arm': 'Ncold', 'scenario': 'N1', 'model': '4B-2507', 'n': n_cal, 'when': '機種のセッションごとに 1 回', 'band_pass': 'V′／M 実測比 5 pt', 'band_fail': '手元系列（門0.5 の Ncold × N1 を初点・転記行 M）',
          'withdrawal': {'pilot_n': pn, 'band_pt': 15, 'consequence': '当該セッションを新 seed で一度だけ再走・なお外れれば当該セッションの走行を「器の異常」として記帳し確証札に注（機種は降格しない）', 'model_eligibility': '測定不能率と門2 のみ（中間域の帯は置かない）'}}
 gate2 = {'n': pn, 'rule': '検閲後に 3 規模以上が残る場面が 2 つ未満 → 傾きの族を縮小（判定不能の枠として m を消費・Holm の m は 35 のまま）し、主成果を床持続の記述と臨界規模に置く', 'once': '門はパイロットで一度・本走行で引き直さない'}

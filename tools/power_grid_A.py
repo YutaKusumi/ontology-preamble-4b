@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from firth import design, pplrt
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 T = json.load(open(os.path.join(REPO, 'design', 'contrasts-A.json'), encoding='utf-8')); n = T['n_per_arm']; pn = T['pilot_n']; ncal = T['calibration_n']
-ap = argparse.ArgumentParser(); ap.add_argument('--B', type=int, default=2000); ap.add_argument('--seed', type=int, default=20260913); ap.add_argument('--z', default=None, help='JSON: {"0.6B":z,...}（design_facts_A が実パラメータ数から渡す）')
+ap = argparse.ArgumentParser(); ap.add_argument('--B', type=int, default=2000); ap.add_argument('--seed', type=int, default=20260913); ap.add_argument('--z', default=None, help='JSON: {"0.6B":z,...}（design_facts_A が実パラメータ数から渡す）'); ap.add_argument('--md-only', action='store_true', help='既存の JSON から md だけ再生成（シミュレーションを走らせない）')
 a = ap.parse_args()
 Z = json.loads(a.z) if a.z else {'0.6B': -1.9, '1.7B': -0.86, '4B': 0.0, '8B': 0.69, '14B': 1.25, '32B': 2.08}   # 既定は公称比の対数（実値は転記行 L で置換）
 SIZES = T['sizes']; zs = np.array([Z[s] for s in SIZES]); z_span = zs[-1] - zs[2]   # 32B と 4B の z の差
@@ -101,17 +101,20 @@ def grid_M():
     return {'per_arm_null_fire_two_env': {str(b): null_fire_diff(n, b) for b in (10, 12, 15)}, 'arms_per_bridge': len(T['arms']['preamble'])}
 
 
-R = {'z': Z, 'z_span_32B_4B': round(float(z_span), 4), 'B': a.B, 'seed': a.seed, 'D': grid_D(), 'E': grid_E(), 'H': grid_H(), 'I': grid_I(), 'M': grid_M()}
 os.makedirs(os.path.join(REPO, 'records', 'A'), exist_ok=True)
-json.dump(R, open(os.path.join(REPO, 'records', 'A', 'power-grid-A.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-L = ['# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` v1・B=%d・seed %d）' % (a.B, a.seed), '', '## D. 傾きの族 β₃（Firth PPLRT 両側・n=200 × 6 規模・両腕条件の検閲後）', '',
+if a.md_only:
+    R = json.load(open(os.path.join(REPO, 'records', 'A', 'power-grid-A.json'), encoding='utf-8'))
+else:
+    R = {'z': Z, 'z_span_32B_4B': round(float(z_span), 4), 'B': a.B, 'seed': a.seed, 'D': grid_D(), 'E': grid_E(), 'H': grid_H(), 'I': grid_I(), 'M': grid_M()}
+    json.dump(R, open(os.path.join(REPO, 'records', 'A', 'power-grid-A.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+L = ['# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` v1・B=%d・seed %d）' % (R['B'], R['seed']), '', '## D. 傾きの族 β₃（Firth PPLRT 両側・n=200 × 6 規模・両腕条件の検閲後）', '',
      '| 対照の基底 | 4B の差 d0 | Δ（32B−4B の pt 差の変化） | 判定不能率（<3 規模） | p<0.05 | p<0.05/35 | 解釈条項の発火率 | 残存規模の平均 |', '|---|---|---|---|---|---|---|---|']
 for r in R['D']:
     L.append('| %s | %.2f | %.2f | %.3f | %.3f | %.3f | %.3f | %.2f |' % (r['pattern'], r['d0_pt'], r['delta_pt_32B_minus_4B'], r['undecidable_rate'], r['reject_005'], r['reject_holm_first'], r['interp_clause_rate'], r['mean_kept_sizes']))
 L += ['', '## E. 床持続（記述）の到達可能性の三段（n=200）', '', '| 真の率 | 単一セル k≤4 | 6 規模同時 | Holm 初段 k≤2 |', '|---|---|---|---|']
 for r in R['E']['rows']:
     L.append('| %.3f | %.4f | %.5f | %.6f |' % (r['true_rate'], r['single_cell_k_le_4'], r['six_sizes_joint'], r['holm_first_stage_k_le_2']))
-L += ['', 'k≤%d（CP 95% 片側上限 <0.05）・Holm 初段の k≤%d・H0 での実サイズ %.5f' % (R['E']['k_max_cp95_n200'], R['E']['k_max_holm_first_n200'], R['E']['p_size_k_le_4']),
+L += ['', 'k≤%d（CP 95%% 片側上限 <0.05）・Holm 初段の k≤%d・H0 での実サイズ %.5f' % (R['E']['k_max_cp95_n200'], R['E']['k_max_holm_first_n200'], R['E']['p_size_k_le_4']),
       '', '## H. 錨帯の帰無発火率（n=200 × 2 走行・真の率別・帯 pt）', '', json.dumps(R['H'], ensure_ascii=False), '', '## I. 校正腕と撤退条件', '', json.dumps(R['I'], ensure_ascii=False), '', '## M. 橋のセルの環境差の帯', '', json.dumps(R['M'], ensure_ascii=False), '']
 open(os.path.join(REPO, 'records', 'A', 'power-grid-A.md'), 'w', encoding='utf-8', newline='\n').write('\n'.join(L))
 print('[power_grid_A] written records/A/power-grid-A.{json,md}', '| D rows', len(R['D']))
