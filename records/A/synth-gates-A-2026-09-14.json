@@ -1,0 +1,136 @@
+{
+ "kind": "synth_gates_A",
+ "version": "v1",
+ "generated_utc": "2026-09-13 15:03",
+ "checks": [
+  {
+   "check": "gates-pass: 門0.5 の判定",
+   "ok": true,
+   "detail": "[identity_screen_A] pass（平均 0.050 pt・最大 0.250 pt）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-pass\\records\\identity.{json,md}\n"
+  },
+  {
+   "check": "gates-pass: 門2 の縮小",
+   "ok": true,
+   "detail": "[gate_A] 門2 縮小 False（残る場面 ['N1', 'N2', 'S1', 'S4', 'SK']）・撤退条件 pass・測定不能 0 セル・環境帯の引き直し 15 written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-pass\\records\\gate.{json,md}\n"
+  },
+  {
+   "check": "gates-pass: 撤退条件",
+   "ok": true,
+   "detail": "{\"branch\": \"pass\", \"band_pt\": 15, \"first\": {\"k\": 39, \"n\": 40, \"rate\": 0.975, \"fired\": false, \"reference\": {\"api\": [390, 400]}, \"test\": \"一標本・下側\"}, \"rerun\": null, \"status\": \"pass\", \"anomaly\": false, \"consequence\": \"帯を外れたら、パイロットの 4B-2507 × N1 の走行を seed に seeds.rerun_offset を足して一度だけ再走し、再走の Ncold × N1 で判"
+  },
+  {
+   "check": "gates-pass: 環境帯の引き直しの印字",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "gates-pass: 校正腕の判定",
+   "ok": true,
+   "detail": "{\"main|0.6B|1\": \"pass\", \"main|8B|1\": \"fired\", \"main|8B|2\": \"retry_pass\", \"main|14B|1\": \"fired\", \"main|32B|1\": \"fired\", \"main|32B|2\": \"anomaly\", \"bridge|4B|1\": \"pass\"}"
+  },
+  {
+   "check": "gates-pass: 器の異常の走行キー",
+   "ok": true,
+   "detail": "['stageA__N1__none__seed62601']"
+  },
+  {
+   "check": "gates-pass: やり直し待ち",
+   "ok": true,
+   "detail": "[{'phase': 'main', 'owner': '14B', 'session': 1, 'run_key': 'stageA-calib__N1__none__seed65501'}]"
+  },
+  {
+   "check": "gates-pass: 手順の逸脱",
+   "ok": true,
+   "detail": "[{'run_key': 'stageA-calib__N1__none__seed65401', 'session_record': 'stageA__8B__s1.json', 'run_keys': ['stageA__N1__none__seed62401'], 'text': '帯を超えたセッションで機種の走行が記帳されている（calibration.timing の逸脱）'}]"
+  },
+  {
+   "check": "gates-pass: 管理図の記帳（既存の表に追記）",
+   "ok": true,
+   "detail": "[control_chart_A] pass 枝・8 行を記帳 → C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-pass\\records\\control-chart.md\n[control_chart_A] pass 枝・0 行を記帳 → C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce"
+  },
+  {
+   "check": "gates-pass: 整合検査（identity）",
+   "ok": true,
+   "detail": "[integrity_A] 全走行 整合（1 走行）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-pass\\records\\integrity-identity.{md,json}\n"
+  },
+  {
+   "check": "gates-pass: 整合検査（pilot）",
+   "ok": true,
+   "detail": "[integrity_A] 全走行 整合（35 走行）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-pass\\records\\integrity-pilot.{md,json}\n"
+  },
+  {
+   "check": "gates-pass: 整合検査（calibration）",
+   "ok": true,
+   "detail": "[integrity_A] 全走行 整合（7 走行）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-pass\\records\\integrity-calibration.{md,json}\n"
+  },
+  {
+   "check": "gates-pass: 整合検査が要求の設定の違いを検出",
+   "ok": true,
+   "detail": "[integrity_A] 不整合または未完 1 走行（1 走行）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-pass\\records\\integrity-main-bad.{md,json}\n"
+  },
+  {
+   "check": "gates-fail: 門0.5 の判定",
+   "ok": true,
+   "detail": "[identity_screen_A] fail（平均 0.717 pt・最大 20.125 pt）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-fail\\records\\identity.{json,md}\n"
+  },
+  {
+   "check": "gates-fail: 門2 の縮小",
+   "ok": true,
+   "detail": "[gate_A] 門2 縮小 True（残る場面 ['N1']）・撤退条件 anomaly・測定不能 0 セル・環境帯の引き直し 15 written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-fail\\records\\gate.{json,md}\n"
+  },
+  {
+   "check": "gates-fail: 撤退条件",
+   "ok": true,
+   "detail": "{\"branch\": \"fail\", \"band_pt\": 15, \"first\": {\"k\": 30, \"n\": 40, \"rate\": 0.75, \"fired\": true, \"reference\": {\"gate05_local\": [156, 160]}, \"test\": \"二標本・下側\"}, \"rerun\": {\"k\": 30, \"n\": 40, \"rate\": 0.75, \"fired\": true, \"reference\": {\"gate05_local\": [156, 160]}, \"test\": \"二標本・下側\"}, \"status\": \"anomaly\", \"anomal"
+  },
+  {
+   "check": "gates-fail: 環境帯の引き直しの印字",
+   "ok": true,
+   "detail": ""
+  },
+  {
+   "check": "gates-fail: 校正腕の判定（初点と両側）",
+   "ok": true,
+   "detail": "{\"main|0.6B|1\": \"first_point\", \"main|1.7B|1\": \"pass\", \"main|4B|1\": \"fired\", \"main|4B|2\": \"retry_pass\"}"
+  },
+  {
+   "check": "gates-fail: 器の異常なし",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "check": "gates-fail: 管理図の記帳（手元系列を新設）",
+   "ok": true,
+   "detail": "[control_chart_A] fail 枝・5 行を記帳 → C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-fail\\records\\control-chart.md\n[control_chart_A] fail 枝・0 行を記帳 → C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce"
+  },
+  {
+   "check": "gates-fail: 整合検査（identity）",
+   "ok": true,
+   "detail": "[integrity_A] 全走行 整合（1 走行）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-fail\\records\\integrity-identity.{md,json}\n"
+  },
+  {
+   "check": "gates-fail: 整合検査（pilot）",
+   "ok": true,
+   "detail": "[integrity_A] 全走行 整合（36 走行）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-fail\\records\\integrity-pilot.{md,json}\n"
+  },
+  {
+   "check": "gates-fail: 整合検査（calibration）",
+   "ok": true,
+   "detail": "[integrity_A] 全走行 整合（4 走行）written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\synth-gates-final\\gates-fail\\records\\integrity-calibration.{md,json}\n"
+  }
+ ],
+ "pass": true,
+ "B_identity_mc": 200,
+ "inputs": {
+  "identity_screen_A.py": "9FFE9BC3D25C6367",
+  "gate_A.py": "B0007BA39578E834",
+  "calib_band_A.py": "F4E41B139CFFC225",
+  "control_chart_A.py": "CAE3FB66D2B43A52",
+  "integrity_A.py": "B8F202FFA3892E4A",
+  "runs_A.py": "54229073C649E591",
+  "bands_A.py": "BFF15C1D51957E26",
+  "synth_gates_A.py": "ECF8877EF33302E9"
+ },
+ "contrasts_sha16": "4ABA25604B6E34CF",
+ "clause": "合成の件数は検査のための人工値であり、いかなる読みにも用いない。本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

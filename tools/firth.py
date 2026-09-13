@@ -113,7 +113,10 @@ def slope_rows(z_sizes, k_ctrl, k_trt, n_ctrl, n_trt):
 def _selftest(B=2000):
     """assert つきの自己検査。閾値はこの関数に書いた値のまま（結果を見て動かさない）。"""
     from scipy.optimize import minimize
-    zs = np.array([-1.9093, -0.8492, 0.0, 0.7111, 1.3006, 2.0974]); n = 200; N6 = np.full(6, n)
+    import os, json
+    from zaxis_A import z_sizes   # z は実パラメータ数から機械計算（凍結前検分の採否表 P60・直書きしない）
+    _T = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'design', 'contrasts-A.json'), encoding='utf-8'))
+    zs = np.array(z_sizes(_T['sizes'])); n = _T['n_per_arm']; N6 = np.full(len(zs), n)
     rng = np.random.default_rng([20260913, 1]); lines = []
 
     # 1. 集約形とベルヌーイ行の一致（統計量・係数）

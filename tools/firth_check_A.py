@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""firth_check_A.py v1 —— tools/firth.py v2 と R logistf の一致検査（claude.ai 三票の採否表 C41・合否規則は design/contrasts-A.json の firth_check・2026-09-13）。
+"""firth_check_A.py v1.1 —— tools/firth.py v2 と R logistf の一致検査（claude.ai 三票の採否表 C41・合否規則は design/contrasts-A.json の firth_check・2026-09-13）。
+v1.1: Python 側の当てはめの打ち切りを正本 firth_check.python_control から読む（R の control と対称・登録者裁定 D14・走らせる前）。z は tools/zaxis_A.py（採否表 P3・P60）。許容差は動かさない。
 走らせる場所: Colab の CPU ランタイム（手元に R は無い）。--install で R（apt の r-base-core）と logistf（CRAN）を入れる。
 手順:
  (1) 本設計型の合成データ 3 配置を firth_check.seed で生成し、ベルヌーイの長形式 CSV に書く。
@@ -24,13 +25,9 @@ ap.add_argument('--python-only', action='store_true'); ap.add_argument('--rscrip
 a = ap.parse_args(); os.makedirs(a.work, exist_ok=True)
 
 
-def params(v):
-    V, h, L, i, nh, nkv, hd = v['vocab_size'], v['hidden_size'], v['num_hidden_layers'], v['intermediate_size'], v['num_attention_heads'], v['num_key_value_heads'], v['head_dim']
-    return V * h * (1 if v.get('tie_word_embeddings', False) else 2) + L * (h * nh * hd + 2 * h * nkv * hd + nh * hd * h + 2 * hd + 3 * h * i + 2 * h) + h
-
-
-PAR = {k: params(v) for k, v in HF['models'].items()}
-ZS = np.array([math.log(PAR[k] / PAR['4B']) for k in T['sizes']]); ZSPAN = float(ZS[-1]); n = T['n_per_arm']
+from zaxis_A import z_sizes
+ZS = np.array(z_sizes(T['sizes'])); ZSPAN = float(ZS[-1]); n = T['n_per_arm']
+PC = FC['python_control']   # Python 側の当てはめの打ち切り（R の control と対称・登録者裁定 D14・走らせる前に登録）
 SYN = [('synth_rising_ptconst', np.linspace(0.3, 0.9, len(ZS)), 'const', 0.15), ('synth_mid_delta', np.full(len(ZS), 0.5), 'slope', 0.15), ('synth_floor_sparse', np.full(len(ZS), 0.03), 'slope', 0.05)]
 
 
@@ -57,10 +54,10 @@ def py_fit(ds, resp, covs, inter, tests):
     cols = [np.ones(len(data))] + [np.array([float(row[idx[c]]) for row in data]) for c in covs]
     if inter:
         cols.append(cols[names.index(inter[0])] * cols[names.index(inter[1])]); names.append('%s:%s' % inter)
-    X = np.column_stack(cols); full = firth.fit(X, y)
-    out = {'coef': dict(zip(names, full['beta'].tolist())), 'loglik_full': full['ll'], 'converged': bool(full['converged']), 'tests': {}}
+    X = np.column_stack(cols); full = firth.fit(X, y, gtol=PC['gtol'], tol=PC['tol'], max_iter=PC['max_iter'])
+    out = {'coef': dict(zip(names, full['beta'].tolist())), 'loglik_full': full['ll'], 'converged': bool(full['converged']), 'score_max': float(full['score_max']), 'tests': {}}
     for t in tests:
-        j = names.index(t); rr = firth.fit(X, y, fixed={j: 0.0})
+        j = names.index(t); rr = firth.fit(X, y, fixed={j: 0.0}, gtol=PC['gtol'], tol=PC['tol'], max_iter=PC['max_iter'])
         out['tests'][t] = {'loglik_restricted': rr['ll'], 'stat': 2.0 * (full['ll'] - rr['ll']), 'converged': bool(rr['converged'])}
     return out
 
@@ -93,7 +90,7 @@ for ds in present:
     res[ds[0]] = {'coef_max_abs_diff': d_coef, 'penalized_loglik_abs_diff': d_ll, 'plr_stat_max_abs_diff': d_stat, 'pass': ok, 'python': py, 'R': rr}
 sess = open(os.path.join(a.work, 'r_session.txt'), encoding='utf-8').read().strip().split('\n') if os.path.isfile(os.path.join(a.work, 'r_session.txt')) else []
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
-out = {'generated_utc': now, 'verdict': 'PASS' if allpass else 'FAIL', 'tolerances': TOL, 'rule': FC['rule'], 'R_session': sess, 'R_control': FC['R_control'],
+out = {'generated_utc': now, 'verdict': 'PASS' if allpass else 'FAIL', 'tolerances': TOL, 'rule': FC['rule'], 'R_session': sess, 'R_control': FC['R_control'], 'python_control': PC,
        'firth_py_sha16': sha_file(os.path.join(REPO, 'tools', 'firth.py')), 'firth_version': firth.VERSION, 'contrasts_sha16': sha_file(CPATH), 'datasets': res}
 json.dump(out, open(os.path.join(REPO, 'records', 'A', 'firth-check-A.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 L = ['# Firth の一致検査（機械生成・`tools/firth_check_A.py` v1・%s UTC）' % now, '', '- 判定: **%s**（規則: %s）' % (out['verdict'], FC['rule']), '- 許容差: %s' % json.dumps(TOL), '- R: %s・control `%s`' % ('・'.join(sess), FC['R_control']),

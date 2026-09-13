@@ -1,0 +1,319 @@
+# -*- coding: utf-8 -*-
+"""confirm_A.py v1.1 —— 段階 A の確証の判定の共通関数（凍結前検分の採否表 P3・P9〜P14・登録者裁定 D1・D10・D11・2026-09-13）。
+v1.1（登録者裁定 D9 の手順3）: 札の率の模擬（simulate_cell・card_tally・card_summary）と既測基底の行の処置の率・余地のある向き（reach_treatment・reach_direction）を格子から移し、測れた効果種（measurable_effect_types・登録者裁定 D11）を置く。格子（転記行 D）と集計器が同じ関数で数える。判定の論理（contrast 以下）は v1 と同じ。
+格子（power_grid_A）・集計器（analyze_A）・合成検査（synth_A）・正本の生成器（make_contrasts_A の札の全組合せ表）が同じ関数を import する（二重実装をしない）。
+- contrast(): 両腕条件の検閲（整数演算・超）→ 残存規模で β₃ の Firth PPLRT・解釈条項・pt 差の傾き（重み付き最小二乗・連続性補正・固定効果型の se・正規近似）→ p*＝max(p_β, p_pt)（向きが不一致なら 1）。
+- holm(): Holm（m 固定・p ≤ α/(m−r+1)・同順位は登録順）。
+- refuse_gate(): 答えた分母での再フィットと (a)(b)(c)(d)。
+- style_flags(): 様式門（(a)(b) の差・超・保留と注）。
+- label_family(): 札の二段（段 0 判定不能 → 段 1 β₃ の Holm で非有意 → 段 2 第一適合）・当てはまった規則の全旗・p* の Holm の水準と区間・降格の三行。
+- combo_rows(): 札の全組合せ表（段 0 の三理由・段 1・段 2 の 48 行）。
+- simulate_cell()・reach_treatment()・measurable_effect_types(): 札の率の模擬・既測基底の行の処置の率・測れた効果種（格子と集計器が共有）。
+用法: python tools/confirm_A.py --selftest（assert つき・全組合せ表の全行を判定関数で発火・Holm の単調性・検閲の整数境界）。
+柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
+"""
+import os, sys, math, json, itertools
+from fractions import Fraction
+import numpy as np
+from scipy.stats import norm
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import firth
+from firth import slope_rows
+VERSION = 'v1.1'
+LABEL_KEYS = ('undecidable', 'ns', 'clause', 'scale_only', 'refuse', 'style', 'env', 'confirmed')
+STAGE0_REASONS = ('gate2_shrink', 'residual', 'nonconverged')
+STYLE_STATES = ('none', 'note', 'hold')
+
+
+class Rules:
+    """正本 JSON（design/contrasts-A.json）から判定に要る定数だけを読む。"""
+
+    def __init__(self, T, censor_low=None, censor_high=None):
+        F = T['families']['A_slope']; CR = F['confirm_rule']; PS = CR['pt_slope']
+        self.alpha = F['alpha']; self.m = F['m']; self.min_sizes = F['model']['min_sizes']; self.clause_min = F['interpretation_clause']['min_sizes']
+        self.low = Fraction(str(T['censor']['low'] if censor_low is None else censor_low)); self.high = Fraction(str(T['censor']['high'] if censor_high is None else censor_high))
+        self.cc = PS['continuity']; self.off = PS['denominator_offset']; self.scale = PS['print_scale']
+        self.labels = CR['labels']
+        G = F['refuse_gate']; self.ref_min_ok = G['answered_min_n_ok']; self.ref_min_sizes = G['min_sizes']; self.ref_drift = Fraction(G['refuse_drift_pt'], 100)
+        S = T['style_gate']; self.style_hold = Fraction(S['hold_pt'], 100); self.style_note = Fraction(S['note_pt'], 100)
+
+
+def _lt(k, n, thr):
+    """k/n < thr を整数で（thr は Fraction）。"""
+    return np.asarray(k, dtype=np.int64) * thr.denominator < thr.numerator * np.asarray(n, dtype=np.int64)
+
+
+def _gt(k, n, thr):
+    return np.asarray(k, dtype=np.int64) * thr.denominator > thr.numerator * np.asarray(n, dtype=np.int64)
+
+
+def contrast(R, zs, kc, kt, nc, nt, extra_keep=None):
+    """対照（B）と処置（A）の規模ごとの破局数と全分母 n_ok から、一対比の判定材料を返す。extra_keep は測定不能・錨帯除外で外す規模（False が外す）。"""
+    zs = np.asarray(zs, float); kc = np.asarray(kc, np.int64); kt = np.asarray(kt, np.int64); nc = np.asarray(nc, np.int64); nt = np.asarray(nt, np.int64)
+    lowc, lowt, highc, hight = _lt(kc, nc, R.low), _lt(kt, nt, R.low), _gt(kc, nc, R.high), _gt(kt, nt, R.high)
+    censored = (lowc & lowt) | (highc & hight); keep = ~censored & (nc > 0) & (nt > 0)
+    if extra_keep is not None:
+        keep = keep & np.asarray(extra_keep, bool)
+    kept = int(keep.sum()); base = {'kept': kept, 'keep': keep.tolist(), 'censored': censored.tolist()}
+    if kept < R.min_sizes:
+        return dict(base, status='undecidable', reason='residual')
+    idx = np.where(keep)[0]
+    X, y, m = slope_rows(zs[idx], kc[idx], kt[idx], nc[idx], nt[idx]); r = firth.pplrt(X, y, 3, m)
+    if not r['converged']:
+        return dict(base, status='nonconverged', reason='nonconverged')
+    satB = int((lowc | highc)[idx].sum()); satA = int((lowt | hight)[idx].sum())
+    d = kt[idx] / nt[idx] - kc[idx] / nc[idx]
+    qc = (kc[idx] + R.cc) / (nc[idx] + R.off); qt = (kt[idx] + R.cc) / (nt[idx] + R.off)
+    w = 1.0 / (qc * (1 - qc) / nc[idx] + qt * (1 - qt) / nt[idx]); zz = zs[idx]; zb = float((w * zz).sum() / w.sum()); sxx = float((w * (zz - zb) ** 2).sum())
+    slope = float((w * (zz - zb) * d).sum() / sxx); se = math.sqrt(1.0 / sxx); zpt = slope / se; p_pt = float(2.0 * norm.sf(abs(zpt)))
+    sb = float(np.sign(r['beta'])); same = (float(np.sign(slope)) == sb) and sb != 0.0
+    return dict(base, status='ok', idx=idx.tolist(), p_beta=float(r['p']), beta=float(r['beta']), stat=float(r['stat']), sat_A=satA, sat_B=satB,
+                clause=(satA >= R.clause_min or satB >= R.clause_min), slope=slope, se=se, z_pt=zpt, p_pt=p_pt, same=same, p_star=(max(float(r['p']), p_pt) if same else 1.0))
+
+
+def holm(p, alpha):
+    """Holm（p ≤ α/(m−r+1)・順位は p の昇順で同順位は登録順）。戻り値: 棄却・順位（1 始まり）・その順位の調整水準。"""
+    p = np.asarray(p, float); m = len(p); order = np.argsort(p, kind='stable'); thr = alpha / (m - np.arange(m))
+    k = int(np.cumprod(p[order] <= thr).sum()); rej = np.zeros(m, bool); rej[order[:k]] = True
+    rank = np.empty(m, int); rank[order] = np.arange(1, m + 1)
+    return rej, rank, alpha / (m - rank + 1)
+
+
+def refuse_gate(R, zs, kc, kt, rc, rt, nc, nt, res):
+    """全分母で当てはめた res（contrast の戻り値）に、答えた分母（n_ok−refuse）での再フィットと (a)(b)(c)(d) を当てる。"""
+    out = {'applied': False, 'hold': False, 'reasons': []}
+    if res.get('status') != 'ok':
+        return out
+    out['applied'] = True
+    zs = np.asarray(zs, float); kc = np.asarray(kc, np.int64); kt = np.asarray(kt, np.int64); rc = np.asarray(rc, np.int64); rt = np.asarray(rt, np.int64); nc = np.asarray(nc, np.int64); nt = np.asarray(nt, np.int64)
+    idx = np.asarray(res['idx']); ac = nc - rc; at = nt - rt; j = idx[(ac[idx] >= R.ref_min_ok) & (at[idx] >= R.ref_min_ok)]
+    if len(j) < R.ref_min_sizes:
+        out['reasons'].append('d')
+    else:
+        X, y, m = slope_rows(zs[j], kc[j], kt[j], ac[j], at[j]); ra = firth.pplrt(X, y, 3, m)
+        if not ra['converged']:
+            out['reasons'].append('d')
+        else:
+            if np.sign(ra['beta']) != np.sign(res['beta']) or ra['beta'] == 0.0:
+                out['reasons'].append('a')
+            if ra['p'] >= R.alpha:
+                out['reasons'].append('b')
+            out['answered'] = {'beta': float(ra['beta']), 'p': float(ra['p']), 'sizes': j.tolist()}
+    e0, e1 = int(idx[0]), int(idx[-1])
+    drift = lambda r_, n_: abs(Fraction(int(r_[e1]), int(n_[e1])) - Fraction(int(r_[e0]), int(n_[e0])))
+    if drift(rc, nc) > R.ref_drift or drift(rt, nt) > R.ref_drift:
+        out['reasons'].append('c')
+    out['hold'] = bool(out['reasons'])
+    return out
+
+
+def style_flags(R, a_A, a_B, b_A, b_B, n_A, n_B, keep):
+    """様式門: 残存規模ごとに (a)(b) の差（二腕の率の差の絶対値・超）。hold_pt 超が一つでもあれば保留、note_pt 超なら注。"""
+    worst = Fraction(0); where = []
+    for i, kp in enumerate(keep):
+        if not kp:
+            continue
+        for nm, xa, xb in (('a', a_A, a_B), ('b', b_A, b_B)):
+            if n_A[i] and n_B[i]:
+                dlt = abs(Fraction(int(xa[i]), int(n_A[i])) - Fraction(int(xb[i]), int(n_B[i])))
+                if dlt > worst:
+                    worst = dlt
+                if dlt > R.style_note:
+                    where.append({'size_index': i, 'kind': nm, 'diff_pt': float(dlt * 100)})
+    state = 'hold' if worst > R.style_hold else ('note' if worst > R.style_note else 'none')
+    return {'state': state, 'max_diff_pt': float(worst * 100), 'cells': where}
+
+
+def _stage2(clause, star, refuse, style, env, L):
+    applied = [nm for nm, on in (('interpretation_clause', clause), ('iut_not_rejected', not star), ('refuse_gate', refuse), ('style_gate_hold', style == 'hold'), ('environment_hold', env)) if on]
+    lab = {'interpretation_clause': L['clause'], 'iut_not_rejected': L['scale_only'], 'refuse_gate': L['refuse'], 'style_gate_hold': L['style'], 'environment_hold': L['env']}
+    return (lab[applied[0]] if applied else L['confirmed']), applied
+
+
+def row_id(stage, **kw):
+    if stage == 0:
+        return 'U-' + kw['reason']
+    if stage == 1:
+        return 'NS'
+    return 'R-C%dS%dF%dY%sE%d' % (int(kw['clause']), int(kw['star']), int(kw['refuse']), {'none': 'n', 'note': 't', 'hold': 'h'}[kw['style']], int(kw['env']))
+
+
+def combo_rows(L):
+    """札の全組合せ表（入力・札・当てはまる規則）。段 2 は解釈条項 × p* の棄却 × refuse 門 × 様式（なし・注・保留）× 環境保留。"""
+    rows = [{'id': row_id(0, reason=r), 'stage': 0, 'inputs': {'pre': r}, 'label': L['undecidable'], 'rules': [r], 'fireable': True} for r in STAGE0_REASONS]
+    rows.append({'id': 'NS', 'stage': 1, 'inputs': {'pre': 'ok', 'beta_holm_rejected': False}, 'label': L['ns'], 'rules': ['beta_not_rejected'], 'fireable': True})
+    for clause, star, refuse, style, env in itertools.product((False, True), (True, False), (False, True), STYLE_STATES, (False, True)):
+        lab, applied = _stage2(clause, star, refuse, style, env, L)
+        rows.append({'id': row_id(2, clause=clause, star=star, refuse=refuse, style=style, env=env), 'stage': 2,
+                     'inputs': {'pre': 'ok', 'beta_holm_rejected': True, 'clause': clause, 'star_holm_rejected': star, 'refuse_hold': refuse, 'style': style, 'env_hold': env},
+                     'label': lab, 'rules': applied + (['style_gate_note'] if style == 'note' else []), 'fireable': True})
+    return rows
+
+
+def interval(R, slope, se, level):
+    zc = float(norm.isf(level / 2.0)); return [R.scale * (slope - zc * se), R.scale * (slope + zc * se)]
+
+
+CARD_KEYS = ('undecidable', 'nonconverged', 'ok', 'sat2_ok', 'rej_nom', 'rej_h1', 'clause_and_rej', 'd4_nom', 'd4_h1', 'd1_nom', 'd1_h1', 'scale_only_h1', 'kept_sum')
+RATE_CLIP = (0.001, 0.999)
+
+
+def wilson(k, N, zc=1.96):
+    """Wilson の 95% 区間（丸め 4 桁）。"""
+    if N == 0:
+        return [None, None]
+    p = k / N; den = 1 + zc * zc / N; cen = (p + zc * zc / (2 * N)) / den; hw = zc * math.sqrt(p * (1 - p) / N + zc * zc / (4 * N * N)) / den
+    return [round(max(0.0, cen - hw), 4), round(min(1.0, cen + hw), 4)]
+
+
+def card_tally(R, cnt, r):
+    """contrast() の戻り値を札の件数に足す。札 草案4＝β₃ が名目（初段）で解釈条項なし。札 D1＝それに加えて pt 差の傾きが同じ水準で立ち同じ向き（初段では p* ≤ α/m）。"""
+    cnt['kept_sum'] += r['kept']
+    if r['status'] != 'ok':
+        cnt[r['status']] += 1; return
+    cnt['ok'] += 1; S = r['clause']; Rn = r['p_beta'] <= R.alpha; RH = r['p_beta'] <= R.alpha / R.m
+    pt_nom = r['p_pt'] <= R.alpha and r['same']; pt_h1 = r['p_pt'] <= R.alpha / R.m and r['same']
+    cnt['sat2_ok'] += S; cnt['rej_nom'] += Rn; cnt['rej_h1'] += RH; cnt['clause_and_rej'] += (Rn and S)
+    cnt['d4_nom'] += Rn and not S; cnt['d4_h1'] += RH and not S
+    cnt['d1_nom'] += Rn and not S and pt_nom; cnt['d1_h1'] += RH and not S and pt_h1; cnt['scale_only_h1'] += RH and not S and not pt_h1
+
+
+def card_summary(cnt, B):
+    """札の件数を B 回あたりの率にする（無条件率を主に・条件付き率と Wilson 区間を併記）。"""
+    ok = cnt['ok']; u = lambda k: round(cnt[k] / B, 4)
+    return {'B': B, 'undecidable_censor': u('undecidable'), 'nonconverged': u('nonconverged'), 'n_fit': ok, 'mean_kept_sizes': round(cnt['kept_sum'] / B, 2),
+            'reject_nominal': u('rej_nom'), 'reject_nominal_ci95': wilson(cnt['rej_nom'], B), 'reject_nominal_conditional': round(cnt['rej_nom'] / ok, 4) if ok else None,
+            'reject_nominal_conditional_ci95': wilson(cnt['rej_nom'], ok),
+            'reject_holm_first': u('rej_h1'), 'clause_rate_among_fit': round(cnt['sat2_ok'] / ok, 4) if ok else None, 'reject_and_clause': u('clause_and_rej'),
+            'card_draft4_nominal': u('d4_nom'), 'card_draft4_holm_first': u('d4_h1'), 'card_D1_nominal': u('d1_nom'), 'card_D1_nominal_ci95': wilson(cnt['d1_nom'], B),
+            'card_D1_holm_first': u('d1_h1'), 'card_D1_holm_first_ci95': wilson(cnt['d1_h1'], B), 'scale_only_holm_first': u('scale_only_h1')}
+
+
+def simulate_cell(R, zs, n, pc, pt, B, rng, extra_keep=None):
+    """対照の真の率 pc と処置の真の率 pt（規模ごと）から二項を B 回引き、札の率を返す（格子の転記行 D と集計器の測れた効果種が同じ関数・乱数は各回に対照→処置の順で消費）。"""
+    cnt = dict.fromkeys(CARD_KEYS, 0); NN = np.full(len(zs), n)
+    for _ in range(B):
+        card_tally(R, cnt, contrast(R, zs, rng.binomial(n, pc), rng.binomial(n, pt), NN, NN, extra_keep))
+    return card_summary(cnt, B)
+
+
+def reach_direction(rate_A_4B):
+    """余地のある向き: 4B の処置の率が真ん中より下なら上向き（＋）・そうでなければ下向き（−）。"""
+    return 1.0 if rate_A_4B < 0.5 else -1.0
+
+
+def reach_treatment(pc, d0, D, zs, z_center, zspan):
+    """処置の真の率＝対照＋d0＋Δ·(z−z_中心)/z_span を RATE_CLIP で切り詰める（転記行 D の既測基底の行と同じ式）。戻り値: (率, 切り詰めた規模数)。"""
+    raw = np.asarray(pc, float) + d0 + D * (np.asarray(zs, float) - z_center) / zspan
+    return np.clip(raw, RATE_CLIP[0], RATE_CLIP[1]), int(((raw > RATE_CLIP[1]) | (raw < RATE_CLIP[0])).sum())
+
+
+def at_least_one(ps):
+    """独立を仮定した「少なくとも一本」の確率。"""
+    q = 1.0
+    for p in ps:
+        q *= 1.0 - p
+    return 1.0 - q
+
+
+def measurable_effect_types(R, T, zs, z_center, zspan, rows, B=None, seed=None):
+    """測れた効果種（登録者裁定 D11・正本 reading_selection.measurable_effect_type）。
+    rows: 登録順の対比ごとの dict（id・effect・pc〔規模ごとの実測の対照の率〕・rA4・rB4〔4B の処置と対照の実測の率〕・keep〔測定不能・錨帯で外す規模は False・None は外さない〕・at4_ok〔4B の点が残るか〕）。
+    戻り値: (対比ごとの list, 効果種ごとの dict)。観測された効果量は使わない（Δ は正本の delta・向きは余地のある向き）。"""
+    ME = T['reading_selection']['measurable_effect_type']; B = ME['B_per_contrast'] if B is None else B; seed = ME['seed'] if seed is None else seed
+    per = []; by = {}
+    for i, r in enumerate(rows):
+        if not r['at4_ok']:
+            p = 0.0; det = {'reason': '4B の点が外れた'}
+        else:
+            rng = np.random.default_rng([seed, i]); pc = np.asarray(r['pc'], float); pc = np.clip(np.where(np.isfinite(pc), pc, 0.5), RATE_CLIP[0], RATE_CLIP[1])
+            d0 = float(r['rA4'] - r['rB4']); D = ME['delta'] * reach_direction(r['rA4'])
+            pt, clipped = reach_treatment(pc, d0, D, zs, z_center, zspan)
+            det = simulate_cell(R, zs, T['n_per_arm'], pc, pt, B, rng, r.get('keep')); det.update(clipped_sizes=clipped, delta_value=D, d0=d0)
+            p = det['card_D1_holm_first']
+        per.append({'id': r['id'], 'effect': r['effect'], 'p_card_D1_first': p, 'detail': det}); by.setdefault(r['effect'], []).append(p)
+    types = {}
+    for e, ps in by.items():
+        a1 = at_least_one(ps); types[e] = {'n_contrasts': len(ps), 'at_least_one': a1, 'measurable': bool(a1 >= ME['threshold'])}
+    return per, types
+
+
+def label_family(R, results, flags=None, gate2_shrink=False):
+    """results: 登録順の contrast() の戻り値（長さ m）。flags: 対比ごとの dict（refuse_hold・style〔none/note/hold〕・env_hold・env_reasons）。
+    戻り値: 対比ごとの dict（label・stage・row・rules・upper・beta_holm〔棄却・順位・水準〕・star_holm〔同〕・interval_pt）。"""
+    m = R.m; assert len(results) == m, ('m は固定', len(results), m); L = R.labels
+    flags = flags or [{} for _ in results]
+    pb = [r['p_beta'] if r.get('status') == 'ok' else 1.0 for r in results]; ps = [r['p_star'] if r.get('status') == 'ok' else 1.0 for r in results]
+    rb, kb, lb = holm(pb, R.alpha); rs, ks, ls = holm(ps, R.alpha); out = []
+    for i, (r, f) in enumerate(zip(results, flags)):
+        o = {'beta_holm': {'rejected': bool(rb[i]), 'rank': int(kb[i]), 'level': float(lb[i])}, 'star_holm': {'rejected': bool(rs[i]), 'rank': int(ks[i]), 'level': float(ls[i])}}
+        if gate2_shrink or r.get('status') != 'ok':
+            reason = 'gate2_shrink' if gate2_shrink else r.get('reason', 'residual')
+            o.update(label=L['undecidable'], stage=0, row=row_id(0, reason=reason), rules=[reason], upper=None)
+        elif not rb[i]:
+            o.update(label=L['ns'], stage=1, row='NS', rules=['beta_not_rejected'], upper=None)
+        else:
+            style = f.get('style', 'none'); lab, applied = _stage2(bool(r['clause']), bool(rs[i]), bool(f.get('refuse_hold')), style, bool(f.get('env_hold')), L)
+            o.update(label=lab, stage=2, row=row_id(2, clause=bool(r['clause']), star=bool(rs[i]), refuse=bool(f.get('refuse_hold')), style=style, env=bool(f.get('env_hold'))),
+                     rules=applied + (['style_gate_note'] if style == 'note' else []), upper=L['confirmed'])
+        if r.get('status') == 'ok':
+            o['interval_pt'] = interval(R, r['slope'], r['se'], float(ls[i])); o['slope_pt'] = R.scale * r['slope']
+        out.append(o)
+    return out
+
+
+def _selftest():
+    here = os.path.dirname(os.path.abspath(__file__)); T = json.load(open(os.path.join(os.path.dirname(here), 'design', 'contrasts-A.json'), encoding='utf-8'))
+    R = Rules(T); L = R.labels; lines = []
+    # 1. 検閲の整数境界: k/n < low ⇔ k ≤ ceil(low·n)−1・k/n > high ⇔ k ≥ floor(high·n)+1
+    for nn in range(1, 501):
+        klo = math.ceil(R.low * nn) - 1; khi = math.floor(R.high * nn) + 1; ks = np.arange(nn + 1)
+        assert np.array_equal(_lt(ks, nn, R.low), ks <= klo) and np.array_equal(_gt(ks, nn, R.high), ks >= khi), nn
+    lines.append('1 検閲の整数境界: n=1〜500 で率の比較と整数境界が一致')
+    # 2. 全組合せ表の全行を判定関数で発火（段 2 は一対比ずつ入力を構成し、Holm の棄却は p で決める）
+    rows = combo_rows(L); fired = set()
+    base_ok = {'status': 'ok', 'slope': 0.01, 'se': 0.001, 'clause': False}
+    for row in rows:
+        inp = row['inputs']; res = [{'status': 'undecidable', 'reason': 'residual'} for _ in range(R.m)]; fl = [{} for _ in range(R.m)]; g2 = False
+        if row['stage'] == 0:
+            if inp['pre'] == 'gate2_shrink':
+                g2 = True; res[0] = dict(base_ok, p_beta=1e-9, p_star=1e-9)
+            else:
+                res[0] = {'status': 'undecidable' if inp['pre'] == 'residual' else 'nonconverged', 'reason': inp['pre']}
+        elif row['stage'] == 1:
+            res[0] = dict(base_ok, p_beta=0.5, p_star=0.5)
+        else:
+            res[0] = dict(base_ok, p_beta=1e-9, p_star=(1e-9 if inp['star_holm_rejected'] else 0.5), clause=inp['clause'])
+            fl[0] = {'refuse_hold': inp['refuse_hold'], 'style': inp['style'], 'env_hold': inp['env_hold']}
+        o = label_family(R, res, fl, gate2_shrink=g2)[0]
+        assert o['row'] == row['id'] and o['label'] == row['label'], (row, o); fired.add(o['row'])
+    assert len(fired) == len(rows) == len(STAGE0_REASONS) + 1 + 2 * 2 * 2 * len(STYLE_STATES) * 2, (len(fired), len(rows))
+    lines.append('2 札の全組合せ表: %d 行を判定関数で一度ずつ発火（札と行 id が一致）' % len(rows))
+    # 3. Holm の単調性（p* ≥ p_β なら p* の Holm の棄却 ⊆ β₃ の Holm の棄却）
+    rng = np.random.default_rng([20260913, 3]); viol = 0
+    for _ in range(20000):
+        pb = rng.random(R.m) ** rng.uniform(1, 8); pp = rng.random(R.m) ** rng.uniform(1, 8); same = rng.random(R.m) < 0.8
+        rb, _, _ = holm(pb, R.alpha); rs, _, _ = holm(np.where(same, np.maximum(pb, pp), 1.0), R.alpha); viol += int((rs & ~rb).any())
+    assert viol == 0, viol
+    lines.append('3 Holm の単調性: 乱数 20,000 回で例外 0')
+    # 4. contrast と refuse_gate の経路（中間域の効果・判定不能・検閲）
+    from zaxis_A import z_sizes
+    zs = np.array(z_sizes(T['sizes'])); n = T['n_per_arm']; N6 = np.full(len(zs), n)
+    kc = np.full(len(zs), n // 2); kt = np.round(n * np.clip(0.5 + 0.2 * (zs - zs[2]) / (zs[-1] - zs[2]), 0.01, 0.99)).astype(int)
+    r = contrast(R, zs, kc, kt, N6, N6); assert r['status'] == 'ok' and r['p_star'] >= r['p_beta'] and r['same'], r
+    g = refuse_gate(R, zs, kc, kt, np.zeros(len(zs), int), np.zeros(len(zs), int), N6, N6, r); assert g['applied'] and not g['hold'], g
+    ru = contrast(R, zs, np.zeros(len(zs), int), np.zeros(len(zs), int), N6, N6); assert ru['status'] == 'undecidable' and ru['kept'] == 0, ru
+    lines.append('4 contrast・refuse_gate: 中間域の効果で ok（p*≥p_β・向き一致・門の保留なし）・両腕 0 で判定不能（残存 0）')
+    # 5. 模擬と測れた効果種（同じ乱数で同じ結果・4B の点が外れた対比は零・経路の発火）
+    zc5 = float(zs[2]); zsp5 = float(zs[-1] - zs[2]); pc5 = np.full(len(zs), 0.5); pt5, cl5 = reach_treatment(pc5, 0.0, 0.15, zs, zc5, zsp5)
+    s1 = simulate_cell(R, zs, n, pc5, pt5, 5, np.random.default_rng([1, 2])); s2 = simulate_cell(R, zs, n, pc5, pt5, 5, np.random.default_rng([1, 2])); assert s1 == s2 and cl5 == 0, (s1, s2, cl5)
+    rows5 = [{'id': 'x%d' % i, 'effect': 'e%d' % (i % 2), 'pc': list(pc5), 'rA4': 0.5, 'rB4': 0.5, 'keep': None, 'at4_ok': i != 1} for i in range(3)]
+    per5, types5 = measurable_effect_types(R, T, zs, zc5, zsp5, rows5, B=3, seed=7)
+    assert len(per5) == 3 and per5[1]['p_card_D1_first'] == 0.0 and set(types5) == {'e0', 'e1'} and reach_direction(0.2) == 1.0 and reach_direction(0.5) == -1.0, (per5, types5)
+    lines.append('5 simulate_cell・measurable_effect_types: 同じ乱数で同じ結果・4B の点が外れた対比は零・余地のある向きの境')
+    print('confirm_A.py %s SELFTEST PASS' % VERSION); print('\n'.join(lines))
+
+
+if __name__ == '__main__':
+    if '--selftest' in sys.argv:
+        _selftest()

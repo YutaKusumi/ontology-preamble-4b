@@ -1,0 +1,81 @@
+# -*- coding: utf-8 -*-
+"""freeze_A.py v1 —— 段階 A の凍結マニフェストを発行・検証する（発行は登録者の凍結指示があってから・2026-09-13 整備・登録者裁定 D9 の三つ目の手順）。
+凍結範囲（FILES）: 凍結本文・正本と生成器・確証と帯と読み出しの共通関数・Firth の基準実装と一致検査・格子と設計事実とその出力・本文の数の検査と組み立て器・走行器と起動器・
+  門・集計・様式・整合・抽出・断片・管理図の器・合成検査とその記録・報告の組み立て器と走査器・報告雛形（原稿と組み立て）・機種の記録・盤の台帳と凍結物の写し（前置き・場面・パーサ）・
+  門0.5 と Firth の一致検査の記録・凍結器。
+発行の前に、報告雛形に正本 report_rules.frames の枠の見出しがすべて実在することを機械検証する（無ければ発行しない・frames_rule）。
+出力: records/freeze-A-<日付>.json（同名があれば連番・上書きなし）。--verify <manifest> で現物と突合（不一致は非零終了）。SHA16 はファイルバイトの SHA-256 先頭 16 桁（CRLF→LF 正規化・strip なし）。
+用法: python tools/freeze_A.py --design design/design-stageA-FROZEN.md [--check]（--check は発行せずに一覧・欠け・枠の検証だけを印字）
+      python tools/freeze_A.py --verify records/freeze-A-<日付>.json
+柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
+"""
+import os, sys, json, glob, argparse, datetime
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import runs_A
+REPO = runs_A.REPO
+VERSION = 'v1'
+TOOLS = ['make_contrasts_A.py', 'confirm_A.py', 'bands_A.py', 'runs_A.py', 'zaxis_A.py', 'firth.py', 'firth_check_A.py', 'firth_check_A.R', 'power_grid_A.py', 'design_facts_A.py', 'numbers_lint.py', 'build_draftA.py',
+         'run_preamble_local.py', 'colab/boot_stageA.py', 'identity_screen_A.py', 'gate_A.py', 'calib_band_A.py', 'control_chart_A.py', 'analyze_A.py', 'response_mode_A.py', 'integrity_A.py',
+         'sample_inspection_A.py', 'judge_fragments_A.py', 'synth_A.py', 'synth_gates_A.py', 'build_report_A.py', 'report_lint.py', 'freeze_A.py', 'cost_facts.py']
+RECORDS = ['design/contrasts-A.json', 'records/A/power-grid-A.json', 'records/A/power-grid-A.md', 'records/A/design-facts-A.json', 'records/A/design-facts-A.md', 'records/A/hf-models-A.json',
+           'records/A/results-report-template-A.src.md', 'records/A/results-report-template-A.md', 'records/A/identity-screen-A.json', 'records/A/identity-screen-A.md', 'records/A/firth-check-A.json', 'records/A/firth-check-A.md',
+           'arms/panel/SHA-LEDGER.json', 'arms/frozen-from-ryokai-os/app-scenarios.json', 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
+           'arms/frozen-from-ryokai-os/armsE/preamble-O.md', 'arms/frozen-from-ryokai-os/armsE/preamble-Onull.md', 'arms/frozen-from-ryokai-os/armsE/preamble-Lneg.md', 'design/contrasts-F.json']
+GLOBS = ['records/A/synth-A-*.json', 'records/A/synth-A-*.md', 'records/A/synth-gates-A-*.json', 'records/A/synth-gates-A-*.md', 'records/A/numbers-lint-*A*.md']
+
+
+def rel(p):
+    return p.replace('\\', '/')
+
+
+def file_list(design):
+    fs = [design, 'design/design-stageA-draft7.src.md'] + ['tools/' + t for t in TOOLS] + RECORDS
+    T = runs_A.load_T()
+    fs += ['arms/panel/%s.md' % a for a in T['arms']['preamble'] if a not in ('N', 'O', 'Onull', 'Lneg')]
+    for g in GLOBS:
+        fs += sorted(rel(os.path.relpath(p, REPO)) for p in glob.glob(os.path.join(REPO, g)))
+    seen = set(); out = []
+    for f in fs:
+        if f not in seen:
+            seen.add(f); out.append(f)
+    return out
+
+
+def frames_check(T):
+    tp = os.path.join(REPO, T['report_rules']['template'])
+    if not os.path.exists(tp):
+        return ['雛形が無い: %s' % T['report_rules']['template']]
+    heads = [l for l in open(tp, encoding='utf-8').read().split('\n') if l.startswith('#')]
+    return ['枠の見出しが無い: %s' % f for f in T['report_rules']['frames'] if not any(f in h for h in heads)]
+
+
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser(); ap.add_argument('--design', default='design/design-stageA-FROZEN.md'); ap.add_argument('--verify', default=None); ap.add_argument('--check', action='store_true')
+    a = ap.parse_args()
+    if a.verify:
+        MF = runs_A.read_json(a.verify); bad = []
+        for f, want in MF['files'].items():
+            p = os.path.join(REPO, f)
+            got = runs_A.sha16_file(p) if os.path.exists(p) else None
+            if got != want:
+                bad.append((f, want, got))
+        print('[freeze_A --verify] %d/%d 一致' % (len(MF['files']) - len(bad), len(MF['files'])))
+        for b in bad:
+            print('  不一致: %s 凍結 %s 現物 %s' % b)
+        sys.exit(1 if bad else 0)
+    T = runs_A.load_T(); files = file_list(a.design); missing = [f for f in files if not os.path.exists(os.path.join(REPO, f))]; fr = frames_check(T)
+    print('[freeze_A] 対象 %d・欠け %d・枠の検証 %s' % (len(files), len(missing), '一致' if not fr else '・'.join(fr)))
+    for m in missing:
+        print('  欠け: %s' % m)
+    if a.check:
+        sys.exit(0 if not fr else 1)
+    if missing or fr:
+        sys.exit('欠けまたは枠の不一致があるので発行しない')
+    stamp = datetime.date.today().isoformat(); p = os.path.join(REPO, 'records', 'freeze-A-%s.json' % stamp); k = 2
+    while os.path.exists(p):
+        p = os.path.join(REPO, 'records', 'freeze-A-%s-%d.json' % (stamp, k)); k += 1
+    MF = {'kind': 'freeze_A', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'design': a.design, 'sha16_rule': 'SHA-256 の先頭 16 桁（CRLF→LF 正規化・strip なし）',
+          'files': {f: runs_A.sha16_file(os.path.join(REPO, f)) for f in files}, 'frames_checked': T['report_rules']['frames'],
+          'clause': '本マニフェストのいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'}
+    json.dump(MF, open(p, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
+    print('[freeze_A] written %s（%d ファイル）' % (p, len(MF['files'])))

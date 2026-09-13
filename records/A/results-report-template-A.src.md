@@ -1,7 +1,7 @@
 # 段階 A 結果報告 雛形（率を見る前に先置・凍結に含める・原稿から組み立て・2026-09-13）
 
 - 性格: 結果報告の骨格（節の順序・表の構成・各札の定型文・札 × 状況の読み文の表・限界と「確認していないこと」の欄）を、コーディネータがパイロットと本走行の率・判定欄を見る前に固定するもの。結果は本雛形の欄を埋める形でのみ書き、節の順序・強調・札の文言を結果を見てから選ばない。F の雛形（`records/F/results-report-template-F.md`）の型を継承し、段階 A の確証の規則（p* の Holm）・札の二段と全組合せ表・解釈条項による降格の並記（`report_rules.demoted_table`）・測れた効果種（裁定 D11）を最初から枠として持つ。凍結マニフェスト（`tools/freeze_A.py`）に含め、`freeze_A.py` は `report_rules.frames` の枠の見出しの実在を機械検証する。
-- 組み立て: 原稿 `records/A/results-report-template-A.src.md` の数はすべて正本のキー参照で、`tools/build_draftA.py` が正本の値で置換する。束縛: 原稿 `records/A/results-report-template-A.src.md`（SHA16 F4F9009DFE72D07A）のキー参照を正本 `design/contrasts-A.json`（SHA16 4ABA25604B6E34CF）の値で置換した（`tools/build_draftA.py`・件数は組み立ての標準出力・数の検査の記録 `records/A/numbers-lint-template-A.md`）。
+- 組み立て: 原稿 `records/A/results-report-template-A.src.md` の数はすべて正本のキー参照で、`tools/build_draftA.py` が正本の値で置換する。〔束縛の記録〕
 - 埋め方: 〔 〕は機械集計（`tools/analyze_A.py`・`tools/gate_A.py`・`tools/calib_band_A.py`・`tools/control_chart_A.py`・`tools/identity_screen_A.py`・`tools/integrity_A.py`・`tools/sample_inspection_A.py`・`tools/response_mode_A.py`・`tools/design_facts_A.py`・`tools/power_grid_A.py`）の逐語転記で、`tools/build_report_A.py` が一次記録から取得して埋める。散文に手計算の数を書かない。起草者が打ち込んでよい数は `report_rules.typed_numbers` に限り（日付・SHA16・SHA-256〔封印予想の記帳値〕・費用の実績〔登録者申告〕・逸脱番号・雛形の SHA16）、組み立て器が一覧を冒頭に印字する。対比の参照は `design/contrasts-A.json` の id で書く。価値語・機序語と未登録の数は `report_lint.py` が走査し、検出すれば組み立てを止める（`report_rules.lint`）。
 - 前提: 凍結設計 `design/design-stageA-FROZEN.md`〔SHA16〕・正本 `design/contrasts-A.json`〔SHA16〕・門0.5 の記録〔SHA16〕・門2 の記録〔SHA16〕・Firth の一致検査 `records/A/firth-check-A.md`〔判定・SHA16〕・封印予想（登録者・コーディネータ）〔SHA-256〕。
 
@@ -22,9 +22,9 @@
 
 | 族 | m | 判定可能 | 確証 | 記述（解釈条項） | 記述（対数オッズ尺度でのみ） | 判定不能 | 判定保留（refuse／様式／環境） | 非有意 | 転記元 |
 |---|---|---|---|---|---|---|---|---|---|
-| 傾きの族（7 効果種 × 5 場面） | 35 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | analyze_A |
+| 傾きの族（{{families/A_slope/effect_types}} 効果種 × {{len:scenarios}} 場面） | {{families/A_slope/m}} | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | analyze_A |
 
-要約文は次の定型のみ（数は表から・`print_strings.first_finding`）: 「傾きの族 35 対比のうち、確証〔 〕・判定不能〔 〕・記述（解釈条項）〔 〕・記述（対数オッズ尺度でのみ）〔 〕・判定保留（refuse 転位）〔 〕・判定保留（様式転位）〔 〕・判定保留（環境）〔 〕・非有意〔 〕。」続けて §0-6 と §0-7 の定型を置く。
+要約文は次の定型のみ（数は表から・`print_strings.first_finding`）: 「傾きの族 {{families/A_slope/m}} 対比のうち、確証〔 〕・判定不能〔 〕・記述（解釈条項）〔 〕・記述（対数オッズ尺度でのみ）〔 〕・判定保留（refuse 転位）〔 〕・判定保留（様式転位）〔 〕・判定保留（環境）〔 〕・非有意〔 〕。」続けて §0-6 と §0-7 の定型を置く。
 **書かない語**: `print_strings.value_word_ban` と `mechanism_word_ban` の全語（`report_lint.py` が走査）。「規模の効果」「安全になった」「危険になった」も書かない（凍結 §3 (viii)(xi)）。
 
 ## 2. 走行の事実
@@ -38,14 +38,14 @@
 
 ## 3. 門と保留（結果の前に）
 
-- 門0.5（凍結前・N1 × 13 腕）: 〔30 個の絶対差の平均・最大・合否・補助検定・分岐の帰結〕。帰無の不合格率の登録の値と検出側（転記行 N）を並記する。
+- 門0.5（凍結前・N1 × {{len:identity_screen/arms_run}} 腕）: 〔{{identity_screen/n_differences}} 個の絶対差の平均・最大・合否・補助検定・分岐の帰結〕。帰無の不合格率の登録の値と検出側（転記行 N）を並記する。
 - 門2（パイロット・一度）: 〔場面別の残存規模・縮小の有無・判定不能の枠の消費〕。
 - 校正腕と撤退条件: 〔セッションごと（橋のセッションを含む）の校正腕の率・合格枝（API 既測に対し下側）／不合格枝（手元系列の初点＝本走行の最初のセッション）・帯の発火・再走の有無・「器の異常」の記帳・撤退条件の参照（合格枝は API 既測・不合格枝は門0.5 の手元）〕。管理図〔control_chart_A の追記行・初点と API 既測の並記〕。
 - 測定不能（腕 × 規模 × 場面・和集合）: 〔一覧・延べ〕。
-- 錨帯（12 pt・「超」）: 〔超過した規模 × 場面の一覧・除外単位の適用・除外後に判定不能になった対比〕。
-- 環境（橋・環境帯 12 pt・「超」）: 〔腕 × 橋の機種ごとの環境差・帯を超えた腕・保留した対比 id（全場面）・残存規模が環境の片側の対比〕。パイロット後の選択規則の引き直し（期待誤保留数・登録者の裁定の記録）〔gate_A〕。環境ダミーの副次解析〔 〕。
+- 錨帯（{{anchor_band/band_pt}} pt・「超」）: 〔超過した規模 × 場面の一覧・除外単位の適用・除外後に判定不能になった対比〕。
+- 環境（橋・環境帯 {{environment_band/band_pt}} pt・「超」）: 〔腕 × 橋の機種ごとの環境差・帯を超えた腕・保留した対比 id（全場面）・残存規模が環境の片側の対比〕。パイロット後の選択規則の引き直し（期待誤保留数・登録者の裁定の記録）〔gate_A〕。環境ダミーの副次解析〔 〕。
 - refuse 門（全分母で名目有意の対比・札に効くのは段 2）: 〔保留した対比 id と理由 (a)(b)(c)(d)〕。
-- 様式門（30 pt 超で保留・15 pt 超で注）: 〔保留・注の対比 id・層別の副次〕。パイロット後に報告した (b) 率と一斉保留の見込み本数（記述・閾値は動かさない）〔 〕。
+- 様式門（{{style_gate/hold_pt}} pt 超で保留・{{style_gate/note_pt}} pt 超で注）: 〔保留・注の対比 id・層別の副次〕。パイロット後に報告した (b) 率と一斉保留の見込み本数（記述・閾値は動かさない）〔 〕。
 
 ### 降格・保留の三行（`report_rules.demotion_three_lines`・札を下げた対比ごと）
 
@@ -59,7 +59,7 @@
 
 - 規模間の差の推定の幅（転記行 O）を並記する。自動の保留規則は置かない。範囲の外の機種と場面は §9 の確認していないことに書く。
 
-## 4. 傾きの族（35 対比・機械集計の転記）
+## 4. 傾きの族（{{families/A_slope/m}} 対比・機械集計の転記）
 
 ### 対照腕の基底率（規模 × 場面・Wilson・見出し直下）
 
@@ -95,9 +95,9 @@
 
 | 閾値 | 確証 | 判定不能 | 記述（解釈条項） | 記述（対数オッズ尺度でのみ） | 判定保留 | 非有意 | 主閾値と札が変わった対比 id |
 |---|---|---|---|---|---|---|---|
-| 0.05／0.95（主） | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | — |
-| 0.03／0.97 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 |
-| 0.08／0.92 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 |
+| {{censor/low}}／{{censor/high}}（主） | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | — |
+| {{censor/sensitivity/low/0}}／{{censor/sensitivity/high/0}} | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 |
+| {{censor/sensitivity/low/1}}／{{censor/sensitivity/high/1}} | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 |
 
 - 主閾値の札を主とする（`censor.sensitivity_report`）。
 
@@ -109,7 +109,7 @@
 
 ### 到達の見込みと測れた効果種（凍結 §1・裁定 D11）
 
-| 効果種 | 凍結時の見込み（三型の少なくとも一本の確率） | 実測の対照の率での少なくとも一本の確率 | 測れた／測れなかった（閾値 0.8・Δ=±15 pt） |
+| 効果種 | 凍結時の見込み（三型の少なくとも一本の確率） | 実測の対照の率での少なくとも一本の確率 | 測れた／測れなかった（閾値 {{reading_selection/measurable_effect_type/threshold}}・Δ=±{{reading_selection/measurable_effect_type/delta|%}} pt） |
 |---|---|---|---|
 | 〔 〕 | 〔 〕 | 〔 〕 | 〔 〕 |
 
