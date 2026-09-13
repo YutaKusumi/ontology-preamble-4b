@@ -147,11 +147,13 @@ t_id = n_id * len(ARMS); t_pilot = len(MODELS) * len(SC) * len(ARMS) * pn; t_mai
 t_anchor = len(AB['models']) * anchor_trials; sess_up = sum(plans['upper']['rows'][m['key']]['sessions'] for m in MODELS); t_cal = sess_up * n_cal
 t_bridge = len(T['bridge']['cells']) * len(T['bridge']['arms']) * T['bridge']['n']; t_api = len(T['seeds']['api_rerun']) * len(ARMS) * n
 t_total = t_id + t_pilot + t_main + t_anchor + t_cal + t_bridge
-F['A'] = {'text': '規模: 門0.5 同一性選別 %s（%s × %d 腕 × n=%d）／パイロット %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／本走行 %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／錨反復 %s（%d 規模 × %d 場面 × %d 腕 × n=%d）／校正腕 %s（機種のセッションごとに n=%d・転記行 F の上界のセッション数の合計 %d）／橋 %s（%s × %d 腕 × n=%d・場面 %s・各機種の本走行の %s と対にする）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（%s × %s × %d 腕 × n=%d）。' % (
+JV = T['judge_validity']; jv_all = len(MODELS) * len(SC) * JV['n_per_cell']; jv_fb = len(JV['fallback_scope']['models']) * len(SC) * JV['n_per_cell']
+F['A'] = {'text': '規模: 門0.5 同一性選別 %s（%s × %d 腕 × n=%d）／パイロット %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／本走行 %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／錨反復 %s（%d 規模 × %d 場面 × %d 腕 × n=%d）／校正腕 %s（機種のセッションごとに n=%d・転記行 F の上界のセッション数の合計 %d）／橋 %s（%s × %d 腕 × n=%d・場面 %s・各機種の本走行の %s と対にする）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（%s × %s × %d 腕 × n=%d）。判定器の妥当性の断片（パイロットから抽出・系統外の盲検判定）: 全機種なら %s（%d 機種 × %d 場面 × %d）・絞る場合 %s（%s × %d 場面 × %d）・範囲は %s。' % (
     format(t_id, ','), T['identity_screen']['scenario'], len(ARMS), n_id, format(t_pilot, ','), len(MODELS), len(SC), len(ARMS), pn, format(t_main, ','), len(MODELS), len(SC), len(ARMS), n,
     format(t_anchor, ','), len(AB['models']), len(AB['scenarios']), len(AB['arms']), n, format(t_cal, ','), n_cal, sess_up,
     format(t_bridge, ','), '・'.join('%s の %s 側' % (k, v['bridge_env']) for k, v in T['bridge']['cells'].items()), len(T['bridge']['arms']), T['bridge']['n'], T['bridge']['scenario'], T['bridge']['scenario'],
-    format(t_total, ','), format(t_api, ','), '・'.join(T['seeds']['api_rerun']), T['bridge']['scenario'], len(ARMS), n),
+    format(t_total, ','), format(t_api, ','), '・'.join(T['seeds']['api_rerun']), T['bridge']['scenario'], len(ARMS), n,
+    format(jv_all, ','), len(MODELS), len(SC), JV['n_per_cell'], format(jv_fb, ','), '・'.join(JV['fallback_scope']['models']), len(SC), JV['n_per_cell'], JV['status']),
     'data': {'identity': t_id, 'pilot': t_pilot, 'main': t_main, 'anchor_rerun': t_anchor, 'calibration': t_cal, 'bridge': t_bridge, 'total_local': t_total, 'api_rerun': t_api}}
 
 # ---- B: 対比と整合
@@ -274,12 +276,12 @@ F['I'] = {'text': '校正腕（%s × %s × %s・n=%d・「超」・厳密）: �
 
 # ---- J: 器材
 TOOLS_NOW = [('make_contrasts_A.py', 'tools/make_contrasts_A.py'), ('firth.py', 'tools/firth.py'), ('power_grid_A.py', 'tools/power_grid_A.py'), ('design_facts_A.py', 'tools/design_facts_A.py'),
-             ('numbers_lint.py', 'tools/numbers_lint.py'), ('build_draft5A.py', 'tools/build_draft5A.py'), ('firth_check_A.py', 'tools/firth_check_A.py'), ('firth_check_A.R', 'tools/firth_check_A.R'),
+             ('numbers_lint.py', 'tools/numbers_lint.py'), ('build_draft5A.py', 'tools/build_draft5A.py'), ('firth_check_A.py', 'tools/firth_check_A.py'), ('firth_check_A.R', 'tools/firth_check_A.R'), ('results-report-template-A.md', 'records/A/results-report-template-A.md'), ('bundle_prefreeze_A.py', 'tools/bundle_prefreeze_A.py'),
              ('cost_facts.py', 'tools/cost_facts.py'), ('run_preamble_local.py', 'tools/run_preamble_local.py'), ('boot_cost_pilot.py', 'tools/colab/boot_cost_pilot.py')]
 PLANNED = ['boot_stageA.py', 'identity_screen_A.py', 'analyze_A.py', 'calib_band_A.py', 'gate_A.py', 'control_chart_A.py', 'integrity_A.py', 'sample_inspection_A.py', 'synth_A.py', 'build_report_A.py', 'report_lint.py', 'freeze_A.py']
 exist = [(nm, sha_file(os.path.join(REPO, p))) for nm, p in TOOLS_NOW if os.path.isfile(os.path.join(REPO, p))]
-still = [nm for nm, p in TOOLS_NOW if not os.path.isfile(os.path.join(REPO, p))] + [nm for nm in PLANNED if not os.path.isfile(os.path.join(REPO, 'tools', nm))] + ['報告雛形']
-F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則→contrasts-A.json／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・二尺度の確証規則・refuse 門・様式門・錨帯・測定不能・環境副次→analyze_A.py／校正帯・撤退→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査→numbers_lint.py／草案の組み立て→build_draft5A.py／整合→integrity_A.py・sample_inspection_A.py・synth_A.py／報告→報告雛形・build_report_A.py・report_lint.py／凍結→freeze_A.py。**実在（SHA16）**: %s。**未整備（凍結前に整備し dry-run と合成データで検査）**: %s。' % (
+still = [nm for nm, p in TOOLS_NOW if not os.path.isfile(os.path.join(REPO, p))] + [nm for nm in PLANNED if not os.path.isfile(os.path.join(REPO, 'tools', nm))]
+F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則→contrasts-A.json／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・二尺度の確証規則・refuse 門・様式門・錨帯・測定不能・環境副次→analyze_A.py／校正帯・撤退→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査→numbers_lint.py／草案の組み立て→build_draft5A.py／整合→integrity_A.py・sample_inspection_A.py・synth_A.py／報告→報告雛形 results-report-template-A.md・build_report_A.py・report_lint.py／凍結前の検分の束→bundle_prefreeze_A.py／凍結→freeze_A.py。**実在（SHA16）**: %s。**未整備（凍結前に整備し dry-run と合成データで検査）**: %s。' % (
     '・'.join('%s %s' % e for e in exist), '・'.join(still)), 'data': {'exist': dict(exist), 'not_yet': still}}
 
 # ---- K: 引数・seed・tag
@@ -290,11 +292,12 @@ F['K'] = {'text': '引数文字列 `--arms %s`（SHA16 %s・%d 腕）。seed: �
 
 # ---- M: 環境帯
 M = PG['M']; EB = T['environment_band']; cands = sorted(M['candidates'], key=int)
-F['M'] = {'text': '環境帯（橋の %s・本走行の %s 対 橋・n=%d 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔%s〕・既測の無い腕は %s）: %s。**選択規則（確証 %d 対比の期待誤保留数が %s 以下となる最小の候補）で選ばれる候補 %s pt**（値は登録者最終確認で確定・正本の band_pt は未設定）。' % (
+assert EB['band_pt'] is None or EB['band_pt'] == M['selected_by_rule'], ('登録した環境帯と選択規則の候補が不一致', EB['band_pt'], M['selected_by_rule'])
+F['M'] = {'text': '環境帯（橋の %s・本走行の %s 対 橋・n=%d 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔%s〕・既測の無い腕は %s）: %s。**選択規則（確証 %d 対比の期待誤保留数が %s 以下となる最小の候補）で選ばれる候補 %s pt**。' % (
     '・'.join(M['bridge_models']), T['bridge']['scenario'], M['n'], T['bridge']['scenario'], EB['rule_missing_base_rate'],
     '／'.join('%s pt: 腕あたり（真の率 0.5）%s・いずれかの腕が超える確率 %.3f・期待誤保留数 %.2f・検出 %s' % (b, sci(M['candidates'][b]['per_arm_at_05']), M['candidates'][b]['p_any_arm_any_model'], M['candidates'][b]['expected_false_held_contrasts'],
                                                                    '・'.join('差 %s pt で %.3f' % (s_, v) for s_, v in M['candidates'][b]['detection_by_shift_pt'].items())) for b in cands),
-    len(CONTR), EB['rule_expected_max'], M['selected_by_rule']), 'data': M}
+    len(CONTR), EB['rule_expected_max'], M['selected_by_rule']) + (('**登録値 %d pt**・%s・選択規則の候補と一致: %s。' % (EB['band_pt'], EB['status'], EB['band_pt'] == M['selected_by_rule'])) if EB['band_pt'] is not None else ''), 'data': M}
 
 # ---- N: 門0.5 の帰無の不合格率
 N_ = PG['N']; IS = T['identity_screen']

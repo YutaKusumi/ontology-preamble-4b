@@ -122,7 +122,7 @@ environments = {
     '32B': {'env': 'A100', 'gpu': 'A100', 'memory_class_gb': 80, 'concurrency': 17, 'if_40GB': None, 'if_not_80GB': {'env': '第三', 'gpu': 'A100 80GB（時間貸し）', 'memory_class_gb': 80, 'concurrency': 17}},
     '4B-2507': {'env': 'L4', 'gpu': 'L4', 'memory_class_gb': 24, 'concurrency': 24}}
 environment_rule = {'values': ['L4', 'A100', '第三'], 'text': '8B・14B・32B は A100 80GB を主環境とする。40GB が割り当てられたセッションでは 8B・14B だけを走らせ（同時要求数は if_40GB）、32B は 80GB の割当を待つ。時間貸しの 80GB を使う場合は環境値「第三」として記帳する（登録者裁定 D3）。', 'record': 'GPU 型・メモリ・同時要求数・vLLM 版・pip freeze の SHA を manifest と凍結記録に',
-                    'correction': '登録者裁定 D3 の承認時に示した同時要求数の一部は、GPU を名目の容量で計算した誤りだった（コーディネータの追い問い V24）。規則は同じで、capacity_rule.memory_source の容量で計算し直した値を登録する（登録者最終確認で確認）。'}
+                    'correction': '登録者裁定 D3 の承認時に示した同時要求数の一部は、GPU を名目の容量で計算した誤りだった（コーディネータの追い問い V24）。規則は同じで、capacity_rule.memory_source の容量で計算し直した値を登録する。', 'correction_confirmed': '登録者最終確認（2026-09-13）'}
 cost = {'source': 'records/cost-pilot/cost-facts-2026-09-13.md（U 表の経費合計秒・R 表の試行／時と実測の時間あたりユニット・門0 は同時要求 24）', 'session_h': 8.0,
         'size_factor_assumption': {'0.6B': 0.25, '1.7B': 0.5, '4B': 1.0, '4B-2507': 1.0, '8B': 2.0, '14B': 3.5, '32B': 8.0},
         'throughput_bounds': {'upper': '処理量は同時要求数に比例する（上限 concurrency_cap に対する比）', 'lower': '同時要求数で処理量が落ちない'},
@@ -132,9 +132,9 @@ bridge = {'scenario': 'N1', 'arms': ARMS, 'n': n,
           'cells': {'4B': {'main_env': 'L4', 'bridge_env': 'A100', 'bridge_concurrency': 24}, '8B': {'main_env': 'A100', 'bridge_env': 'L4', 'bridge_concurrency': 12}},
           'rule': '各機種の本走行の N1（13 腕 × n=200）を一方の環境の点とし、もう一方の環境だけを別走行する（登録者裁定 D3）',
           'reading': '環境のずれは 4B と 8B の二規模で記述する。規模で変わるかは検定しない（§3 (xiii)）。'}
-environment_band = {'strict': True, 'band_pt': None, 'candidates_pt': [10, 12, 15, 20], 'rule_missing_base_rate': 0.5, 'rule_expected_max': 1,
+environment_band = {'strict': True, 'band_pt': 12, 'candidates_pt': [10, 12, 15, 20], 'rule_missing_base_rate': 0.5, 'rule_expected_max': 1,
                     'selection_rule': '真の率を 4B-2507 の API 既測（N1・全分母・既測の無い腕は 0.5）に置いたとき、確証 35 対比の期待誤保留数（対比の二腕 × 橋の二機種のいずれかが帯を超える確率の和）が 1 以下となる最小の候補',
-                    'status': '選択規則で選んだ候補を転記行 M に機械印字し、値は登録者最終確認で確定する',
+                    'status': '登録者最終確認（2026-09-13）で選択規則の候補どおり確定（転記行 M で選択規則の結果との一致を assert）',
                     'unit': '腕 × 橋の機種（本走行の N1 n=200 対 橋の n=200）', 'hold': '対比の二腕のいずれかが、いずれかの橋の機種で帯を超えたら、その対比の確証を保留（記述）'}
 firth_check = {'reference': 'R logistf（Heinze–Schemper の罰則付き尤度比検定・制約付き当てはめも全模型の罰則）',
                'datasets': {'required': ['sex2（logistf 同梱）', '本設計型の合成データ 3 配置（firth_check_A.py が seed で生成）'], 'if_available': ['endometrial（logistf に同梱されている場合）']},
@@ -143,7 +143,16 @@ firth_check = {'reference': 'R logistf（Heinze–Schemper の罰則付き尤度
                'tolerances': {'coef_abs': 1e-6, 'penalized_loglik_abs': 1e-6, 'plr_stat_abs': 1e-5},
                'R_control': 'logistf.control(maxit=1000, maxhs=50, maxstep=5, lconv=1e-12, gconv=1e-12, xconv=1e-12)',
                'rule': 'すべての量が許容差の内側なら合格。一つでも外れたら不合格として凍結を止め、原因を記録する（許容差を後から動かさない）。',
-               'when': '凍結前・Colab の CPU ランタイム（R と logistf を導入）', 'order': '合否規則は草案5 の公開で先に登録し、その後に走らせる', 'seed': 67001}
+               'when': '凍結前・Colab の CPU ランタイム（R と logistf を導入）', 'order': '合否規則は草案5 の公開で先に登録し、その後に走らせる', 'seed': 67001, 'status': '合否規則（許容差・R の control・データの組）は登録者最終確認（2026-09-13）で確定・未実行'}
+judge_validity = {'n_per_cell': 60, 'unit': '機種 × 場面', 'source': 'パイロットの標本から機械抽出した断片', 'judges': '系統外一名以上・盲検', 'report': 'κ と方向別の誤判定率',
+                  'default_scope': {'models': 'all', 'scenarios': 'all'}, 'fallback_scope': {'models': ['4B', '32B'], 'scenarios': 'all'},
+                  'rule': '凍結前に登録者が系統外の判定者の都合を確かめ、合わなければ fallback_scope を登録する（登録者最終確認 2026-09-13 で推奨どおり承認）', 'scope_decided': None, 'status': '判定者の都合の確認待ち（凍結前・登録者）'}
+report_rules = {'template': 'records/A/results-report-template-A.md',
+                'demoted_table': '傾きの族の全対比を一つの表に並べ、確証に残った対比と、記述（解釈条項）・記述（対数オッズ尺度でのみ）・判定不能・判定保留に回った対比を、札と回った理由の機械規則名つきで示す（登録者最終確認 2026-09-13・解釈条項による到達の低下を受け入れ）',
+                'demotion_three_lines': '札の降格・保留には「上限（規則で立ちえた札）／実際の札／差の理由（機械規則名）」の三行を印字する',
+                'clause_unchanged': '解釈条項は変えずに凍結する（登録者最終確認 2026-09-13）',
+                'typed_numbers': '報告に打ち込む数は日付・SHA16・費用の実績（登録者申告）・逸脱番号・雛形の SHA16 に限り、冒頭に一覧を印字する',
+                'lint': '価値語・機序語と未登録の数を機械走査し、検出すれば報告の組み立てを止める'}
 seeds = {'identity': 60001, 'pilot': {m['key']: {sc: 61000 + 100 * i + j for j, sc in enumerate(SC, 1)} for i, m in enumerate(MODELS, 1)},
          'main': {m['key']: {sc: 62000 + 100 * i + j for j, sc in enumerate(SC, 1)} for i, m in enumerate(MODELS, 1)},
          'anchor_rerun': {k: {sc: 63000 + 100 * i + j for j, sc in enumerate(SC, 1)} for i, k in enumerate(SIZES, 1)},
@@ -151,8 +160,8 @@ seeds = {'identity': 60001, 'pilot': {m['key']: {sc: 61000 + 100 * i + j for j, 
          'calibration': {'base': 65000, 'rule': 'base＋100×機種の番号（models の順・1 始まり）＋セッション番号（1 始まり）'},
          'api_rerun': {'8B': 66001, '14B': 66002, '32B': 66003}, 'firth_check': 67001, 'dryrun': 69999}
 tags = {'identity': 'idA', 'pilot': 'pilotA', 'main': 'stageA', 'anchor_rerun': 'stageA-anchor2', 'bridge': 'stageA-bridge', 'calibration': 'stageA-calib', 'api_rerun': 'stageA-api', 'dryrun': 'dryA'}
-procedure = ['門0（費用パイロット・済 2026-09-13）', '門0.5 同一性選別（凍結前・N1 × 13 腕 × n=160・vLLM L4）', 'Firth の一致検査（凍結前・R logistf・合否規則は firth_check）',
-             '凍結・予想封印・記録先行公開', 'パイロット（7 機種 × 5 場面 × 13 腕 × n=40・撤退条件 (a)・測定不能率・断片の抽出・t=0 診断・機種ごとの処理量の実測と費用の停止規則）',
+procedure = ['門0（費用パイロット・済 2026-09-13）', '凍結前の検分（系統内外・登録者決定 2026-09-13）', '門0.5 同一性選別（凍結前・N1 × 13 腕 × n=160・vLLM L4）', 'Firth の一致検査（凍結前・R logistf・合否規則は firth_check）',
+             '凍結（判定器の妥当性の範囲の確定を含む）・予想封印・記録先行公開', 'パイロット（7 機種 × 5 場面 × 13 腕 × n=40・撤退条件 (a)・測定不能率・断片の抽出・t=0 診断・機種ごとの処理量の実測と費用の停止規則）',
              '門2（一度）', '本走行（7 機種 × 5 場面 × 13 腕 × n=200・校正腕を機種セッションごとに・最初のセッションの校正腕を手元系列の初点に）',
              '橋（4B の A100 側・8B の L4 側・N1 × 13 腕 × n=200）', '錨反復（6 規模 × Onull・O-Ncold × 5 場面 × 2 走行目）', '率盲検の整合検査・抽出検査',
              'API 再走行（門0.5 合格時のみ・8B/14B/32B × N1 × 13 腕 × n=200）', '集計', '報告草案 → 検分 → 公開 → 反映メモ A']
@@ -181,12 +190,12 @@ assert set(environments) == {m['key'] for m in MODELS}, 'environments と models
 assert set(bridge['cells']) <= set(SIZES) and all(v['main_env'] == environments[k]['env'] for k, v in bridge['cells'].items()), '橋の主環境が environments と不一致'
 integrity = {'id_duplicates': len(dup), 'arms_required_missing': missing, 'arms_without_contrast': unlinked, 'arms_not_in_ledger': not_in_ledger,
              'checked': ['id の重複', '対比が要求する腕の台帳での有無', '登録対比を持たない腕', '台帳に無い腕', 'environments と models の一致', '橋の主環境と environments の一致']}
-T = {'id': 'contrasts-A', 'version': 'draft5-2026-09-13', 'generator': 'tools/make_contrasts_A.py v2', 'note': '段階 A の正本（機械可読・凍結対象・tools/make_contrasts_A.py が生成）。本文の数はここからの転記のみ。',
+T = {'id': 'contrasts-A', 'version': 'draft6-2026-09-13', 'generator': 'tools/make_contrasts_A.py v2.1', 'note': '段階 A の正本（機械可読・凍結対象・tools/make_contrasts_A.py が生成）。本文の数はここからの転記のみ。',
      'n_per_arm': n, 'pilot_n': pn, 'identity_n': n_id, 'calibration_n': n_cal, 'scenarios': SC, 'models': MODELS, 'sizes': SIZES,
      'arms': {'preamble': ARMS, 'sha16': arm_sha, 'arms_string': ','.join(ARMS), 'notes': {'N': '前置きなし（前置きファイルを持たない腕のため sha16 は null）'}},
      'bases_4B2507_api': BASE, 'families': fam, 'descriptive_families': desc, 'censor': censor, 'style_gate': style_gate, 'unmeasurable': unmeasurable, 'anchor_band': anchor_band,
      'calibration': calib, 'gate2': gate2, 'identity_screen': identity, 'capacity_rule': capacity_rule, 'environments': environments, 'environment_rule': environment_rule, 'cost': cost,
-     'bridge': bridge, 'environment_band': environment_band, 'firth_check': firth_check,
+     'bridge': bridge, 'environment_band': environment_band, 'firth_check': firth_check, 'judge_validity': judge_validity, 'report_rules': report_rules,
      'seeds': seeds, 'tags': tags, 'procedure': procedure, 'print_strings': print_strings, 'denominators': denominators, 'publication': publication,
      'fwer_note': '確証は傾きの族のみ（Holm の m 固定・二尺度の IUT: β₃ と pt 差の傾きを同じ調整水準で・登録者裁定 D1）。対照の基底が規模で動く配置での札の率は転記行 D。床持続は記述（登録者決定 2026-09-13）。',
      'integrity': integrity}

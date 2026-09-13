@@ -49,7 +49,7 @@ def walk_str(x, path, key=None):
 
 
 walk_const(Jd); walk_str(Jd, '$')
-MASKS = [r'`[^`]*`', r'https?://\S+', r'(?:records|design|tools|results|arms|prompts)/[\w\-./]+', r'\b[0-9A-F]{16}\b', r'\b(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b',
+MASKS = [r'`[^`]*`', r'https?://\S+', r'SHA-?(?:256|16)', r'(?:records|design|tools|results|arms|prompts)/[\w\-./]+', r'\b[0-9A-F]{16}\b', r'\b(?=[0-9a-f]*[a-f])[0-9a-f]{7,40}\b',
          r'\d{4}-\d{2}-\d{2}(?:[ T]\d{2}:\d{2}(?::\d{2})?)?(?:\s*UTC)?', r'\b\d{1,2}:\d{2}\b', r'§\s*\d+(?:[.\-]\d+)*(?:-補)?', r'^#{1,6}\s+\d+(?:\.\d+)*(?:-補)?',
          r'\bv\d+(?:\.\d+)*', r'草案\s?\d+[AB]?', r'第[一二三四五六七八九十〇\d]+[章節巡票部段]', r'(?<![A-Za-z])[DCVEJK]\d+(?:〜[DCVEJK]?\d+)?(?![\d.])', r'\(\d+[a-z]\)',
          r'\b(?:I|F)-\d+\b', r'F\s?§0-\d+', r'Qwen\d*(?:[-/][\w.]+)*', r'(?<![\w.])\d+(?:\.\d+)?B(?:-\d{4})?(?![\w])', r'\b(?:L4|T4|A100(?:-SXM4-80GB)?|H100)\b', r'\b\d+\s?GB\b',

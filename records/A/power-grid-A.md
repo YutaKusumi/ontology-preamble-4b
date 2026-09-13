@@ -1,6 +1,6 @@
-# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` v2・2026-09-13 08:26 UTC）
+# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` v2・2026-09-13 09:32 UTC）
 
-- 入力: contrasts-A.json SHA16 F7F3788674C9216B・hf-models-A.json SHA16 C916AD253AEF88DF・firth.py v2（SHA16 EC392E63DE42EA94）・power_grid_A.py SHA16 513AF75580CB51EC
+- 入力: contrasts-A.json SHA16 B3FC7A58394AAC15・hf-models-A.json SHA16 C916AD253AEF88DF・firth.py v2（SHA16 EC392E63DE42EA94）・power_grid_A.py SHA16 513AF75580CB51EC
 - z（実パラメータ数から）: 0.6B -1.9093・1.7B -0.8492・4B 0.0000・8B 0.7111・14B 1.3006・32B 2.0974・z_span（32B−4B）2.0974
 - seed 20260913・節ごとの子ストリーム {"D": 1, "DR": 2, "DS": 3, "R": 4, "N": 7}・節ごとの B {"D": 2000, "DR": 1000, "DS": 1000, "R": 2000, "N": 20000}・水準 α=0.05／Holm 初段 α/35（正規の臨界 1.960／3.189）・検閲の整数境界（n=200）X ≤ 9 または X ≥ 191
 

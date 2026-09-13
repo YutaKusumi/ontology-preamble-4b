@@ -9,7 +9,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ap = argparse.ArgumentParser()
 ap.add_argument('--src', default=os.path.join(REPO, 'design', 'design-stageA-draft5.src.md')); ap.add_argument('--out', default=os.path.join(REPO, 'design', 'design-stageA-draft5.md'))
 ap.add_argument('--facts', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.json')); ap.add_argument('--facts-md', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.md'))
-ap.add_argument('--lint-report', default=os.path.join(REPO, 'records', 'A', 'numbers-lint-draft5A.md'))
+ap.add_argument('--lint-report', default=os.path.join(REPO, 'records', 'A', 'numbers-lint-draft5A.md')); ap.add_argument('--label', default='草案5')
 a = ap.parse_args()
 CPATH = os.path.join(REPO, 'design', 'contrasts-A.json')
 sha = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
@@ -24,7 +24,7 @@ for l in s.split('\n'):
         continue
     if in6 and l.startswith('## 7.'):
         in6 = False
-        out += ['### 6-補 原稿 → 草案5 の置換の記録（機械）', '', '- 置換した転記行: %s（`tools/build_draft5A.py`・原稿 `%s` SHA16 %s）。本文中の〔転記行 X〕は §6 への参照に改めた。本文の数は `tools/numbers_lint.py` で検査した（`%s`）。' % ('・'.join(replaced), rel(a.src), sha(a.src), rel(a.lint_report)), '', l]
+        out += ['### 6-補 原稿 → %s の置換の記録（機械）' % a.label, '', '- 置換した転記行: %s（`tools/build_draft5A.py`・原稿 `%s` SHA16 %s）。本文中の〔転記行 X〕は §6 への参照に改めた。本文の数は `tools/numbers_lint.py` で検査した（`%s`）。' % ('・'.join(replaced), rel(a.src), sha(a.src), rel(a.lint_report)), '', l]
         continue
     if in6:
         m = re.match(r'^- 〔転記行 ([A-Z])〕\s*$', l)
