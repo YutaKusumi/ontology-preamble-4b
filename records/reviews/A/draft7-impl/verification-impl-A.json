@@ -1,0 +1,318 @@
+{
+ "kind": "verify_review_impl_A",
+ "generated_utc": "2026-09-13 19:46",
+ "commit_tools": "99d28da02659",
+ "rows": [
+  {
+   "id": "W33",
+   "findings": "F1・F-01",
+   "desc": "起動器の hf_rev が登録の rev を返すか（返さなければ重みの版が固定されない）",
+   "reproduced": true,
+   "detail": "{'hf_rev': {'0.6B': None, '1.7B': None, '4B': None, '8B': None, '14B': None, '32B': None, '4B-2507': None}, 'registered': {'0.6B': 'c1899de289a0', '1.7B': '70d244cc86cc', '4B': '1cfa9a720891', '8B': 'b968826d9c46', '14B': '40c069824f42', '32B': '9216db5781bf', '4B-2507': 'cdbee75f17c0'}}"
+  },
+  {
+   "id": "W34",
+   "findings": "F-02",
+   "desc": "奪取の場面で選択 b・量 5 の読み取り: 実装の式と凍結パーサの経路の破局が食い違うか",
+   "reproduced": true,
+   "detail": "{'implementation': True, 'frozen_parser': False, 'parsed_X': 0}"
+  },
+  {
+   "id": "W35",
+   "findings": "F2・F-14(a)",
+   "desc": "起動器が走行器の終了コードを見て止まらず、校正腕の no_data でも機種の走行に進むか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W36",
+   "findings": "F3",
+   "desc": "OP4B_DRY_N が DRY と無関係に読まれ、run() で n を置き換えるか",
+   "reproduced": true,
+   "detail": "VLLM = os.environ.get('OP4B_VLLM', '0.29.0'); ENV_OVERRIDE = os.environ.get('OP4B_ENV_VALUE'); DRY_N = int(os.environ.get('OP4B_DRY_N', '0') or 0)"
+  },
+  {
+   "id": "W37",
+   "findings": "F4・F-14(d)",
+   "desc": "起動器の飛ばしの判定が行数だけで、--redo-errors の経路が無いか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W38",
+   "findings": "F5",
+   "desc": "セッション記録の files_sha16_lf が plan の走行キーだけを数え、校正腕を含まないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W39",
+   "findings": "F6・F-14(b)(c)",
+   "desc": "起動器の校正帯の判定が calib_band_A と別に実装され、初点に n_ok の条件が無く、やり直しが SESSION−1 だけか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W40",
+   "findings": "F7",
+   "desc": "撤退条件の再走を含むパイロット（同じ機種 × 場面の走行が二つ）で response_mode_A が止まるか",
+   "reproduced": true,
+   "detail": "ify-impl\\w40\\pilotA\\pilotA__N1__none__seed61701 と C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\verify-impl\\w40\\pilotA\\pilotA__N1__none__seed71701）\n"
+  },
+  {
+   "id": "W41",
+   "findings": "F8",
+   "desc": "合成の集計で組み立てると、雛形の句（引数文字列・除外後に判定不能・パイロット後の (b) 率）が出力から消えるか",
+   "reproduced": true,
+   "detail": "{'lost': ['引数文字列〔arms_string SHA16〕', '除外後に判定不能になった対比', 'パイロット後に報告した (b) 率'], 'rc': 0}"
+  },
+  {
+   "id": "W42",
+   "findings": "F9・F-13",
+   "desc": "偽の機械の区画・code span の数・(2048)・第3章・#12・D99・12 GB・段 7・費用の行の別の数を、走査器が一件も違反にしないか",
+   "reproduced": true,
+   "detail": "[report_lint] 違反 0 {} → C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\verify-impl\\w42-lint.md"
+  },
+  {
+   "id": "W43",
+   "findings": "F10・F-12",
+   "desc": "走行器の語彙と refuse の規則・F の台帳・転記行 F と G の入力・運用の解釈の一覧が凍結範囲に無いか",
+   "reproduced": true,
+   "detail": "[]"
+  },
+  {
+   "id": "W44",
+   "findings": "F11・F-03",
+   "desc": "集計器の --identity・--calib が任意で、欠けても検査用の印に入らないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W45",
+   "findings": "F-04",
+   "desc": "セッション記録の無い走行キーを登録の環境値で補い、止めないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W46",
+   "findings": "F-05",
+   "desc": "様式の記録にセルが無いと 0 として扱うか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W47",
+   "findings": "F12・F-06",
+   "desc": "門0.5 不合格の注が傾きの族の対比にしか付かない（記述の Ncold−N に無い）か",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W48",
+   "findings": "F-07",
+   "desc": "残存の非連続の注と、対照どうしの差の出力が無いか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W49",
+   "findings": "F-09",
+   "desc": "seed から解いて組み直す検査が、規則上ありうる全 seed で真になる（自己循環）か",
+   "reproduced": true,
+   "detail": "{'seeds': 891, 'false': 0}"
+  },
+  {
+   "id": "W50",
+   "findings": "F13・F-10",
+   "desc": "変異 M1（校正の注を全確証に付ける・走 3）と M4（refuse の理由を (c) だけにする・走 7）を入れても合成検査が不一致 0 のまま通るか",
+   "reproduced": true,
+   "detail": "{'M1': {'rc': 0, 'mismatch_line': [\"[synth_A] 行 7/52 発火・不一致 0・経路の未発火 ['unmeasurable', 'anchor_exclusion', 'env_bridge', 'env_one_side', 'measurable_no', 'identity_fail_note', 'withdrawal_anomaly_note', 'stack_rows', 'floor_0']\"]}, 'M4': {'rc': 0, 'mismatch_line': [\"[synth_A] 行 7/52 発火・不一致 0・経路の未発火 ['unmeasurable', 'anchor_exclusion', 'env_bridge', 'env_one_side', 'style_cells', 'stratified_ok', 'stratified_any', 'measurable_no', 'identity_fail_note', 'calib_anomaly_note', 'withdrawal_anomaly_note', 'stack_rows', 'floor_0', 'confirmed_label_string']\"]}}"
+  },
+  {
+   "id": "W51",
+   "findings": "F-11",
+   "desc": "門と校正の合成検査で、撤退条件の合格枝の発火・再走待ち・再走の合格と、不合格枝の器の異常・橋のセッションが発火しないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W52",
+   "findings": "F14・F-16",
+   "desc": "門2 の縮小で 35 対比すべてを判定不能にし、Holm には実の p を入れるか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W53",
+   "findings": "F15",
+   "desc": "環境帯の引き直しで rule_missing_base_rate を「パイロットの率が無い腕」にだけ当てるか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W54",
+   "findings": "F16・F-21",
+   "desc": "断片の鍵の既定の置き場が records/A・機械の refuse を書式外と合わせて除く・κ は先頭の二名だけ・鍵の SHA-256 を照合しない",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W55",
+   "findings": "F17",
+   "desc": "「上向きの確証」を確証かつ slope_pt>0 で選ぶか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W56",
+   "findings": "F18・F-14(e)(f)・F-22・F-24・F-25",
+   "desc": "軽微の群: 環境値の上書きを GPU と照合しない・既定のコミット main を受ける・local_env を真偽で見る・管理図の追記先が最後の表・枠の検証が部分一致",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W57",
+   "findings": "F-15",
+   "desc": "走行器の manifest の local_env に同時要求数・pip freeze・先取りの回数・サーバの引数が無いか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W58",
+   "findings": "F-17・F18",
+   "desc": "p* の不一致の値と判定不能の p を正本から読まず 1.0 を直書きしているか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W59",
+   "findings": "F-18",
+   "desc": "撤退条件の再走の n_ok が零だと rerun_pass になるか（fired が None）",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W60",
+   "findings": "F-19",
+   "desc": "錨反復と橋の n_ok が零のとき黙って帯を超えない扱いにし、--B-measurable の上書きを印に入れないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W61",
+   "findings": "F-13(4)・F9",
+   "desc": "組み立て器が打ち込んだ数の一覧を冒頭に印字せず、走査の違反で止まらないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W62",
+   "findings": "F-20",
+   "desc": "組み立て器の対照腕の表に Wilson の区間が無いか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W63",
+   "findings": "F-23",
+   "desc": "応答様式の器が語彙の名を直書きし、場面ファイルの SHA を照合しないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W64",
+   "findings": "F-26",
+   "desc": "草案7 の refuse 門の文が「各セル n_ok が…以上」で、正本の答えた分母の下限と語が違うか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W65",
+   "findings": "F-27",
+   "desc": "差の符号が（＋, 0, −, …）の配置で、実装の読みは 4B、零を異なる符号と読むと 1.7B になるか",
+   "reproduced": true,
+   "detail": "4B"
+  },
+  {
+   "id": "W66",
+   "findings": "F-28",
+   "desc": "p* の Holm を 35 対比に当てる現行の順位と水準が、β₃ で棄却された対比だけに当てる読みと食い違う例があるか",
+   "reproduced": true,
+   "detail": "{'all35_rank_level_of_first': (2, 0.0014705882352941176), 'beta_rejected_subset': [0]}"
+  },
+  {
+   "id": "W67",
+   "findings": "F-29",
+   "desc": "集計の打ち切り（既定）と一致検査の打ち切り（python_control）が別で、統計量の差は小さいか",
+   "reproduced": true,
+   "detail": "{'max_stat_diff': 1.8189894035458565e-12, 'converged_flag_mismatch': 0}"
+  },
+  {
+   "id": "W68",
+   "findings": "F-30",
+   "desc": "方向別の誤判定率を機械の判定で条件付けるか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W69",
+   "findings": "F-31",
+   "desc": "正本に「新 seed で一度だけ再走」の consequence と「次のセッション番号でやり直す」の timing が併存するか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W70",
+   "findings": "F-33",
+   "desc": "様式門を残存規模にだけ当て、解釈条項の飽和を全除外の後の規模で数え、refuse を choice だけで数えるか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W71",
+   "findings": "F-34",
+   "desc": "抽出検査の標本に腕の名と生本文の先頭を並べて印字するか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W72",
+   "findings": "F6(iv)",
+   "desc": "不合格枝で並行のランタイムを止める仕組み（初点の確立を待つ規則）が起動器に無いか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W73",
+   "findings": "F18",
+   "desc": "整合検査がパイロットの全セルに再走の seed を許すか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W74",
+   "findings": "F18",
+   "desc": "抽出検査が再走の走行も枠に入れるか（正本に規則が無い）",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W75",
+   "findings": "F-08",
+   "desc": "dry-run の印（manifest の dry_model_rewritten・行の dry_run）を読み出しと門と集計の器が見ないか",
+   "reproduced": true,
+   "detail": ""
+  },
+  {
+   "id": "W76",
+   "findings": "F16(c)(d)",
+   "desc": "断片の採点でラベルの無い断片を判定不能と区別せず、機械の破局の再計算と保存値の一致を確かめないか",
+   "reproduced": true,
+   "detail": ""
+  }
+ ],
+ "reproduced": 44,
+ "total": 44,
+ "skip_mutation": false
+}
