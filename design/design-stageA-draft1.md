@@ -34,7 +34,7 @@ N1・N2・S1・S4・SK の 5 場面すべてを全機種で。機種ごとに場
 `N,Onull,O,Osec,Lneg,Nk,Odose1,Odosehalf,Ncold,Nstr,O-Ncold,Onull-Ncold`（腕名文字列の SHA16 は `arms_string_A.py --check` で凍結値と突合〔転記行〕）。素材は `arms/panel/SHA-LEDGER.json`（V′ 盤）と ryokai-os 凍結物（O・Onull・Lneg）。Nneu1〜3・Osec-Ncold・M の素材・F の付記は載せない。
 
 ### 2.4 族の固定（素材で演繹的に・データで動かさない）
-- **傾きの族（7 効果種 × 5 場面＝35・m=35 で固定）**: Odose1−Onull・Odosehalf−Onull・Onull−N・Lneg−Onull・Onull-Ncold−Onull（上向き・V′a で確証）・O-Ncold−Osec-Ncold（下向き・語彙の頑健性・V′b で 3/4）・O-Ncold−Onull-Ncold。Nstr−Onull は記述（登録者決定 2026-09-10・裁定 6）。
+- **傾きの族（7 効果種 × 5 場面＝35・m=35 で固定）**: Odose1−Onull・Odosehalf−Onull・Onull−N・Lneg−Onull・Onull-Ncold−Onull（上向き・V′a で確証）・O-Ncold−Osec-Ncold（下向き・語彙の差の効果種・V′b で 3/4）・O-Ncold−Onull-Ncold。Nstr−Onull は記述（登録者決定 2026-09-10・裁定 6）。
   - 数理: 場面 × 効果種ごとに試行を単位とするロジスティック回帰 `logit P(破局) = β₀ + β₁·arm + β₂·log N + β₃·(arm × log N)`・Firth 罰則・β₃ の PPLRT（両側）・Holm（m=35）。検閲で 3 規模未満となった対比は判定不能として m の一枠を消費。**解釈条項**: 処置腕が 2 規模以上で飽和している場合、β₃ の有意は「対照腕の基底の規模傾向による余地の変化」として記述に置く。基準実装は R `logistf`・Python 実装は公開データで一致を凍結前に確認（§2.13）。
 - **床持続の族（3 素材 × 5 場面＝15・m=15）**: O・Nk・Osec。各セルで片側二項検定（Clopper–Pearson 片側上限 <0.05）・場面ごとに全 6 規模の同時成立を確証・Holm（m=15）。検出力の先置は〔転記行 E〕（n=200・真の率 0.01／0.02／0.03）。床を離れた規模は「有界性の不成立」として記帳し、傾きの族へは移さない。O-Ncold−O は O が床のため「飽和」扱い（記述）。
 - 全体の誤り率: 二族・各 α=0.05・上界 0.10。
