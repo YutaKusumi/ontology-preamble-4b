@@ -26,6 +26,7 @@
 - 計画案（内部・v2.2）の順序に従い、A・B の凍結前に **費用パイロット（門0）** を置く: Colab の L4 と A100 40GB で各 1 セッション、Qwen3-4B-Instruct-2507 を vLLM（bf16）で N1 × 12 腕 × n=40 走らせ、ユニットあたりの試行数・出力トークン長の分布・セッション経費を実測する。手順書と事前登録（seed・tag・測定表・決定木・外挿の係数）は `records/cost-pilot/cost-pilot-plan-2026-09-12.md`。率は記述であり確証ではない。
 - 器材: `tools/make_runner_local.py` → `tools/run_preamble_local.py` v2.7（凍結走行器 v2.6 から機械生成・provider local・採点経路は関数単位で同一）／`tools/colab/boot_cost_pilot.py`（登録者が Colab で一行 exec）／`tools/cost_facts.py`（実測から §6 の転記行を生成）。走行は登録者の Chrome 越しにコーディネータが操作し、Drive の同意・ダウンロード・支払いは登録者が行う（2026-09-13 打ち合わせ・boot v2）。
 - **門0 完了（2026-09-13）**: L4・A100（80GB 割当）各 1 セッション・480/480・二 GPU とも「続行」（`records/cost-pilot/cost-facts-2026-09-13.md`・生データ `results/costpilot-{L4,A100}/`）。Colab はコーディネータが登録者の Chrome 越しに駆動（同意・DL・支払いは登録者）。
+- **段階 A・B の設計草案4（2026-09-13・凍結前）**: 系統内一巡（新規 2 体・58 件全採用）→ 草案2 → 系統外四票（Gemini 3.8 Flash × 2・Grok 4.6 × 2・差し戻し 2・条件つき 2・逐語 `records/reviews/AB/round-ext/`・全採用）→ 草案3（登録者裁定 A 1・B 4 承認）→ 器材整備 → **草案4**（`design/design-stageA-draft4.md`・`design-stageB-draft4.md`・〔転記行〕を `records/A/design-facts-A.md`・`records/B/design-facts-B.md` の逐語で機械置換）。正本 `design/contrasts-A.json`・`contrasts-B.json`（`tools/make_contrasts_{A,B}.py`）・Firth PPLRT `tools/firth.py`・検出力格子 `records/A/power-grid-A.md`（B=2,000）。
 - **段階 A・B の設計草案1（2026-09-13・凍結前・検分前）**: `design/design-stageA-draft1.md`（規模軸・6 機種 × 5 場面 × 12 腕・傾き 35＋床持続 15・検閲・様式門・錨反復・同一性選別）／`design/design-stageB-draft1.md`（機構層・4B-2507・方向の抽出と減算・加算・保留 AUC・S4 反証・品質床）。数は設計定数のみで計算量は〔転記行〕（器材整備後に機械置換）。
 
 ## 段階 F（2026-09-11 凍結・2026-09-12 結果公開・場面冒頭の検査認識の付記の効果）
