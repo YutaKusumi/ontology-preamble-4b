@@ -1,1075 +1,832 @@
 {
- "generated_utc": "2026-09-13 05:40",
- "contrasts_sha16": "B352C87750DCE8CE",
+ "generated_utc": "2026-09-13 09:05",
+ "generator": "tools/design_facts_A.py v2",
+ "contrasts_sha16": "F7F3788674C9216B",
+ "power_grid_json_sha16": "E9ED3FEA6EED1B88",
  "z": {
-  "0.6B": -1.9093,
-  "1.7B": -0.8492,
+  "0.6B": -1.909327,
+  "1.7B": -0.849237,
   "4B": 0.0,
-  "8B": 0.7111,
-  "14B": 1.3006,
-  "32B": 2.0974
+  "8B": 0.711108,
+  "14B": 1.300588,
+  "32B": 2.097377
  },
  "facts": {
   "L": {
-   "text": "機種別（HF 2026-09-13・実パラメータ数は config.json から機械計算・収容＝重み＋KV〔2,048 トークン × 同時 24〕＋1.5 GiB が GPU の 90% 以内・4B の L4 収容は門0 で実測済み）: 0.6B: rev c1899de289a0・596.0 M params・z=-1.9093・重み 1.40 GiB・要 8.15 GiB・L4 可・A100-40 可・A100-80 可／1.7B: rev 70d244cc86cc・1720.6 M params・z=-0.8492・重み 3.78 GiB・要 10.53 GiB・L4 可・A100-40 可・A100-80 可／4B: rev 1cfa9a720891・4022.5 M params・z=0.0000・重み 7.49 GiB・要 15.74 GiB・L4 可・A100-40 可・A100-80 可／8B: rev b968826d9c46・8190.7 M params・z=0.7111・重み 15.26 GiB・要 23.51 GiB・L4 不可・A100-40 可・A100-80 可／14B: rev 40c069824f42・14768.3 M params・z=1.3006・重み 27.51 GiB・要 36.51 GiB・L4 不可・A100-40 不可・A100-80 可／32B: rev 9216db5781bf・32762.1 M params・z=2.0974・重み 61.02 GiB・要 74.52 GiB・L4 不可・A100-40 不可・A100-80 不可／4B-2507: rev cdbee75f17c0・4022.5 M params・z=0.0000・重み 7.49 GiB・要 15.74 GiB・L4 可・A100-40 可・A100-80 可。**橋のセルの機種＝4B**（8B は L4 に収容できない）。**14B は A100-40GB に載らず 80GB の割当が要る。32B は同時要求 24 では 80GB にも載らず、同時要求 8 なら要 66.52 GiB で 80GB に載る（同時要求数は機種の環境列に記帳・処理量は落ちる）。**",
+   "text": "機種別の容量と収容（HF 取得 2026-09-13・実パラメータ数は config.json から機械計算・収容規則＝重み＋KV〔要求あたり 2,048 トークン × 同時要求数〕＋1.5 GiB が GPU メモリの 0.9 以内・GPU メモリは hf-models-A.json の gpu_gib〔L4 22.5・A100 40GB 39.4・A100 80GB 79.2 GiB〕・同時要求数の上限 24・登録値の収容は assert 済み）: 0.6B: rev c1899de289a0・596.0 M params・z=-1.9093・重み 1.40 GiB・KV／要求 0.2188 GiB・最大同時（L4／A100 40GB／A100 80GB）24／24／24・登録 L4 24GB 同時 24／1.7B: rev 70d244cc86cc・1720.6 M params・z=-0.8492・重み 3.78 GiB・KV／要求 0.2188 GiB・最大同時（L4／A100 40GB／A100 80GB）24／24／24・登録 L4 24GB 同時 24／4B: rev 1cfa9a720891・4022.5 M params・z=+0.0000・重み 7.49 GiB・KV／要求 0.2812 GiB・最大同時（L4／A100 40GB／A100 80GB）24／24／24・登録 L4 24GB 同時 24／8B: rev b968826d9c46・8190.7 M params・z=+0.7111・重み 15.26 GiB・KV／要求 0.2812 GiB・最大同時（L4／A100 40GB／A100 80GB）12／24／24・登録 A100 80GB 同時 24・40GB では同時 24／14B: rev 40c069824f42・14768.3 M params・z=+1.3006・重み 27.51 GiB・KV／要求 0.3125 GiB・最大同時（L4／A100 40GB／A100 80GB）0／20／24・登録 A100 80GB 同時 24・40GB では同時 20／32B: rev 9216db5781bf・32762.1 M params・z=+2.0974・重み 61.02 GiB・KV／要求 0.5000 GiB・最大同時（L4／A100 40GB／A100 80GB）0／0／17・登録 A100 80GB 同時 17・40GB では走らせない・80GB が割り当てられなければ環境値「第三」（A100 80GB（時間貸し）・同時 17）／4B-2507: rev cdbee75f17c0・4022.5 M params・z=+0.0000・重み 7.49 GiB・KV／要求 0.2812 GiB・最大同時（L4／A100 40GB／A100 80GB）24／24／24・登録 L4 24GB 同時 24。橋: 4B の A100 側 同時 24（最大 24・A100 側は 40GB で検査）・8B の L4 側 同時 12（最大 12・A100 側は 40GB で検査）。",
    "data": {
     "0.6B": {
+     "rev": "c1899de289a0",
      "params_M": 596.0,
      "z": -1.9093,
      "weights_gib": 1.4,
-     "kv_24x2048_gib": 5.25,
-     "need_gib": 8.15,
-     "fits_L4": true,
-     "fits_A100_40": true,
-     "fits_A100_80": true,
-     "rev": "c1899de289a0"
+     "kv_per_request_gib": 0.2188,
+     "max_concurrency": {
+      "L4": 24,
+      "A100 40GB": 24,
+      "A100 80GB": 24
+     },
+     "registered": {
+      "env": "L4",
+      "gpu": "L4",
+      "memory_class_gb": 24,
+      "concurrency": 24
+     }
     },
     "1.7B": {
+     "rev": "70d244cc86cc",
      "params_M": 1720.6,
      "z": -0.8492,
      "weights_gib": 3.78,
-     "kv_24x2048_gib": 5.25,
-     "need_gib": 10.53,
-     "fits_L4": true,
-     "fits_A100_40": true,
-     "fits_A100_80": true,
-     "rev": "70d244cc86cc"
+     "kv_per_request_gib": 0.2188,
+     "max_concurrency": {
+      "L4": 24,
+      "A100 40GB": 24,
+      "A100 80GB": 24
+     },
+     "registered": {
+      "env": "L4",
+      "gpu": "L4",
+      "memory_class_gb": 24,
+      "concurrency": 24
+     }
     },
     "4B": {
+     "rev": "1cfa9a720891",
      "params_M": 4022.5,
      "z": 0.0,
      "weights_gib": 7.49,
-     "kv_24x2048_gib": 6.75,
-     "need_gib": 15.74,
-     "fits_L4": true,
-     "fits_A100_40": true,
-     "fits_A100_80": true,
-     "rev": "1cfa9a720891"
+     "kv_per_request_gib": 0.2812,
+     "max_concurrency": {
+      "L4": 24,
+      "A100 40GB": 24,
+      "A100 80GB": 24
+     },
+     "registered": {
+      "env": "L4",
+      "gpu": "L4",
+      "memory_class_gb": 24,
+      "concurrency": 24
+     }
     },
     "8B": {
+     "rev": "b968826d9c46",
      "params_M": 8190.7,
      "z": 0.7111,
      "weights_gib": 15.26,
-     "kv_24x2048_gib": 6.75,
-     "need_gib": 23.51,
-     "fits_L4": false,
-     "fits_A100_40": true,
-     "fits_A100_80": true,
-     "rev": "b968826d9c46"
+     "kv_per_request_gib": 0.2812,
+     "max_concurrency": {
+      "L4": 12,
+      "A100 40GB": 24,
+      "A100 80GB": 24
+     },
+     "registered": {
+      "env": "A100",
+      "gpu": "A100",
+      "memory_class_gb": 80,
+      "concurrency": 24,
+      "if_40GB": {
+       "memory_class_gb": 40,
+       "concurrency": 24
+      }
+     }
     },
     "14B": {
+     "rev": "40c069824f42",
      "params_M": 14768.3,
      "z": 1.3006,
      "weights_gib": 27.51,
-     "kv_24x2048_gib": 7.5,
-     "need_gib": 36.51,
-     "fits_L4": false,
-     "fits_A100_40": false,
-     "fits_A100_80": true,
-     "rev": "40c069824f42"
+     "kv_per_request_gib": 0.3125,
+     "max_concurrency": {
+      "L4": 0,
+      "A100 40GB": 20,
+      "A100 80GB": 24
+     },
+     "registered": {
+      "env": "A100",
+      "gpu": "A100",
+      "memory_class_gb": 80,
+      "concurrency": 24,
+      "if_40GB": {
+       "memory_class_gb": 40,
+       "concurrency": 20
+      }
+     }
     },
     "32B": {
+     "rev": "9216db5781bf",
      "params_M": 32762.1,
      "z": 2.0974,
      "weights_gib": 61.02,
-     "kv_24x2048_gib": 12.0,
-     "need_gib": 74.52,
-     "fits_L4": false,
-     "fits_A100_40": false,
-     "fits_A100_80": false,
-     "rev": "9216db5781bf"
+     "kv_per_request_gib": 0.5,
+     "max_concurrency": {
+      "L4": 0,
+      "A100 40GB": 0,
+      "A100 80GB": 17
+     },
+     "registered": {
+      "env": "A100",
+      "gpu": "A100",
+      "memory_class_gb": 80,
+      "concurrency": 17,
+      "if_40GB": null,
+      "if_not_80GB": {
+       "env": "第三",
+       "gpu": "A100 80GB（時間貸し）",
+       "memory_class_gb": 80,
+       "concurrency": 17
+      }
+     }
     },
     "4B-2507": {
+     "rev": "cdbee75f17c0",
      "params_M": 4022.5,
      "z": 0.0,
      "weights_gib": 7.49,
-     "kv_24x2048_gib": 6.75,
-     "need_gib": 15.74,
-     "fits_L4": true,
-     "fits_A100_40": true,
-     "fits_A100_80": true,
-     "rev": "cdbee75f17c0"
+     "kv_per_request_gib": 0.2812,
+     "max_concurrency": {
+      "L4": 24,
+      "A100 40GB": 24,
+      "A100 80GB": 24
+     },
+     "registered": {
+      "env": "L4",
+      "gpu": "L4",
+      "memory_class_gb": 24,
+      "concurrency": 24
+     }
     }
-   },
-   "bridge": [
-    "4B"
-   ]
+   }
+  },
+  "F": {
+   "text": "費用と時間（門0 の実測: L4 2.67 ユニット/h・3,839 試行/h・経費 512 s／A100〔NVIDIA A100-SXM4-80GB〕12.82 ユニット/h・19,200 試行/h・経費 465 s・門0 の同時要求 24・4B 比の試行時間の仮定 {\"0.6B\": 0.25, \"1.7B\": 0.5, \"4B\": 1.0, \"4B-2507\": 1.0, \"8B\": 2.0, \"14B\": 3.5, \"32B\": 8.0} ◐・セッション 8.0 時間・校正腕は 4B-2507 の係数）: **上界**（処理量 ∝ 同時要求数）: 0.6B（L4・同時 24）18,000 試行・1.4 h・1 セッション・3.7 ユニット／1.7B（L4・同時 24）18,000 試行・2.5 h・1 セッション・6.8 ユニット／4B（L4・同時 24）18,000 試行・4.8 h・1 セッション・12.9 ユニット／8B（A100・同時 24）18,000 試行・2.0 h・1 セッション・25.4 ユニット／14B（A100・同時 24）18,000 試行・3.4 h・1 セッション・43.0 ユニット／32B（A100・同時 17）18,400 試行・10.7 h・2 セッション・136.6 ユニット／4B-2507（L4・同時 24）16,000 試行・4.3 h・1 セッション・11.5 ユニット／橋 4B（A100 側）（A100・同時 24）2,600 試行・0.3 h・1 セッション・3.4 ユニット／橋 8B（L4 側）（L4・同時 12）2,600 試行・2.9 h・1 セッション・7.6 ユニット。**上界の合計 129,600 試行・32.2 時間・251.0 ユニット**。下界（同時要求数で処理量が落ちない）の合計 27.6 時間・206.7 ユニット。A100 40GB が割り当てられた場合（上界）: 8B（A100・同時 24）18,000 試行・2.0 h・1 セッション・25.4 ユニット／14B（A100・同時 20）18,000 試行・4.0 h・1 セッション・51.3 ユニット／32B は走らせない。最後のセッションの余裕の最小 0.403（4B）。停止規則: パイロット後の見込みが上界の 1.25 倍（313.8 ユニット）を超えたら本走行の前に登録者が再裁定。門0 の判定時の A＋B 見込み 86〜88 ユニットに対し、A の上界は 2.85 倍。門0.5（n=160 × 13 腕・L4・vLLM）2,080 試行・0.68 h・1.83 ユニット。API 再走行・判定器の断片・機種の切替の経費は含まない。パイロットで機種ごとの実測に置き換える。",
+   "data": {
+    "plans": {
+     "upper": {
+      "rows": {
+       "0.6B": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 1.39,
+        "sessions": 1,
+        "units": 3.72,
+        "last_session_margin": 0.841
+       },
+       "1.7B": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 2.54,
+        "sessions": 1,
+        "units": 6.78,
+        "last_session_margin": 0.695
+       },
+       "4B": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 4.83,
+        "sessions": 1,
+        "units": 12.9,
+        "last_session_margin": 0.403
+       },
+       "8B": {
+        "env": "A100",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 1.98,
+        "sessions": 1,
+        "units": 25.43,
+        "last_session_margin": 0.764
+       },
+       "14B": {
+        "env": "A100",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 3.36,
+        "sessions": 1,
+        "units": 43.05,
+        "last_session_margin": 0.59
+       },
+       "32B": {
+        "env": "A100",
+        "concurrency": 17,
+        "trials": 18400,
+        "hours": 10.65,
+        "sessions": 2,
+        "units": 136.57,
+        "last_session_margin": 0.679
+       },
+       "4B-2507": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 16000,
+        "hours": 4.31,
+        "sessions": 1,
+        "units": 11.51,
+        "last_session_margin": 0.47
+       },
+       "橋 4B（A100 側）": {
+        "env": "A100",
+        "concurrency": 24,
+        "trials": 2600,
+        "hours": 0.26,
+        "sessions": 1,
+        "units": 3.39
+       },
+       "橋 8B（L4 側）": {
+        "env": "L4",
+        "concurrency": 12,
+        "trials": 2600,
+        "hours": 2.85,
+        "sessions": 1,
+        "units": 7.61
+       }
+      },
+      "units": 251.0,
+      "hours": 32.2,
+      "trials": 129600
+     },
+     "lower": {
+      "rows": {
+       "0.6B": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 1.39,
+        "sessions": 1,
+        "units": 3.72,
+        "last_session_margin": 0.841
+       },
+       "1.7B": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 2.54,
+        "sessions": 1,
+        "units": 6.78,
+        "last_session_margin": 0.695
+       },
+       "4B": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 4.83,
+        "sessions": 1,
+        "units": 12.9,
+        "last_session_margin": 0.403
+       },
+       "8B": {
+        "env": "A100",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 1.98,
+        "sessions": 1,
+        "units": 25.43,
+        "last_session_margin": 0.764
+       },
+       "14B": {
+        "env": "A100",
+        "concurrency": 24,
+        "trials": 18000,
+        "hours": 3.36,
+        "sessions": 1,
+        "units": 43.05,
+        "last_session_margin": 0.59
+       },
+       "32B": {
+        "env": "A100",
+        "concurrency": 17,
+        "trials": 18000,
+        "hours": 7.48,
+        "sessions": 1,
+        "units": 95.94,
+        "last_session_margin": 0.066
+       },
+       "4B-2507": {
+        "env": "L4",
+        "concurrency": 24,
+        "trials": 16000,
+        "hours": 4.31,
+        "sessions": 1,
+        "units": 11.51,
+        "last_session_margin": 0.47
+       },
+       "橋 4B（A100 側）": {
+        "env": "A100",
+        "concurrency": 24,
+        "trials": 2600,
+        "hours": 0.26,
+        "sessions": 1,
+        "units": 3.39
+       },
+       "橋 8B（L4 側）": {
+        "env": "L4",
+        "concurrency": 12,
+        "trials": 2600,
+        "hours": 1.5,
+        "sessions": 1,
+        "units": 4.0
+       }
+      },
+      "units": 206.7,
+      "hours": 27.6,
+      "trials": 129200
+     }
+    },
+    "alt_40GB_upper": {
+     "8B": {
+      "env": "A100",
+      "concurrency": 24,
+      "trials": 18000,
+      "hours": 1.98,
+      "sessions": 1,
+      "units": 25.43,
+      "last_session_margin": 0.764
+     },
+     "14B": {
+      "env": "A100",
+      "concurrency": 20,
+      "trials": 18000,
+      "hours": 4.0,
+      "sessions": 1,
+      "units": 51.28,
+      "last_session_margin": 0.508
+     },
+     "32B": null
+    },
+    "stop_threshold_units": 313.8,
+    "gate05": {
+     "trials": 2080,
+     "hours": 0.68,
+     "units": 1.83
+    },
+    "gate0_estimates_AB": [
+     86,
+     88
+    ]
+   }
   },
   "A": {
-   "text": "規模: 門0.5 同一性選別 1,040（N1 × 13 腕 × n=80）／パイロット 18,200（7 機種 × 5 場面 × 13 腕 × n=40）／本走行 91,000（7 機種 × 5 場面 × 13 腕 × n=200）／錨反復 14,000（7 機種 × 5 場面 × 2 腕 × n=200）／校正腕 5,600（7 機種 × 2 セッション想定 × n=400・セッション数は実走で置換）／橋のセル 5,200（4B × 13 腕 × n=200 × 2 環境）＝**手元合計 135,040 試行**。API 再走行（門0.5 合格時のみ）7,800（8B・14B・32B × N1 × 13 腕 × n=200）。",
+   "text": "規模: 門0.5 同一性選別 2,080（N1 × 13 腕 × n=160）／パイロット 18,200（7 機種 × 5 場面 × 13 腕 × n=40）／本走行 91,000（7 機種 × 5 場面 × 13 腕 × n=200）／錨反復 12,000（6 規模 × 5 場面 × 2 腕 × n=200）／校正腕 3,200（機種のセッションごとに n=400・転記行 F の上界のセッション数の合計 8）／橋 5,200（4B の A100 側・8B の L4 側 × 13 腕 × n=200・場面 N1・各機種の本走行の N1 と対にする）＝**手元合計 131,680 試行**。API 再走行（門0.5 合格時のみ）7,800（8B・14B・32B × N1 × 13 腕 × n=200）。",
    "data": {
-    "identity": 1040,
+    "identity": 2080,
     "pilot": 18200,
     "main": 91000,
-    "anchor_rerun": 14000,
-    "calibration": 5600,
+    "anchor_rerun": 12000,
+    "calibration": 3200,
     "bridge": 5200,
-    "total_local": 135040,
+    "total_local": 131680,
     "api_rerun": 7800
    }
   },
   "B": {
-   "text": "対比: 確証 35（傾きの族・7 効果種 × 5 場面・m=35 固定・両側）・記述 90（Nstr−Onull 5・Ncold−N 5・床持続 15 セル列・レシピ対 65・様式／錨差／スタック差／環境差は走行後に生成）・id の重複 0・対比が要求する腕の不在 0・登録対比を持たない腕 0。確証 35 本のうち 4B-2507 の API 既測で両腕の基底を持つもの 22（Odose1・Odosehalf を含む 10 本と N2 の Ncold 系 5 本は既測なし・仮定基底）。",
+   "text": "対比: 確証 35（傾きの族・7 効果種 × 5 場面・m=35 固定・両側・二尺度の IUT）・記述（Nstr−Onull 5・Ncold−N 5・床持続 15 セル列〔15 セル〕・レシピ対 65・様式／錨差／スタック差／環境差／対数オッズ尺度でのみ立った対比は走行後に生成）。整合検査（正本の生成時）: id の重複 0・対比が要求する腕の台帳での不在 0・登録対比を持たない腕 0・台帳に無い腕 0。確証 35 本のうち 4B-2507 の API 既測で両腕の基底を持つもの 22・欠くもの 13（Odose1・Odosehalf 系 10 本＋その他 3 本: N2:Onull-Ncold~Onull・N2:O-Ncold~Osec-Ncold・N2:O-Ncold~Onull-Ncold）。確証族に一度も現れない腕: O・Osec・Nk・Ncold・Nstr（O・Osec・Nk は床持続の記述降格の帰結・Ncold と Nstr は記述の設計）。",
    "data": {
     "confirmed": 35,
-    "m": 35,
-    "descriptive": 90,
-    "measured_bases": 22
+    "measured_bases": 22,
+    "missing_bases": [
+     "N1:Odose1~Onull",
+     "N1:Odosehalf~Onull",
+     "N2:Odose1~Onull",
+     "N2:Odosehalf~Onull",
+     "N2:Onull-Ncold~Onull",
+     "N2:O-Ncold~Osec-Ncold",
+     "N2:O-Ncold~Onull-Ncold",
+     "S1:Odose1~Onull",
+     "S1:Odosehalf~Onull",
+     "S4:Odose1~Onull",
+     "S4:Odosehalf~Onull",
+     "SK:Odose1~Onull",
+     "SK:Odosehalf~Onull"
+    ],
+    "arms_not_in_confirm_family": [
+     "O",
+     "Osec",
+     "Nk",
+     "Ncold",
+     "Nstr"
+    ]
    }
   },
   "C": {
-   "text": "検閲の誤判率（両腕条件・n=200・規模単位・二項）: 帰無（効果 0）で両腕が同じ基底 p にあるとき落ちる確率は p=0.02 で 0.985・0.05 で 0.207・0.20 で 0.000・0.50 で 0.000・0.80 で 0.000・0.95 で 0.207・0.98 で 0.985。真の効果 +9pt（床側）・−9pt（天井側）・±15pt（中間）を持つ対比が落ちる確率は格子の表（design-facts-A.json C.grid）。4B-2507 の API 既測の基底では、確証 35 本のうち 4B の規模で検閲される見込み（>0.5）の対比は 0 本（なし）。**残り方の偏り**: 検閲は両腕が同時に床（O 族・Nk・Osec-Ncold の床側）または天井（N・Ncold・Onull-Ncold の天井側）に落ちる規模で起き、小規模では書式外による測定不能が、大規模では天井が先に立つ見込み——上端・下端のどちらを欠くかは効果種で異なり、報告は残った規模の一覧を機械印字する。",
-   "grid": [
-    {
-     "ctrl": 0.02,
-     "effect_pt": 0.0,
-     "p_censor": 0.9851
-    },
-    {
-     "ctrl": 0.02,
-     "effect_pt": 0.09,
-     "p_censor": 0.0009
-    },
-    {
-     "ctrl": 0.02,
-     "effect_pt": -0.09,
-     "p_censor": 0.9925
-    },
-    {
-     "ctrl": 0.02,
-     "effect_pt": 0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.02,
-     "effect_pt": -0.15,
-     "p_censor": 0.9925
-    },
-    {
-     "ctrl": 0.05,
-     "effect_pt": 0.0,
-     "p_censor": 0.2068
-    },
-    {
-     "ctrl": 0.05,
-     "effect_pt": 0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.05,
-     "effect_pt": -0.09,
-     "p_censor": 0.4547
-    },
-    {
-     "ctrl": 0.05,
-     "effect_pt": 0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.05,
-     "effect_pt": -0.15,
-     "p_censor": 0.4547
-    },
-    {
-     "ctrl": 0.2,
-     "effect_pt": 0.0,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.2,
-     "effect_pt": 0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.2,
-     "effect_pt": -0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.2,
-     "effect_pt": 0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.2,
-     "effect_pt": -0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.5,
-     "effect_pt": 0.0,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.5,
-     "effect_pt": 0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.5,
-     "effect_pt": -0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.5,
-     "effect_pt": 0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.5,
-     "effect_pt": -0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.8,
-     "effect_pt": 0.0,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.8,
-     "effect_pt": 0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.8,
-     "effect_pt": -0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.8,
-     "effect_pt": 0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.8,
-     "effect_pt": -0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.95,
-     "effect_pt": 0.0,
-     "p_censor": 0.2068
-    },
-    {
-     "ctrl": 0.95,
-     "effect_pt": 0.09,
-     "p_censor": 0.4547
-    },
-    {
-     "ctrl": 0.95,
-     "effect_pt": -0.09,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.95,
-     "effect_pt": 0.15,
-     "p_censor": 0.4547
-    },
-    {
-     "ctrl": 0.95,
-     "effect_pt": -0.15,
-     "p_censor": 0.0
-    },
-    {
-     "ctrl": 0.98,
-     "effect_pt": 0.0,
-     "p_censor": 0.9851
-    },
-    {
-     "ctrl": 0.98,
-     "effect_pt": 0.09,
-     "p_censor": 0.9925
-    },
-    {
-     "ctrl": 0.98,
-     "effect_pt": -0.09,
-     "p_censor": 0.0009
-    },
-    {
-     "ctrl": 0.98,
-     "effect_pt": 0.15,
-     "p_censor": 0.9925
-    },
-    {
-     "ctrl": 0.98,
-     "effect_pt": -0.15,
-     "p_censor": 0.0
-    }
-   ],
-   "measured": [
-    {
-     "id": "N1:Onull~N",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "N1:Lneg~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "N1:Onull-Ncold~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "N1:O-Ncold~Osec-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "N1:O-Ncold~Onull-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "N2:Onull~N",
-     "p_censor_at_4B_bases": 0.0625
-    },
-    {
-     "id": "N2:Lneg~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S1:Onull~N",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S1:Lneg~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S1:Onull-Ncold~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S1:O-Ncold~Osec-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S1:O-Ncold~Onull-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S4:Onull~N",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S4:Lneg~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S4:Onull-Ncold~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S4:O-Ncold~Osec-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "S4:O-Ncold~Onull-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "SK:Onull~N",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "SK:Lneg~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "SK:Onull-Ncold~Onull",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "SK:O-Ncold~Osec-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    },
-    {
-     "id": "SK:O-Ncold~Onull-Ncold",
-     "p_censor_at_4B_bases": 0.0
-    }
-   ]
+   "text": "検閲の誤判率（両腕条件・n=200・規模単位・率 <0.05 は X ≤ 9・率 >0.95 は X ≥ 191・厳密二項）: 帰無（両腕が同じ基底 p）で落ちる確率は p=0.02 で 0.985・p=0.05 で 0.207・p=0.2 で 0.000・p=0.5 で 0.000・p=0.8 で 0.000・p=0.95 で 0.207・p=0.98 で 0.985。4B-2507 の API 既測の基底で、4B の規模で検閲される確率が 0.5 を超える確証対比 0 本。**片腕が既に閾外（<0.05 または >0.95）にある確証対比 6 本**: N2:Onull~N・N2:Lneg~Onull・S1:Onull~N・S1:Lneg~Onull・SK:Onull~N・SK:Lneg~Onull（ほかに 1 規模で同じ腕が閾外になれば解釈条項が発火する）。残った規模の一覧は報告で機械印字する。",
+   "data": {
+    "one_arm_saturated_at_4B": [
+     "N2:Onull~N",
+     "N2:Lneg~Onull",
+     "S1:Onull~N",
+     "S1:Lneg~Onull",
+     "SK:Onull~N",
+     "SK:Lneg~Onull"
+    ],
+    "censor_likely_at_4B": []
+   }
   },
   "D": {
-   "text": "傾きの族の検出力と実サイズ（Firth PPLRT 両側・n=200 × 6 規模・両腕条件の検閲後・B=2000・seed 20260913・z は転記行 L の実値）: 型 I 誤りの実サイズ（Δ=0）は対照中間 0.054・床 0.197・天井 0.192・対照が規模で動く 0.052（名目 0.05）。検出力（p<0.05／Holm 初段 p<0.05/35）: 対照中間で Δ=10pt 0.87／0.50・15pt 1.00／0.94・20pt 1.00／1.00・30pt 1.00／1.00。対照が床（0.03）では Δ=15pt 0.45／0.24（解釈条項の発火率 0.99・判定不能率 0.02）、対照が天井（0.97）では Δ=−15pt 相当の設定で 0.88／0.77（発火率 0.90）。**対照が規模で動く（0.3→0.9）とき処置が平坦なら（d0=0.15・Δ=0）の実サイズ 0.407・解釈条項の発火率 0.10**。検出できるのは 4B〜32B 間で 15〜20 pt 級以上の pt 差の変化であり、10 pt 級は検出域外。**尺度依存の先置**: β₃ は対数オッズ尺度の交互作用であり、対照の基底が規模で動くとき処置との pt 差が一定でも β₃≠0 になる（上の 0.407 はその型で、偽陽性ではなく尺度の違い）。確証札の隣に pt 差の規模傾向（記述・傾向検定）を機械印字し、pt 差の傾きの区間が 0 を含む対比には「尺度依存」の注を付す（読み条項 (xiv)）。",
-   "data": [
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.054,
-     "reject_holm_first": 0.0015,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.873,
-     "reject_holm_first": 0.4955,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.999,
-     "reject_holm_first": 0.942,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.049,
-     "reject_holm_first": 0.0025,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.911,
-     "reject_holm_first": 0.585,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 0.9785,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "mid_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 122,
-     "undecidable_rate": 0.939,
-     "reject_005": 0.1967,
-     "reject_holm_first": 0.0246,
-     "interp_clause_rate": 0.9426,
-     "mean_kept_sizes": 0.93
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 1773,
-     "undecidable_rate": 0.1135,
-     "reject_005": 0.3768,
-     "reject_holm_first": 0.2234,
-     "interp_clause_rate": 0.9791,
-     "mean_kept_sizes": 3.16
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 1955,
-     "undecidable_rate": 0.0225,
-     "reject_005": 0.445,
-     "reject_holm_first": 0.2379,
-     "interp_clause_rate": 0.9852,
-     "mean_kept_sizes": 3.29
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 1993,
-     "undecidable_rate": 0.0035,
-     "reject_005": 0.4987,
-     "reject_holm_first": 0.2664,
-     "interp_clause_rate": 0.9824,
-     "mean_kept_sizes": 3.32
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 1999,
-     "undecidable_rate": 0.0005,
-     "reject_005": 0.6028,
-     "reject_holm_first": 0.3197,
-     "interp_clause_rate": 0.983,
-     "mean_kept_sizes": 3.33
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.0445,
-     "reject_holm_first": 0.001,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.623,
-     "reject_holm_first": 0.183,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 5.99
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.705,
-     "reject_holm_first": 0.3495,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 5.43
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.789,
-     "reject_holm_first": 0.379,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 5.07
-    },
-    {
-     "pattern": "floor_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.887,
-     "reject_holm_first": 0.6445,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 4.86
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 104,
-     "undecidable_rate": 0.948,
-     "reject_005": 0.1923,
-     "reject_holm_first": 0.0,
-     "interp_clause_rate": 0.9231,
-     "mean_kept_sizes": 0.92
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 654,
-     "undecidable_rate": 0.673,
-     "reject_005": 0.8563,
-     "reject_holm_first": 0.7431,
-     "interp_clause_rate": 0.9021,
-     "mean_kept_sizes": 2.32
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 707,
-     "undecidable_rate": 0.6465,
-     "reject_005": 0.8826,
-     "reject_holm_first": 0.768,
-     "interp_clause_rate": 0.8953,
-     "mean_kept_sizes": 2.39
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 711,
-     "undecidable_rate": 0.6445,
-     "reject_005": 0.9086,
-     "reject_holm_first": 0.7975,
-     "interp_clause_rate": 0.8945,
-     "mean_kept_sizes": 2.4
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 674,
-     "undecidable_rate": 0.663,
-     "reject_005": 0.9703,
-     "reject_holm_first": 0.8858,
-     "interp_clause_rate": 0.8902,
-     "mean_kept_sizes": 2.4
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 26,
-     "undecidable_rate": 0.987,
-     "reject_005": 0.0,
-     "reject_holm_first": 0.0,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 0.5
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 20,
-     "undecidable_rate": 0.99,
-     "reject_005": 0.0,
-     "reject_holm_first": 0.0,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 0.48
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 19,
-     "undecidable_rate": 0.9905,
-     "reject_005": 0.2632,
-     "reject_holm_first": 0.0526,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 0.48
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 82,
-     "undecidable_rate": 0.959,
-     "reject_005": 0.9634,
-     "reject_holm_first": 0.9512,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 1.21
-    },
-    {
-     "pattern": "ceiling_const",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 116,
-     "undecidable_rate": 0.942,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 1.0,
-     "mean_kept_sizes": 1.4
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.0525,
-     "reject_holm_first": 0.0015,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.9935,
-     "reject_holm_first": 0.8475,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 0.994,
-     "interp_clause_rate": 0.0,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.008,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.0,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.9935,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.0,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.407,
-     "reject_holm_first": 0.0645,
-     "interp_clause_rate": 0.101,
-     "mean_kept_sizes": 5.99
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.1,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 0.9975,
-     "reject_holm_first": 0.9435,
-     "interp_clause_rate": 0.9975,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.15,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 0.9985,
-     "interp_clause_rate": 0.998,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.2,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.9965,
-     "mean_kept_sizes": 6.0
-    },
-    {
-     "pattern": "ctrl_rising",
-     "d0_pt": 0.15,
-     "delta_pt_32B_minus_4B": 0.3,
-     "B": 2000,
-     "n_fit": 2000,
-     "undecidable_rate": 0.0,
-     "reject_005": 1.0,
-     "reject_holm_first": 1.0,
-     "interp_clause_rate": 0.996,
-     "mean_kept_sizes": 6.0
-    }
-   ]
+   "text": "傾きの族（Firth PPLRT 両側・n=200 × 6 規模・両腕条件の検閲・率は B 回あたりの無条件率・B=2000・seed 20260913・子ストリーム 1・z は転記行 L の実値〔一致を assert〕・札 D1＝β₃ と pt 差の傾きが同じ水準で同じ向き〔二尺度の IUT・登録者裁定 D1〕・初段＝Holm 初段 α/35）。**Δ=0・d0=0 の棄却率**: 対照中間（0.5） 0.057〔条件付き 0.057・n_fit 2000・判定不能 0.000・非収束 0.000〕・対照が床（0.03） 0.011〔条件付き 0.233・n_fit 90・判定不能 0.955・非収束 0.000〕・対照が天井（0.97） 0.010〔条件付き 0.235・n_fit 85・判定不能 0.958・非収束 0.000〕・対照が上昇（0.3→0.9） 0.050〔条件付き 0.050・n_fit 2000・判定不能 0.000・非収束 0.000〕・対照が下降（0.9→0.3） 0.053〔条件付き 0.053・n_fit 2000・判定不能 0.000・非収束 0.000〕。**検出力**: 対照中間（0.5）・Δ=10／15／20／30 pt の札 D1（初段）0.479／0.941／0.999／1.000・札 D1（名目）0.885／0.998／1.000／1.000・草案4 の規則の初段 0.479／0.941／0.999／1.000。**尺度依存の穴**: pt 差が全規模で一定（Δ=0）の配置での札（草案4 の規則の名目／初段 → 裁定 D1 の名目／初段）は、対照が上昇（0.3→0.9）: d0=5 pt で 0.066／0.005 → 0.022／0.002・d0=10 pt で 0.279／0.030 → 0.021／0.001・d0=15 pt で 0.376／0.056 → 0.001／0.000・d0=20 pt で 0.008／0.001 → 0.000／0.000・d0=30 pt で 0.001／0.000 → 0.000／0.000、対照が下降（0.9→0.3）: d0=5 pt で 0.127／0.007 → 0.023／0.001・d0=10 pt で 0.580／0.140 → 0.021／0.001・d0=15 pt で 0.659／0.227 → 0.001／0.000・d0=20 pt で 0.005／0.004 → 0.000／0.000・d0=30 pt で 0.001／0.001 → 0.000／0.000。対照が床（0.03）・Δ=15 pt の札 D1（初段）0.005（判定不能 0.028・解釈条項 0.983）／対照が天井（0.97）・Δ=15 pt（処置が下がる向き）の札 D1（初段）0.004（判定不能 0.018・解釈条項 0.981）。全規模が上限・下限に切り詰められて格子から外した行 0（なし）。**実基底**: 両腕の既測基底を持つ 22 本の 4B の実基底を入力にすると（B=1000）、対照の規模変化 一定（32B−4B +0 pt）: Δ=0 で札 D1（初段）の最大 0.003（SK:O-Ncold~Osec-Ncold）・期待本数 0.015・少なくとも 1 本 0.015（独立を仮定）・草案4 の規則（名目）の最大 0.059（SK:O-Ncold~Osec-Ncold）・期待本数 0.774・判定不能の期待本数 0.00／Δ=±0.15 で札 D1（初段）の中央値 0.679・平均 0.537（草案4 の規則の初段の平均 0.539）・最小 0.000（N2:Lneg~Onull）・解釈条項が当てはめの 0.5 以上で発火する対比 8 本・草案4 の規則の初段から 0.1 以上下がる対比 0 本／対照の規模変化 上昇（32B−4B +20 pt）: Δ=0 で札 D1（初段）の最大 0.002（S4:Lneg~Onull）・期待本数 0.003・少なくとも 1 本 0.003（独立を仮定）・草案4 の規則（名目）の最大 0.489（N1:O-Ncold~Osec-Ncold）・期待本数 2.246・判定不能の期待本数 0.07／Δ=±0.15 で札 D1（初段）の中央値 0.011・平均 0.254（草案4 の規則の初段の平均 0.258）・最小 0.000（N1:O-Ncold~Osec-Ncold）・解釈条項が当てはめの 0.5 以上で発火する対比 12 本・草案4 の規則の初段から 0.1 以上下がる対比 0 本／対照の規模変化 下降（32B−4B -20 pt）: Δ=0 で札 D1（初段）の最大 0.002（S4:Lneg~Onull）・期待本数 0.005・少なくとも 1 本 0.005（独立を仮定）・草案4 の規則（名目）の最大 0.454（S4:Onull-Ncold~Onull）・期待本数 2.490・判定不能の期待本数 0.00／Δ=±0.15 で札 D1（初段）の中央値 0.000・平均 0.273（草案4 の規則の初段の平均 0.276）・最小 0.000（N1:Onull-Ncold~Onull）・解釈条項が当てはめの 0.5 以上で発火する対比 14 本・草案4 の規則の初段から 0.1 以上下がる対比 0 本。既測基底の無い 13 本は格子に載せない。検閲の感度閾値（B=1000）: 閾値 0.03／0.97 で 対照中間・Δ=15 pt の札 D1（初段）0.943・対照が上昇・d0=15 pt・Δ=0 の札 D1（名目）0.001・対照が床の判定不能 0.010／閾値 0.08／0.92 で 対照中間・Δ=15 pt の札 D1（初段）0.931・対照が上昇・d0=15 pt・Δ=0 の札 D1（名目）0.004・対照が床の判定不能 1.000。refuse 門（B=2000）: 転位なし・効果あり（破局 0.45・refuse 0.10 一定・Δ=+0.15）: 名目有意 0.998・そのうち保留 0.000（(a) 0.000・(b) 0.000・(c) 0.000・(d) 0.000）・札 D1（初段）は門の前 0.945・門のあと 0.945／転位なし・効果なし（破局 0.45・refuse 0.10 一定・Δ=0）: 名目有意 0.038・そのうち保留 0.286（(a) 0.000・(b) 0.286・(c) 0.000・(d) 0.000）・札 D1（初段）は門の前 0.001・門のあと 0.001／転位なし・refuse 0.30 一定・効果あり（Δ=+0.15）: 名目有意 0.997・そのうち保留 0.002（(a) 0.000・(b) 0.001・(c) 0.001・(d) 0.000）・札 D1（初段）は門の前 0.955・門のあと 0.954／転位あり（処置の refuse が規模とともに 0.05→0.35・答えた分母の破局率は一定）: 名目有意 0.705・そのうち保留 1.000（(a) 0.277・(b) 0.960・(c) 1.000・(d) 0.000）・札 D1（初段）は門の前 0.228・門のあと 0.000。",
+   "data_ref": "records/A/power-grid-A.json"
   },
   "E": {
-   "text": "床持続（記述）の到達可能性（n=200・棄却域 k≤4〔CP 95% 片側上限 <0.05・H0 での実サイズ 0.0265〕）: 真の率 0.005／0.01／0.02／0.03 で 単一セル 0.997／0.948／0.629／0.281・6 規模同時 0.979／0.727／0.062／0.0005・Holm 初段（k≤2・m=15 のとき）0.607／0.096／0.00017／0.000000。記述に降格したため多重補正は課さず、各セルの CP 上限と全規模 0/1 を印字する。0/1 が 0 であることを「床を離れた」と読まない。",
+   "text": "床持続（記述）の到達可能性（n=200・棄却域 k≤4〔CP 片側上限 <0.05・境界での実サイズ 0.0265〕）: 真の率 0.005／0.01／0.02／0.03 で 単一セル 0.997／0.948／0.629／0.281・6 規模同時 0.9789／0.7270／0.0618／0.0005・Holm 初段（k≤2・m=15 のとき）0.606990／0.096005／0.000169／0.000000。記述に降格したため多重補正は課さず、各セルの CP 上限と全規模 0/1 を印字する。0/1 が 0 であることを「床を離れた」と読まない。",
    "data": {
     "rows": [
      {
       "true_rate": 0.005,
-      "single_cell_k_le_4": 0.9965,
+      "single_cell": 0.9965,
       "six_sizes_joint": 0.97891,
-      "holm_first_stage_k_le_2": 0.60699
+      "holm_first_six": 0.60699
      },
      {
       "true_rate": 0.01,
-      "single_cell_k_le_4": 0.9483,
+      "single_cell": 0.9483,
       "six_sizes_joint": 0.72702,
-      "holm_first_stage_k_le_2": 0.096005
+      "holm_first_six": 0.096005
      },
      {
       "true_rate": 0.02,
-      "single_cell_k_le_4": 0.6288,
+      "single_cell": 0.6288,
       "six_sizes_joint": 0.06184,
-      "holm_first_stage_k_le_2": 0.000169
+      "holm_first_six": 0.000169
      },
      {
       "true_rate": 0.03,
-      "single_cell_k_le_4": 0.281,
+      "single_cell": 0.281,
       "six_sizes_joint": 0.00049,
-      "holm_first_stage_k_le_2": 0.0
+      "holm_first_six": 0.0
      }
     ],
-    "k_max_cp95_n200": 4,
-    "k_max_holm_first_n200": 2,
-    "p_size_k_le_4": 0.02645
+    "k_max_cp95": 4,
+    "k_max_holm_first_m15": 2,
+    "size_at_k_max": 0.02645,
+    "holm_first_boundary_p": [
+     0.002336294190063917,
+     0.00904837639610153,
+     0.0033333333333333335
+    ]
    }
   },
-  "F": {
-   "text": "費用と時間（門0 の実測係数〔L4 2.67 ユニット/h・3,839 試行/h・経費 512 s／A100 12.82・19,200・465 s〕× 4B 比の試行時間の仮定 {\"0.6B\": 0.25, \"1.7B\": 0.5, \"4B\": 1.0, \"4B-2507\": 1.0, \"8B\": 2.0, \"14B\": 3.5, \"32B\": 8.0} ◐・セッション 8 時間・機種別の環境）: 0.6B: 18,400 試行・1.3 h・1 セッション・3.6 ユニット／1.7B: 18,400 試行・2.5 h・1 セッション・6.8 ユニット／4B: 23,600 試行・6.3 h・1 セッション・16.8 ユニット／8B: 18,400 試行・2.0 h・1 セッション・26.2 ユニット／14B: 18,400 試行・3.5 h・1 セッション・44.7 ユニット／32B: 18,400 試行・7.8 h・1 セッション・99.9 ユニット／4B-2507: 18,400 試行・4.9 h・1 セッション・13.2 ユニット。**合計 ≈211 ユニット・≈28 時間**（v2.3 §6 の見込み A ≈84〜81 と同じ桁・32B の係数 8 と A100 80GB の割当は仮定）。門0.5・API 再走行・判定器の断片は含まない。パイロットで機種ごとの実測に置き換える。",
-   "data": {
-    "0.6B": {
-     "env": "L4",
-     "trials": 18400,
-     "hours_run": 1.2,
-     "sessions": 1,
-     "hours_total": 1.34,
-     "units": 3.6
-    },
-    "1.7B": {
-     "env": "L4",
-     "trials": 18400,
-     "hours_run": 2.4,
-     "sessions": 1,
-     "hours_total": 2.54,
-     "units": 6.8
-    },
-    "4B": {
-     "env": "L4",
-     "trials": 23600,
-     "hours_run": 6.15,
-     "sessions": 1,
-     "hours_total": 6.29,
-     "units": 16.8
-    },
-    "8B": {
-     "env": "A100",
-     "trials": 18400,
-     "hours_run": 1.92,
-     "sessions": 1,
-     "hours_total": 2.05,
-     "units": 26.2
-    },
-    "14B": {
-     "env": "A100",
-     "trials": 18400,
-     "hours_run": 3.35,
-     "sessions": 1,
-     "hours_total": 3.48,
-     "units": 44.7
-    },
-    "32B": {
-     "env": "A100",
-     "trials": 18400,
-     "hours_run": 7.67,
-     "sessions": 1,
-     "hours_total": 7.8,
-     "units": 99.9
-    },
-    "4B-2507": {
-     "env": "L4",
-     "trials": 18400,
-     "hours_run": 4.79,
-     "sessions": 1,
-     "hours_total": 4.94,
-     "units": 13.2
-    }
-   },
-   "total_units": 211.2,
-   "total_hours": 28.4
-  },
   "G": {
-   "text": "様式門の一斉保留の見込み: 既測の (b) JSON 直答率は段階 F の様式記録（4B-2507・U 腕 N・Ncold・O-Ncold・4 場面）にのみあり、他の 10 腕と N2 は既測なし。取れた値: 様式記録の形式が想定と異なり取得できず（パイロットで置換）。腕別・規模別の (b) 率はパイロットで転記し、30 pt 超の見込み本数を凍結前に置き換える（この転記行は仮）。",
-   "data": {}
-  },
-  "H": {
-   "text": "錨帯の帰無発火率（n=200 × 2 走行・二項の差・真の率 0.1／0.3／0.5／0.7／0.9）: 帯 10 pt で {'0.1': 0.0013, '0.3': 0.0314, '0.5': 0.0502, '0.7': 0.0338, '0.9': 0.0014}・12 pt で {'0.1': 0.0001, '0.3': 0.0089, '0.5': 0.0192, '0.7': 0.0109, '0.9': 0.0001}・15 pt で {'0.1': 0.0, '0.3': 0.0015, '0.5': 0.0019, '0.7': 0.0008, '0.9': 0.0}。対 60 本（5 場面 × 6 規模 × 2 腕）で真の率 0.5 のときの帰無での除外の期待本数は 10 pt 3.0・12 pt 1.1・15 pt 0.1。**帯は登録者確認（2026-09-13）で 12 pt に決定**（10 pt は真の率 0.5 で両側 0.050 に達するため）。",
+   "text": "様式門（(a)(b) の差・二項の差・n=200 同士・「超」・厳密）の帰無発火率: 注（15 pt 超）p=0.1 で 4.82e-07・p=0.3 で 8.59e-04・p=0.5 で 2.25e-03・p=0.7 で 8.59e-04・p=0.9 で 4.82e-07・判定保留（30 pt 超）p=0.1 で 2.24e-22・p=0.3 で 3.13e-11・p=0.5 で 1.08e-09・p=0.7 で 3.13e-11・p=0.9 で 2.24e-22。既測の (b) JSON 直答率（段階 F の stageF1・4B-2507・U 腕・記述）: N1: N 0.575・Ncold 0.000・O-Ncold 0.000／S1: N 1.000・Ncold 0.795・O-Ncold 0.000／S4: N 0.865・Ncold 1.000・O-Ncold 0.000／SK: N 1.000・Ncold 0.762・O-Ncold 0.000。腕別・規模別の (b) 率と一斉保留の見込み本数はパイロット後に記述として報告し、閾値は動かさない（登録者裁定 D6）。",
    "data": {
-    "per_pair_null_fire": {
-     "10": {
-      "0.1": 0.0013,
-      "0.3": 0.0314,
-      "0.5": 0.0502,
-      "0.7": 0.0338,
-      "0.9": 0.0014
-     },
-     "12": {
-      "0.1": 0.0001,
-      "0.3": 0.0089,
-      "0.5": 0.0192,
-      "0.7": 0.0109,
-      "0.9": 0.0001
-     },
-     "15": {
-      "0.1": 0.0,
-      "0.3": 0.0015,
-      "0.5": 0.0019,
-      "0.7": 0.0008,
-      "0.9": 0.0
+    "null": {
+     "n": 200,
+     "strict": true,
+     "bands": {
+      "15": {
+       "0.1": 4.824583296207499e-07,
+       "0.3": 0.0008592199595156565,
+       "0.5": 0.002248208104470807,
+       "0.7": 0.0008592199595156565,
+       "0.9": 4.824583296207501e-07
+      },
+      "30": {
+       "0.1": 2.24102029837508e-22,
+       "0.3": 3.127422575091189e-11,
+       "0.5": 1.0846402527089739e-09,
+       "0.7": 3.1274225750911944e-11,
+       "0.9": 2.241020298375068e-22
+      }
      }
     },
-    "n_pairs": 60,
-    "expected_false_exclusions_at_p05": {
-     "10": 3.01,
-     "12": 1.15,
-     "15": 0.11
+    "measured_b_rates": {
+     "N1": {
+      "N": 0.575,
+      "Ncold": 0.0,
+      "O-Ncold": 0.0
+     },
+     "S1": {
+      "N": 1.0,
+      "Ncold": 0.795,
+      "O-Ncold": 0.0
+     },
+     "S4": {
+      "N": 0.865,
+      "Ncold": 1.0,
+      "O-Ncold": 0.0
+     },
+     "SK": {
+      "N": 1.0,
+      "Ncold": 0.7625,
+      "O-Ncold": 0.0
+     }
     }
+   }
+  },
+  "H": {
+   "text": "錨帯（Onull・O-Ncold × 6 規模 × 5 場面 × 2 走行・n=200・「超」・厳密）: 腕あたりの帰無発火率（真の率 0.5・超／以上）10 pt 4.02e-02／5.10e-02・12 pt 1.42e-02／1.87e-02・15 pt 2.25e-03／3.13e-03。除外単位（規模 × 場面＝30）あたり 10 pt 0.0788／12 pt 0.0282／15 pt 0.0045、期待誤除外数 10 pt 2.37／12 pt 0.85／15 pt 0.13、少なくとも 1 単位 10 pt 0.915／12 pt 0.576／15 pt 0.126、4B-2507 の API 既測の基底での期待誤除外数 10 pt 1.53／12 pt 0.51／15 pt 0.07。検出側（走行間の真の drift・真の率 0.5 付近）: 10 pt の帯で drift 10 pt 0.481／drift 14 pt 0.776／drift 16 pt 0.878／drift 20 pt 0.976・12 pt の帯で drift 10 pt 0.326／drift 14 pt 0.639／drift 16 pt 0.777／drift 20 pt 0.943・15 pt の帯で drift 10 pt 0.146／drift 14 pt 0.401／drift 16 pt 0.561／drift 20 pt 0.834。**登録値 12 pt**。規則（真の率 0.5 で期待誤除外数 1 以下）を満たす最小の帯 12 pt・登録値は規則を満たす: True（値は登録者確認 2026-09-13・規約と根拠は登録者裁定 D2）。",
+   "data": {
+    "n": 200,
+    "units": 30,
+    "strict": true,
+    "registered_pt": 12,
+    "bands": {
+     "10": {
+      "per_pair": {
+       "0.1": {
+        "strict": 0.0006609754720396171,
+        "ge": 0.0011912990710030537
+       },
+       "0.3": {
+        "strict": 0.02519341180560736,
+        "ge": 0.033245887463332444
+       },
+       "0.5": {
+        "strict": 0.040230739680638006,
+        "ge": 0.051040223129147994
+       },
+       "0.7": {
+        "strict": 0.02519341180560736,
+        "ge": 0.03324588746333244
+       },
+       "0.9": {
+        "strict": 0.0006609754720396193,
+        "ge": 0.0011912990710030574
+       }
+      },
+      "per_unit_at_05": 0.07884296694602488,
+      "expected_false_exclusions_at_05": 2.3652890083807465,
+      "p_any_false_exclusion_at_05": 0.914884203227632,
+      "expected_false_exclusions_at_measured_bases": 1.5338364258934112,
+      "detection_by_drift_pt": {
+       "10": 0.48065636273107254,
+       "14": 0.7758950461165729,
+       "16": 0.8778182506765881,
+       "20": 0.9762331923199842
+      }
+     },
+     "12": {
+      "per_pair": {
+       "0.1": {
+        "strict": 4.9095676117056795e-05,
+        "ge": 9.75324241339913e-05
+       },
+       "0.3": {
+        "strict": 0.007452109345534587,
+        "ge": 0.010272403120197083
+       },
+       "0.5": {
+        "strict": 0.014184123191882173,
+        "ge": 0.01866152031735993
+       },
+       "0.7": {
+        "strict": 0.007452109345534589,
+        "ge": 0.010272403120197084
+       },
+       "0.9": {
+        "strict": 4.909567611705692e-05,
+        "ge": 9.753242413399157e-05
+       }
+      },
+      "per_unit_at_05": 0.02816705703304201,
+      "expected_false_exclusions_at_05": 0.8450117109912603,
+      "p_any_false_exclusion_at_05": 0.5756262643748382,
+      "expected_false_exclusions_at_measured_bases": 0.505044163849677,
+      "detection_by_drift_pt": {
+       "10": 0.32605057819642946,
+       "14": 0.6388851044078663,
+       "16": 0.7766321129600112,
+       "20": 0.9426508470705395
+      }
+     },
+     "15": {
+      "per_pair": {
+       "0.1": {
+        "strict": 4.824583296207499e-07,
+        "ge": 1.106384738833898e-06
+       },
+       "0.3": {
+        "strict": 0.0008592199595156565,
+        "ge": 0.0012667969483581077
+       },
+       "0.5": {
+        "strict": 0.002248208104470807,
+        "ge": 0.003129016126814526
+       },
+       "0.7": {
+        "strict": 0.0008592199595156565,
+        "ge": 0.001266796948358108
+       },
+       "0.9": {
+        "strict": 4.824583296207501e-07,
+        "ge": 1.1063847388338987e-06
+       }
+      },
+      "per_unit_at_05": 0.004491361769260571,
+      "expected_false_exclusions_at_05": 0.13474085307781714,
+      "p_any_false_exclusion_at_05": 0.12632283422953794,
+      "expected_false_exclusions_at_measured_bases": 0.07154941845716989,
+      "detection_by_drift_pt": {
+       "10": 0.14559646656406205,
+       "14": 0.4012059539767513,
+       "16": 0.561418979519983,
+       "20": 0.8339263611555515
+      }
+     }
+    },
+    "smallest_band_meeting_rule": 12,
+    "registered_meets_rule": true
    }
   },
   "I": {
-   "text": "校正腕（4B-2507 × Ncold × N1・n=400・API 既測 0.975・5 pt 帯）: 発火境界 ≤370 または ≥None・帰無発火率 0.000。撤退条件（パイロット n=40・15 pt 帯・同じ基底）: 発火境界 ≤33 または ≥None・帰無発火率 0.000。門2 の誤判率は転記行 C の検閲確率と検出力格子から: n=40 では両腕条件の閾値が 2/40・38/40 に相当し、帰無で落ちる確率は転記行 C の p=0.02・0.98 の行を n=40 で引き直した値（design-facts-A.json I.gate2）。",
+   "text": "校正腕（4B-2507 × Ncold × N1・n=400・「超」・厳密）: 合格枝＝API 既測 0.975 に対し下側 5 pt（上側は 1.0 を超える）→ 発火 X ≤ 369・帰無発火率 4.56e-08・検出 真の率 0.95 で 0.011・真の率 0.94 で 0.089・真の率 0.93 で 0.305・真の率 0.9 で 0.948。不合格枝＝手元系列の初点を本走行の最初のセッションの校正腕（n=400）とする二標本・両側 5 pt → 帰無発火率 真の率 0.975 で 6.15e-06・真の率 0.95 で 9.37e-04・検出 0.95 から 5 pt 下で 0.471・0.95 から 7.5 pt 下で 0.886・0.95 から 10 pt 下で 0.991（参考: 初点を門0.5 の n=160 にした場合の帰無発火率 真の率 0.975 で 1.00e-03・真の率 0.95 で 1.33e-02）。撤退条件（パイロット n=40・15 pt・同じ API 既測）: 発火 X ≤ 32・帰無発火率 5.74e-06・検出 真の率 0.9 で 0.042・真の率 0.85 で 0.244・真の率 0.8 で 0.563。門2（n=40）の検閲の整数境界: 率 <0.05 は X ≤ 1・率 >0.95 は X ≥ 39・両腕が同じ p のとき落ちる確率 p=0.02 で 6.55e-01・p=0.05 で 1.59e-01・p=0.95 で 1.59e-01・p=0.98 で 6.55e-01。",
    "data": {
-    "calibration": {
-     "base_api": 0.975,
+    "calibration_pass": {
      "n": 400,
+     "base_api": 0.975,
      "band_pt": 5,
-     "fire_if_le": 370,
-     "fire_if_ge": null,
-     "null_fire": 0.0
-    },
-    "withdrawal_pilot": {
-     "n": 40,
-     "band_pt": 15,
-     "fire_if_le": 33,
-     "fire_if_ge": null,
-     "null_fire": 0.0001
-    }
-   },
-   "gate2": {
-    "0.02": 0.6554,
-    "0.05": 0.1593,
-    "0.2": 0.0,
-    "0.5": 0.0,
-    "0.8": 0.0,
-    "0.95": 0.1593,
-    "0.98": 0.6554
-   }
-  },
-  "M": {
-   "text": "環境差の帯（橋のセル・n=200 × 2 環境・腕ごと・真の率 0.1〜0.9）: 帯 10 pt で {'0.1': 0.0014, '0.3': 0.0331, '0.5': 0.0491, '0.7': 0.0326, '0.9': 0.001}・12 pt で {'0.1': 0.0001, '0.3': 0.0097, '0.5': 0.0182, '0.7': 0.0104, '0.9': 0.0001}・15 pt で {'0.1': 0.0, '0.3': 0.001, '0.5': 0.0029, '0.7': 0.0016, '0.9': 0.0001}（13 腕 × 1 機種）。手元系列の校正帯（門0.5 不合格時・n=400 同士・同じ二項の差）は帯 5 pt で真の率 0.95 のとき帰無発火率 0.002。帯の値は凍結前に裁定。",
-   "data": {
-    "per_arm_null_fire_two_env": {
-     "10": {
-      "0.1": 0.0014,
-      "0.3": 0.0331,
-      "0.5": 0.0491,
-      "0.7": 0.0326,
-      "0.9": 0.001
-     },
-     "12": {
-      "0.1": 0.0001,
-      "0.3": 0.0097,
-      "0.5": 0.0182,
-      "0.7": 0.0104,
-      "0.9": 0.0001
-     },
-     "15": {
-      "0.1": 0.0,
-      "0.3": 0.001,
-      "0.5": 0.0029,
-      "0.7": 0.0016,
-      "0.9": 0.0001
+     "fire_if_le": 369,
+     "null": 4.56377221359823e-08,
+     "detection": {
+      "0.95": 0.011436998186688863,
+      "0.94": 0.08914746871167045,
+      "0.93": 0.3046244406951136,
+      "0.9": 0.9476087534214177
      }
     },
-    "arms_per_bridge": 13
+    "calibration_fail_local": {
+     "n_first": 400,
+     "n_session": 400,
+     "band_pt": 5,
+     "null": {
+      "0.975": 6.148585341599623e-06,
+      "0.95": 0.0009367369767380613
+     },
+     "detection_from_095": {
+      "5": 0.4711602645697335,
+      "7.5": 0.8855058519542223,
+      "10": 0.9907451474678128
+     },
+     "if_first_point_were_gate05": {
+      "n_first": 160,
+      "null": {
+       "0.975": 0.0010042375905066395,
+       "0.95": 0.013341557118232138
+      }
+     }
+    },
+    "withdrawal": {
+     "n": 40,
+     "band_pt": 15,
+     "fire_if_le": 32,
+     "null": 5.735884387174139e-06,
+     "detection": {
+      "0.9": 0.04190194267336359,
+      "0.85": 0.24406673702957343,
+      "0.8": 0.5628541020125893
+     }
+    },
+    "gate2": {
+     "n": 40,
+     "censor_low_if_le": 1,
+     "censor_high_if_ge": 39,
+     "null_both_arms_same_p": {
+      "0.02": 0.655350912744626,
+      "0.05": 0.1592521280726661,
+      "0.95": 0.1592521280726663,
+      "0.98": 0.6553509127446248
+     }
+    }
    }
   },
   "J": {
-   "text": "凍結射程と器材の対応表: 腕・場面・環境→contrasts-A.json／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・refuse 門・様式門・錨帯・測定不能・環境副次→analyze_A.py／校正帯・撤退→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／整合→integrity_A.py・sample_inspection_A.py／報告→template・build_report_A.py・report_lint／凍結→freeze_A.py。**本草案4 時点で実在する器材: make_contrasts_A.py・firth.py・power_grid_A.py・design_facts_A.py・cost_facts.py・run_preamble_local.py・boot_cost_pilot.py（boot_stageA の型）。残りは凍結前に整備し dry-run と合成データで検査する。**"
+   "text": "凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則→contrasts-A.json／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・二尺度の確証規則・refuse 門・様式門・錨帯・測定不能・環境副次→analyze_A.py／校正帯・撤退→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査→numbers_lint.py／草案の組み立て→build_draft5A.py／整合→integrity_A.py・sample_inspection_A.py・synth_A.py／報告→報告雛形・build_report_A.py・report_lint.py／凍結→freeze_A.py。**実在（SHA16）**: make_contrasts_A.py 15CE961CB8D35433・firth.py EC392E63DE42EA94・power_grid_A.py 513AF75580CB51EC・design_facts_A.py 5960011B38E53D32・numbers_lint.py 65E4CB6713CC1828・build_draft5A.py 1F8BD9010100FECE・firth_check_A.py A0A032E92094BC0B・firth_check_A.R 03EF1FF659759A2A・cost_facts.py 9FB5C64C4CB63A80・run_preamble_local.py 9F849D2823132BA2・boot_cost_pilot.py 8E1EF49B4206FE58。**未整備（凍結前に整備し dry-run と合成データで検査）**: boot_stageA.py・identity_screen_A.py・analyze_A.py・calib_band_A.py・gate_A.py・control_chart_A.py・integrity_A.py・sample_inspection_A.py・synth_A.py・build_report_A.py・report_lint.py・freeze_A.py・報告雛形。",
+   "data": {
+    "exist": {
+     "make_contrasts_A.py": "15CE961CB8D35433",
+     "firth.py": "EC392E63DE42EA94",
+     "power_grid_A.py": "513AF75580CB51EC",
+     "design_facts_A.py": "5960011B38E53D32",
+     "numbers_lint.py": "65E4CB6713CC1828",
+     "build_draft5A.py": "1F8BD9010100FECE",
+     "firth_check_A.py": "A0A032E92094BC0B",
+     "firth_check_A.R": "03EF1FF659759A2A",
+     "cost_facts.py": "9FB5C64C4CB63A80",
+     "run_preamble_local.py": "9F849D2823132BA2",
+     "boot_cost_pilot.py": "8E1EF49B4206FE58"
+    },
+    "not_yet": [
+     "boot_stageA.py",
+     "identity_screen_A.py",
+     "analyze_A.py",
+     "calib_band_A.py",
+     "gate_A.py",
+     "control_chart_A.py",
+     "integrity_A.py",
+     "sample_inspection_A.py",
+     "synth_A.py",
+     "build_report_A.py",
+     "report_lint.py",
+     "freeze_A.py",
+     "報告雛形"
+    ]
+   }
   },
   "K": {
-   "text": "引数文字列 `--arms N,Onull,O,Osec,Lneg,Nk,Odose1,Odosehalf,Ncold,Nstr,O-Ncold,Onull-Ncold,Osec-Ncold`（SHA16 B28598704ED7BB23・13 腕）。seed: 門0.5 60001／パイロット 61xxx（機種 × 場面）／本走行 62xxx／錨反復 63xxx／橋 {\"4B\": {\"L4\": 64001, \"A100\": 64002}, \"8B\": {\"L4\": 64003, \"A100\": 64004}}／校正 65001／API 再走行 {\"8B\": 66001, \"14B\": 66002, \"32B\": 66003}／dry-run 69999。tag: {\"identity\": \"idA\", \"pilot\": \"pilotA\", \"main\": \"stageA\", \"anchor_rerun\": \"stageA-anchor2\", \"bridge\": \"stageA-bridge\", \"calibration\": \"stageA-calib\", \"api_rerun\": \"stageA-api\", \"dryrun\": \"dryA\"}。"
+   "text": "引数文字列 `--arms N,Onull,O,Osec,Lneg,Nk,Odose1,Odosehalf,Ncold,Nstr,O-Ncold,Onull-Ncold,Osec-Ncold`（SHA16 B28598704ED7BB23・13 腕）。seed: 門0.5 60001／パイロット 61101〜（機種 × 場面）／本走行 62101〜／錨反復 63101〜（規模 × 場面）／橋 {\"4B\": {\"A100\": 64002}, \"8B\": {\"L4\": 64003}}／校正 65000 を基に base＋100×機種の番号（models の順・1 始まり）＋セッション番号（1 始まり）／API 再走行 {\"8B\": 66001, \"14B\": 66002, \"32B\": 66003}／Firth 一致検査 67001／dry-run 69999。tag: {\"identity\": \"idA\", \"pilot\": \"pilotA\", \"main\": \"stageA\", \"anchor_rerun\": \"stageA-anchor2\", \"bridge\": \"stageA-bridge\", \"calibration\": \"stageA-calib\", \"api_rerun\": \"stageA-api\", \"dryrun\": \"dryA\"}。"
+  },
+  "M": {
+   "text": "環境帯（橋の 4B・8B・本走行の N1 対 橋・n=200 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔N1〕・既測の無い腕は 0.5）: 10 pt: 腕あたり（真の率 0.5）4.02e-02・いずれかの腕が超える確率 0.309・期待誤保留数 2.76・検出 差 10 pt で 0.481・差 15 pt で 0.832・差 20 pt で 0.976／12 pt: 腕あたり（真の率 0.5）1.42e-02・いずれかの腕が超える確率 0.109・期待誤保留数 0.88・検出 差 10 pt で 0.326・差 15 pt で 0.712・差 20 pt で 0.943／15 pt: 腕あたり（真の率 0.5）2.25e-03・いずれかの腕が超える確率 0.016・期待誤保留数 0.12・検出 差 10 pt で 0.146・差 15 pt で 0.481・差 20 pt で 0.834／20 pt: 腕あたり（真の率 0.5）4.84e-05・いずれかの腕が超える確率 0.000・期待誤保留数 0.00・検出 差 10 pt で 0.019・差 15 pt で 0.144・差 20 pt で 0.481。**選択規則（確証 35 対比の期待誤保留数が 1 以下となる最小の候補）で選ばれる候補 12 pt**（値は登録者最終確認で確定・正本の band_pt は未設定）。",
+   "data": {
+    "n": 200,
+    "bridge_models": [
+     "4B",
+     "8B"
+    ],
+    "strict": true,
+    "arm_rates_used": {
+     "N": 0.7675,
+     "Onull": 0.69,
+     "O": 0.0,
+     "Osec": 0.0,
+     "Lneg": 0.2625,
+     "Nk": 0.0,
+     "Odose1": 0.5,
+     "Odosehalf": 0.5,
+     "Ncold": 0.975,
+     "Nstr": 0.85,
+     "O-Ncold": 0.13,
+     "Onull-Ncold": 0.915,
+     "Osec-Ncold": 0.3675
+    },
+    "candidates": {
+     "10": {
+      "per_arm_at_05": 0.040230739680638006,
+      "p_any_arm_any_model": 0.3091482829423222,
+      "expected_false_held_contrasts": 2.7635277002882748,
+      "detection_by_shift_pt": {
+       "10": 0.48065636273107254,
+       "15": 0.8317389194606266,
+       "20": 0.9762331923199842
+      }
+     },
+     "12": {
+      "per_arm_at_05": 0.014184123191882173,
+      "p_any_arm_any_model": 0.10881494113101187,
+      "expected_false_held_contrasts": 0.8798247087384781,
+      "detection_by_shift_pt": {
+       "10": 0.32605057819642946,
+       "15": 0.7115647989521808,
+       "20": 0.9426508470705395
+      }
+     },
+     "15": {
+      "per_arm_at_05": 0.002248208104470807,
+      "p_any_arm_any_model": 0.015560697427118297,
+      "expected_false_held_contrasts": 0.11633963689990368,
+      "detection_by_shift_pt": {
+       "10": 0.14559646656406205,
+       "15": 0.4808436780387455,
+       "20": 0.8339263611555515
+      }
+     },
+     "20": {
+      "per_arm_at_05": 4.840613086397451e-05,
+      "p_any_arm_any_model": 0.00027774577608086215,
+      "expected_false_held_contrasts": 0.0018410013258635116,
+      "detection_by_shift_pt": {
+       "10": 0.01935532081535257,
+       "15": 0.14403197417700855,
+       "20": 0.4810085115683136
+      }
+     }
+    },
+    "selected_by_rule": 12
+   }
+  },
+  "N": {
+   "text": "門0.5 同一性選別の帰無の不合格率（両スタックが同じ分布でも主判定〔30 個の絶対差の平均 5 超または最大 12 超〕に落ちる確率・N1 の API 既測を真の分布とする・B=20000）: 手元 n=80・API を固定: 0.077（最大絶対差の 95 パーセンタイル 12.7 pt）・手元 n=80・API も再標本: 0.128（最大絶対差の 95 パーセンタイル 14.1 pt）・手元 n=160・API を固定: 0.004（最大絶対差の 95 パーセンタイル 9.0 pt）・手元 n=160・API も再標本: 0.024（最大絶対差の 95 パーセンタイル 10.9 pt）。登録値 n=160（登録者裁定 D7）。",
+   "data": {
+    "n80_api_fixed": {
+     "n_local": 80,
+     "mode": "api_fixed",
+     "B": 20000,
+     "fail_rate": 0.0772,
+     "max_abs_diff_p95": 12.749999999999995
+    },
+    "n80_api_resampled": {
+     "n_local": 80,
+     "mode": "api_resampled",
+     "B": 20000,
+     "fail_rate": 0.12805,
+     "max_abs_diff_p95": 14.0625
+    },
+    "n160_api_fixed": {
+     "n_local": 160,
+     "mode": "api_fixed",
+     "B": 20000,
+     "fail_rate": 0.0038,
+     "max_abs_diff_p95": 8.999999999999996
+    },
+    "n160_api_resampled": {
+     "n_local": 160,
+     "mode": "api_resampled",
+     "B": 20000,
+     "fail_rate": 0.02425,
+     "max_abs_diff_p95": 10.9375
+    }
+   }
   }
  }
 }

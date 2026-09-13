@@ -1,119 +1,313 @@
 # -*- coding: utf-8 -*-
-"""design_facts_A.py v1 —— 段階 A の設計事実（転記行 A〜M）を `design/contrasts-A.json`・`records/A/power-grid-A.json`・`records/A/hf-models-A.json`・`records/cost-pilot/cost-facts-2026-09-13.md` の係数から機械生成する（2026-09-13）。
-本文（草案4／凍結文書）はこの出力を転記するだけで、散文中に手計算の数を書かない。出力: records/A/design-facts-A.md と同 .json。
-転記行: A 規模／B 対比／C 検閲の誤判率と残り方の偏り／D 傾きの検出力と実サイズ／E 床持続の三段／F 費用と時間／G 様式門の一斉保留の見込み／H 錨帯の帰無発火率／I 校正腕と撤退条件／J 凍結射程と器材の対応表／K 引数文字列の SHA・seed・tag／L 機種別の容量・実パラメータ数・収容／M 環境差の帯と手元系列の校正帯。
+"""design_facts_A.py v2 —— 段階 A の設計事実（転記行 A〜N）を機械生成する（2026-09-13）。
+入力: design/contrasts-A.json（正本）・records/A/power-grid-A.json（v2）・records/A/hf-models-A.json・records/cost-pilot/cost-facts-2026-09-13.md（U 表・R 表・G 行を解析）・records/F/style-stageF1.json（(b) 率の既測・記述）。
+v2 の変更（claude.ai 三票の採否表 C12・C24〜C36・C45〜C46・登録者裁定 D1〜D3・D6・D7）: 書式文字列に手計算の数や評価語を置かない（数はスロット・設計定数も正本から読む）／格子の入力 SHA16 と z を assert／費用の係数は cost-facts を解析して読む／登録した同時要求数の収容を assert／費用は処理量の上界と下界・校正腕はセッションごと・橋は二機種の片側だけ／転記行 N（門0.5 の帰無の不合格率）を追加。
+出力: records/A/design-facts-A.md と同 .json。
+柵: 本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, sys, json, math, hashlib, datetime
+import os, sys, re, json, math, hashlib, datetime, argparse, statistics
+from fractions import Fraction
 from scipy.stats import binom
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-T = json.load(open(os.path.join(REPO, 'design', 'contrasts-A.json'), encoding='utf-8')); n, pn, n_id, n_cal = T['n_per_arm'], T['pilot_n'], T['identity_n'], T['calibration_n']
-PG = json.load(open(os.path.join(REPO, 'records', 'A', 'power-grid-A.json'), encoding='utf-8'))
-HF = json.load(open(os.path.join(REPO, 'records', 'A', 'hf-models-A.json'), encoding='utf-8'))
-SC = T['scenarios']; ARMS = T['arms']['preamble']; SIZES = T['sizes']; MODELS = T['models']; F = {}
-sha = lambda s: hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper()
-# ---- 費用の係数（門0 の実測・cost-facts §R: 料率と試行/時・経費）
-COST = {'L4': {'units_per_h': 2.67, 'trials_per_h': 3839, 'setup_s': 512}, 'A100': {'units_per_h': 12.82, 'trials_per_h': 19200, 'setup_s': 465}}   # cost-facts-2026-09-13.md U／R の転記
-SIZE_FACTOR = {'0.6B': 0.25, '1.7B': 0.5, '4B': 1.0, '4B-2507': 1.0, '8B': 2.0, '14B': 3.5, '32B': 8.0}   # 4B 比の試行時間の仮定（◐・パイロットで置換）
-SESSION_H = 8.0
-# ---- L: 実パラメータ数・容量・収容
-def params(c):
-    h, L, i, nh, nkv, hd, V = c['hidden_size'], c['num_hidden_layers'], c['intermediate_size'], c['num_attention_heads'], c['num_key_value_heads'], c['head_dim'], c['vocab_size']
-    attn = h * nh * hd + 2 * h * nkv * hd + nh * hd * h + 2 * hd; mlp = 3 * h * i; per = attn + mlp + 2 * h
-    return V * h * (1 if c.get('tie_word_embeddings') else 2) + L * per + h
-P = {k: params(v) for k, v in HF['models'].items()}; z = {k: round(math.log(P[k] / P['4B']), 4) for k in SIZES}
-KV_TOK = 2048
-kv_tok = {k: 2 * v['num_hidden_layers'] * v['num_key_value_heads'] * v['head_dim'] * 2 for k, v in HF['models'].items()}
-fit = {}
-for k, v in HF['models'].items():
-    need = v['safetensors_gib'] + kv_tok[k] * KV_TOK * 24 / 2**30 + 1.5   # KV は同時 24 要求 × 実効トークン（門0 の実測: prompt 中央値 462＋出力 p90 660 → 2,048 を上限の目安に）
-    fit[k] = {'params_M': round(P[k] / 1e6, 1), 'z': z.get(k, 0.0), 'weights_gib': v['safetensors_gib'], 'kv_24x2048_gib': round(kv_tok[k] * KV_TOK * 24 / 2**30, 2), 'need_gib': round(need, 2),
-              'fits_L4': need <= HF['gpu_gib']['L4'] * 0.90, 'fits_A100_40': need <= HF['gpu_gib']['A100-40GB'] * 0.90, 'fits_A100_80': need <= HF['gpu_gib']['A100-80GB'] * 0.90, 'rev': v['rev']}
-bridge = ['4B'] + (['8B'] if fit['8B']['fits_L4'] else [])
-F['L'] = {'text': '機種別（HF 2026-09-13・実パラメータ数は config.json から機械計算・収容＝重み＋KV〔2,048 トークン × 同時 24〕＋1.5 GiB が GPU の 90% 以内・4B の L4 収容は門0 で実測済み）: ' + '／'.join(
-    '%s: rev %s・%s M params・z=%.4f・重み %.2f GiB・要 %.2f GiB・L4 %s・A100-40 %s・A100-80 %s' % (k, fit[k]['rev'], fit[k]['params_M'], fit[k]['z'], fit[k]['weights_gib'], fit[k]['need_gib'], '可' if fit[k]['fits_L4'] else '不可', '可' if fit[k]['fits_A100_40'] else '不可', '可' if fit[k]['fits_A100_80'] else '不可') for k in ['0.6B', '1.7B', '4B', '8B', '14B', '32B', '4B-2507']) + '。**橋のセルの機種＝%s**（8B は L4 に%s）。**14B は A100-40GB に載らず 80GB の割当が要る。32B は同時要求 24 では 80GB にも載らず、同時要求 8 なら要 %.2f GiB で 80GB に載る（同時要求数は機種の環境列に記帳・処理量は落ちる）。**' % ('・'.join(bridge), '収容できる' if fit['8B']['fits_L4'] else '収容できない', HF['models']['32B']['safetensors_gib'] + kv_tok['32B'] * KV_TOK * 8 / 2**30 + 1.5), 'data': fit, 'bridge': bridge}
-# ---- A: 規模
-n_models = len(MODELS); n_arms = len(ARMS); n_sc = len(SC)
-t_id = n_id * n_arms; t_pilot = n_models * n_sc * n_arms * pn; t_main = n_models * n_sc * n_arms * n; t_anchor = n_models * n_sc * 2 * n
-t_calib = n_models * n_cal * 2; t_bridge = len(bridge) * n_arms * n * 2; t_api = 3 * n_arms * n
-t_total_local = t_id + t_pilot + t_main + t_anchor + t_calib + t_bridge
-F['A'] = {'text': '規模: 門0.5 同一性選別 %s（N1 × 13 腕 × n=80）／パイロット %s（7 機種 × 5 場面 × 13 腕 × n=40）／本走行 %s（7 機種 × 5 場面 × 13 腕 × n=200）／錨反復 %s（7 機種 × 5 場面 × 2 腕 × n=200）／校正腕 %s（7 機種 × 2 セッション想定 × n=400・セッション数は実走で置換）／橋のセル %s（%s × 13 腕 × n=200 × 2 環境）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（8B・14B・32B × N1 × 13 腕 × n=200）。' % (
-    format(t_id, ','), format(t_pilot, ','), format(t_main, ','), format(t_anchor, ','), format(t_calib, ','), format(t_bridge, ','), '・'.join(bridge), format(t_total_local, ','), format(t_api, ',')),
-    'data': {'identity': t_id, 'pilot': t_pilot, 'main': t_main, 'anchor_rerun': t_anchor, 'calibration': t_calib, 'bridge': t_bridge, 'total_local': t_total_local, 'api_rerun': t_api}}
-# ---- B: 対比
-fam = T['families']['A_slope']; desc = T['descriptive_families']; conf_n = len(fam['contrasts']); desc_n = sum(len(v.get('contrasts', [])) for v in desc.values()) + len(desc['A_desc_floor']['cells'])
-ids = [c['id'] for c in fam['contrasts']] + [c['id'] for v in desc.values() for c in v.get('contrasts', [])]; assert len(ids) == len(set(ids))
-measured = sum(1 for c in fam['contrasts'] if c['base_A_4B2507'] is not None and c['base_B_4B2507'] is not None)
-F['B'] = {'text': '対比: 確証 %d（傾きの族・7 効果種 × 5 場面・m=%d 固定・両側）・記述 %d（Nstr−Onull 5・Ncold−N 5・床持続 15 セル列・レシピ対 65・様式／錨差／スタック差／環境差は走行後に生成）・id の重複 0・対比が要求する腕の不在 0・登録対比を持たない腕 0。確証 35 本のうち 4B-2507 の API 既測で両腕の基底を持つもの %d（Odose1・Odosehalf を含む 10 本と N2 の Ncold 系 5 本は既測なし・仮定基底）。' % (conf_n, fam['m'], desc_n, measured),
-          'data': {'confirmed': conf_n, 'm': fam['m'], 'descriptive': desc_n, 'measured_bases': measured}}
-# ---- C: 検閲の誤判率（4B 既測基底＋仮定基底・両腕条件・規模単位・n=200）
+ap = argparse.ArgumentParser()
+ap.add_argument('--pg', default=os.path.join(REPO, 'records', 'A', 'power-grid-A.json')); ap.add_argument('--out', default=os.path.join(REPO, 'records', 'A', 'design-facts-A'))
+ap.add_argument('--allow-quick', action='store_true')
+a = ap.parse_args()
+CPATH = os.path.join(REPO, 'design', 'contrasts-A.json')
+J = lambda p: json.load(open(p, encoding='utf-8'))
+T = J(CPATH); PG = J(a.pg); HF = J(os.path.join(REPO, 'records', 'A', 'hf-models-A.json'))
+sha_file = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
+sha_str = lambda s: hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper()
+assert PG.get('version') == 'v2', '格子は v2 が要る'
+assert PG['inputs']['contrasts_sha16'] == sha_file(CPATH), ('格子の入力 SHA16 と現行の正本が不一致', PG['inputs']['contrasts_sha16'], sha_file(CPATH))
+assert a.allow_quick or not PG.get('quick'), 'quick の格子は転記に使わない'
+n, pn, n_id, n_cal = T['n_per_arm'], T['pilot_n'], T['identity_n'], T['calibration_n']
+SC = T['scenarios']; ARMS = T['arms']['preamble']; SIZES = T['sizes']; MODELS = T['models']; FAM = T['families']['A_slope']; CONTR = FAM['contrasts']
 lo, hi = T['censor']['low'], T['censor']['high']
-def p_out(p):   # 1 セルが <lo または >hi に落ちる確率（n=200）
-    return float(binom.cdf(math.ceil(lo * n) - 1, n, p) + binom.sf(math.floor(hi * n), n, p))
-def p_censored_pair(pc, pt):   # 両腕条件で落ちる確率（両方 <lo または 両方 >hi）
-    a = float(binom.cdf(math.ceil(lo * n) - 1, n, pc)) * float(binom.cdf(math.ceil(lo * n) - 1, n, pt)); b = float(binom.sf(math.floor(hi * n), n, pc)) * float(binom.sf(math.floor(hi * n), n, pt)); return a + b
-grid = [0.02, 0.05, 0.20, 0.50, 0.80, 0.95, 0.98]; rows = []
-for pc in grid:
-    for eff in (0.0, 0.09, -0.09, 0.15, -0.15):
-        pt = min(max(pc + eff, 0.001), 0.999); rows.append({'ctrl': pc, 'effect_pt': eff, 'p_censor': round(p_censored_pair(pc, pt), 4)})
-meas = []
-for c in fam['contrasts']:
-    if c['base_A_4B2507'] is not None and c['base_B_4B2507'] is not None:
-        pa, pb = c['base_A_4B2507'] / c['base_n_A'], c['base_B_4B2507'] / c['base_n_B']; meas.append({'id': c['id'], 'p_censor_at_4B_bases': round(p_censored_pair(pb, pa), 4)})
-n_cens_4b = sum(1 for m in meas if m['p_censor_at_4B_bases'] > 0.5)
-F['C'] = {'text': '検閲の誤判率（両腕条件・n=200・規模単位・二項）: 帰無（効果 0）で両腕が同じ基底 p にあるとき落ちる確率は p=0.02 で %.3f・0.05 で %.3f・0.20 で %.3f・0.50 で %.3f・0.80 で %.3f・0.95 で %.3f・0.98 で %.3f。真の効果 +9pt（床側）・−9pt（天井側）・±15pt（中間）を持つ対比が落ちる確率は格子の表（design-facts-A.json C.grid）。4B-2507 の API 既測の基底では、確証 35 本のうち 4B の規模で検閲される見込み（>0.5）の対比は %d 本（%s）。**残り方の偏り**: 検閲は両腕が同時に床（O 族・Nk・Osec-Ncold の床側）または天井（N・Ncold・Onull-Ncold の天井側）に落ちる規模で起き、小規模では書式外による測定不能が、大規模では天井が先に立つ見込み——上端・下端のどちらを欠くかは効果種で異なり、報告は残った規模の一覧を機械印字する。' % (
-    tuple(round(p_censored_pair(p, p), 3) for p in grid) + (n_cens_4b, '・'.join(m['id'] for m in meas if m['p_censor_at_4B_bases'] > 0.5) or 'なし')), 'grid': rows, 'measured': meas}
-# ---- D: 傾きの検出力と実サイズ
-D = PG['D']; sel = lambda pat, d0, D_: next(r for r in D if r['pattern'] == pat and r['d0_pt'] == d0 and r['delta_pt_32B_minus_4B'] == D_)
-size_rows = [r for r in D if r['delta_pt_32B_minus_4B'] == 0.0]
-F['D'] = {'text': '傾きの族の検出力と実サイズ（Firth PPLRT 両側・n=200 × 6 規模・両腕条件の検閲後・B=%d・seed %d・z は転記行 L の実値）: 型 I 誤りの実サイズ（Δ=0）は対照中間 %.3f・床 %.3f・天井 %.3f・対照が規模で動く %.3f（名目 0.05）。検出力（p<0.05／Holm 初段 p<0.05/35）: 対照中間で Δ=10pt %.2f／%.2f・15pt %.2f／%.2f・20pt %.2f／%.2f・30pt %.2f／%.2f。対照が床（0.03）では Δ=15pt %.2f／%.2f（解釈条項の発火率 %.2f・判定不能率 %.2f）、対照が天井（0.97）では Δ=−15pt 相当の設定で %.2f／%.2f（発火率 %.2f）。**対照が規模で動く（0.3→0.9）とき処置が平坦なら（d0=0.15・Δ=0）の実サイズ %.3f・解釈条項の発火率 %.2f**。検出できるのは 4B〜32B 間で 15〜20 pt 級以上の pt 差の変化であり、10 pt 級は検出域外。**尺度依存の先置**: β₃ は対数オッズ尺度の交互作用であり、対照の基底が規模で動くとき処置との pt 差が一定でも β₃≠0 になる（上の 0.407 はその型で、偽陽性ではなく尺度の違い）。確証札の隣に pt 差の規模傾向（記述・傾向検定）を機械印字し、pt 差の傾きの区間が 0 を含む対比には「尺度依存」の注を付す（読み条項 (xiv)）。' % (
-    PG['B'], PG['seed'], sel('mid_const', 0.0, 0.0)['reject_005'], sel('floor_const', 0.0, 0.0)['reject_005'], sel('ceiling_const', 0.0, 0.0)['reject_005'], sel('ctrl_rising', 0.0, 0.0)['reject_005'],
-    sel('mid_const', 0.0, 0.10)['reject_005'], sel('mid_const', 0.0, 0.10)['reject_holm_first'], sel('mid_const', 0.0, 0.15)['reject_005'], sel('mid_const', 0.0, 0.15)['reject_holm_first'], sel('mid_const', 0.0, 0.20)['reject_005'], sel('mid_const', 0.0, 0.20)['reject_holm_first'], sel('mid_const', 0.0, 0.30)['reject_005'], sel('mid_const', 0.0, 0.30)['reject_holm_first'],
-    sel('floor_const', 0.0, 0.15)['reject_005'], sel('floor_const', 0.0, 0.15)['reject_holm_first'], sel('floor_const', 0.0, 0.15)['interp_clause_rate'], sel('floor_const', 0.0, 0.15)['undecidable_rate'],
-    sel('ceiling_const', 0.0, 0.15)['reject_005'], sel('ceiling_const', 0.0, 0.15)['reject_holm_first'], sel('ceiling_const', 0.0, 0.15)['interp_clause_rate'], sel('ctrl_rising', 0.15, 0.0)['reject_005'], sel('ctrl_rising', 0.15, 0.0)['interp_clause_rate']), 'data': D}
-# ---- E
-E = PG['E']; er = {str(r['true_rate']): r for r in E['rows']}
-F['E'] = {'text': '床持続（記述）の到達可能性（n=200・棄却域 k≤%d〔CP 95%% 片側上限 <0.05・H0 での実サイズ %.4f〕）: 真の率 0.005／0.01／0.02／0.03 で 単一セル %.3f／%.3f／%.3f／%.3f・6 規模同時 %.3f／%.3f／%.3f／%.4f・Holm 初段（k≤%d・m=15 のとき）%.3f／%.3f／%.5f／%.6f。記述に降格したため多重補正は課さず、各セルの CP 上限と全規模 0/1 を印字する。0/1 が 0 であることを「床を離れた」と読まない。' % (
-    E['k_max_cp95_n200'], E['p_size_k_le_4'], er['0.005']['single_cell_k_le_4'], er['0.01']['single_cell_k_le_4'], er['0.02']['single_cell_k_le_4'], er['0.03']['single_cell_k_le_4'],
-    er['0.005']['six_sizes_joint'], er['0.01']['six_sizes_joint'], er['0.02']['six_sizes_joint'], er['0.03']['six_sizes_joint'], E['k_max_holm_first_n200'], er['0.005']['holm_first_stage_k_le_2'], er['0.01']['holm_first_stage_k_le_2'], er['0.02']['holm_first_stage_k_le_2'], er['0.03']['holm_first_stage_k_le_2']), 'data': E}
-# ---- F: 費用（cost_facts §P の形・料率 × 本走行時間 ＋ セッション数 × 経費・機種比は仮定 ◐）
-def hours_for(model_key, trials):
-    return trials * SIZE_FACTOR[model_key] / COST[T['environments'][model_key]]['trials_per_h']
-per_model = {}
+F = {}
+f3 = lambda v: '—' if v is None else '%.3f' % v
+sci = lambda v: '%.2e' % v
+CENSOR_LIKELY = 0.5   # 転記行 C の「検閲される見込み」の閾（記述の区切り）
+CLAUSE_MAJORITY = 0.5   # 転記行 D: 解釈条項が当てはめの多数で発火する対比を数える区切り（記述）
+LOSS_MARGIN = 0.1   # 転記行 D: 二尺度の規則で草案4 の規則より到達が下がる対比を数える区切り（記述）
+
+
+# ---- z（格子と一致を assert）
+def params(v):
+    V, h, L, i, nh, nkv, hd = v['vocab_size'], v['hidden_size'], v['num_hidden_layers'], v['intermediate_size'], v['num_attention_heads'], v['num_key_value_heads'], v['head_dim']
+    return V * h * (1 if v.get('tie_word_embeddings', False) else 2) + L * (h * nh * hd + 2 * h * nkv * hd + nh * hd * h + 2 * hd + 3 * h * i + 2 * h) + h
+
+
+PAR = {k: params(v) for k, v in HF['models'].items()}
+Z = {k: math.log(PAR[k] / PAR['4B']) for k in PAR}
+for k in SIZES:
+    assert abs(PG['z'][k] - Z[k]) < 1e-9, ('格子の z が実パラメータ数の z と不一致', k)
+
+# ---- L: 容量と収容（登録値を assert）
+CR = T['capacity_rule']; ENVS = T['environments']; GG = HF['gpu_gib']
+KV = {k: 2 * v['num_hidden_layers'] * v['num_key_value_heads'] * v['head_dim'] * 2 * CR['kv_tokens_per_request'] / 2**30 for k, v in HF['models'].items()}
+cmax = lambda k, G: int(math.floor((CR['gpu_fraction'] * G - HF['models'][k]['safetensors_gib'] - CR['overhead_gib']) / KV[k]))
+GPUS = [('L4', GG['L4']), ('A100 40GB', GG['A100-40GB']), ('A100 80GB', GG['A100-80GB'])]; GMAP = {24: GG['L4'], 40: GG['A100-40GB'], 80: GG['A100-80GB']}
+Ld = {}; parts = []
 for m in MODELS:
-    k = m['key']; env = T['environments'][k]; tr = n_sc * n_arms * (pn + n) + n_sc * 2 * n + n_cal * 2 + (n_arms * n * 2 if k in bridge else 0)
-    h = hours_for(k, tr); sess = math.ceil(h / (SESSION_H - COST[env]['setup_s'] / 3600)); h_tot = h + sess * COST[env]['setup_s'] / 3600; u = h_tot * COST[env]['units_per_h']
-    per_model[k] = {'env': env, 'trials': tr, 'hours_run': round(h, 2), 'sessions': sess, 'hours_total': round(h_tot, 2), 'units': round(u, 1)}
-u_tot = sum(v['units'] for v in per_model.values()); h_tot = sum(v['hours_total'] for v in per_model.values())
-F['F'] = {'text': '費用と時間（門0 の実測係数〔L4 2.67 ユニット/h・3,839 試行/h・経費 512 s／A100 12.82・19,200・465 s〕× 4B 比の試行時間の仮定 %s ◐・セッション 8 時間・機種別の環境）: ' % json.dumps(SIZE_FACTOR, ensure_ascii=False) + '／'.join('%s: %s 試行・%.1f h・%d セッション・%.1f ユニット' % (k, format(v['trials'], ','), v['hours_total'], v['sessions'], v['units']) for k, v in per_model.items()) + '。**合計 ≈%.0f ユニット・≈%.0f 時間**（v2.3 §6 の見込み A ≈84〜81 と同じ桁・32B の係数 8 と A100 80GB の割当は仮定）。門0.5・API 再走行・判定器の断片は含まない。パイロットで機種ごとの実測に置き換える。' % (u_tot, h_tot), 'data': per_model, 'total_units': round(u_tot, 1), 'total_hours': round(h_tot, 1)}
-# ---- G: 様式門の一斉保留の見込み（既測の (b) JSON 直答率・F の style 記録から取れる腕のみ）
-G = {}
-for tag in ('style-stageF1.json',):
-    p = os.path.join(REPO, 'records', 'F', tag)
-    if os.path.isfile(p):
-        S = json.load(open(p, encoding='utf-8'))
-        for sc, runs in S['runs'].items():
-            for arm, v in runs.items():
-                if arm in ARMS and isinstance(v, dict) and 'b' in v:
-                    G.setdefault(sc, {})[arm] = v['b'].get('rate') if isinstance(v['b'], dict) else v['b']
-F['G'] = {'text': '様式門の一斉保留の見込み: 既測の (b) JSON 直答率は段階 F の様式記録（4B-2507・U 腕 N・Ncold・O-Ncold・4 場面）にのみあり、他の 10 腕と N2 は既測なし。取れた値: %s。腕別・規模別の (b) 率はパイロットで転記し、30 pt 超の見込み本数を凍結前に置き換える（この転記行は仮）。' % (json.dumps(G, ensure_ascii=False) if G else '様式記録の形式が想定と異なり取得できず（パイロットで置換）'), 'data': G}
-# ---- H・I・M
-H = PG['H']; F['H'] = {'text': '錨帯の帰無発火率（n=200 × 2 走行・二項の差・真の率 0.1／0.3／0.5／0.7／0.9）: 帯 10 pt で %s・12 pt で %s・15 pt で %s。対 %d 本（5 場面 × 6 規模 × 2 腕）で真の率 0.5 のときの帰無での除外の期待本数は 10 pt %.1f・12 pt %.1f・15 pt %.1f。**帯は登録者確認（2026-09-13）で 12 pt に決定**（10 pt は真の率 0.5 で両側 %.3f に達するため）。' % (
-    H['per_pair_null_fire']['10'], H['per_pair_null_fire']['12'], H['per_pair_null_fire']['15'], H['n_pairs'], H['expected_false_exclusions_at_p05']['10'], H['expected_false_exclusions_at_p05']['12'], H['expected_false_exclusions_at_p05']['15'], H['per_pair_null_fire']['10']['0.5']), 'data': H}
-I = PG['I']; F['I'] = {'text': '校正腕（4B-2507 × Ncold × N1・n=400・API 既測 %.3f・5 pt 帯）: 発火境界 ≤%s または ≥%s・帰無発火率 %.3f。撤退条件（パイロット n=40・15 pt 帯・同じ基底）: 発火境界 ≤%s または ≥%s・帰無発火率 %.3f。門2 の誤判率は転記行 C の検閲確率と検出力格子から: n=40 では両腕条件の閾値が 2/40・38/40 に相当し、帰無で落ちる確率は転記行 C の p=0.02・0.98 の行を n=40 で引き直した値（design-facts-A.json I.gate2）。' % (
-    I['calibration']['base_api'], I['calibration']['fire_if_le'], I['calibration']['fire_if_ge'], I['calibration']['null_fire'], I['withdrawal_pilot']['fire_if_le'], I['withdrawal_pilot']['fire_if_ge'], I['withdrawal_pilot']['null_fire']),
-    'data': I, 'gate2': {str(p): round(float(binom.cdf(math.ceil(lo * pn) - 1, pn, p) ** 2 + binom.sf(math.floor(hi * pn), pn, p) ** 2), 4) for p in grid}}
-M = PG['M']; F['M'] = {'text': '環境差の帯（橋のセル・n=200 × 2 環境・腕ごと・真の率 0.1〜0.9）: 帯 10 pt で %s・12 pt で %s・15 pt で %s（13 腕 × %d 機種）。手元系列の校正帯（門0.5 不合格時・n=400 同士・同じ二項の差）は帯 5 pt で真の率 0.95 のとき帰無発火率 %.3f。帯の値は凍結前に裁定。' % (
-    M['per_arm_null_fire_two_env']['10'], M['per_arm_null_fire_two_env']['12'], M['per_arm_null_fire_two_env']['15'], len(bridge), float((abs(__import__('numpy').random.default_rng(1).binomial(400, 0.95, 20000) - __import__('numpy').random.default_rng(2).binomial(400, 0.95, 20000)) / 400 >= 0.05).mean())), 'data': M}
-# ---- J・K
-F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境→contrasts-A.json／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・refuse 門・様式門・錨帯・測定不能・環境副次→analyze_A.py／校正帯・撤退→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／整合→integrity_A.py・sample_inspection_A.py／報告→template・build_report_A.py・report_lint／凍結→freeze_A.py。**本草案4 時点で実在する器材: make_contrasts_A.py・firth.py・power_grid_A.py・design_facts_A.py・cost_facts.py・run_preamble_local.py・boot_cost_pilot.py（boot_stageA の型）。残りは凍結前に整備し dry-run と合成データで検査する。**'}
-F['K'] = {'text': '引数文字列 `--arms %s`（SHA16 %s・13 腕）。seed: 門0.5 %d／パイロット 61xxx（機種 × 場面）／本走行 62xxx／錨反復 63xxx／橋 %s／校正 %d／API 再走行 %s／dry-run %d。tag: %s。' % (
-    T['arms']['arms_string'], sha(T['arms']['arms_string']), T['seeds']['identity'], json.dumps(T['seeds']['bridge']), T['seeds']['calibration'], json.dumps(T['seeds']['api_rerun']), T['seeds']['dryrun'], json.dumps(T['tags'], ensure_ascii=False))}
+    k = m['key']; e = ENVS[k]; c = {nm: max(0, min(CR['concurrency_cap'], cmax(k, G))) for nm, G in GPUS}
+    assert 0 < e['concurrency'] <= min(CR['concurrency_cap'], cmax(k, GMAP[e['memory_class_gb']])), ('登録の同時要求数が収容を超える', k)
+    extra = ''
+    if 'if_40GB' in e:
+        if e['if_40GB'] is None:
+            extra += '・40GB では走らせない'
+        else:
+            assert e['if_40GB']['concurrency'] <= cmax(k, GMAP[e['if_40GB']['memory_class_gb']]), ('40GB の同時要求数が収容を超える', k); extra += '・40GB では同時 %d' % e['if_40GB']['concurrency']
+    if e.get('if_not_80GB'):
+        g = e['if_not_80GB']; assert g['concurrency'] <= cmax(k, GMAP[g['memory_class_gb']]), ('第三の環境の同時要求数が収容を超える', k)
+        extra += '・80GB が割り当てられなければ環境値「%s」（%s・同時 %d）' % (g['env'], g['gpu'], g['concurrency'])
+    Ld[k] = {'rev': HF['models'][k]['rev'], 'params_M': round(PAR[k] / 1e6, 1), 'z': round(Z[k], 4), 'weights_gib': HF['models'][k]['safetensors_gib'], 'kv_per_request_gib': round(KV[k], 4), 'max_concurrency': c, 'registered': e}
+    parts.append('%s: rev %s・%s M params・z=%+.4f・重み %.2f GiB・KV／要求 %.4f GiB・最大同時（L4／A100 40GB／A100 80GB）%d／%d／%d・登録 %s %dGB 同時 %d%s' % (
+        k, HF['models'][k]['rev'], Ld[k]['params_M'], Z[k], HF['models'][k]['safetensors_gib'], KV[k], c['L4'], c['A100 40GB'], c['A100 80GB'], e['env'], e['memory_class_gb'], e['concurrency'], extra))
+bparts = []
+for k, bc in T['bridge']['cells'].items():
+    G = GG['L4'] if bc['bridge_env'] == 'L4' else GG['A100-40GB']
+    assert bc['bridge_concurrency'] <= min(CR['concurrency_cap'], cmax(k, G)), ('橋の同時要求数が収容を超える', k)
+    bparts.append('%s の %s 側 同時 %d（最大 %d・A100 側は 40GB で検査）' % (k, bc['bridge_env'], bc['bridge_concurrency'], min(CR['concurrency_cap'], cmax(k, G))))
+F['L'] = {'text': '機種別の容量と収容（HF 取得 %s・実パラメータ数は config.json から機械計算・収容規則＝重み＋KV〔要求あたり %s トークン × 同時要求数〕＋%s GiB が GPU メモリの %s 以内・GPU メモリは hf-models-A.json の gpu_gib〔L4 %s・A100 40GB %s・A100 80GB %s GiB〕・同時要求数の上限 %d・登録値の収容は assert 済み）: ' % (
+    HF['fetched_utc'], format(CR['kv_tokens_per_request'], ','), CR['overhead_gib'], CR['gpu_fraction'], GG['L4'], GG['A100-40GB'], GG['A100-80GB'], CR['concurrency_cap']) + '／'.join(parts) + '。橋: ' + '・'.join(bparts) + '。', 'data': Ld}
+
+# ---- F: 費用（cost-facts を解析）
+CF_PATH = os.path.join(REPO, re.search(r'records/[\w\-./]+\.md', T['cost']['source']).group(0)); CFt = open(CF_PATH, encoding='utf-8').read()
+
+
+def md_table(text, prefix):
+    lines = text.split('\n'); i0 = next(j for j, l in enumerate(lines) if l.startswith(prefix)); rows = []; started = False
+    for l in lines[i0 + 1:]:
+        if l.startswith('|'):
+            started = True; rows.append([x.strip() for x in l.strip().strip('|').split('|')])
+        elif started:
+            break
+    return rows[0], rows[2:]
+
+
+hU, bU = md_table(CFt, '## U.'); hR, bR = md_table(CFt, '## R.')
+col = lambda h, s: next(i for i, x in enumerate(h) if x.startswith(s))
+SETUP = {r[0]: float(r[col(hU, '経費合計')]) for r in bU}; GPUN = {r[0]: r[col(hU, 'GPU')] for r in bU}
+TPH = {r[0]: float(r[col(hR, '試行／時')]) for r in bR}; WORK = {r[0]: int(r[col(hR, 'workers')]) for r in bR}; RATE = {r[0]: float(r[col(hR, '実測の時間あたりユニット')]) for r in bR}
+TAG = {'L4': 'costpilot-L4', 'A100': 'costpilot-A100'}
+for env, tg in TAG.items():
+    assert WORK[tg] == CR['concurrency_cap'], ('門0 の同時要求数と上限が不一致', tg)
+EST = [int(x) for x in re.findall(r'A＋B 見込み (\d+) ユニット', CFt)]
+C = T['cost']; SF = C['size_factor_assumption']; SH = C['session_h']; CAP = CR['concurrency_cap']; AB = T['anchor_band']
+anchor_trials = len(AB['scenarios']) * len(AB['arms']) * n; base_trials = len(SC) * len(ARMS) * (pn + n)
+
+
+def plan_model(k, env, conc, bound):
+    tg = TAG[env]; tph = TPH[tg]; st = SETUP[tg] / 3600; eff = tph * (conc / CAP if bound == 'upper' else 1.0)
+    main = base_trials + (anchor_trials if k in AB['models'] else 0); sess = 1; h_run = 0.0
+    for _ in range(60):
+        h_run = main * SF[k] / eff + sess * n_cal * SF[T['calibration']['model']] / tph
+        new = max(1, math.ceil(h_run / (SH - st)))
+        if new == sess:
+            break
+        sess = new
+    h_tot = h_run + sess * st
+    return {'env': env, 'concurrency': conc, 'trials': main + sess * n_cal, 'hours': round(h_tot, 2), 'sessions': sess, 'units': round(h_tot * RATE[tg], 2), 'last_session_margin': round((sess * (SH - st) - h_run) / (SH - st), 3)}
+
+
+def plan_bridge(k, bc, bound):
+    env = bc['bridge_env']; tg = TAG[env]; tph = TPH[tg]; st = SETUP[tg] / 3600; eff = tph * (bc['bridge_concurrency'] / CAP if bound == 'upper' else 1.0)
+    tr = len(T['bridge']['arms']) * T['bridge']['n']; h_run = tr * SF[k] / eff; sess = max(1, math.ceil(h_run / (SH - st))); h_tot = h_run + sess * st
+    return {'env': env, 'concurrency': bc['bridge_concurrency'], 'trials': tr, 'hours': round(h_tot, 2), 'sessions': sess, 'units': round(h_tot * RATE[tg], 2)}
+
+
+plans = {}
+for bound in ('upper', 'lower'):
+    rows = {m['key']: plan_model(m['key'], ENVS[m['key']]['env'], ENVS[m['key']]['concurrency'], bound) for m in MODELS}
+    for k, bc in T['bridge']['cells'].items():
+        rows['橋 %s（%s 側）' % (k, bc['bridge_env'])] = plan_bridge(k, bc, bound)
+    plans[bound] = {'rows': rows, 'units': round(sum(v['units'] for v in rows.values()), 1), 'hours': round(sum(v['hours'] for v in rows.values()), 1), 'trials': sum(v['trials'] for v in rows.values())}
+alt40 = {}
+for m in MODELS:
+    e = ENVS[m['key']]
+    if 'if_40GB' in e:
+        alt40[m['key']] = None if e['if_40GB'] is None else plan_model(m['key'], e['env'], e['if_40GB']['concurrency'], 'upper')
+tgL = TAG['L4']; g05_tr = n_id * len(ARMS); g05_h = g05_tr / TPH[tgL] + SETUP[tgL] / 3600
+margin = min((v['last_session_margin'], k) for k, v in plans['upper']['rows'].items() if 'last_session_margin' in v)
+stop_thr = plans['upper']['units'] * C['stop_rule']['multiplier']
+row_txt = lambda k, v: '%s（%s・同時 %d）%s 試行・%.1f h・%d セッション・%.1f ユニット' % (k, v['env'], v['concurrency'], format(v['trials'], ','), v['hours'], v['sessions'], v['units'])
+F['F'] = {'text': ('費用と時間（門0 の実測: L4 %.2f ユニット/h・%s 試行/h・経費 %d s／A100〔%s〕%.2f ユニット/h・%s 試行/h・経費 %d s・門0 の同時要求 %d・4B 比の試行時間の仮定 %s ◐・セッション %s 時間・校正腕は %s の係数）: '
+                   '**上界**（処理量 ∝ 同時要求数）: %s。**上界の合計 %s 試行・%.1f 時間・%.1f ユニット**。下界（同時要求数で処理量が落ちない）の合計 %.1f 時間・%.1f ユニット。'
+                   'A100 40GB が割り当てられた場合（上界）: %s。最後のセッションの余裕の最小 %.3f（%s）。停止規則: パイロット後の見込みが上界の %s 倍（%.1f ユニット）を超えたら本走行の前に登録者が再裁定。'
+                   '門0 の判定時の A＋B 見込み %s ユニットに対し、A の上界は %.2f 倍。門0.5（n=%d × %d 腕・L4・vLLM）%s 試行・%.2f h・%.2f ユニット。API 再走行・判定器の断片・機種の切替の経費は含まない。パイロットで機種ごとの実測に置き換える。') % (
+    RATE[TAG['L4']], format(int(TPH[TAG['L4']]), ','), SETUP[TAG['L4']], GPUN[TAG['A100']], RATE[TAG['A100']], format(int(TPH[TAG['A100']]), ','), SETUP[TAG['A100']], WORK[TAG['L4']], json.dumps(SF, ensure_ascii=False), SH, T['calibration']['model'],
+    '／'.join(row_txt(k, v) for k, v in plans['upper']['rows'].items()), format(plans['upper']['trials'], ','), plans['upper']['hours'], plans['upper']['units'], plans['lower']['hours'], plans['lower']['units'],
+    '／'.join(('%s は走らせない' % k) if v is None else row_txt(k, v) for k, v in alt40.items()), margin[0], margin[1], C['stop_rule']['multiplier'], stop_thr,
+    '〜'.join(str(x) for x in sorted(set(EST))), plans['upper']['units'] / max(EST), n_id, len(ARMS), format(g05_tr, ','), g05_h, g05_h * RATE[tgL]),
+    'data': {'plans': plans, 'alt_40GB_upper': alt40, 'stop_threshold_units': round(stop_thr, 1), 'gate05': {'trials': g05_tr, 'hours': round(g05_h, 2), 'units': round(g05_h * RATE[tgL], 2)}, 'gate0_estimates_AB': EST}}
+
+# ---- A: 規模
+t_id = n_id * len(ARMS); t_pilot = len(MODELS) * len(SC) * len(ARMS) * pn; t_main = len(MODELS) * len(SC) * len(ARMS) * n
+t_anchor = len(AB['models']) * anchor_trials; sess_up = sum(plans['upper']['rows'][m['key']]['sessions'] for m in MODELS); t_cal = sess_up * n_cal
+t_bridge = len(T['bridge']['cells']) * len(T['bridge']['arms']) * T['bridge']['n']; t_api = len(T['seeds']['api_rerun']) * len(ARMS) * n
+t_total = t_id + t_pilot + t_main + t_anchor + t_cal + t_bridge
+F['A'] = {'text': '規模: 門0.5 同一性選別 %s（%s × %d 腕 × n=%d）／パイロット %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／本走行 %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／錨反復 %s（%d 規模 × %d 場面 × %d 腕 × n=%d）／校正腕 %s（機種のセッションごとに n=%d・転記行 F の上界のセッション数の合計 %d）／橋 %s（%s × %d 腕 × n=%d・場面 %s・各機種の本走行の %s と対にする）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（%s × %s × %d 腕 × n=%d）。' % (
+    format(t_id, ','), T['identity_screen']['scenario'], len(ARMS), n_id, format(t_pilot, ','), len(MODELS), len(SC), len(ARMS), pn, format(t_main, ','), len(MODELS), len(SC), len(ARMS), n,
+    format(t_anchor, ','), len(AB['models']), len(AB['scenarios']), len(AB['arms']), n, format(t_cal, ','), n_cal, sess_up,
+    format(t_bridge, ','), '・'.join('%s の %s 側' % (k, v['bridge_env']) for k, v in T['bridge']['cells'].items()), len(T['bridge']['arms']), T['bridge']['n'], T['bridge']['scenario'], T['bridge']['scenario'],
+    format(t_total, ','), format(t_api, ','), '・'.join(T['seeds']['api_rerun']), T['bridge']['scenario'], len(ARMS), n),
+    'data': {'identity': t_id, 'pilot': t_pilot, 'main': t_main, 'anchor_rerun': t_anchor, 'calibration': t_cal, 'bridge': t_bridge, 'total_local': t_total, 'api_rerun': t_api}}
+
+# ---- B: 対比と整合
+D_ = T['descriptive_families']; I_ = T['integrity']
+meas = [c for c in CONTR if c['base_A_4B2507'] is not None and c['base_B_4B2507'] is not None]; miss = [c for c in CONTR if c not in meas]
+dose = [c for c in miss if c['A'].startswith('Odose')]; other = [c for c in miss if not c['A'].startswith('Odose')]
+used = {c['A'] for c in CONTR} | {c['B'] for c in CONTR}; not_in = [x for x in ARMS if x not in used]
+assert {'O', 'Osec', 'Nk'} <= set(not_in), '床持続の腕が確証族に現れている'
+F['B'] = {'text': '対比: 確証 %d（傾きの族・%d 効果種 × %d 場面・m=%d 固定・両側・二尺度の IUT）・記述（Nstr−Onull %d・Ncold−N %d・床持続 %d セル列〔%d セル〕・レシピ対 %d・様式／錨差／スタック差／環境差／対数オッズ尺度でのみ立った対比は走行後に生成）。整合検査（正本の生成時）: id の重複 %d・対比が要求する腕の台帳での不在 %d・登録対比を持たない腕 %d・台帳に無い腕 %d。確証 %d 本のうち 4B-2507 の API 既測で両腕の基底を持つもの %d・欠くもの %d（Odose1・Odosehalf 系 %d 本＋その他 %d 本: %s）。確証族に一度も現れない腕: %s（O・Osec・Nk は床持続の記述降格の帰結・Ncold と Nstr は記述の設計）。' % (
+    len(CONTR), FAM['effect_types'], len(SC), FAM['m'], len(D_['A_desc_nstr']['contrasts']), len(D_['A_desc_ncold']['contrasts']), D_['A_desc_floor']['cell_series'], len(D_['A_desc_floor']['cells']), len(D_['A_desc_recipe']['contrasts']),
+    I_['id_duplicates'], len(I_['arms_required_missing']), len(I_['arms_without_contrast']), len(I_['arms_not_in_ledger']), len(CONTR), len(meas), len(miss), len(dose), len(other), '・'.join(c['id'] for c in other), '・'.join(not_in)),
+    'data': {'confirmed': len(CONTR), 'measured_bases': len(meas), 'missing_bases': [c['id'] for c in miss], 'arms_not_in_confirm_family': not_in}}
+
+# ---- C: 検閲
+klo = math.ceil(Fraction(str(lo)) * n) - 1; khi = math.floor(Fraction(str(hi)) * n) + 1
+cens2 = lambda pa, pb: float(binom.cdf(klo, n, pa) * binom.cdf(klo, n, pb) + binom.sf(khi - 1, n, pa) * binom.sf(khi - 1, n, pb))
+GRID_P = [0.02, 0.05, 0.20, 0.50, 0.80, 0.95, 0.98]
+sat_ids = []; cens_hi = []
+for c in meas:
+    ra = c['base_A_4B2507'] / c['base_n_A']; rb = c['base_B_4B2507'] / c['base_n_B']
+    if ra < lo or ra > hi or rb < lo or rb > hi:
+        sat_ids.append(c['id'])
+    if cens2(ra, rb) > CENSOR_LIKELY:
+        cens_hi.append(c['id'])
+F['C'] = {'text': '検閲の誤判率（両腕条件・n=%d・規模単位・率 <%s は X ≤ %d・率 >%s は X ≥ %d・厳密二項）: 帰無（両腕が同じ基底 p）で落ちる確率は %s。4B-2507 の API 既測の基底で、4B の規模で検閲される確率が %s を超える確証対比 %d 本%s。**片腕が既に閾外（<%s または >%s）にある確証対比 %d 本**: %s（ほかに %d 規模で同じ腕が閾外になれば解釈条項が発火する）。残った規模の一覧は報告で機械印字する。' % (
+    n, lo, klo, hi, khi, '・'.join('p=%s で %.3f' % (p, cens2(p, p)) for p in GRID_P), CENSOR_LIKELY, len(cens_hi), ('（' + '・'.join(cens_hi) + '）') if cens_hi else '', lo, hi, len(sat_ids), '・'.join(sat_ids),
+    FAM['interpretation_clause']['min_sizes'] - 1), 'data': {'one_arm_saturated_at_4B': sat_ids, 'censor_likely_at_4B': cens_hi}}
+
+# ---- D: 傾きの族の格子
+PL = {'mid_const': '対照中間', 'floor_const': '対照が床', 'ceiling_const': '対照が天井', 'ctrl_rising': '対照が上昇', 'ctrl_falling': '対照が下降'}
+
+
+def sel(pat, d0, D):
+    for r in PG['D']:
+        if r['pattern'] == pat and abs(r['d0_pt'] - d0) < 1e-9 and abs(r['delta_pt_32B_minus_4B'] - D) < 1e-9:
+            return r
+    raise KeyError((pat, d0, D))
+
+
+def pdesc(nm):
+    v = PG['patterns'][nm]['ctrl']; return '%s（%s）' % (PL[nm], ('%g' % v[0]) if v[0] == v[-1] else '%g→%g' % (v[0], v[-1]))
+
+
+D0V = PG['d0_values']; DV = PG['delta_values']; DREF = PG['real_base']['delta']
+s_size = '・'.join('%s %.3f〔条件付き %s・n_fit %d・判定不能 %.3f・非収束 %.3f〕' % (pdesc(nm), r['reject_nominal'], f3(r['reject_nominal_conditional']), r['n_fit'], r['undecidable_censor'], r['nonconverged']) for nm in PG['patterns'] for r in [sel(nm, 0.0, 0.0)])
+rm = [sel('mid_const', 0.0, D) for D in DV if D > 0]
+s_pow = '%s・Δ=%s pt の札 D1（初段）%s・札 D1（名目）%s・草案4 の規則の初段 %s' % (pdesc('mid_const'), '／'.join('%g' % (D * 100) for D in DV if D > 0), '／'.join('%.3f' % r['card_D1_holm_first'] for r in rm), '／'.join('%.3f' % r['card_D1_nominal'] for r in rm), '／'.join('%.3f' % r['card_draft4_holm_first'] for r in rm))
+
+
+def ptconst(nm):
+    out = []
+    for d0 in D0V:
+        if d0 == 0:
+            continue
+        r = sel(nm, d0, 0.0)
+        out.append(('d0=%g pt は外した' % (d0 * 100)) if 'dropped' in r else ('d0=%g pt で %.3f／%.3f → %.3f／%.3f' % (d0 * 100, r['card_draft4_nominal'], r['card_draft4_holm_first'], r['card_D1_nominal'], r['card_D1_holm_first'])))
+    return '・'.join(out)
+
+
+s_hole = 'pt 差が全規模で一定（Δ=0）の配置での札（草案4 の規則の名目／初段 → 裁定 D1 の名目／初段）は、%s: %s、%s: %s' % (pdesc('ctrl_rising'), ptconst('ctrl_rising'), pdesc('ctrl_falling'), ptconst('ctrl_falling'))
+fr = sel('floor_const', 0.0, DREF); cr = sel('ceiling_const', 0.0, DREF)
+s_fc = '%s・Δ=%g pt の札 D1（初段）%s（判定不能 %s・解釈条項 %s）／%s・Δ=%g pt（処置が下がる向き）の札 D1（初段）%s（判定不能 %s・解釈条項 %s）' % (
+    pdesc('floor_const'), DREF * 100, f3(fr.get('card_D1_holm_first')), f3(fr.get('undecidable_censor')), f3(fr.get('clause_rate_among_fit')), pdesc('ceiling_const'), DREF * 100, f3(cr.get('card_D1_holm_first')), f3(cr.get('undecidable_censor')), f3(cr.get('clause_rate_among_fit')))
+dropped = [r for r in PG['D'] if 'dropped' in r]
+s_drop = '全規模が上限・下限に切り詰められて格子から外した行 %d（%s）' % (len(dropped), '・'.join('%s d0=%g Δ=%g' % (PL[r['pattern']], r['d0_pt'] * 100, r['delta_pt_32B_minus_4B'] * 100) for r in dropped) or 'なし')
+DRr = PG['DR']; dl1 = sorted({r['delta'] for r in DRr} - {'0'})[0]; nDR = len({r['id'] for r in DRr}); dparts = []
+for tr in ('一定', '上昇', '下降'):
+    r0 = [r for r in DRr if r['ctrl_trend'] == tr and r['delta'] == '0']; r1 = [r for r in DRr if r['ctrl_trend'] == tr and r['delta'] == dl1]
+    mx = max(r0, key=lambda r: r['card_D1_holm_first']); mx4 = max(r0, key=lambda r: r['card_draft4_nominal']); mn = min(r1, key=lambda r: r['card_D1_holm_first'])
+    dparts.append('対照の規模変化 %s（32B−4B %+g pt）: Δ=0 で札 D1（初段）の最大 %.3f（%s）・期待本数 %.3f・少なくとも 1 本 %.3f（独立を仮定）・草案4 の規則（名目）の最大 %.3f（%s）・期待本数 %.3f・判定不能の期待本数 %.2f／Δ=%s で札 D1（初段）の中央値 %.3f・平均 %.3f（草案4 の規則の初段の平均 %.3f）・最小 %.3f（%s）・解釈条項が当てはめの %s 以上で発火する対比 %d 本・草案4 の規則の初段から %s 以上下がる対比 %d 本' % (
+        tr, r0[0]['ctrl_change_32B_minus_4B'] * 100, mx['card_D1_holm_first'], mx['id'], sum(r['card_D1_holm_first'] for r in r0), 1 - math.prod(1 - r['card_D1_holm_first'] for r in r0),
+        mx4['card_draft4_nominal'], mx4['id'], sum(r['card_draft4_nominal'] for r in r0), sum(r['undecidable_censor'] for r in r0), dl1, statistics.median(r['card_D1_holm_first'] for r in r1), statistics.mean(r['card_D1_holm_first'] for r in r1), statistics.mean(r['card_draft4_holm_first'] for r in r1), mn['card_D1_holm_first'], mn['id'],
+        CLAUSE_MAJORITY, sum(1 for r in r1 if (r['clause_rate_among_fit'] or 0) >= CLAUSE_MAJORITY), LOSS_MARGIN, sum(1 for r in r1 if r['card_draft4_holm_first'] - r['card_D1_holm_first'] >= LOSS_MARGIN)))
+s_dr = '両腕の既測基底を持つ %d 本の 4B の実基底を入力にすると（B=%d）、%s。既測基底の無い %d 本は格子に載せない' % (nDR, PG['B']['DR'], '／'.join(dparts), len(CONTR) - nDR)
+DSr = PG['DS']; sparts = []
+for slo_, shi_ in zip(T['censor']['sensitivity']['low'], T['censor']['sensitivity']['high']):
+    g = lambda nm, d0, D: next((r for r in DSr if abs(r['censor_low'] - slo_) < 1e-9 and abs(r['censor_high'] - shi_) < 1e-9 and r['pattern'] == nm and abs(r['d0_pt'] - d0) < 1e-9 and abs(r['delta_pt_32B_minus_4B'] - D) < 1e-9), {})
+    sparts.append('閾値 %g／%g で %s・Δ=%g pt の札 D1（初段）%s・%s・d0=%g pt・Δ=0 の札 D1（名目）%s・%sの判定不能 %s' % (slo_, shi_, PL['mid_const'], DREF * 100, f3(g('mid_const', 0.0, DREF).get('card_D1_holm_first')), PL['ctrl_rising'], DREF * 100, f3(g('ctrl_rising', DREF, 0.0).get('card_D1_nominal')), PL['floor_const'], f3(g('floor_const', 0.0, 0.0).get('undecidable_censor'))))
+s_ds = '検閲の感度閾値（B=%d）: %s' % (PG['B']['DS'], '／'.join(sparts))
+s_r = 'refuse 門（B=%d）: %s' % (PG['B']['R'], '／'.join('%s: 名目有意 %.3f・そのうち保留 %s（(a) %s・(b) %s・(c) %s・(d) %s）・札 D1（初段）は門の前 %.3f・門のあと %.3f' % (
+    r['config'], r['nominal_significant'], f3(r['hold_among_nominal']), f3(r['hold_a_among_nominal']), f3(r['hold_b_among_nominal']), f3(r['hold_c_among_nominal']), f3(r['hold_d_among_nominal']), r['card_D1_holm_first_without_gate'], r['card_D1_holm_first_after_gate']) for r in PG['R']))
+F['D'] = {'text': '傾きの族（Firth PPLRT 両側・n=%d × %d 規模・両腕条件の検閲・率は B 回あたりの無条件率・B=%d・seed %d・子ストリーム %d・z は転記行 L の実値〔一致を assert〕・札 D1＝β₃ と pt 差の傾きが同じ水準で同じ向き〔二尺度の IUT・登録者裁定 D1〕・初段＝Holm 初段 α/%d）。**Δ=0・d0=0 の棄却率**: %s。**検出力**: %s。**尺度依存の穴**: %s。%s。%s。**実基底**: %s。%s。%s。' % (
+    n, len(SIZES), PG['B']['D'], PG['seed'], PG['streams']['D'], FAM['m'], s_size, s_pow, s_hole, s_fc, s_drop, s_dr, s_ds, s_r), 'data_ref': 'records/A/power-grid-A.json'}
+
+# ---- E: 床持続
+E = PG['E']; cs = D_['A_desc_floor']['cell_series']
+F['E'] = {'text': '床持続（記述）の到達可能性（n=%d・棄却域 k≤%d〔CP 片側上限 <%s・境界での実サイズ %.4f〕）: 真の率 %s で 単一セル %s・%d 規模同時 %s・Holm 初段（k≤%d・m=%d のとき）%s。記述に降格したため多重補正は課さず、各セルの CP 上限と全規模 0/1 を印字する。0/1 が 0 であることを「床を離れた」と読まない。' % (
+    n, E['k_max_cp95'], lo, E['size_at_k_max'], '／'.join('%g' % r['true_rate'] for r in E['rows']), '／'.join('%.3f' % r['single_cell'] for r in E['rows']), len(SIZES), '／'.join('%.4f' % r['six_sizes_joint'] for r in E['rows']),
+    E['k_max_holm_first_m15'], cs, '／'.join('%.6f' % r['holm_first_six'] for r in E['rows'])), 'data': E}
+
+# ---- G: 様式門
+G_ = PG['G']; SG = T['style_gate']; style_meas = {}
+sp = os.path.join(REPO, 'records', 'F', 'style-stageF1.json')
+if os.path.isfile(sp):
+    S = J(sp)
+    for scn, arms_ in S['runs'].items():
+        for arm, v in arms_.items():
+            if arm in ARMS and isinstance(v, dict) and v.get('b_rate_final') is not None:
+                style_meas.setdefault(scn, {})[arm] = v['b_rate_final']
+F['G'] = {'text': '様式門（(a)(b) の差・二項の差・n=%d 同士・「超」・厳密）の帰無発火率: 注（%d pt 超）%s・判定保留（%d pt 超）%s。既測の (b) JSON 直答率（段階 F の stageF1・4B-2507・U 腕・記述）: %s。腕別・規模別の (b) 率と一斉保留の見込み本数はパイロット後に記述として報告し、閾値は動かさない（登録者裁定 D6）。' % (
+    n, SG['note_pt'], '・'.join('p=%s で %s' % (p, sci(v)) for p, v in G_['bands'][str(SG['note_pt'])].items()), SG['hold_pt'], '・'.join('p=%s で %s' % (p, sci(v)) for p, v in G_['bands'][str(SG['hold_pt'])].items()),
+    '／'.join('%s: %s' % (scn, '・'.join('%s %.3f' % (arm, r) for arm, r in d.items())) for scn, d in style_meas.items()) or '取得できず'), 'data': {'null': G_, 'measured_b_rates': style_meas}}
+
+# ---- H: 錨帯
+H = PG['H']; bands = sorted(H['bands'], key=int); rt = str(AB['rule_true_rate'])
+F['H'] = {'text': '錨帯（%s × %d 規模 × %d 場面 × %d 走行・n=%d・「超」・厳密）: 腕あたりの帰無発火率（真の率 %s・超／以上）%s。除外単位（規模 × 場面＝%d）あたり %s、期待誤除外数 %s、少なくとも 1 単位 %s、4B-2507 の API 既測の基底での期待誤除外数 %s。検出側（走行間の真の drift・真の率 %s 付近）: %s。**登録値 %d pt**。規則（真の率 %s で期待誤除外数 %s 以下）を満たす最小の帯 %s pt・登録値は規則を満たす: %s（値は登録者確認 2026-09-13・規約と根拠は登録者裁定 D2）。' % (
+    '・'.join(AB['arms']), len(AB['models']), len(AB['scenarios']), AB['runs'], n, rt, '・'.join('%s pt %s／%s' % (b, sci(H['bands'][b]['per_pair'][rt]['strict']), sci(H['bands'][b]['per_pair'][rt]['ge'])) for b in bands), H['units'],
+    '／'.join('%s pt %.4f' % (b, H['bands'][b]['per_unit_at_05']) for b in bands), '／'.join('%s pt %.2f' % (b, H['bands'][b]['expected_false_exclusions_at_05']) for b in bands),
+    '／'.join('%s pt %.3f' % (b, H['bands'][b]['p_any_false_exclusion_at_05']) for b in bands), '／'.join('%s pt %.2f' % (b, H['bands'][b]['expected_false_exclusions_at_measured_bases']) for b in bands), rt,
+    '・'.join('%s pt の帯で %s' % (b, '／'.join('drift %s pt %.3f' % (dl, v) for dl, v in H['bands'][b]['detection_by_drift_pt'].items())) for b in bands), AB['band_pt'], rt, AB['rule_expected_max'], H['smallest_band_meeting_rule'], H['registered_meets_rule']), 'data': H}
+
+# ---- I: 校正腕・撤退条件・門2
+I2 = PG['I']; cp = I2['calibration_pass']; cf = I2['calibration_fail_local']; wd = I2['withdrawal']; g2 = I2['gate2']; CAL = T['calibration']
+F['I'] = {'text': '校正腕（%s × %s × %s・n=%d・「超」・厳密）: 合格枝＝API 既測 %.3f に対し下側 %d pt（上側は 1.0 を超える）→ 発火 X ≤ %d・帰無発火率 %s・検出 %s。不合格枝＝手元系列の初点を本走行の最初のセッションの校正腕（n=%d）とする二標本・両側 %d pt → 帰無発火率 %s・検出 %s（参考: 初点を門0.5 の n=%d にした場合の帰無発火率 %s）。撤退条件（パイロット n=%d・%d pt・同じ API 既測）: 発火 X ≤ %d・帰無発火率 %s・検出 %s。門2（n=%d）の検閲の整数境界: 率 <%s は X ≤ %d・率 >%s は X ≥ %d・両腕が同じ p のとき落ちる確率 %s。' % (
+    CAL['model'], CAL['arm'], CAL['scenario'], cp['n'], cp['base_api'], cp['band_pt'], cp['fire_if_le'], sci(cp['null']), '・'.join('真の率 %s で %.3f' % (p, v) for p, v in cp['detection'].items()),
+    cf['n_first'], cf['band_pt'], '・'.join('真の率 %s で %s' % (p, sci(v)) for p, v in cf['null'].items()), '・'.join('0.95 から %s pt 下で %.3f' % (dl, v) for dl, v in cf['detection_from_095'].items()),
+    cf['if_first_point_were_gate05']['n_first'], '・'.join('真の率 %s で %s' % (p, sci(v)) for p, v in cf['if_first_point_were_gate05']['null'].items()),
+    wd['n'], wd['band_pt'], wd['fire_if_le'], sci(wd['null']), '・'.join('真の率 %s で %.3f' % (p, v) for p, v in wd['detection'].items()),
+    g2['n'], lo, g2['censor_low_if_le'], hi, g2['censor_high_if_ge'], '・'.join('p=%s で %s' % (p, sci(v)) for p, v in g2['null_both_arms_same_p'].items())), 'data': I2}
+
+# ---- J: 器材
+TOOLS_NOW = [('make_contrasts_A.py', 'tools/make_contrasts_A.py'), ('firth.py', 'tools/firth.py'), ('power_grid_A.py', 'tools/power_grid_A.py'), ('design_facts_A.py', 'tools/design_facts_A.py'),
+             ('numbers_lint.py', 'tools/numbers_lint.py'), ('build_draft5A.py', 'tools/build_draft5A.py'), ('firth_check_A.py', 'tools/firth_check_A.py'), ('firth_check_A.R', 'tools/firth_check_A.R'),
+             ('cost_facts.py', 'tools/cost_facts.py'), ('run_preamble_local.py', 'tools/run_preamble_local.py'), ('boot_cost_pilot.py', 'tools/colab/boot_cost_pilot.py')]
+PLANNED = ['boot_stageA.py', 'identity_screen_A.py', 'analyze_A.py', 'calib_band_A.py', 'gate_A.py', 'control_chart_A.py', 'integrity_A.py', 'sample_inspection_A.py', 'synth_A.py', 'build_report_A.py', 'report_lint.py', 'freeze_A.py']
+exist = [(nm, sha_file(os.path.join(REPO, p))) for nm, p in TOOLS_NOW if os.path.isfile(os.path.join(REPO, p))]
+still = [nm for nm, p in TOOLS_NOW if not os.path.isfile(os.path.join(REPO, p))] + [nm for nm in PLANNED if not os.path.isfile(os.path.join(REPO, 'tools', nm))] + ['報告雛形']
+F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則→contrasts-A.json／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・二尺度の確証規則・refuse 門・様式門・錨帯・測定不能・環境副次→analyze_A.py／校正帯・撤退→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査→numbers_lint.py／草案の組み立て→build_draft5A.py／整合→integrity_A.py・sample_inspection_A.py・synth_A.py／報告→報告雛形・build_report_A.py・report_lint.py／凍結→freeze_A.py。**実在（SHA16）**: %s。**未整備（凍結前に整備し dry-run と合成データで検査）**: %s。' % (
+    '・'.join('%s %s' % e for e in exist), '・'.join(still)), 'data': {'exist': dict(exist), 'not_yet': still}}
+
+# ---- K: 引数・seed・tag
+S_ = T['seeds']
+F['K'] = {'text': '引数文字列 `--arms %s`（SHA16 %s・%d 腕）。seed: 門0.5 %d／パイロット %d〜（機種 × 場面）／本走行 %d〜／錨反復 %d〜（規模 × 場面）／橋 %s／校正 %d を基に %s／API 再走行 %s／Firth 一致検査 %d／dry-run %d。tag: %s。' % (
+    T['arms']['arms_string'], sha_str(T['arms']['arms_string']), len(ARMS), S_['identity'], min(v for d in S_['pilot'].values() for v in d.values()), min(v for d in S_['main'].values() for v in d.values()),
+    min(v for d in S_['anchor_rerun'].values() for v in d.values()), json.dumps(S_['bridge']), S_['calibration']['base'], S_['calibration']['rule'], json.dumps(S_['api_rerun']), S_['firth_check'], S_['dryrun'], json.dumps(T['tags'], ensure_ascii=False))}
+
+# ---- M: 環境帯
+M = PG['M']; EB = T['environment_band']; cands = sorted(M['candidates'], key=int)
+F['M'] = {'text': '環境帯（橋の %s・本走行の %s 対 橋・n=%d 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔%s〕・既測の無い腕は %s）: %s。**選択規則（確証 %d 対比の期待誤保留数が %s 以下となる最小の候補）で選ばれる候補 %s pt**（値は登録者最終確認で確定・正本の band_pt は未設定）。' % (
+    '・'.join(M['bridge_models']), T['bridge']['scenario'], M['n'], T['bridge']['scenario'], EB['rule_missing_base_rate'],
+    '／'.join('%s pt: 腕あたり（真の率 0.5）%s・いずれかの腕が超える確率 %.3f・期待誤保留数 %.2f・検出 %s' % (b, sci(M['candidates'][b]['per_arm_at_05']), M['candidates'][b]['p_any_arm_any_model'], M['candidates'][b]['expected_false_held_contrasts'],
+                                                                   '・'.join('差 %s pt で %.3f' % (s_, v) for s_, v in M['candidates'][b]['detection_by_shift_pt'].items())) for b in cands),
+    len(CONTR), EB['rule_expected_max'], M['selected_by_rule']), 'data': M}
+
+# ---- N: 門0.5 の帰無の不合格率
+N_ = PG['N']; IS = T['identity_screen']
+F['N'] = {'text': '門0.5 同一性選別の帰無の不合格率（両スタックが同じ分布でも主判定〔%d 個の絶対差の平均 %d 超または最大 %d 超〕に落ちる確率・%s の API 既測を真の分布とする・B=%d）: %s。登録値 n=%d（登録者裁定 D7）。' % (
+    IS['n_differences'], IS['mean_pt'], IS['max_pt'], IS['scenario'], PG['B']['N'], '・'.join('手元 n=%d・%s: %.3f（最大絶対差の 95 パーセンタイル %.1f pt）' % (v['n_local'], {'api_fixed': 'API を固定', 'api_resampled': 'API も再標本'}[v['mode']], v['fail_rate'], v['max_abs_diff_p95']) for v in N_.values()), n_id), 'data': N_}
+
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
-os.makedirs(os.path.join(REPO, 'records', 'A'), exist_ok=True)
-json.dump({'generated_utc': now, 'contrasts_sha16': sha(open(os.path.join(REPO, 'design', 'contrasts-A.json'), encoding='utf-8').read()), 'z': z, 'facts': F}, open(os.path.join(REPO, 'records', 'A', 'design-facts-A.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v1・%s UTC・正本 contrasts-A.json SHA16 %s）' % (now, sha(open(os.path.join(REPO, 'design', 'contrasts-A.json'), encoding='utf-8').read())), '']
-for k in 'ABCDEFGHIJKLM':
+outj = {'generated_utc': now, 'generator': 'tools/design_facts_A.py v2', 'contrasts_sha16': sha_file(CPATH), 'power_grid_json_sha16': sha_file(a.pg), 'z': {k: round(Z[k], 6) for k in SIZES}, 'facts': F}
+os.makedirs(os.path.dirname(a.out), exist_ok=True)
+json.dump(outj, open(a.out + '.json', 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
+L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v2・%s UTC・正本 contrasts-A.json SHA16 %s・格子 power-grid-A.json SHA16 %s）' % (now, outj['contrasts_sha16'], outj['power_grid_json_sha16']), '']
+for k in 'ABCDEFGHIJKLMN':
     L.append('- **転記行 %s** — %s' % (k, F[k]['text'])); L.append('')
 L.append('本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。')
-open(os.path.join(REPO, 'records', 'A', 'design-facts-A.md'), 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
-print('[design_facts_A] written records/A/design-facts-A.{md,json}')
+open(a.out + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
+print('[design_facts_A v2] written %s.{md,json}' % a.out)

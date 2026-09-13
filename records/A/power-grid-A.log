@@ -1,5 +1,11 @@
-Traceback (most recent call last):
-  File "C:\Users\PC\Desktop\GitHub-Repositories\ontology-preamble-4b\tools\power_grid_A.py", line 114, in <module>
-    L += ['', 'k≤%d（CP 95% 片側上限 <0.05）・Holm 初段の k≤%d・H0 での実サイズ %.5f' % (R['E']['k_max_cp95_n200'], R['E']['k_max_holm_first_n200'], R['E']['p_size_k_le_4']),
-              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-ValueError: unsupported format character '?' (0x7247) at index 12
+[exact] E G H I M done
+[grid N] done
+[grid R] done
+[grid DS] done
+[grid DR] done 599s
+[grid D] mid_const done 212s
+[grid D] floor_const done 494s
+[grid D] ceiling_const done 776s
+[grid D] ctrl_rising done 1020s
+[grid D] ctrl_falling done 1255s
+[power_grid_A v2] written C:\Users\PC\Desktop\GitHub-Repositories\ontology-preamble-4b\records\A\power-grid-A.{json,md} | D rows 150 | DR 132 | elapsed 2106.4 s
