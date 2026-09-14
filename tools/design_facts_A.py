@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""design_facts_A.py v3.3 —— 段階 A の設計事実（転記行 A〜O）を機械生成する（2026-09-13）。
+"""design_facts_A.py v3.4 —— 段階 A の設計事実（転記行 A〜O）を機械生成する（2026-09-13）。
+v3.4（2026-09-15・登録者裁定 D37）: 転記行 A の判定器の断片の判定者の文言を、系統外に限らない形（正本 judge_validity.judges を指す）に改める（数と規則は v3.3 と同じ）。
 v3.3（2026-09-14・凍結前の最終検分の採否表 P118・P120・P122〜P125・登録者裁定 D27〜D29・D34）: 格子 v3.3 を要求する。転記行 A に校正腕のセッション数の内訳と下界、転記行 D に両向きの到達と区間と測れた対比の本数・測れた効果種の B の対応・格子の解釈条項の発火率の注、
   転記行 E は格子の丸めの前の値から一度で丸める、転記行 F に時間貸しに移す機種を除いた停止規則の参照、転記行 G にセルをまたいだ率、転記行 M は確証族の腕の値を先に置く。到達の下限は正本 blind_below から読む。
 v3.2（2026-09-14・登録者裁定 D18・実装検分の採否表 P98）: 格子 v3.2 を要求する。転記行 F と G の入力（cost-facts と style-stageF1）の SHA16 を記帳する。転記行 J の器材の一覧に名の語彙の出所（response_mode_M.py・response_mode_F.py）を足す。
@@ -179,7 +180,7 @@ multi = {m['key']: plans['upper']['rows'][m['key']]['sessions'] for m in MODELS 
 t_bridge = len(T['bridge']['cells']) * len(T['bridge']['arms']) * T['bridge']['n']; t_api = len(T['seeds']['api_rerun']) * len(ARMS) * n
 t_total = t_id + t_pilot + t_main + t_anchor + t_cal + t_bridge
 JV = T['judge_validity']; jv_all = len(MODELS) * len(SC) * JV['n_per_cell']; jv_fb = len(JV['fallback_scope']['models']) * len(SC) * JV['n_per_cell']
-F['A'] = {'text': '規模: 門0.5 同一性選別 %s（%s × %d 腕 × n=%d）／パイロット %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／本走行 %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／錨反復 %s（%d 規模 × %d 場面 × %d 腕 × n=%d）／校正腕 %s（セッションごとに n=%d・転記行 F の上界のセッション数の合計 %d〔機種 %d（複数のセッションの機種: %s）・橋 %d〕に依存・下界のセッション数 %d なら %s）／橋 %s（%s × %d 腕 × n=%d・場面 %s・各機種の本走行の %s と対にする）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（%s × %s × %d 腕 × n=%d）。判定器の妥当性の断片（パイロットから抽出・系統外の盲検判定）: 全機種なら %s（%d 機種 × %d 場面 × %d）・絞る場合 %s（%s × %d 場面 × %d）・範囲は %s。' % (
+F['A'] = {'text': '規模: 門0.5 同一性選別 %s（%s × %d 腕 × n=%d）／パイロット %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／本走行 %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／錨反復 %s（%d 規模 × %d 場面 × %d 腕 × n=%d）／校正腕 %s（セッションごとに n=%d・転記行 F の上界のセッション数の合計 %d〔機種 %d（複数のセッションの機種: %s）・橋 %d〕に依存・下界のセッション数 %d なら %s）／橋 %s（%s × %d 腕 × n=%d・場面 %s・各機種の本走行の %s と対にする）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（%s × %s × %d 腕 × n=%d）。判定器の妥当性の断片（パイロットから抽出・盲検判定・判定者の構成は judge_validity.judges）: 全機種なら %s（%d 機種 × %d 場面 × %d）・絞る場合 %s（%s × %d 場面 × %d）・範囲は %s。' % (
     format(t_id, ','), T['identity_screen']['scenario'], len(ARMS), n_id, format(t_pilot, ','), len(MODELS), len(SC), len(ARMS), pn, format(t_main, ','), len(MODELS), len(SC), len(ARMS), n,
     format(t_anchor, ','), len(AB['models']), len(AB['scenarios']), len(AB['arms']), n, format(t_cal, ','), n_cal, sess_all, sess_models, '・'.join('%s が %d' % kv for kv in multi.items()) or 'なし', sess_all - sess_models, sess_lo, format(sess_lo * n_cal, ','),
     format(t_bridge, ','), '・'.join('%s の %s 側' % (k, v['bridge_env']) for k, v in T['bridge']['cells'].items()), len(T['bridge']['arms']), T['bridge']['n'], T['bridge']['scenario'], T['bridge']['scenario'],
@@ -405,13 +406,13 @@ F['O'] = {'text': '判定器の方向別の誤判定率の規模間の差の推�
     JVg['n_per_cell'], JVg['scenarios'], JVg['method'], '・'.join('類の割合 %g・誤判定率 %g で ±%.1f pt' % (r['class_share'], r['true_error_rate'], r['diff_halfwidth95_pt']) for r in JVg['rows']), T['judge_validity']['reading_clause']), 'data': JVg}
 
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
-outj = {'generated_utc': now, 'generator': 'tools/design_facts_A.py v3.3', 'contrasts_sha16': sha_file(CPATH), 'power_grid_json_sha16': sha_file(a.pg),
+outj = {'generated_utc': now, 'generator': 'tools/design_facts_A.py v3.4', 'contrasts_sha16': sha_file(CPATH), 'power_grid_json_sha16': sha_file(a.pg),
         'inputs_F_G': {'cost_facts': [os.path.relpath(CF_PATH, REPO).replace(os.sep, '/'), sha_file(CF_PATH)], 'style_stageF1': [os.path.relpath(sp, REPO).replace(os.sep, '/'), sha_file(sp) if os.path.isfile(sp) else None]}, 'z': {k: round(Z[k], 6) for k in SIZES}, 'dev_marks': DEV, 'facts': F}
 os.makedirs(os.path.dirname(a.out), exist_ok=True)
 json.dump(outj, open(a.out + '.json', 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v3.3・%s UTC・正本 contrasts-A.json SHA16 %s・格子 power-grid-A.json SHA16 %s・転記行 F の入力 SHA16 %s・転記行 G の入力 SHA16 %s%s）' % (now, outj['contrasts_sha16'], outj['power_grid_json_sha16'], outj['inputs_F_G']['cost_facts'][1], outj['inputs_F_G']['style_stageF1'][1], ('・**検査用の印 %s**' % '・'.join(DEV)) if DEV else ''), '']
+L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v3.4・%s UTC・正本 contrasts-A.json SHA16 %s・格子 power-grid-A.json SHA16 %s・転記行 F の入力 SHA16 %s・転記行 G の入力 SHA16 %s%s）' % (now, outj['contrasts_sha16'], outj['power_grid_json_sha16'], outj['inputs_F_G']['cost_facts'][1], outj['inputs_F_G']['style_stageF1'][1], ('・**検査用の印 %s**' % '・'.join(DEV)) if DEV else ''), '']
 for k in sorted(F):
     L.append('- **転記行 %s** — %s' % (k, F[k]['text'])); L.append('')
 L.append('本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。')
 open(a.out + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
-print('[design_facts_A v3.3] written %s.{md,json}%s' % (a.out, (' dev_marks=' + ','.join(DEV)) if DEV else ''))
+print('[design_facts_A v3.4] written %s.{md,json}%s' % (a.out, (' dev_marks=' + ','.join(DEV)) if DEV else ''))

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""tooling_interpretations_A.py v1 —— 運用の解釈の一覧 records/A/tooling-interpretations-A.md を正本 design/contrasts-A.json から組み立てる（2026-09-14・凍結前の最終検分の採否表 P106・P140・登録者裁定 D26）。
+"""tooling_interpretations_A.py v1.1 ——運用の解釈の一覧 records/A/tooling-interpretations-A.md を正本 design/contrasts-A.json から組み立てる（2026-09-14・凍結前の最終検分の採否表 P106・P140・登録者裁定 D26）。
 各項の文言は正本の該当キーからの逐語転記。「なぜ要ったか」「採らなかった案」「向き（§0-1 の引かれる向きとの関係・コーディネータの読み）」は本器に置く（一覧の再現のため公開する）。
 v2.3〜v2.4 の一覧は一時置き場の一回きりの器で組み立てていた。本器はその文言を引き継ぎ、向きの一行（採否表 P140）と追補の二項（calibration.claim_release・judge_validity.extract.echo・登録者裁定 D26）を足す。
 用法: python tools/tooling_interpretations_A.py [--out records/A/tooling-interpretations-A.md]
@@ -9,7 +9,7 @@ import os, sys, json, argparse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v1'
+VERSION = 'v1.1'   # v1.1（2026-09-15・登録者裁定 D38〜D40 の器材化）: 判定器の妥当性の運びの追補六項の「なぜ要ったか」「採らなかった案」「向き」と COI の一行
 SAME = '§0-1 (a) の引かれる向き（傾向が立ってほしい）と同じ側（保留や降格が減り、確証が増えうる）'
 OPP = '§0-1 (a) の引かれる向きと逆の側（判定不能や規模の除外が増え、確証が減りうる）'
 MEAS = '§0-1 (a) の引かれる向きと同じ側（測れた効果種が減り、規模非依存の読みに届きにくい）'
@@ -46,6 +46,12 @@ WHY = {
     'families.A_slope.refuse_gate.denominator_detail': ('refuse 門の (c) の refuse 率の分母と、refuse の数え方（答えの JSON の refuse か、散文の拒否も含むか）が決まっていなかった（実装検分の所見 F-33）。', '散文の拒否も refuse に数える案（書式外と refuse の区別が走行器の分類の細目に依存する）。答えの JSON の choice に限った（登録者裁定 D25）。', SAME),
     'calibration.claim_release': ('不合格枝で初点を名乗った機種を走らせられない事情が出たときの、名乗りの移し替えの手順が、器の説明文と反映の記録にだけあり、正本に無かった（凍結前の最終検分の Cl3 中8・採否表 P144）。', '発生したときに逸脱台帳に書く案（手順が走らせる前に登録されない）。正本に置く案を採った（登録者裁定 D26）。', NOLABEL),
     'judge_validity.extract.echo': ('判定器の断片で、応答の本文が前置きを復唱すると腕が推測されうることが器の説明文の限界にだけ書かれ、測る手順が無かった（凍結前の最終検分の Ge2 軽3・採否表 P141）。', '断片から復唱の部分を除く案（判定者に渡す本文を変え、機械と同じ定義を当てる検査にならない）。本文は変えずに一致字数を測って記述する案を採った（登録者裁定 D26）。', NOLABEL),
+    'judge_validity.files.balance': ('登録者裁定 D38 で最小のファイル数は決まるが、その数のもとでの区切りの位置は一通りに決まらない。', '前から上限まで詰める案（前の数本が上限に近くなり、後ろのファイルだけが小さくなる。読み込みの失敗は上限に近いファイルで起きやすい）。', NOLABEL),
+    'judge_validity.files.fallback': ('登録者の手元の系統が上限の大きさのファイルを読み込めない場合の手が決まっていなかった（登録者の言葉は「その都度、新規のGemini,Grokに追加で依頼する」）。', '読み込めなかったときに登録者が裁定して上限を決め直す案（判定の途中で区切りの規則を決めることになる）。上限を半分にした区切りを同じ規則で機械が作る案を採った。', NOLABEL),
+    'judge_validity.attachment.request': ('添付ファイルに置く依頼文の文言（読み取る欄・答えが変わる場合・回答の指示の形の外の本文・判定不能）が決まっていなかった。', 'v2.1 の断片の MD をそのまま送る案（見出しに「機種と腕と機械判定は伏せる」と書いており、研究の組み立てを判定者に伝える）。', NOLABEL),
+    'judge_validity.attachment.reply': ('判定者の書き出しの形と、登録者が送る文が決まっていなかった。v2.1 のラベルの形は一つの塊の JSON で、一件あたりの字数が大きく、何回かに分けて受け取るときの境が決まらない。', 'v2.1 の JSON の形のまま受け取る案（二千件を超える書き出しが一回の返信に収まりにくく、分けたときに塊が壊れやすい）。', NOLABEL),
+    'judge_validity.attachment.merge': ('貼られた返信からラベルを読み取る規則（やり直しの区切り・同じ番号の重なり・範囲の外の番号・形の崩れ・大文字と全角）が決まっていなかった。', '同じ番号の読みが食い違えば形の不備に数える案（続きの返信で重ねて書いた行を落とし、対が減る）。後の行を採り、食い違いの件数を印字する案を採った。', NOLABEL),
+    'judge_validity.position.measures': ('登録者裁定 D39 は「位置ごとに機械の判定との一致を記述する」で、一致の量と位置の区分の細目が決まっていなかった。', '位置ごとに κ を出す案（位置ごとの対の数が少なく、基底率の違いで値が大きく揺れる）。', NOLABEL),
 }
 
 
@@ -60,7 +66,7 @@ def build(T):
     TI = T['tooling_interpretations']; missing = [k for k in TI['items'] if k not in WHY]
     assert not missing, ('運用の解釈の項に「なぜ要ったか」が無い', missing)
     same = [k for k in TI['items'] if WHY[k][2] == SAME]; meas = [k for k in TI['items'] if WHY[k][2] == MEAS]
-    out = ['# 器材の整備で確定した運用の解釈（登録者の確認待ち・2026-09-13・登録者裁定 D9 の三つ目の手順・追補と文言の直し 2026-09-14・登録者裁定 D16〜D25・D26）', '',
+    out = ['# 器材の整備で確定した運用の解釈（登録者の確認待ち・2026-09-13・登録者裁定 D9 の三つ目の手順・追補と文言の直し 2026-09-14・登録者裁定 D16〜D25・D26・追補 2026-09-15・登録者裁定 D38〜D40 の器材化）', '',
            '- 性格: 登録済みの文言が決めていなかった運用を、器材を一義に動かすために正本 `design/contrasts-A.json`（SHA16 %s）に書き足した。各項の文言は正本の該当キーからの逐語転記（`tools/tooling_interpretations_A.py` %s が組み立てる）。' % (runs_A.sha16_file(runs_A.CPATH), VERSION),
            '- 変えていないもの: 確証の規則・札の定義・閾値・帯の値は変えていない。札の入力を決める運用の読み（門2 の数え方・測定不能の走行・錨帯の比べ方・環境値）を含む（採否表 P103 で文言を改めた）。',
            '- 状態: %s' % TI['status'],
@@ -73,7 +79,9 @@ def build(T):
             '- 器材の試走で門0 の既存のデータ（4B-2507 × N1）の腕別の (b) 率と層ごとの破局数が目に入った。閾値と帯は動かしていない。',
             '- 実装検分の反映（2026-09-14）で追補した項のうち、sessions.commit_rule は採否表 P82 の本走行の相を、データを作るすべての相に広げた。calibration.incomplete_rule は採否表 P77・P91 の器材の直しを正本の文言にした。どちらも登録者裁定 D26（2026-09-14）で確認を受けた。',
             '- %s は、いずれも §0-1 (a) の引かれる向きと同じ側（保留や降格が減る）に効く（凍結前の最終検分の Cl1 軽1・Cl2 中7・採否表 P140）。%s も同じ側（測れた効果種が減り、規模非依存の読みに届きにくい・コーディネータの読み）に効く。値は変えていない。' % ('・'.join(same), '・'.join(meas)),
-            '- 登録者裁定 D26（2026-09-14）で calibration.claim_release と judge_validity.extract.echo を追補した。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。', '',
+            '- 登録者裁定 D26（2026-09-14）で calibration.claim_release と judge_validity.extract.echo を追補した。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。',
+            '- 追補（2026-09-15）の六項（judge_validity.files.balance・files.fallback・attachment.request・attachment.reply・attachment.merge・position.measures）は、登録者裁定 D38〜D40 を器材に移すときにコーディネータが決めた細目で、札に効かない（判定器の妥当性は記述）。'
+            '登録者の「盲検を複雑にしない」という依頼に合わせて手順を簡単に見せたい向きがあるので、手順書に登録者の操作の数（判定者 × ファイルの会話の数・続きの送信・貼り付け）を書いた。', '',
             '本文書のいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。']
     return '\n'.join(out) + '\n', len(TI['items'])
 
