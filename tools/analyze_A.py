@@ -27,7 +27,7 @@ import confirm_A
 import firth
 from zaxis_A import z_sizes
 REPO = runs_A.REPO
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・採否表 P117・P127・P128・登録者裁定 D27〜D31）: 設計事実の記録を必須に（--no-facts は検査用）・効果種は正本の effect・測れた効果種を両向きと区間と測れた対比の本数で印字・区間の被覆の断り
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--tag', default=None); ap.add_argument('--root', default=None); ap.add_argument('--contrasts', default=None)
@@ -35,7 +35,7 @@ ap.add_argument('--style', default=None); ap.add_argument('--no-style', action='
 ap.add_argument('--gate', default=None); ap.add_argument('--no-gate', action='store_true')
 ap.add_argument('--identity', default=None); ap.add_argument('--calib', default=None)
 ap.add_argument('--no-identity', action='store_true'); ap.add_argument('--no-calib', action='store_true'); ap.add_argument('--allow-missing-sessions', action='store_true'); ap.add_argument('--allow-dry', action='store_true')
-ap.add_argument('--facts', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.json'))
+ap.add_argument('--facts', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.json')); ap.add_argument('--no-facts', action='store_true')
 ap.add_argument('--anchor-tag', default=None); ap.add_argument('--bridge-tag', default=None); ap.add_argument('--api-tag', default=None)
 ap.add_argument('--B-measurable', type=int, default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true')
 ap.add_argument('--allow-incomplete', action='store_true'); ap.add_argument('--synth-nonconverged', default='')
@@ -55,7 +55,7 @@ if (os.path.exists(OUT + '.json') or os.path.exists(OUT + '.md')) and not a.forc
     sys.exit('出力が既にある（上書きしない・--force で置き換え）: %s' % OUT)
 dev_marks = [x for x, on in (('no_gate', a.no_gate), ('no_style', a.no_style), ('no_identity', a.no_identity), ('no_calib', a.no_calib), ('allow_incomplete', a.allow_incomplete),
                               ('allow_missing_sessions', a.allow_missing_sessions), ('allow_dry', a.allow_dry), ('B_measurable_override', a.B_measurable is not None), ('synth_nonconverged', bool(SYN_NC)),
-                              ('not_results_root', not real_root)) if on]
+                              ('not_results_root', not real_root), ('no_facts', a.no_facts)) if on]
 missing = []
 fr = lambda k, n: Fraction(int(k), int(n))
 ZERO = dict(n=0, n_ok=0, api_error=0, cat=0, refuse=0, ff=0, loop=0, trunc=0, unmeas=0)
@@ -102,7 +102,12 @@ elif not os.path.exists(SPATH):
     sys.exit('様式の記録が無い: %s（--no-style は検査用）' % SPATH)
 else:
     STY = load_rec(SPATH, 'response_mode_A')
-FACTS = runs_A.read_json(a.facts) if a.facts and os.path.exists(a.facts) else None
+if a.no_facts:
+    FACTS = None
+elif not (a.facts and os.path.exists(a.facts)):
+    sys.exit('設計事実の記録が無い: %s（到達の見込みの欄を欠いたまま集計しない・--no-facts は検査用・採否表 P128）' % a.facts)
+else:
+    FACTS = runs_A.read_json(a.facts)
 CSHA = runs_A.sha16_file(CPATH); INREC = {}
 for _nm, _rec in (('gate', G), ('identity', ID), ('calib', CB), ('style', STY)):
     if _rec is None:
@@ -294,16 +299,17 @@ for lo, hi in zip(T['censor']['sensitivity']['low'], T['censor']['sensitivity'][
 rows_m = []
 for c, X, (u, an, ke) in zip(CONTR, XS, EXC):
     nA, nB = X['nA'], X['nB']
-    rows_m.append({'id': c['id'], 'effect': c['id'].split(':', 1)[1], 'pc': [(X['kB'][i] / nB[i]) if nB[i] else float('nan') for i in range(len(SIZES))],
+    rows_m.append({'id': c['id'], 'effect': c['effect'], 'pc': [(X['kB'][i] / nB[i]) if nB[i] else float('nan') for i in range(len(SIZES))],
                    'rA4': (X['kA'][i4] / nA[i4]) if nA[i4] else float('nan'), 'rB4': (X['kB'][i4] / nB[i4]) if nB[i4] else float('nan'), 'keep': ke, 'at4_ok': bool(ke[i4] and nA[i4] and nB[i4])})
 PERM, TYPES = confirm_A.measurable_effect_types(R, T, zs, z4, zspan, rows_m, B=a.B_measurable)
 ME = T['reading_selection']['measurable_effect_type']
 MEAS_YES = [e for e, v in TYPES.items() if v['measurable']]; MEAS_NO = [e for e, v in TYPES.items() if not v['measurable']]
 MEAS_STR = PS['measurable'].format(delta_pt='%g' % round(ME['delta'] * 100, 6), thr=ME['threshold'], yes='・'.join(MEAS_YES) or 'なし', no='・'.join(MEAS_NO) or 'なし')
+MEAS_COV = [PS['measurable_coverage'].format(effect=e, measured=v['measured_contrasts'], n=v['n_contrasts'], blind='・'.join(v['blind_ids']) or 'なし') for e, v in TYPES.items()]   # 登録者裁定 D29
 REACH = None
 if FACTS:
     Dd = FACTS['facts']['D']['data']
-    REACH = PS['reach_note'].format(n_meas=Dd['n_measured'], n_blind=len(Dd['blind_all_trends']), delta_pt='%g' % round(Dd['delta'] * 100, 6), thr=Dd['blind_threshold'], n_nobase=len(Dd['no_base']))
+    REACH = PS['reach_note'].format(n_meas=Dd['n_measured'], n_blind=len(Dd['blind_all_trends']), n_blind_opp=len(Dd['blind_all_trends_opposite']), delta_pt='%g' % round(Dd['delta'] * 100, 6), thr=Dd['blind_threshold'], n_nobase=len(Dd['no_base']))
 
 # ---- 床持続（記述・p を印字しない）
 FD = T['descriptive_families']['A_desc_floor']; LOWF = float(T['censor']['low']); floor_rows = []
@@ -499,7 +505,7 @@ INPUTS = {'contrasts_sha16': runs_A.sha16_file(CPATH), 'confirm_A': [confirm_A.V
           'style': sha_or_none(None if a.no_style else SPATH), 'gate': sha_or_none(a.gate), 'identity': sha_or_none(a.identity), 'calib': sha_or_none(a.calib), 'facts': sha_or_none(a.facts), 'sessions': len(SESS)}
 RESULT = {'kind': 'analyze_A', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'tag': tag, 'root': a.root, 'dev_marks': dev_marks, 'inputs': INPUTS,
           'missing': missing, 'env_fallback_run_keys': env_fallback, 'gate2_shrink': GATE2, 'gate2_remaining_scenarios': REMAIN, 'gate2_shrink_ids': [CONTR[i]['id'] for i in sorted(SHRINK_IDX)], 'upward_confirmed': UPWARD, 'input_records': INREC, 'input_dev_marks': IN_MARKS, 'calib_open': CALIB_OPEN, 'withdrawal_status': WD_STATUS, 'identity_verdict': ID_VERDICT, 'withdrawal_anomaly': WD_ANOM, 'calib_anomaly_run_keys': sorted(ANOM_RK),
-          'label_counts': COUNTS, 'first_finding': FIRST, 'reach_note': REACH, 'measurable': {'string': MEAS_STR, 'types': TYPES, 'per_contrast': PERM, 'B': a.B_measurable or ME['B_per_contrast']},
+          'label_counts': COUNTS, 'first_finding': FIRST, 'reach_note': REACH, 'measurable': {'string': MEAS_STR, 'coverage': MEAS_COV, 'types': TYPES, 'per_contrast': PERM, 'B': a.B_measurable or ME['B_per_contrast'], 'ci_level': ME['ci_level'], 'directions': ME['directions']},
           'unmeasurable': unmeas_rows, 'anchor_excluded_units': [{'model': s, 'scenario': sc, 'arms': v} for (s, sc), v in sorted(ANCH_EX.items())], 'size_env': {'%s|%s' % k: sorted(v) for k, v in sorted(SIZE_ENV.items())},
           'env_flag_arms': {k: v for k, v in ENV_FLAG.items()}, 'contrasts': OUTC, 'demotions': DEMOTE, 'sensitivity': SENS, 'floor': floor_rows, 'descriptive': DESC, 'stratified': STRAT, 'control_bases': CTRL,
           'clause': '本集計のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'}
@@ -531,16 +537,23 @@ for x in OUTC:
         ('発火（A %d・B %d）' % (r['sat_A'], r['sat_B']) if r['clause'] else '—') if ok else '—',
         ('保留（%s）' % ''.join(x['refuse_gate']['reasons']) if x['refuse_gate']['hold'] else '当てた・保留なし') if x['refuse_gate'] else '—',
         x['style'], ('保留（%s）' % '・'.join(e['rule'] for e in x['env_reasons'])) if x['env_hold'] else '—', x['label'], x['stage'], '・'.join(x['rules']), x['row'], '・'.join(x['notes']) or '—'))
-M += ['', '### 定型文（対比ごと）', ''] + ['- %s: %s' % (x['id'], ' '.join([x['strings'].get('label', '')] + x['strings'].get('env', []) + x['strings'].get('style', []))) for x in OUTC if x['strings'].get('label') or x['strings'].get('env')]
+M += ['', PS['interval_note'], '', '### 定型文（対比ごと）', ''] +['- %s: %s' % (x['id'], ' '.join([x['strings'].get('label', '')] + x['strings'].get('env', []) + x['strings'].get('style', []))) for x in OUTC if x['strings'].get('label') or x['strings'].get('env')]
 M += ['', '## 降格・保留の三行', ''] + (['- %s: %s' % (d['id'], d['string']) for d in DEMOTE] or ['- なし'])
 M += ['', '## 上向きの確証（report_rules.upward_rule）', ''] + (['- %s（最大の残存規模 %s・pt 差の傾き %+.2f pt／z）' % (u_['id'], u_['largest_residual_size'], u_['slope_pt']) for u_ in UPWARD] or ['- なし'])
 M += ['', '## 感度閾値での札', '', '| 閾値 | %s | 主閾値と札が変わった対比 |' % ' | '.join(L[k] for k in ORDER), '|---|%s---|' % ('---|' * len(ORDER)),
       '| %s／%s（主） | %s | — |' % (T['censor']['low'], T['censor']['high'], ' | '.join(str(COUNTS[k]) for k in ORDER))]
 for s_ in SENS:
     M.append('| %s／%s | %s | %s |' % (s_['low'], s_['high'], ' | '.join(str(s_['counts'][k]) for k in ORDER), '・'.join(x['id'] for x in s_['changed']) or 'なし'))
-M += ['', '## 到達の見込みと測れた効果種（本走行の対照の率・Δ は正本の値・B=%d）' % RESULT['measurable']['B'], '', '| 効果種 | 対比数 | 少なくとも一本の確率 | 測れた |', '|---|---|---|---|']
-M += ['| %s | %d | %.3f | %s |' % (e, v['n_contrasts'], v['at_least_one'], '測れた' if v['measurable'] else '測れなかった') for e, v in TYPES.items()]
-M += ['', '| 対比 | 札 D1（初段）の確率 | 備考 |', '|---|---|---|'] + ['| %s | %.3f | %s |' % (p['id'], p['p_card_D1_first'], p['detail'].get('reason', '')) for p in PERM]
+M += ['', '## 到達の見込みと測れた効果種（本走行の対照の率・Δ は正本の値・両向き・B=%d）' % RESULT['measurable']['B'], '',
+      '| 効果種 | 対比数 | 余地のある向き（少なくとも一本・区間・判定） | 逆向き（同） | 測れた対比 | 下限未満の対比 | 測れた | 理由 |', '|---|---|---|---|---|---|---|---|']
+dirtxt = lambda d: '—' if d is None else '%.3f（%.3f〜%.3f・%s）' % (d['at_least_one'], d['ci'][0], d['ci'][1], confirm_A.STATE_TEXT[d['state']])
+M += ['| %s | %d | %s | %s | %d/%d | %s | %s | %s |' % (e, v['n_contrasts'], dirtxt(v['directions'].get('room')), dirtxt(v['directions'].get('opposite')), v['measured_contrasts'], v['n_contrasts'],
+                                                     '・'.join(v['blind_ids']) or 'なし', '測れた' if v['measurable'] else '測れなかった', '・'.join(v['reasons']) or '—') for e, v in TYPES.items()]
+M += [''] + ['- ' + s_ for s_ in MEAS_COV]
+ptxt = lambda d: '—' if d is None else '%.3f（解釈条項の発火 %s）' % (d['p_card_D1_first'], f3(d.get('clause_rate_among_fit')))
+M += ['', '| 対比 | d0 | 余地のある向き（札 D1 の初段） | 逆向き（同） | 備考 |', '|---|---|---|---|---|']
+M += ['| %s | %s | %s | %s | %s |' % (p['id'], '—' if p['d0'] is None else '%+.3f' % p['d0'], ptxt(p['directions'].get('room')), ptxt(p['directions'].get('opposite')),
+                                   '・'.join(sorted({v['reason'] for v in p['directions'].values() if v.get('reason')})) or '—') for p in PERM]
 M += ['', '## 測定不能（腕 × 規模 × 場面）', ''] + (['- %s × %s × %s: 和集合 %d/%d（書式外 %d・ループ %d・切り詰め %d・延べ %d・%s）' % (x['model'], x['scenario'], x['arm'], x['union'], x['n_ok'], x['format_fail'], x['loop'], x['truncated'], x['total_count'], x['reason']) for x in unmeas_rows] or ['- なし'])
 M += ['', '## 錨帯（除外単位＝規模 × 場面）', ''] + (['- %s × %s（帯を超えた腕: %s）' % (x['model'], x['scenario'], '・'.join(x['arms'])) for x in RESULT['anchor_excluded_units']] or ['- 除外なし'])
 M += ['', '## 橋と環境', '', '| 機種 | 腕 | 本走行 | 橋 | 主環境 | 橋の環境 | 差（pt） | 帯を超えた |', '|---|---|---|---|---|---|---|---|']

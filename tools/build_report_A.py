@@ -15,18 +15,19 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 import report_lint
 REPO = runs_A.REPO
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・採否表 P128・P133・登録者裁定 D27〜D31・D32・P141）: 到達の見込みの欠けで止まる・両向きの測れた効果種と測れた対比の本数・区間の被覆の断り・抽出検査の一致・断片の復唱の記述・検査用の口
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--draft', type=int, required=True); ap.add_argument('--analysis', required=True); ap.add_argument('--identity'); ap.add_argument('--gate'); ap.add_argument('--calib'); ap.add_argument('--integrity', nargs='*', default=[])
 ap.add_argument('--judge'); ap.add_argument('--facts'); ap.add_argument('--grid'); ap.add_argument('--style'); ap.add_argument('--design'); ap.add_argument('--freeze-verify'); ap.add_argument('--predictions')
 ap.add_argument('--template', default=None); ap.add_argument('--contrasts', default=None); ap.add_argument('--out', default=None); ap.add_argument('--force', action='store_true')
+ap.add_argument('--sampling', nargs='*', default=[]); ap.add_argument('--allow-dev-marks', action='store_true')
 a = ap.parse_args()
 T = runs_A.load_T(a.contrasts); MB = report_lint.machine_block(T); L = T['families']['A_slope']['confirm_rule']['labels']; PS = T['print_strings']; SIZES = T['sizes']
 TP = a.template or os.path.join(REPO, T['report_rules']['template'])
 RD = lambda p: runs_A.read_json(p) if p else None
 AN = RD(a.analysis); ID = RD(a.identity); GT = RD(a.gate); CB = RD(a.calib); INTEG = [runs_A.read_json(p) for p in a.integrity]; JUD = RD(a.judge); FACTS = RD(a.facts); GRID = RD(a.grid)
-STY = RD(a.style); FV = RD(a.freeze_verify); PRED = RD(a.predictions)
+STY = RD(a.style); FV = RD(a.freeze_verify); PRED = RD(a.predictions); SAMP = [runs_A.read_json(p) for p in a.sampling]
 C = AN['label_counts']; OUTC = AN['contrasts']
 f3 = lambda v: '—' if v is None else '%.3f' % v
 sha = lambda p: runs_A.sha16_file(p) if (p and os.path.exists(p)) else '記録なし'
@@ -79,7 +80,13 @@ def r_labels6(line):
 
 
 def r_reach7(line):
-    return ['7. **到達の見込みと測れた効果種**:'] + mb([AN.get('reach_note') or '（到達の見込みの記録なし）', AN['measurable']['string']])
+    if AN.get('reach_note') is None and 'no_facts' not in (AN.get('dev_marks') or []):
+        sys.exit('[build_report_A] 集計に到達の見込みの記録が無い（設計事実の記録を渡して集計し直す・採否表 P128）')
+    return ['7. **到達の見込みと測れた効果種**:'] + mb([AN.get('reach_note') or '（到達の見込みの記録なし）', AN['measurable']['string']] + list(AN['measurable'].get('coverage') or []))
+
+
+def r_coverage(line):
+    return ['- 測れた対比の本数（効果種ごと・両向き・機械の転記）:'] + mb(list(AN['measurable'].get('coverage') or ['記録なし']))
 
 
 def t_summary(tbl):
@@ -108,7 +115,9 @@ def r_env(line):
 def r_integ(line):
     if not INTEG:
         return None
-    return ['- 整合（機械の転記）:'] + mb(['%s（相 %s）: %s・走行 %d' % (J['tag'], J['phase'], J['verdict'], len(J['runs'])) for J in INTEG] + ['ループ・切り詰めは §3 の測定不能の一覧（和集合）を参照。抽出検査の記録は起草者が転記する。'])
+    return ['- 整合（機械の転記）:'] + mb(['%s（相 %s）: %s・走行 %d' % (J['tag'], J['phase'], J['verdict'], len(J['runs'])) for J in INTEG] +
+                                      ['抽出検査の目視と機械分類の一致（%s・%s）: 照合 %d 件・一致 %d・一致率 %s' % (S_['tag'], S_['phase'], S_['n_compared'], S_['agree'], f3(S_['agree_rate'])) for S_ in SAMP] +
+                                      ['ループ・切り詰めは §3 の測定不能の一覧（和集合）を参照。抽出検査の目視の記録は起草者が転記する。'])
 
 
 def r_g05(line):
@@ -183,8 +192,11 @@ def t_judge(tbl):
 def r_judge_inter(line):
     if not JUD:
         return None
+    E_ = JUD.get('echo') or {}
     return ['- 判定者どうしの κ と鍵の照合（機械の転記）:'] + mb(['%s 対 %s: 対 %d・κ %s' % (d['judges'][0], d['judges'][1], d['n_pairs'], f3(d['kappa'])) for d in JUD['inter_judge']] +
-                                                    ['鍵の SHA-256 %s（封印の記録との一致を採点の器が確かめた）' % JUD['key_sha256']])
+                                                    ['鍵の SHA-256 %s（封印の記録との一致を採点の器が確かめた）' % JUD['key_sha256']] +
+                                                    (['断片の本文と自分の腕の前置きの最長共通部分（字数・記述・閾値なし）: %s・自分の腕の値がほかの腕の最大を超える断片 %d/%d' % (
+                                                        json.dumps(E_.get('own_arm_quantiles'), ensure_ascii=False), E_.get('own_exceeds_max_other', 0), E_.get('n_with_preamble', 0))] if E_ else []))
 
 
 def t_ctrl(tbl):
@@ -202,6 +214,7 @@ def r_bigtable(line):
             ('%+.2f・%.3g' % (x['slope_pt'], r['p_pt'])) if ok else '—', ('%.3g・%d/%.5f・%+.2f〜%+.2f' % (r['p_star'], x['star_holm']['rank'], x['star_holm']['level'], x['interval_pt'][0], x['interval_pt'][1])) if ok else '—',
             ('発火（A %d・B %d）' % (r['sat_A'], r['sat_B']) if r['clause'] else '—') if ok else '—', ('保留（%s）' % ''.join(x['refuse_gate']['reasons']) if x['refuse_gate']['hold'] else '保留なし') if x['refuse_gate'] else '—',
             x['style'], '保留' if x['env_hold'] else '—', x['label'], x['stage'], '・'.join(x['rules']), x['row'], '・'.join(x['notes']) or '—'))
+    rows += ['', PS['interval_note']]   # 区間の被覆の断り（登録者裁定 D31）
     rows += ['', '破局/n（規模順 %s）:' % '・'.join(SIZES)] + ['- %s: A %s／B %s' % (x['id'], ' '.join('%d/%d' % (k, n) for k, n in zip(x['counts']['kA'], x['counts']['nA'])), ' '.join('%d/%d' % (k, n) for k, n in zip(x['counts']['kB'], x['counts']['nB']))) for x in OUTC]
     return mb(rows)
 
@@ -245,14 +258,18 @@ def t_detect(tbl):
 
 
 def t_reach(tbl):
-    frozen = collections.defaultdict(lambda: collections.defaultdict(lambda: 1.0))
+    frozen = collections.defaultdict(lambda: collections.defaultdict(lambda: 1.0)); frozen_o = collections.defaultdict(lambda: collections.defaultdict(lambda: 1.0))
     for r in (GRID or {}).get('DR', []):
-        if r['delta'] != '0':
-            frozen[r['id'].split(':', 1)[1]][r['ctrl_trend']] *= (1 - r['card_D1_holm_first'])
+        if r['delta_value'] != 0.0:
+            frozen[r['effect']][r['ctrl_trend']] *= (1 - r['card_D1_holm_first'])
+    for r in (GRID or {}).get('DR_opp', []):
+        frozen_o[r['effect']][r['ctrl_trend']] *= (1 - r['card_D1_holm_first'])
+    dtx = lambda d: '—' if d is None else '%.3f（%.3f〜%.3f）' % (d['at_least_one'], d['ci'][0], d['ci'][1])
     rows = tbl[:2]
     for e, v in AN['measurable']['types'].items():
-        fz = '／'.join('%s %.3f' % (tr, 1 - q) for tr, q in frozen[e].items()) if e in frozen else '既測基底なし'
-        rows.append('| %s | %s | %.3f | %s |' % (e, fz, v['at_least_one'], '測れた' if v['measurable'] else '測れなかった'))
+        fz = '／'.join('%s %.3f・%.3f' % (tr, 1 - q, 1 - frozen_o[e][tr]) for tr, q in frozen[e].items()) if e in frozen else '既測基底なし'
+        rows.append('| %s | %s | %s／%s | %d/%d | %s | %s |' % (e, fz, dtx(v['directions'].get('room')), dtx(v['directions'].get('opposite')), v['measured_contrasts'], v['n_contrasts'],
+                                                              '・'.join(v['blind_ids']) or 'なし', '測れた' if v['measurable'] else '測れなかった（%s）' % '・'.join(v['reasons'])))
     return mb(rows)
 
 
@@ -320,12 +337,17 @@ def r_control_pairs(line):
 
 
 def r_recalc(line):
-    return ['- 実測の対照の率での初段の札の確率（機械の転記・Δ は凍結時の値・観測された効果量は使わない）:'] + mb(['%s: %.3f%s' % (p['id'], p['p_card_D1_first'], '（%s）' % p['detail']['reason'] if p['detail'].get('reason') else '') for p in AN['measurable']['per_contrast']])
+    out = []
+    for p in AN['measurable']['per_contrast']:
+        ds = '・'.join('%s %.3f（解釈条項の発火 %s）' % ({'room': '余地のある向き', 'opposite': '逆向き'}[dn], v['p_card_D1_first'], f3(v.get('clause_rate_among_fit'))) for dn, v in p['directions'].items())
+        rs = '・'.join(sorted({v['reason'] for v in p['directions'].values() if v.get('reason')}))
+        out.append('%s: d0 %s・%s%s' % (p['id'], '—' if p['d0'] is None else '%+.3f' % p['d0'], ds, '（%s）' % rs if rs else ''))
+    return ['- 実測の対照の率での初段の札の確率（機械の転記・両向き・Δ は凍結時の値・観測された効果量は使わない・基底と 4B の水準差 d0 は実測）:'] + mb(out)
 
 
 def r_measrec(line):
-    ME = T['reading_selection']['measurable_effect_type']
-    return ['- 測れた効果種の計算の記録（機械の転記）:'] + mb(['B=%d・seed %d・閾値 %s・Δ ±%s' % (AN['measurable']['B'], ME['seed'], ME['threshold'], ME['delta'])])
+    ME = T['reading_selection']['measurable_effect_type']; M_ = AN['measurable']
+    return ['- 測れた効果種の計算の記録（機械の転記）:'] + mb(['B=%d・seed %d・閾値 %s・Δ ±%s・向き %s・区間の水準 %s・下限 %s' % (M_['B'], ME['seed'], ME['threshold'], ME['delta'], M_.get('directions'), M_.get('ci_level'), ME['blind_below'])])
 
 
 def r_pred(line):
@@ -341,7 +363,7 @@ def r_freeze(line):
 
 
 LINE_RULES = [('- 前提: 凍結設計', r_premise), ('1. 利益相反（第一条項', r_coi), ('3. 走行の事実の一行', r_runfacts), ('4. **門0.5 の分岐', r_identity0), ('5. **上向きの確証', r_upward),
-              ('6. **札の内訳**', r_labels6), ('7. **到達の見込みと測れた効果種**', r_reach7), ('要約文は次の定型のみ', r_summary_sentence), ('- 器材: 走行器', r_tools), ('- 環境: 機種ごとの GPU 型', r_env),
+              ('6. **札の内訳**', r_labels6), ('7. **到達の見込みと測れた効果種**', r_reach7), ('- 測れた対比の本数（効果種ごと', r_coverage),('要約文は次の定型のみ', r_summary_sentence), ('- 器材: 走行器', r_tools), ('- 環境: 機種ごとの GPU 型', r_env),
               ('- 整合: 〔integrity_A', r_integ), ('- 門0.5（凍結前', r_g05), ('- 門2（パイロット・一度）', r_gate2), ('- 校正腕と撤退条件', r_calib), ('- 測定不能（腕 × 規模 × 場面', r_unmeas), ('- 錨帯（', r_anchor),
               ('- 環境（橋・環境帯', r_env3), ('- refuse 門（全分母で名目有意', r_refuse), ('- 様式門（', r_style), ('- 〔対比 id〕: 上限', r_demote), ('〔analyze_A の表', r_bigtable), ('- 確証札の定型', r_label_strings),
               ('- 残存規模の非連続と端の欠けの注', r_residual_gap), ('- 〔二つの対照を持つ処置腕', r_control_pairs), ('- 判定者どうしの κ（すべての対）', r_judge_inter), ('〔`print_strings.floor_desc`', r_floor),
@@ -356,6 +378,8 @@ OUT_LINES = ['# 段階 A 結果報告 草案%d（機械組み立て・`tools/bui
              '- 雛形 `%s`（SHA16 %s）の節順で組み立てた。機械の区画の外の記入欄（〔 〕）は起草者が埋める（`tools/report_lint.py` が埋め残しと未登録の数を止める）。' % (os.path.relpath(TP, REPO).replace('\\', '/'), sha(TP)),
              '- 集計の検査用の印: %s・足りない記録: %s' % ('・'.join(AN.get('dev_marks') or []) or 'なし', '・'.join(AN.get('missing') or []) or 'なし'),
              '- 打ち込んだ数の一覧（`report_rules.typed_numbers`・起草者が記入し、ここに無い数を機械の区画の外に書かない）: 〔日付・SHA16・SHA-256・費用の実績・逸脱番号・雛形の SHA16 の一覧〕']
+if a.allow_dev_marks:
+    OUT_LINES.append('- 検査用の口 --allow-dev-marks で組み立てた（検査用の印が残っても走査の違反にしない・公開する報告には使わない）')   # 機械の区画の外に数を書かない（走査器の未登録の数・反映の確かめで見つけた）
 for i in range(0, start):
     if tl[i].startswith('- 前提:'):
         OUT_LINES += r_premise(tl[i])
@@ -392,7 +416,7 @@ TEXT = '\n'.join(OUT_LINES) + '\n'
 open(out, 'w', encoding='utf-8', newline='\n').write(TEXT)
 SIDE = report_lint.write_sidecar(out, TEXT, T, builder='tools/build_report_A.py %s' % VERSION)   # 機械の区画の中身の SHA16（採否表 P96）
 unused = [k for k, _ in LINE_RULES + TABLE_RULES if not used[k]]
-TL = frozenset(tl); V = report_lint.lint(TEXT, T, TL, sidecar=SIDE); kinds = collections.Counter(v['kind'] for v in V)
+TL = frozenset(tl); V = report_lint.lint(TEXT, T, TL, sidecar=SIDE, allow_dev_marks=a.allow_dev_marks); kinds = collections.Counter(v['kind'] for v in V)
 print('[build_report_A] written %s（機械の区画 %d・記録 %s）| 置き換え %d 規則・当たらなかった規則 %d（%s）| 走査の違反 %d %s' % (
     out, len(SIDE['blocks']), report_lint.sidecar_path(out), len(used), len(unused), '・'.join(unused) or 'なし', len(V), dict(kinds)))
 BAD = [v for v in V if v['kind'] != '埋め残し']

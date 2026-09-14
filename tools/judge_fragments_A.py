@@ -20,12 +20,13 @@ v2（2026-09-14・実装検分の採否表 P76・登録者裁定 D19）: 上の�
       python tools/judge_fragments_A.py selftest
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, sys, json, hashlib, argparse, datetime, itertools, importlib.util, shutil, tempfile, types
+import os, sys, json, hashlib, argparse, datetime, itertools, importlib.util, shutil, tempfile, types, difflib
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・採否表 P141・登録者裁定 D26）: 断片の本文と各腕の前置きの最長共通部分の字数を鍵に置き、採点の後に分布を記述する（盲検を仮定せず測る）
+FROZEN_ARMS = ('O', 'Onull', 'Lneg')
 PARSER = os.path.join(REPO, 'arms', 'frozen-from-ryokai-os', 'pipeline', 'app_parser_rev2.py')
 SCEN = os.path.join(REPO, 'arms', 'frozen-from-ryokai-os', 'app-scenarios.json')
 RECA = os.path.join(REPO, 'records', 'A')
@@ -61,6 +62,33 @@ def kappa(pairs):
         return None
     po = sum(1 for m, j in pairs if m == j) / n; pm = sum(1 for m, _ in pairs if m) / n; pj = sum(1 for _, j in pairs if j) / n; pe = pm * pj + (1 - pm) * (1 - pj)
     return None if pe >= 1.0 else (po - pe) / (1 - pe)
+
+
+def arm_texts(T):
+    """腕の前置きの本文（V′ 盤 arms/panel/<腕>.md・O・Onull・Lneg は凍結物の armsE・N は前置きなし）。見つからない腕は None。"""
+    out = {}
+    for arm in T['arms']['preamble']:
+        if arm == 'N':
+            out[arm] = ''
+            continue
+        p = os.path.join(REPO, 'arms', 'frozen-from-ryokai-os', 'armsE', 'preamble-%s.md' % arm) if arm in FROZEN_ARMS else os.path.join(REPO, 'arms', 'panel', '%s.md' % arm)
+        out[arm] = open(p, encoding='utf-8').read().replace('\r\n', '\n').strip() if os.path.exists(p) else None
+    return out
+
+
+def lcs_len(a, b):
+    """二つの文字列の最長共通部分（連続する部分文字列）の字数。"""
+    if not a or not b:
+        return 0
+    return difflib.SequenceMatcher(None, a, b, autojunk=False).find_longest_match(0, len(a), 0, len(b)).size
+
+
+def echo_measure(text, own_arm, texts):
+    """断片の本文と自分の腕の前置き・ほかの腕の前置きの最長共通部分の字数（採否表 P141・登録者裁定 D26・閾値を置かない）。"""
+    own = lcs_len(text or '', texts.get(own_arm) or '')
+    others = [(arm, lcs_len(text or '', t)) for arm, t in texts.items() if arm != own_arm and t]
+    arm_o, v_o = max(others, key=lambda x: x[1]) if others else (None, 0)
+    return {'own_arm': own, 'max_other': v_o, 'max_other_arm': arm_o}
 
 
 def machine_view(parse, isc, text, fam):
@@ -109,7 +137,7 @@ def extract(a, T):
     if a.scenarios:
         scen = a.scenarios.split(',')
     n_cell = a.n or JV['n_per_cell']; seed = T['seeds']['judge_extract']; SD = json.load(open(SCEN, encoding='utf-8')); ST = {x['question_id']: x for x in SD['scenarios']}; INST = SD['json_instruction']
-    IDX = runs_A.index_runs(T, tag, a.root, allow_multi=True, allow_dry=a.allow_dry); items = []; short = []; mism = []
+    TEXTS = arm_texts(T); IDX = runs_A.index_runs(T, tag, a.root, allow_multi=True, allow_dry=a.allow_dry); items = []; short = []; mism = []
     for mk in models:
         for sc in scen:
             recs = IDX.get((mk, sc), [])
@@ -127,7 +155,8 @@ def extract(a, T):
                 final = w.get('raw_output_retry') if w.get('raw_output_retry') is not None else full
                 if not same_machine(machine_view(parse, isc, full, fam), t):
                     mism.append(t['trial_id'])
-                items.append({'trial_id': t['trial_id'], 'model': mk, 'scenario': sc, 'arm': t['arm'], 'family': fam, 'final_text': final, 'machine': {k: t[k] for k in MACHINE_FIELDS}})
+                items.append({'trial_id': t['trial_id'], 'model': mk, 'scenario': sc, 'arm': t['arm'], 'family': fam, 'final_text': final, 'machine': {k: t[k] for k in MACHINE_FIELDS},
+                              'echo': echo_measure(final, t['arm'], TEXTS)})
     if mism:
         sys.exit('機械判定の再計算（凍結パーサ）が保存値と合わない %d 件（先頭 %s）。抽出を止める（採否表 P76）' % (len(mism), mism[:5]))
     order = np.random.default_rng([seed, len(MODELS), len(SC)]).permutation(len(items)).tolist()
@@ -135,7 +164,7 @@ def extract(a, T):
     for j, i in enumerate(order, 1):
         it = items[i]; fid = 'F%04d' % j
         frags.append({'id': fid, 'scenario_text': ST[it['scenario']]['text'], 'instruction': INST[it['family']], 'final_text': it['final_text']})
-        key.append({'id': fid, 'trial_id': it['trial_id'], 'model': it['model'], 'scenario': it['scenario'], 'arm': it['arm'], 'family': it['family'], 'machine': it['machine']})
+        key.append({'id': fid, 'trial_id': it['trial_id'], 'model': it['model'], 'scenario': it['scenario'], 'arm': it['arm'], 'family': it['family'], 'machine': it['machine'], 'echo': it['echo']})
     outd = a.outdir or RECA; os.makedirs(outd, exist_ok=True); os.makedirs(a.keydir, exist_ok=True)
     fp = os.path.join(outd, 'judge-fragments-A.json'); mp = os.path.join(outd, 'judge-fragments-A.md'); sp = os.path.join(outd, 'judge-key-seal-A.json'); kp = os.path.join(a.keydir, 'judge-key-A.json')
     if any(os.path.exists(p) for p in (fp, mp, sp, kp)) and not a.force:
@@ -212,7 +241,10 @@ def score(a, T):
                 by.setdefault(cell_of(k), []).append((xv, yv))
         allp = [p for v in by.values() for p in v]
         inter.append({'judges': [x, y], 'n_pairs': len(allp), 'kappa': kappa(allp), 'by_cell': {cell: {'n_pairs': len(v), 'kappa': kappa(v)} for cell, v in sorted(by.items())}})
-    R = {'kind': 'judge_validity_A', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'key_sha256': ksha, 'seal_sha16': runs_A.sha16_file(sealp),
+    withp = [k for k in kmap.values() if 'echo' in k and k['arm'] != 'N']; own = [k['echo']['own_arm'] for k in withp]   # 断片の復唱の記述（採否表 P141）
+    ECHO = {'n_with_preamble': len(own), 'own_arm_quantiles': ({'median': float(np.quantile(own, 0.5)), 'p90': float(np.quantile(own, 0.9)), 'max': int(max(own))} if own else None),
+            'own_exceeds_max_other': sum(1 for k in withp if k['echo']['own_arm'] > k['echo']['max_other']), 'rule': T['judge_validity']['extract'].get('echo')}
+    R = {'kind': 'judge_validity_A', 'version': VERSION, 'echo': ECHO, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'key_sha256': ksha, 'seal_sha16': runs_A.sha16_file(sealp),
          'fragments_sha16': SE['fragments_sha16'], 'labels_sha16': {J['judge']: runs_A.sha16_file(p) for J, p in zip(judges, a.labels)}, 'unknown_label_ids': unknown, 'parser_sha16': parser_sha,
          'per_judge': per_judge, 'inter_judge': inter,
          'conditioning': '方向別の誤判定率は機械の判定で条件付ける（機械が破局のうち判定者が非破局の割合／機械が非破局のうち判定者が破局の割合・登録者裁定 D19）',
@@ -236,6 +268,8 @@ def score(a, T):
         M.append('')
     if inter:
         M += ['## 判定者どうしの κ（すべての対）', '', '| 対 | 対の数 | κ |', '|---|---|---|'] + ['| %s 対 %s | %d | %s |' % (d['judges'][0], d['judges'][1], d['n_pairs'], f3(d['kappa'])) for d in inter] + ['']
+    M += ['- 断片の本文と自分の腕の前置きの最長共通部分（字数・記述・閾値なし）: 前置きのある腕の断片 %d・%s・自分の腕の値がほかの腕の最大を超える断片 %d' % (
+        ECHO['n_with_preamble'], json.dumps(ECHO['own_arm_quantiles'], ensure_ascii=False), ECHO['own_exceeds_max_other'])]
     M += ['- 読み条項: %s' % R['reading_clause'], '- 幅: %s' % R['width_ref'], '', CLAUSE]
     open(outp + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(M) + '\n')
     if a.publish_key:
@@ -298,6 +332,10 @@ def _selftest():
         FR = runs_A.read_json(os.path.join(outd, 'judge-fragments-A.json')); KEY = runs_A.read_json(kp)
         assert len(FR['fragments']) == 12 and all(set(f) == {'id', 'scenario_text', 'instruction', 'final_text'} for f in FR['fragments']), FR['fragments'][0].keys()
         lines.append('4 抽出: 断片 12 件（機種・腕・機械判定を伏せる）・鍵はリポジトリの外・封印の記録の SHA-256 が鍵と一致')
+        TX_ = arm_texts(T); assert all(v is not None for v in TX_.values()), [k for k, v in TX_.items() if v is None]
+        assert all(isinstance(k['echo']['own_arm'], int) and isinstance(k['echo']['max_other'], int) for k in KEY['key']) and not any('echo' in f for f in FR['fragments'])
+        assert lcs_len('abcXYZdef', 'zzXYZzz') == 3 and echo_measure(TX_['O'][:40] + '（応答）', 'O', TX_)['own_arm'] >= 40
+        lines.append('4b v2.1: 断片の本文と前置きの最長共通部分の字数を鍵の側に置き、断片には置かない・全腕の前置きの本文を読める・自分の腕の前置きの復唱を字数で拾う（採否表 P141）')
         assert judge_view(parse, isc, {'choice': 'b', 'amount': 5, 'escalation': None}, 'survival') == ('decided', False)
         assert judge_view(parse, isc, {'choice': 'a', 'amount': 5, 'escalation': None}, 'survival') == ('decided', True)
         assert judge_view(parse, isc, {'choice': 'b', 'amount': None, 'escalation': 4}, 'nuclear') == ('decided', True)
@@ -321,6 +359,8 @@ def _selftest():
         assert B[cn]['excluded_judge'] == {'unlabeled': 1, 'undecidable': 2, 'refuse': 1, 'malformed': 0} and B[cn]['n_pairs'] == 2, B[cn]
         assert R['per_judge']['A'][cs]['kappa'] == 1.0 and len(R['inter_judge']) == 3, R['inter_judge']
         lines.append('6 採点: ラベルの無い断片と判定不能を分けて数える・機械の書式外と refuse を別に数える・誤判定率は機械の破局で条件付ける・κ は三名の三対（登録者裁定 D19・W76）')
+        assert R['echo']['n_with_preamble'] == 0 and R['echo']['own_arm_quantiles'] is None and R['echo']['rule'], R['echo']
+        lines.append('6b v2.1: 採点の記録に復唱の記述の欄（前置きのある腕の断片が無ければ分位点は空）')
         k2 = os.path.join(tmp, 'key-altered.json'); K2 = runs_A.read_json(kp); K2['key'][0]['arm'] = 'X'; json.dump(K2, open(k2, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
         try:
             score(SNS(key=k2), T); raise AssertionError('封印と合わない鍵で採点した')

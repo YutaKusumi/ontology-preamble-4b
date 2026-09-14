@@ -22,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 import bands_A
 REPO = runs_A.REPO
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・登録者裁定 D26）: 初点の名乗りの移し替え release_first_point（記録は消さずに退避の名へ移す）
 CLAIM = '_first_point_claim.json'
 UNJUDGED = ('no_session_record', 'no_data', 'incomplete', 'no_first_point')
 CLAUSE = '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
@@ -150,6 +150,24 @@ def claim_first_point(sdir, who):
     with os.fdopen(fd, 'w', encoding='utf-8', newline='\n') as f:
         json.dump(dict(who, claimed=_now()), f, ensure_ascii=False)
     return True, None
+
+
+def release_first_point(sdir, reason, by):
+    """初点の名乗りの移し替え（正本 calibration.claim_release・登録者裁定 D26）。登録者が理由を記帳して判断したときにだけ呼ぶ。
+    名乗りの記録を消さずに退避の名（_first_point_claim-released-<時刻>.json）へ移し、理由と判断した人と時刻を書き足す。名乗りが無ければ None を返す。
+    退避の後は、別の機種が claim_first_point で名乗れる。並行のランタイムを同時に起こさない運用を前提にする。"""
+    p = os.path.join(sdir, CLAIM)
+    if not os.path.exists(p):
+        return None
+    if not (isinstance(reason, str) and reason.strip() and isinstance(by, str) and by.strip()):
+        raise ValueError('退避には理由と判断した人の記帳が要る（calibration.claim_release）')
+    cur = runs_A.read_json(p); stamp = _now(); dst = os.path.join(sdir, CLAIM.replace('.json', '-released-%s.json' % stamp.replace(':', '')))
+    if os.path.exists(dst):
+        raise RuntimeError('退避の名が既にある: %s' % dst)
+    with open(dst, 'x', encoding='utf-8', newline='\n') as f:
+        json.dump(dict(cur, released=stamp, release_reason=reason, released_by=by), f, ensure_ascii=False)
+    os.remove(p)
+    return dst
 
 
 def main():

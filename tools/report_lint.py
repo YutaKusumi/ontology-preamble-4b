@@ -21,8 +21,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 import numbers_lint as NL
 REPO = runs_A.REPO
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・採否表 P128・P133）: 到達の見込みの記録の欠け（組み立て器の代わりの文字列）と、集計の検査用の印が「なし」でない報告を違反にする
 BLANK = re.compile(r'〔[^〕]*〕')
+FALLBACK_REACH = '（到達の見込みの記録なし）'   # build_report_A の代わりの文字列（採否表 P128）
+DEV_LINE = re.compile(r'集計の検査用の印: ([^・\n]*)')
 DEFAULT_MB = {'begin': '<!-- 機械:始 -->', 'end': '<!-- 機械:終 -->', 'cost_line_tag': '〔打ち込み・費用の実績〕'}
 REPORT_DROP = {r'`[^`]*`', r'第[一二三四五六七八九十〇\d]+[章節巡票部段]', r'(?<![A-Za-z])[DCVEJKPW]\d+(?:〜[DCVEJKPW]?\d+)?(?![\d.])', r'\b\d+\s?GB\b', r'#\d+',
                r'\((?:19|20)\d{2}\)', r'(?:19|20)\d{2}(?=\s*Stat|\s*Biometrika)', r'段\s?\d'}
@@ -82,7 +84,7 @@ def write_sidecar(report_path, text, T, builder):
     return S
 
 
-def lint(text, T, template_lines=frozenset(), sidecar=None):
+def lint(text, T, template_lines=frozenset(), sidecar=None, allow_dev_marks=False):
     MB = machine_block(T); PS = T['print_strings']; bans = [('価値語', w) for w in PS['value_word_ban']] + [('機序語', w) for w in PS['mechanism_word_ban']]
     viol = []; in_m = False
     for i, l in enumerate(text.replace('\r\n', '\n').split('\n'), 1):
@@ -93,6 +95,11 @@ def lint(text, T, template_lines=frozenset(), sidecar=None):
         for kind, w in bans:
             if w in l:
                 viol.append({'kind': kind, 'line': i, 'token': w, 'context': l[:160]})
+        if FALLBACK_REACH in l:   # v2.1: 到達の見込みの欄が記録の欠けで置き換わった報告（採否表 P128）
+            viol.append({'kind': '到達の見込みの記録なし', 'line': i, 'token': FALLBACK_REACH, 'context': l[:160]})
+        m_dev = DEV_LINE.search(l)
+        if m_dev and not allow_dev_marks and m_dev.group(1).strip() != 'なし':   # v2.1: 集計の検査用の印が残った報告（採否表 P133）
+            viol.append({'kind': '検査用の印', 'line': i, 'token': m_dev.group(1)[:60], 'context': l[:160]})
         if not in_m and l not in template_lines:
             nums = report_numbers(l[len(MB['cost_line_tag']):] if l.startswith(MB['cost_line_tag']) else l)
             if l.startswith(MB['cost_line_tag']):
@@ -146,6 +153,13 @@ def _selftest():
         p = os.path.join(td, 'r.md'); open(p, 'w', encoding='utf-8').write(text); S = write_sidecar(p, text, T, 'selftest')
         assert os.path.exists(sidecar_path(p)) and S['blocks'] == side['blocks']
     lines.append('5 write_sidecar・sidecar_path の往復')
+    V = lint('\n'.join(['- 到達の見込み: ' + FALLBACK_REACH, '本報告は両方向不定。']) + '\n', T, frozenset()); assert [v['kind'] for v in V] == ['到達の見込みの記録なし'], V
+    lines.append('6 v2.1: 到達の見込みの欄が代わりの文字列の報告は違反（採否表 P128）')
+    dev = '- 集計の検査用の印: no_facts・allow_dry・足りない記録: なし'; nodev = '- 集計の検査用の印: なし・足りない記録: なし'
+    V1 = lint('\n'.join([dev, '本報告は両方向不定。']) + '\n', T, frozenset()); V2 = lint('\n'.join([dev, '本報告は両方向不定。']) + '\n', T, frozenset(), allow_dev_marks=True)
+    V3 = lint('\n'.join([nodev, '本報告は両方向不定。']) + '\n', T, frozenset())
+    assert [v['kind'] for v in V1] == ['検査用の印'] and V2 == [] and V3 == [], (V1, V2, V3)
+    lines.append('7 v2.1: 集計の検査用の印が「なし」でない報告は違反・検査用の口では許す・「なし」は違反にしない（採否表 P133）')
     print('report_lint.py %s SELFTEST PASS' % VERSION); print('\n'.join(lines))
 
 

@@ -19,14 +19,15 @@ refuse の理由を期待と突合する。走の和で五十二行すべての�
 用法: python tools/synth_A.py --root <一時置き場> [--runs 1,13] [--mutations none] [--keep] [--facts <設計事実 JSON>]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, sys, json, shutil, subprocess, itertools, argparse, datetime, time
+import os, sys, re, json, shutil, subprocess, itertools, argparse, datetime, time
+from fractions import Fraction
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 import confirm_A
 from zaxis_A import z_sizes
 REPO = runs_A.REPO
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・凍結前の最終検分の採否表 P129・P134〜P137）: 期待の札（正本 stage2_first_match から組む）と期待の keep（配置から組む）を突合・変異 M7〜M10・門の記録に per_scenario・同じ向きの尺度依存の配置・記録の見出しと限界
 ap = argparse.ArgumentParser()
 ap.add_argument('--root', required=True); ap.add_argument('--facts', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.json')); ap.add_argument('--B-measurable', type=int, default=4)
 ap.add_argument('--runs', default='all'); ap.add_argument('--keep', action='store_true'); ap.add_argument('--record', default=None); ap.add_argument('--mutations', default='all')
@@ -47,7 +48,7 @@ TYPES = {
     'P_N': dict(n=2000, clause=False, star=False, rates={'Onull': lin(0.30, 0.80), 'O-Ncold': lin(0.30, 0.80), 'Odose1': lin(0.45, 0.95), 'Odosehalf': lin(0.45, 0.95), 'Lneg': lin(0.45, 0.95),
                                                           'Onull-Ncold': lin(0.45, 0.95), 'N': lin(0.45, 0.95), 'Osec-Ncold': lin(0.45, 0.95)}),
     'P_C': dict(n=2000, clause=True, star=False, rates=dict({'Onull': [0.02, 0.03, 0.10, 0.30, 0.50, 0.70], 'O-Ncold': [0.02, 0.03, 0.10, 0.30, 0.50, 0.70]},
-                                                           **{x: [0.17, 0.18, 0.25, 0.45, 0.65, 0.85] for x in X_ARMS})),
+                                                           **{x: [0.17, 0.18, 0.25, 0.45, 0.65, 0.84] for x in X_ARMS})),   # v2.1: 最大の規模を下げ、pt 差の傾きを β₃ と同じ向きで非有意にする（変異 M8 を見分ける配置・採否表 P135）
     'MIX': dict(n=200, rates={'Onull': const(0.5), 'Odose1': const(0.5), 'Odosehalf': const(0.5), 'Lneg': const(0.5), 'N': const(0.5), 'Onull-Ncold': const(0.5), 'O-Ncold': const(0.01), 'Osec-Ncold': const(0.01)})}
 SC_TYPE = dict(zip(SC, ['P_S', 'P_CS', 'P_N', 'P_C', 'MIX']))
 COMBOS = list(itertools.product((False, True), ('none', 'note', 'hold'), (False, True)))
@@ -163,8 +164,13 @@ def build(run, root):
     rec = os.path.join(root, 'records'); os.makedirs(rec, exist_ok=True)
     P = {'style': os.path.join(rec, 'style-%s.json' % tag), 'gate': os.path.join(rec, 'gate-%s.json' % tag), 'calib': os.path.join(rec, 'calib-%s.json' % tag)}
     json.dump({'kind': 'response_mode_A', 'synthetic': True, 'tag': tag, 'cells': style}, open(P['style'], 'w', encoding='utf-8'), ensure_ascii=False)
-    json.dump({'kind': 'gate_A', 'synthetic': True, 'gate2': {'shrink': C['remaining'] is not None, 'remaining_scenarios': C['remaining'] if C['remaining'] is not None else list(SC)},
-               'withdrawal': {'anomaly': C['wd_anom'], 'status': 'anomaly' if C['wd_anom'] else 'pass'}}, open(P['gate'], 'w', encoding='utf-8'), ensure_ascii=False)
+    rem = C['remaining'] if C['remaining'] is not None else list(SC)   # v2.1: gate_A と同じ形（per_scenario つき・採否表 P129）
+    per_sc = {sc: {'remains': sc in rem, 'contrasts': [{'id': c['id'], 'kept_n': len(SIZES) if sc in rem else 0} for c in CONTR if c['scenario'] == sc]} for sc in SC}
+    EBR = T['environment_band']['band_pt']   # 組み立て器が読む欄（撤退条件の枝・環境帯の引き直し・様式のパイロット）も gate_A と同じ名で置く（反映の確かめ T6 で欠けを見つけた）
+    json.dump({'kind': 'gate_A', 'synthetic': True, 'gate2': {'shrink': C['remaining'] is not None, 'remaining_scenarios': rem, 'shrink_scenarios': [sc for sc in SC if sc not in rem] if C['remaining'] is not None else [], 'per_scenario': per_sc},
+               'withdrawal': {'branch': 'pass', 'rerun': None, 'anomaly': C['wd_anom'], 'status': 'anomaly' if C['wd_anom'] else 'pass'},
+               'env_band_recheck': {'selected_by_rule_at_pilot': EBR, 'registered_band_pt': EBR, 'registered_meets_rule_at_pilot': True, 'note': '合成'}, 'style_pilot': None},
+              open(P['gate'], 'w', encoding='utf-8'), ensure_ascii=False)
     json.dump({'kind': 'calib_band_A', 'synthetic': True, 'anomaly_run_keys': ['%s__%s__none__seed%d' % (tag, sc, S['main'][s][sc]) for s, sc in C['calib_anom']]}, open(P['calib'], 'w', encoding='utf-8'), ensure_ascii=False)
     if C['identity']:
         P['identity'] = os.path.join(rec, 'identity-%s.json' % tag)
@@ -183,19 +189,47 @@ def expected_row(c, C):
                             env=(x in C['env']) or (c['id'] in C['one_side']))
 
 
-def expected_notes(x, c, C):
-    want = set(); r = x['result']
+FIRST_MATCH = FAM['confirm_rule']['label_stages']['stage2_first_match']
+LOWF, HIGHF = Fraction(str(T['censor']['low'])), Fraction(str(T['censor']['high']))
+
+
+def expected_label(row):
+    """期待の行 id から期待の札を、正本 stage2_first_match の順で組む（confirm_A._stage2 を使わない・採否表 P135）。行 id の符号化（confirm_A.row_id）は判定の器と共有する。"""
+    if row.startswith('U-'):
+        return L['undecidable']
+    if row == 'NS':
+        return L['ns']
+    m = re.fullmatch(r'R-C(\d)S(\d)F(\d)Y([nth])E(\d)', row)
+    on = {'interpretation_clause': m.group(1) == '1', 'iut_not_rejected': m.group(2) != '1', 'refuse_gate': m.group(3) == '1', 'style_gate_hold': m.group(4) == 'h', 'environment_hold': m.group(5) == '1', 'none': True}
+    return next(x['label'] for x in FIRST_MATCH if on[x['rule'].split('（')[0]])
+
+
+def expected_keep(run, c, C):
+    """期待の keep を配置から組む（両腕条件の検閲の整数境界・測定不能・錨帯の除外・集計器の keep を読まない・採否表 P136）。"""
+    keep = []
+    for s in SIZES:
+        nA, kA, _, _ = spec(run, s, c['scenario'], c['A']); nB, kB, _, _ = spec(run, s, c['scenario'], c['B'])
+        low = kA * LOWF.denominator < LOWF.numerator * nA and kB * LOWF.denominator < LOWF.numerator * nB
+        high = kA * HIGHF.denominator > HIGHF.numerator * nA and kB * HIGHF.denominator > HIGHF.numerator * nB
+        unm = any(s in C['unmeas'].get((c['scenario'], arm), ()) for arm in (c['A'], c['B']))
+        keep.append(not (low or high or unm or (s, c['scenario']) in C['anchor']) and nA > 0 and nB > 0)
+    return keep
+
+
+def expected_notes(c, C, ek, exp_row):
+    """注の期待を、期待の札と期待の keep から組む（集計器の札と keep を読まない・採否表 P136）。"""
+    want = set()
     if C['identity'] == 'fail' and 'N' in (c['A'], c['B']):
         want.add('identity')
-    if x['label'] == L['confirmed']:
-        kept = {SIZES[j] for j in range(len(SIZES)) if r['keep'][j]}
+    if expected_label(exp_row) == L['confirmed']:
+        kept = {SIZES[j] for j in range(len(SIZES)) if ek[j]}
         if any(sc == c['scenario'] and s in kept for s, sc in C['calib_anom']):
             want.add('calib')
         if C['wd_anom']:
             want.add('withdrawal')
-    if r['status'] == 'ok':
-        k = [j for j in range(len(SIZES)) if r['keep'][j]]
-        if (k[-1] - k[0] + 1) != len(k) or not r['keep'][0] or not r['keep'][-1]:
+    if sum(ek) >= FAM['model']['min_sizes'] and not (C['types'][c['scenario']] == 'MIX' and c['id'] == NC_ID):
+        k = [j for j in range(len(SIZES)) if ek[j]]
+        if (k[-1] - k[0] + 1) != len(k) or not ek[0] or not ek[-1]:
             want.add('gap')
     return want
 
@@ -213,7 +247,13 @@ def compare(RJ, run, C):
         exp = expected_row(c, C)
         if x['row'] != exp:
             mm.append({'kind': 'row', 'run': run, 'id': x['id'], 'expected': exp, 'got': x['row']})
-        wn, gn = expected_notes(x, c, C), got_notes(x)
+        exl = expected_label(exp)
+        if x['label'] != exl:   # v2.1: 札の突合（採否表 P135）
+            mm.append({'kind': 'label', 'run': run, 'id': x['id'], 'expected': exl, 'got': x['label']})
+        ek = expected_keep(run, c, C)
+        if list(x['result']['keep']) != ek:   # v2.1: keep の突合（採否表 P136）
+            mm.append({'kind': 'keep', 'run': run, 'id': x['id'], 'expected': ek, 'got': x['result']['keep']})
+        wn, gn = expected_notes(c, C, ek, exp), got_notes(x)
         if wn != gn:
             mm.append({'kind': 'notes', 'run': run, 'id': x['id'], 'expected': sorted(wn), 'got': sorted(gn)})
         mode = C['refuse'].get((c['scenario'], xarm(c)))
@@ -245,7 +285,8 @@ def paths_fired(RJ):
              ('confirmed_multi_scenario', len({x['scenario'] for x in C_ if x['label'] == L['confirmed']}) >= 2),
              ('one_side_stage2', any(x['stage'] == 2 and any(e['rule'] == 'one_side' for e in x['env_reasons']) for x in C_)),
              ('residual_gap_note', any('残存規模は連続でない' in n_ for x in C_ for n_ in x['notes'])), ('control_pairs_string', any(p_.get('string') for p_ in RJ['descriptive'].get('A_desc_control_pairs') or [])),
-             ('upward', bool(RJ.get('upward_confirmed'))), ('gate2_partial_shrink', bool(RJ.get('gate2_shrink_ids')) and any(x['stage'] == 2 for x in C_))]
+             ('upward', bool(RJ.get('upward_confirmed'))), ('gate2_partial_shrink', bool(RJ.get('gate2_shrink_ids')) and any(x['stage'] == 2 for x in C_)),
+             ('measurable_both_directions', all(set(v['directions']) == set(confirm_A.DIRECTIONS) for v in RJ['measurable']['types'].values()) and bool(RJ['measurable']['types']))]
     for nm, on in pairs:
         if on:
             got.add(nm)
@@ -256,7 +297,7 @@ def paths_fired(RJ):
     return got
 
 
-PATHS_REQUIRED = ['unmeasurable', 'anchor_exclusion', 'env_bridge', 'env_one_side', 'style_cells', 'stratified_ok', 'stratified_any', 'sensitivity_changed', 'measurable_yes', 'measurable_no',
+PATHS_REQUIRED = ['measurable_both_directions', 'unmeasurable', 'anchor_exclusion', 'env_bridge', 'env_one_side', 'style_cells', 'stratified_ok', 'stratified_any', 'sensitivity_changed', 'measurable_yes', 'measurable_no',
                   'identity_fail_note', 'calib_anomaly_note', 'withdrawal_anomaly_note', 'stack_rows', 'demotions', 'floor_1', 'floor_0', 'critical_size', 'env_secondary', 'scale_only_desc', 'reach_note',
                   'confirmed_label_string', 'refuse_a', 'refuse_b', 'refuse_d', 'style_a_hold', 'confirmed_multi_scenario', 'one_side_stage2', 'residual_gap_note', 'control_pairs_string', 'upward', 'gate2_partial_shrink']
 
@@ -286,7 +327,11 @@ MUTS = [('M1', 'tools/analyze_A.py', [("        if rks & ANOM_RK:\n", "        i
                                      ("            if np.sign(ra['beta']) != np.sign(res['beta']) or ra['beta'] == 0.0:\n", "            if False:\n"), ("            if ra['p'] >= R.alpha:\n", "            if False:\n")], [14],
          'refuse の理由を (c) だけにする'),
         ('M5', 'tools/confirm_A.py', [("        for nm, xa, xb in (('a', a_A, a_B), ('b', b_A, b_B)):\n", "        for nm, xa, xb in (('b', b_A, b_B),):\n")], [15], '様式門の (a) を読まない'),
-        ('M6', 'tools/analyze_A.py', [("SHRINK_IDX = {i for i, c in enumerate(CONTR) if GATE2 and c['scenario'] not in REMAIN}", "SHRINK_IDX = {i for i, c in enumerate(CONTR) if GATE2}")], [13], '門2 の縮小を全対比に当てる')]
+        ('M6', 'tools/analyze_A.py', [("SHRINK_IDX = {i for i, c in enumerate(CONTR) if GATE2 and c['scenario'] not in REMAIN}", "SHRINK_IDX = {i for i, c in enumerate(CONTR) if GATE2}")], [13], '門2 の縮小を全対比に当てる'),
+        ('M7', 'tools/confirm_A.py', [("(('interpretation_clause', clause), ('iut_not_rejected', not star),", "(('iut_not_rejected', not star), ('interpretation_clause', clause),")], [1], '第一適合の順の先頭二つを入れ替える'),
+        ('M8', 'tools/confirm_A.py', [("p_star=(max(float(r['p']), p_pt) if same else R.p_star_mismatch)", "p_star=(min(float(r['p']), p_pt) if same else R.p_star_mismatch)")], [1], 'p* を max から min に'),
+        ('M9', 'tools/analyze_A.py', [("        if (kidx[-1] - kidx[0] + 1) != len(kidx) or ends:\n", "        if (kidx[-1] - kidx[0] + 1) != len(kidx):\n")], [1], '残存の非連続の注から端の欠けの条件を外す'),
+        ('M10', 'tools/analyze_A.py', [("r, f = evaluate(R, c, X, ke); RES.append(r)", "r, f = evaluate(R, c, X, None); RES.append(r)")], [1, 2], '主の当てはめに測定不能・錨帯の除外を渡さない')]
 
 
 def make_mutant(name, rel, pairs):
@@ -339,14 +384,16 @@ SUM = {'kind': 'synth_A', 'version': VERSION, 'generated_utc': datetime.datetime
 recp = a.record or os.path.join(REPO, 'records', 'A', 'synth-A-%s' % datetime.date.today().isoformat())
 if full:
     json.dump(SUM, open(recp + '.json', 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-    Lm = ['# 段階 A 合成検査（機械生成・`tools/synth_A.py` %s・%s UTC）' % (VERSION, SUM['generated_utc']), '', '- 入力: %s' % json.dumps(SUM['inputs'], ensure_ascii=False),
+    Lm = ['# 段階 A 合成検査（機械生成・`tools/synth_A.py` %s・%s UTC・ファイル名の日付は手元の日付〔日本時間〕）' % (VERSION, SUM['generated_utc']), '', '- 入力: %s' % json.dumps(SUM['inputs'], ensure_ascii=False),
           '- 札の全組合せ表: %d 行のうち発火 %d 行（未発火: %s）・期待との不一致 %d 件（行 id・注の範囲・除外の範囲・refuse の理由）・集計器の失敗 %d・経路の未発火: %s・所要 %.0f 秒' % (
               SUM['rows_total'], SUM['rows_fired'], '・'.join(not_fired) or 'なし', len(mismatches), len(errors), '・'.join(paths_missing) or 'なし', SUM['seconds']),
           '- 変異の検査: %s' % '・'.join('%s（%s）%s' % (m['name'], m['text'], '見分けた' if m['detected'] else '見分けなかった') for m in MUT), '',
           '| 走 | 配置 | 札の件数 | 不一致 | 発火した行 | 発火した経路 | 秒 |', '|---|---|---|---|---|---|---|']
     Lm += ['| %d | %s | %s | %d | %s | %s | %s |' % (r['run'], json.dumps(r['combo'], ensure_ascii=False), json.dumps(r['label_counts'], ensure_ascii=False), r['mismatches'], '・'.join(r['rows']), '・'.join(r['paths']), r['seconds']) for r in report]
     Lm += ['', '| 変異 | 器 | 内容 | 走 | 期待との不一致 | 判定 |', '|---|---|---|---|---|---|'] + ['| %s | %s | %s | %s | %d | %s |' % (m['name'], m['file'], m['text'], '・'.join(map(str, m['runs'])), m['mismatches'], '見分けた' if m['detected'] else '見分けなかった') for m in MUT]
-    Lm += ['', SUM['clause']]
+    Lm += ['', '- 限界: 札の全組合せ表（正本 label_combo_table）は判定関数 combo_rows の出力であり、第一適合の順の検査は confirm_A の自己検査の照合と、本器の札の突合（期待の札は正本 stage2_first_match から組む）にある（採否表 P137）。',
+           '- 限界: 期待の行 id の符号化（confirm_A.row_id）は判定の器と共有する（符号化の誤りは両側で同じに出る）。',
+           '- 限界: 本器は Firth の PPLRT・pt 差の傾きの重み付き最小二乗・検閲の数値の実装を独立に再発見しない（数値の実装は自己検査と R logistf との一致検査の受け持ち）。合成の件数は応答の分布を再現しない。', '', SUM['clause']]
     open(recp + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(Lm) + '\n')
     print('written', recp + '.{json,md}')
 print('[synth_A] 行 %d/%d 発火・不一致 %d・失敗 %d・経路の未発火 %s・変異 %s' % (SUM['rows_fired'], SUM['rows_total'], len(mismatches), len(errors), paths_missing, [(m['name'], m['detected']) for m in MUT]))

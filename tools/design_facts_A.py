@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""design_facts_A.py v3.2 —— 段階 A の設計事実（転記行 A〜O）を機械生成する（2026-09-13）。
+"""design_facts_A.py v3.3 —— 段階 A の設計事実（転記行 A〜O）を機械生成する（2026-09-13）。
+v3.3（2026-09-14・凍結前の最終検分の採否表 P118・P120・P122〜P125・登録者裁定 D27〜D29・D34）: 格子 v3.3 を要求する。転記行 A に校正腕のセッション数の内訳と下界、転記行 D に両向きの到達と区間と測れた対比の本数・測れた効果種の B の対応・格子の解釈条項の発火率の注、
+  転記行 E は格子の丸めの前の値から一度で丸める、転記行 F に時間貸しに移す機種を除いた停止規則の参照、転記行 G にセルをまたいだ率、転記行 M は確証族の腕の値を先に置く。到達の下限は正本 blind_below から読む。
 v3.2（2026-09-14・登録者裁定 D18・実装検分の採否表 P98）: 格子 v3.2 を要求する。転記行 F と G の入力（cost-facts と style-stageF1）の SHA16 を記帳する。転記行 J の器材の一覧に名の語彙の出所（response_mode_M.py・response_mode_F.py）を足す。
 v3.1（2026-09-13・登録者裁定 D9 の三つ目の手順）: 格子 v3.1 を要求し、格子の全入力（正本・機種の記録・firth・confirm_A・zaxis_A・power_grid_A・bands_A）の SHA16 を現行のファイルと突合する。転記行 J の器材の一覧を整備後に合わせる。
 入力: design/contrasts-A.json（正本 v2.2）・records/A/power-grid-A.json（v3）・records/A/hf-models-A.json・records/cost-pilot/cost-facts-2026-09-13.md（U 表・R 表・G 行を解析）・records/F/style-stageF1.json（(b) 率の既測・記述）。
@@ -13,6 +15,7 @@ from fractions import Fraction
 from scipy.stats import binom
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from zaxis_A import z_map
+import confirm_A
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ap = argparse.ArgumentParser()
 ap.add_argument('--pg', default=os.path.join(REPO, 'records', 'A', 'power-grid-A.json')); ap.add_argument('--out', default=os.path.join(REPO, 'records', 'A', 'design-facts-A'))
@@ -24,7 +27,7 @@ T = J(CPATH); PG = J(a.pg); HF = J(os.path.join(REPO, 'records', 'A', 'hf-models
 sha_file = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
 sha_str = lambda s: hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper()
 DEV = []
-assert PG.get('version') == 'v3.2', '格子は v3.2 が要る'
+assert PG.get('version') == 'v3.3', '格子は v3.3 が要る'
 NOW_IN = {'contrasts_sha16': CPATH, 'hf_models_sha16': os.path.join(REPO, 'records', 'A', 'hf-models-A.json'), 'firth_sha16': os.path.join(REPO, 'tools', 'firth.py'), 'confirm_sha16': os.path.join(REPO, 'tools', 'confirm_A.py'),
           'zaxis_sha16': os.path.join(REPO, 'tools', 'zaxis_A.py'), 'power_grid_sha16': os.path.join(REPO, 'tools', 'power_grid_A.py'), 'bands_sha16': os.path.join(REPO, 'tools', 'bands_A.py')}
 STALE = [kk for kk, pp in NOW_IN.items() if PG['inputs'].get(kk) != sha_file(pp)]
@@ -42,7 +45,9 @@ civ = lambda v: '—' if (v is None or v[0] is None) else 'Wilson %.3f〜%.3f' %
 CENSOR_LIKELY = 0.5     # 転記行 C の「検閲される見込み」の閾（記述の区切り）
 CLAUSE_MAJORITY = 0.5   # 転記行 D: 解釈条項が当てはめの多数で発火する対比を数える区切り（記述）
 LOSS_MARGIN = 0.1       # 転記行 D: 二尺度の規則で草案4 の規則より到達が下がる対比を数える区切り（記述）
-BLIND = 0.05            # 転記行 D: 到達が届かない対比を数える区切り（記述）
+ME = T['reading_selection']['measurable_effect_type']
+BLIND = ME['blind_below']   # 転記行 D: 到達が届かない対比を数える区切り（正本の下限・登録者裁定 D29・v3.2 までは器の中の記述の区切り〔同じ値〕）
+CIP = '%g%%' % (ME['ci_level'] * 100)
 TRENDS = ['一定', '上昇', '下降']
 Z, PAR = z_map(HF)
 for k in SIZES:
@@ -148,6 +153,9 @@ for m in MODELS:
 tgL = TAG['L4']; g05_tr = n_id * len(ARMS); g05_h = g05_tr / TPH[tgL] + SETUP[tgL] / 3600
 margin = min((v['last_session_margin'], k) for k, v in plans['upper']['rows'].items() if 'last_session_margin' in v)
 stop_thr = plans['upper']['units'] * C['stop_rule']['multiplier']
+RENT = [m['key'] for m in MODELS if ENVS[m['key']].get('if_not_80GB')]   # 時間貸しに移しうる機種（登録者裁定 D34）
+upper_wo = plans['upper']['units'] - sum(plans['upper']['rows'][k]['units'] for k in RENT); thr_wo = upper_wo * C['stop_rule']['multiplier']
+s_rent = '%s を時間貸しに移す場合の停止規則の参照（%s）: %s を除いた上界 %.1f ユニット・その %s 倍 %.1f ユニット。' % ('・'.join(RENT), C['stop_rule']['rental_adjust'], '・'.join(RENT), upper_wo, C['stop_rule']['multiplier'], thr_wo)
 k32 = SIZES[-1]; sens = []
 for dlt in range(0, 5):
     SFx = dict(SF0); SFx[k32] = SF0[k32] + dlt; px = plans_for('upper', SFx); sens.append({'factor': SFx[k32], 'units_32B': px['rows'][k32]['units'], 'upper_total': px['units'], 'exceeds_stop_threshold': px['units'] > stop_thr})
@@ -159,23 +167,26 @@ F['F'] = {'text': ('費用と時間（門0 の実測: L4 %.2f ユニット/h・%
     RATE[TAG['L4']], format(int(TPH[TAG['L4']]), ','), SETUP[TAG['L4']], GPUN[TAG['A100']], RATE[TAG['A100']], format(int(TPH[TAG['A100']]), ','), SETUP[TAG['A100']], WORK[TAG['L4']], json.dumps(SF0, ensure_ascii=False), SH, CALM, C['calibration_throughput'],
     '／'.join(row_txt(k, v) for k, v in plans['upper']['rows'].items()), format(plans['upper']['trials'], ','), plans['upper']['hours'], plans['upper']['units'], plans['upper']['sessions'], plans['lower']['hours'], plans['lower']['units'],
     '／'.join(('%s は走らせない' % k) if v is None else row_txt(k, v) for k, v in alt40.items()), margin[0], margin[1], C['stop_rule']['multiplier'], stop_thr, C['upper_bound_scope'],
-    '・'.join('係数 %g で 32B %.1f・合計 %.1f（%s）' % (s_['factor'], s_['units_32B'], s_['upper_total'], '閾値を超える' if s_['exceeds_stop_threshold'] else '超えない') for s_ in sens), C['rental_rule'] + '。',
+    '・'.join('係数 %g で 32B %.1f・合計 %.1f（%s）' % (s_['factor'], s_['units_32B'], s_['upper_total'], '閾値を超える' if s_['exceeds_stop_threshold'] else '超えない') for s_ in sens), C['rental_rule'] + '。' + s_rent,
     '〜'.join(str(x) for x in sorted(set(EST))), plans['upper']['units'] / max(EST), n_id, len(ARMS), format(g05_tr, ','), g05_h, g05_h * RATE[tgL]),
-    'data': {'plans': plans, 'alt_40GB_upper': alt40, 'stop_threshold_units': stop_thr, 'size_factor_sensitivity_32B': sens, 'gate05': {'trials': g05_tr, 'hours': g05_h, 'units': g05_h * RATE[tgL]}, 'gate0_estimates_AB': EST}}
+    'data': {'plans': plans, 'alt_40GB_upper': alt40, 'stop_threshold_units': stop_thr, 'size_factor_sensitivity_32B': sens, 'gate05': {'trials': g05_tr, 'hours': g05_h, 'units': g05_h * RATE[tgL]}, 'gate0_estimates_AB': EST,
+             'rental_adjust': {'models': RENT, 'upper_units_without': upper_wo, 'stop_threshold_units_without': thr_wo}}}
 
 # ---- A: 規模
 t_id = n_id * len(ARMS); t_pilot = len(MODELS) * len(SC) * len(ARMS) * pn; t_main = len(MODELS) * len(SC) * len(ARMS) * n
 t_anchor = len(AB['models']) * anchor_trials; sess_models = sum(plans['upper']['rows'][m['key']]['sessions'] for m in MODELS); sess_all = plans['upper']['sessions']; t_cal = sess_all * n_cal
+multi = {m['key']: plans['upper']['rows'][m['key']]['sessions'] for m in MODELS if plans['upper']['rows'][m['key']]['sessions'] > 1}; sess_lo = plans['lower']['sessions']   # 採否表 P125
 t_bridge = len(T['bridge']['cells']) * len(T['bridge']['arms']) * T['bridge']['n']; t_api = len(T['seeds']['api_rerun']) * len(ARMS) * n
 t_total = t_id + t_pilot + t_main + t_anchor + t_cal + t_bridge
 JV = T['judge_validity']; jv_all = len(MODELS) * len(SC) * JV['n_per_cell']; jv_fb = len(JV['fallback_scope']['models']) * len(SC) * JV['n_per_cell']
-F['A'] = {'text': '規模: 門0.5 同一性選別 %s（%s × %d 腕 × n=%d）／パイロット %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／本走行 %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／錨反復 %s（%d 規模 × %d 場面 × %d 腕 × n=%d）／校正腕 %s（セッションごとに n=%d・転記行 F の上界のセッション数の合計 %d〔機種 %d・橋 %d〕に依存）／橋 %s（%s × %d 腕 × n=%d・場面 %s・各機種の本走行の %s と対にする）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（%s × %s × %d 腕 × n=%d）。判定器の妥当性の断片（パイロットから抽出・系統外の盲検判定）: 全機種なら %s（%d 機種 × %d 場面 × %d）・絞る場合 %s（%s × %d 場面 × %d）・範囲は %s。' % (
+F['A'] = {'text': '規模: 門0.5 同一性選別 %s（%s × %d 腕 × n=%d）／パイロット %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／本走行 %s（%d 機種 × %d 場面 × %d 腕 × n=%d）／錨反復 %s（%d 規模 × %d 場面 × %d 腕 × n=%d）／校正腕 %s（セッションごとに n=%d・転記行 F の上界のセッション数の合計 %d〔機種 %d（複数のセッションの機種: %s）・橋 %d〕に依存・下界のセッション数 %d なら %s）／橋 %s（%s × %d 腕 × n=%d・場面 %s・各機種の本走行の %s と対にする）＝**手元合計 %s 試行**。API 再走行（門0.5 合格時のみ）%s（%s × %s × %d 腕 × n=%d）。判定器の妥当性の断片（パイロットから抽出・系統外の盲検判定）: 全機種なら %s（%d 機種 × %d 場面 × %d）・絞る場合 %s（%s × %d 場面 × %d）・範囲は %s。' % (
     format(t_id, ','), T['identity_screen']['scenario'], len(ARMS), n_id, format(t_pilot, ','), len(MODELS), len(SC), len(ARMS), pn, format(t_main, ','), len(MODELS), len(SC), len(ARMS), n,
-    format(t_anchor, ','), len(AB['models']), len(AB['scenarios']), len(AB['arms']), n, format(t_cal, ','), n_cal, sess_all, sess_models, sess_all - sess_models,
+    format(t_anchor, ','), len(AB['models']), len(AB['scenarios']), len(AB['arms']), n, format(t_cal, ','), n_cal, sess_all, sess_models, '・'.join('%s が %d' % kv for kv in multi.items()) or 'なし', sess_all - sess_models, sess_lo, format(sess_lo * n_cal, ','),
     format(t_bridge, ','), '・'.join('%s の %s 側' % (k, v['bridge_env']) for k, v in T['bridge']['cells'].items()), len(T['bridge']['arms']), T['bridge']['n'], T['bridge']['scenario'], T['bridge']['scenario'],
     format(t_total, ','), format(t_api, ','), '・'.join(T['seeds']['api_rerun']), T['bridge']['scenario'], len(ARMS), n,
     format(jv_all, ','), len(MODELS), len(SC), JV['n_per_cell'], format(jv_fb, ','), '・'.join(JV['fallback_scope']['models']), len(SC), JV['n_per_cell'], JV['status']),
-    'data': {'identity': t_id, 'pilot': t_pilot, 'main': t_main, 'anchor_rerun': t_anchor, 'calibration': t_cal, 'calibration_sessions': {'all': sess_all, 'models': sess_models}, 'bridge': t_bridge, 'total_local': t_total, 'api_rerun': t_api}}
+    'data': {'identity': t_id, 'pilot': t_pilot, 'main': t_main, 'anchor_rerun': t_anchor, 'calibration': t_cal, 'calibration_sessions': {'all': sess_all, 'models': sess_models, 'multi_session_models': multi, 'lower_all': sess_lo, 'lower_trials': sess_lo * n_cal},
+             'bridge': t_bridge, 'total_local': t_total, 'api_rerun': t_api}}
 
 # ---- B: 対比と整合
 D_ = T['descriptive_families']; I_ = T['integrity']; CRULE = FAM['confirm_rule']
@@ -264,16 +275,31 @@ for tr in TRENDS:
         tr, r0[0]['ctrl_change_32B_minus_4B'] * 100, ZERO, mx['card_D1_holm_first'], mx['id'], sum(r['card_D1_holm_first'] for r in r0), 1 - math.prod(1 - r['card_D1_holm_first'] for r in r0),
         mx4['card_draft4_nominal'], mx4['id'], sum(r['card_draft4_nominal'] for r in r0), sum(r['undecidable_censor'] for r in r0), DREF, statistics.median(r['card_D1_holm_first'] for r in r1), statistics.mean(r['card_D1_holm_first'] for r in r1), statistics.mean(r['card_draft4_holm_first'] for r in r1), mn['card_D1_holm_first'], mn['id'],
         BLIND, sum(1 for r in r1 if r['card_D1_holm_first'] < BLIND), CLAUSE_MAJORITY, sum(1 for r in r1 if (r['clause_rate_among_fit'] or 0) >= CLAUSE_MAJORITY), LOSS_MARGIN, sum(1 for r in r1 if r['card_draft4_holm_first'] - r['card_D1_holm_first'] >= LOSS_MARGIN), sum(r['card_D1_holm_first'] for r in r1)))
-s_dr = '両腕の既測基底を持つ %d 本の 4B の実基底を入力にすると（B=%d）、%s。期待本数は独立を仮定しなくても和で正しく、「少なくとも一本」だけが対比の独立の仮定に依る（腕を共有する対比は独立ではない）' % (nDR, PG['B']['DR'], '／'.join(dparts))
-eff_of = lambda cid: cid.split(':', 1)[1]
+s_dr = ('両腕の既測基底を持つ %d 本の 4B の実基底を入力にすると（B=%d）、%s。期待本数は独立を仮定しなくても和で正しい。「少なくとも一本」は同じ効果種の対比のあいだの独立に依るが、同じ効果種の対比は場面ごとに別の走行の標本なので、'
+        '全場面に Δ を置く計算の前提の内で独立は成り立つ（腕を共有する別の効果種の対比どうしは独立ではない）' % (nDR, PG['B']['DR'], '／'.join(dparts)))
+EFF = {c['id']: c['effect'] for c in CONTR}; eff_of = lambda cid: EFF[cid]   # 効果種は正本の effect（採否表 P127）
 ids = [c['id'] for c in CONTR if any(r['id'] == c['id'] for r in DRr)]; effs = list(dict.fromkeys(eff_of(i) for i in ids))
-sel1 = {(r['id'], r['ctrl_trend']): r for r in DRr if r['delta_value'] != ZERO}; efparts = []
+sel1 = {(r['id'], r['ctrl_trend']): r for r in DRr if r['delta_value'] != ZERO}; selO = {(r['id'], r['ctrl_trend']): r for r in PG['DR_opp']}; efparts = []
+THR = ME['threshold']; BDR = PG['B']['DR']; assert PG['B']['DR_opp'] == BDR; meas_by_trend = {tr: [] for tr in TRENDS}
 for e in effs:
-    ii = [i for i in ids if eff_of(i) == e]
-    efparts.append('%s（%d 本）: %s' % (e, len(ii), '・'.join('%s 平均 %.3f・%s 未満 %d・少なくとも一本 %.3f' % (tr, statistics.mean(sel1[(i, tr)]['card_D1_holm_first'] for i in ii), BLIND, sum(sel1[(i, tr)]['card_D1_holm_first'] < BLIND for i in ii), 1 - math.prod(1 - sel1[(i, tr)]['card_D1_holm_first'] for i in ii)) for tr in TRENDS)))
-blind3 = [i for i in ids if all(sel1[(i, tr)]['card_D1_holm_first'] < BLIND for tr in TRENDS)]; nobase = [c['id'] for c in CONTR if c['id'] not in ids]
-s_eff = '**効果種ごとの到達**（既測基底のある対比・Δ=±%g・札 D1 の初段・「少なくとも一本」は場面の独立を仮定・正本の選択規則の閾値は %s）: %s。**三型のいずれでも %s 未満の対比 %d 本**: %s。**既測基底の無い対比 %d 本**は実基底の行に載らない（Odose 系は下の仮定の基底で計算）' % (
-    DREF, T['reading_selection']['measurable_effect_type']['threshold'], '／'.join(efparts), BLIND, len(blind3), '・'.join(blind3), len(nobase))
+    ii = [i for i in ids if eff_of(i) == e]; tparts = []
+    for tr in TRENDS:
+        pr = [sel1[(i, tr)]['card_D1_holm_first'] for i in ii]; po = [selO[(i, tr)]['card_D1_holm_first'] for i in ii]
+        ar = confirm_A.at_least_one_interval(pr, BDR, ME['ci_level']); ao = confirm_A.at_least_one_interval(po, BDR, ME['ci_level'])
+        sr = confirm_A.direction_state(ar[1], ar[2], THR); so = confirm_A.direction_state(ao[1], ao[2], THR)
+        if sr == 'measured' and so == 'measured':
+            meas_by_trend[tr].append(e)
+        tparts.append('%s 余地のある向き %.3f（区間 %.3f〜%.3f・%s）・逆向き %.3f（区間 %.3f〜%.3f・%s）・測れた対比 %d/%d・一方の向きでも %s 未満 %d' % (
+            tr, ar[0], ar[1], ar[2], confirm_A.STATE_TEXT[sr], ao[0], ao[1], ao[2], confirm_A.STATE_TEXT[so], sum(1 for x, y in zip(pr, po) if min(x, y) >= THR), len(ii), BLIND, sum(1 for x, y in zip(pr, po) if min(x, y) < BLIND)))
+    efparts.append('%s（%d 本）: %s' % (e, len(ii), '・'.join(tparts)))
+blind3 = [i for i in ids if all(sel1[(i, tr)]['card_D1_holm_first'] < BLIND for tr in TRENDS)]; blind3o = [i for i in ids if all(selO[(i, tr)]['card_D1_holm_first'] < BLIND for tr in TRENDS)]
+nobase = [c['id'] for c in CONTR if c['id'] not in ids]
+s_eff = ('**効果種ごとの到達**（既測基底のある対比・Δ=±%g・札 D1 の初段・両向き〔余地のある向きは格子の DR 節・逆向きは DR_opp 節〕・「少なくとも一本」の %s 区間は対比ごとの模擬の二項の分散からデルタ法・'
+         '両向きとも区間の下端が選択規則の閾値 %s 以上で測れた・測れた対比は両向きとも個別に閾値以上・下限 %s）: %s。**両向きとも測れた効果種の数（対照の規模変化の三型）**: %s。'
+         '**三型のいずれでも %s 未満の対比**: 余地のある向きで %d 本（%s）・逆向きで %d 本（%s）。**既測基底の無い対比 %d 本**は実基底の行に載らない（Odose 系は下の仮定の基底で計算）。'
+         '**測れた効果種の B**: 集計時の計算は正本の B=%s、この見込み（DR・DR_opp 節）は B=%d。格子の模擬は測定不能と錨帯の除外を入れない配置の値で、実測では解釈条項の飽和を除外の後に残った規模で数える（運用の解釈 count_after）') % (
+    DREF, CIP, THR, BLIND, '／'.join(efparts), '・'.join('%s %d（%s）' % (tr, len(meas_by_trend[tr]), '・'.join(meas_by_trend[tr]) or 'なし') for tr in TRENDS),
+    BLIND, len(blind3), '・'.join(blind3) or 'なし', len(blind3o), '・'.join(blind3o) or 'なし', len(nobase), format(ME['B_per_contrast'], ','), BDR)
 DOr = PG['DO']; doparts = []
 for e in dict.fromkeys(eff_of(r['id']) for r in DOr):
     for d0 in PG['odose_assumed_d0']:
@@ -289,7 +315,8 @@ s_r = 'refuse 門（B=%d）: %s' % (PG['B']['R'], '／'.join('%s: 名目有意 %
     r['config'], r['nominal_significant'], f3(r['hold_among_nominal']), f3(r['hold_a_among_nominal']), f3(r['hold_b_among_nominal']), f3(r['hold_c_among_nominal']), f3(r['hold_d_among_nominal']), r['card_D1_holm_first_without_gate'], r['card_D1_holm_first_after_gate']) for r in PG['R']))
 F['D'] = {'text': '傾きの族（Firth PPLRT 両側・n=%d × %d 規模・両腕条件の検閲・率は B 回あたりの無条件率・B=%d・seed %d・節ごとの子ストリーム・z は転記行 L の実値〔一致を assert〕・判定は tools/confirm_A.py・札 D1（初段）＝p* ≤ α/%d〔β₃ と pt 差の傾きがともに初段の水準で立ち同じ向き・登録者裁定 D10 の p* の Holm でも初段の値は同じ〕）。**Δ=%g・d0=%g の β₃ の棄却率と札**: %s。**検出力**: %s。**%s**。%s。%s。%s。%s。%s。**実基底**: %s。%s。%s。%s。%s。' % (
     n, len(SIZES), PG['B']['D'], PG['seed'], FAM['m'], ZERO, ZERO, s_size, s_pow, s_hole, s_clean, s_fc, s_drop, s_ps, s_later, s_dr, s_eff, s_do, s_ds, s_r),
-    'data': {'blind_all_trends': blind3, 'no_base': nobase, 'n_measured': len(ids), 'blind_threshold': BLIND, 'delta': DREF}, 'data_ref': 'records/A/power-grid-A.json'}
+    'data': {'blind_all_trends': blind3, 'blind_all_trends_opposite': blind3o, 'no_base': nobase, 'n_measured': len(ids), 'blind_threshold': BLIND, 'delta': DREF, 'measurable_types_by_trend': meas_by_trend,
+             'B_measurable': ME['B_per_contrast'], 'B_DR': BDR}, 'data_ref': 'records/A/power-grid-A.json'}
 
 # ---- E: 床持続
 E = PG['E']; cs = D_['A_desc_floor']['cell_series']
@@ -307,8 +334,10 @@ if os.path.isfile(sp):
             if arm in ARMS and isinstance(v, dict) and v.get('b_rate_final') is not None:
                 style_meas.setdefault(scn, {})[arm] = v['b_rate_final']
 withN = [c['id'] for c in CONTR if 'N' in (c['A'], c['B'])]
-F['G'] = {'text': '様式門（(a)(b) の差・二項の差・n=%d 同士・「超」・厳密）の帰無発火率: 注（%d pt 超）%s・判定保留（%d pt 超）%s。既測の (b) JSON 直答率（段階 F の stageF1・4B-2507・U 腕・記述）: %s。確証族で N を含む対比 %d 本（%s）: %s。腕別・規模別の (b) 率と一斉保留の見込み本数はパイロット後に記述として報告し、閾値は動かさない（登録者裁定 D6）。' % (
+UG = G_['union_independent']
+F['G'] = {'text': '様式門（(a)(b) の差・二項の差・n=%d 同士・「超」・厳密）の帰無発火率: 注（%d pt 超）%s・判定保留（%d pt 超）%s。**一つの対比の %d セル（残存 %d 規模 × (a)(b)）のどれかが超える率**（%s）: 注 %s・判定保留 %s。既測の (b) JSON 直答率（段階 F の stageF1・4B-2507・U 腕・記述）: %s。確証族で N を含む対比 %d 本（%s）: %s。腕別・規模別の (b) 率と一斉保留の見込み本数はパイロット後に記述として報告し、閾値は動かさない（登録者裁定 D6）。' % (
     n, SG['note_pt'], '・'.join('p=%s で %s' % (p, sci(v)) for p, v in G_['bands'][str(SG['note_pt'])].items()), SG['hold_pt'], '・'.join('p=%s で %s' % (p, sci(v)) for p, v in G_['bands'][str(SG['hold_pt'])].items()),
+    G_['cells_per_contrast'], len(SIZES), G_['union_note'], '・'.join('p=%s で %s' % (p, sci(v)) for p, v in UG[str(SG['note_pt'])].items()), '・'.join('p=%s で %s' % (p, sci(v)) for p, v in UG[str(SG['hold_pt'])].items()),
     '／'.join('%s: %s' % (scn, '・'.join('%s %.3f' % (arm, r) for arm, r in d.items())) for scn, d in style_meas.items()) or '取得できず', len(withN), '・'.join(withN), SG['expected_note']), 'data': {'null': G_, 'measured_b_rates': style_meas, 'contrasts_with_N': withN}}
 
 # ---- H: 錨帯
@@ -339,11 +368,12 @@ TOOLS_NOW = [('make_contrasts_A.py', 'tools/make_contrasts_A.py'), ('confirm_A.p
              ('identity_screen_A.py', 'tools/identity_screen_A.py'), ('response_mode_A.py', 'tools/response_mode_A.py'), ('analyze_A.py', 'tools/analyze_A.py'), ('calib_band_A.py', 'tools/calib_band_A.py'),
              ('gate_A.py', 'tools/gate_A.py'), ('control_chart_A.py', 'tools/control_chart_A.py'), ('integrity_A.py', 'tools/integrity_A.py'), ('sample_inspection_A.py', 'tools/sample_inspection_A.py'),
              ('judge_fragments_A.py', 'tools/judge_fragments_A.py'), ('synth_A.py', 'tools/synth_A.py'), ('synth_gates_A.py', 'tools/synth_gates_A.py'), ('build_report_A.py', 'tools/build_report_A.py'),
-             ('report_lint.py', 'tools/report_lint.py'), ('freeze_A.py', 'tools/freeze_A.py'), ('response_mode_M.py', 'tools/response_mode_M.py'), ('response_mode_F.py', 'tools/response_mode_F.py')]
+             ('report_lint.py', 'tools/report_lint.py'), ('freeze_A.py', 'tools/freeze_A.py'), ('response_mode_M.py', 'tools/response_mode_M.py'), ('response_mode_F.py', 'tools/response_mode_F.py'),
+             ('tooling_interpretations_A.py', 'tools/tooling_interpretations_A.py')]
 PLANNED = []
 exist = [(nm, sha_file(os.path.join(REPO, p))) for nm, p in TOOLS_NOW + PLANNED if os.path.isfile(os.path.join(REPO, p))]
 still = [nm for nm, p in TOOLS_NOW + PLANNED if not os.path.isfile(os.path.join(REPO, p))]
-F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則・走行器の設定→contrasts-A.json／確証の判定（二尺度・p* の Holm・札の二段・全組合せ表）→confirm_A.py（格子・集計器・合成検査が同じ関数を import・札の率の模擬と測れた効果種を含む）／帯と門の厳密計算→bands_A.py（格子・門・校正帯が共有）／走行記録の読み出し→runs_A.py（器材が共有）／z→zaxis_A.py／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・確証規則・refuse 門・様式門・錨帯・測定不能・環境保留・測れた効果種→analyze_A.py／応答様式 (a)(b) と言及→response_mode_A.py／校正帯とセッションのやり直し・撤退条件・門2→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査（束縛・登録・生成器）→numbers_lint.py／草案と雛形の組み立て→build_draftA.py／整合と抽出（率盲検）→integrity_A.py・sample_inspection_A.py／判定器の断片→judge_fragments_A.py／合成検査→synth_A.py（札の全組合せ表の全行と集計器の経路）・synth_gates_A.py（門と校正の器）／報告→報告雛形の原稿と雛形・build_report_A.py・report_lint.py／凍結前の検分の束→bundle_prefreeze_A.py／凍結→freeze_A.py。**実在（SHA16）**: %s。**未整備**: %s。' % (
+F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則・走行器の設定→contrasts-A.json／確証の判定（二尺度・p* の Holm・札の二段・全組合せ表）→confirm_A.py（格子・集計器・合成検査が同じ関数を import・札の率の模擬と測れた効果種を含む）／帯と門の厳密計算→bands_A.py（格子・門・校正帯が共有）／走行記録の読み出し→runs_A.py（器材が共有）／z→zaxis_A.py／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・確証規則・refuse 門・様式門・錨帯・測定不能・環境保留・測れた効果種→analyze_A.py／応答様式 (a)(b) と言及→response_mode_A.py／校正帯とセッションのやり直し・撤退条件・門2→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査（束縛・登録・生成器）→numbers_lint.py／草案と雛形の組み立て→build_draftA.py／整合と抽出（率盲検）→integrity_A.py・sample_inspection_A.py／判定器の断片→judge_fragments_A.py／運用の解釈の記録→tooling_interpretations_A.py／合成検査→synth_A.py（札の全組合せ表の全行と集計器の経路）・synth_gates_A.py（門と校正の器）／報告→報告雛形の原稿と雛形・build_report_A.py・report_lint.py／凍結前の検分の束→bundle_prefreeze_A.py／凍結→freeze_A.py。**実在（SHA16）**: %s。**未整備**: %s。' % (
     '・'.join('%s %s' % e for e in exist), '・'.join(still) or 'なし'), 'data': {'exist': dict(exist), 'not_yet': still}}
 
 # ---- K: 引数・seed・tag
@@ -357,7 +387,7 @@ M = PG['M']; EB = T['environment_band']; cands = sorted(M['candidates'], key=int
 assert EB['band_pt'] is None or EB['band_pt'] == M['selected_by_rule'], ('登録した環境帯と選択規則の候補が不一致', EB['band_pt'], M['selected_by_rule'])
 F['M'] = {'text': '環境帯（橋の %s・本走行の %s 対 橋・n=%d 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔%s〕・既測の無い腕は %s）: %s。**選択規則（確証 %d 対比の期待誤保留数が %s 以下となる最小の候補）で選ばれる候補 %s pt**（%s）。真の率の置き方への依存（全腕を同じ率に置いた期待誤保留数）: %s。' % (
     '・'.join(M['bridge_models']), T['bridge']['scenario'], M['n'], T['bridge']['scenario'], EB['rule_missing_base_rate'],
-    '／'.join('%s pt: 腕あたり（真の率 %s）%s・いずれかの腕が超える確率 %.3f（確証族に現れる %d 腕では %.3f）・期待誤保留数 %.2f・検出 %s' % (b, EB['rule_missing_base_rate'], sci(M['candidates'][b]['per_arm_at_05']), M['candidates'][b]['p_any_arm_any_model'], len(M['family_arms']), M['candidates'][b]['p_any_family_arm_any_model'], M['candidates'][b]['expected_false_held_contrasts'],
+    '／'.join('%s pt: 腕あたり（真の率 %s）%s・確証族に現れる %d 腕のいずれかが超える確率 %.3f（全 %d 腕では %.3f）・期待誤保留数 %.2f・検出 %s' % (b, EB['rule_missing_base_rate'], sci(M['candidates'][b]['per_arm_at_05']), len(M['family_arms']), M['candidates'][b]['p_any_family_arm_any_model'], len(M['arm_rates_used']), M['candidates'][b]['p_any_arm_any_model'], M['candidates'][b]['expected_false_held_contrasts'],
                                                                    '・'.join('差 %s pt で %.3f' % (s_, v) for s_, v in M['candidates'][b]['detection_by_shift_pt'].items())) for b in cands),
     len(CONTR), EB['rule_expected_max'], M['selected_by_rule'], EB['selection_rule_side'], '／'.join('全腕 %g で %s' % (x['all_arms_rate'], '・'.join('%s pt %.3f' % (b, v) for b, v in x['expected_false_held_by_candidate'].items())) for x in M['rate_dependence'])) +
     (('**登録値 %d pt**・%s・選択規則の候補と一致: %s。保留の単位: %s。片側: %s。パイロット後: %s。' % (EB['band_pt'], EB['status'], EB['band_pt'] == M['selected_by_rule'], EB['hold'], EB['one_side_rule'], EB['pilot_recheck'])) if EB['band_pt'] is not None else ''), 'data': M}
@@ -375,13 +405,13 @@ F['O'] = {'text': '判定器の方向別の誤判定率の規模間の差の推�
     JVg['n_per_cell'], JVg['scenarios'], JVg['method'], '・'.join('類の割合 %g・誤判定率 %g で ±%.1f pt' % (r['class_share'], r['true_error_rate'], r['diff_halfwidth95_pt']) for r in JVg['rows']), T['judge_validity']['reading_clause']), 'data': JVg}
 
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
-outj = {'generated_utc': now, 'generator': 'tools/design_facts_A.py v3.2', 'contrasts_sha16': sha_file(CPATH), 'power_grid_json_sha16': sha_file(a.pg),
+outj = {'generated_utc': now, 'generator': 'tools/design_facts_A.py v3.3', 'contrasts_sha16': sha_file(CPATH), 'power_grid_json_sha16': sha_file(a.pg),
         'inputs_F_G': {'cost_facts': [os.path.relpath(CF_PATH, REPO).replace(os.sep, '/'), sha_file(CF_PATH)], 'style_stageF1': [os.path.relpath(sp, REPO).replace(os.sep, '/'), sha_file(sp) if os.path.isfile(sp) else None]}, 'z': {k: round(Z[k], 6) for k in SIZES}, 'dev_marks': DEV, 'facts': F}
 os.makedirs(os.path.dirname(a.out), exist_ok=True)
 json.dump(outj, open(a.out + '.json', 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v3.2・%s UTC・正本 contrasts-A.json SHA16 %s・格子 power-grid-A.json SHA16 %s・転記行 F の入力 SHA16 %s・転記行 G の入力 SHA16 %s%s）' % (now, outj['contrasts_sha16'], outj['power_grid_json_sha16'], outj['inputs_F_G']['cost_facts'][1], outj['inputs_F_G']['style_stageF1'][1], ('・**検査用の印 %s**' % '・'.join(DEV)) if DEV else ''), '']
+L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v3.3・%s UTC・正本 contrasts-A.json SHA16 %s・格子 power-grid-A.json SHA16 %s・転記行 F の入力 SHA16 %s・転記行 G の入力 SHA16 %s%s）' % (now, outj['contrasts_sha16'], outj['power_grid_json_sha16'], outj['inputs_F_G']['cost_facts'][1], outj['inputs_F_G']['style_stageF1'][1], ('・**検査用の印 %s**' % '・'.join(DEV)) if DEV else ''), '']
 for k in sorted(F):
     L.append('- **転記行 %s** — %s' % (k, F[k]['text'])); L.append('')
 L.append('本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。')
 open(a.out + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
-print('[design_facts_A v3.2] written %s.{md,json}%s' % (a.out, (' dev_marks=' + ','.join(DEV)) if DEV else ''))
+print('[design_facts_A v3.3] written %s.{md,json}%s' % (a.out, (' dev_marks=' + ','.join(DEV)) if DEV else ''))

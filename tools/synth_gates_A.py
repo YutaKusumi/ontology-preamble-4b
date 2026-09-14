@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """synth_gates_A.py v2 —— 段階 A の門と校正の器（identity_screen_A・gate_A・calib_band_A・control_chart_A・integrity_A）を合成データで発火させる検査（synth_A.py の門の部・2026-09-13 整備・登録者裁定 D9 の三つ目の手順）。
+v2.1（2026-09-14・登録者裁定 D26・採否表 P134）: 初点の名乗りの移し替え（calib_band_A.release_first_point・理由の記帳が無ければ止まる・退避の記録を残す・退避の後に別の機種が名乗れる）を足す。記録の見出しにファイル名の日付の基準を書く。
 v2（2026-09-14・実装検分の採否表 P77・P81・P90〜P92・P101・登録者裁定 D24）: 撤退条件の合格枝の発火・再走待ち・再走の合格・再走の器の異常・再走の n_ok が零・撤退条件のセルでない再走の seed の拒否、
   不合格枝の器の異常・橋のセッション・初点の確立の前に始まったセッションの逸脱、件数のそろわない校正腕（未完・判定しない）、整合検査の否定の経路（重複・欠落・seed の食い違い・dry-run の走行・要求の設定の違い）、
   起動器が使う校正帯の関数（session_verdict・claim_first_point）を足した。セッション記録に相を書く（calib_band_A v2 の読み出し）。
@@ -19,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 import calib_band_A
 REPO = runs_A.REPO
-VERSION = 'v2'
+VERSION = 'v2.1'
 ap = argparse.ArgumentParser(); ap.add_argument('--root', required=True); ap.add_argument('--B', type=int, default=200); ap.add_argument('--record', default=None); ap.add_argument('--keep', action='store_true')
 a = ap.parse_args()
 ROOT = os.path.abspath(a.root)
@@ -172,6 +173,16 @@ def case(name, fail):
         c1 = calib_band_A.claim_first_point(td, {'tag': 'stageA', 'model': '0.6B', 'session': 1}); c2 = calib_band_A.claim_first_point(td, {'tag': 'stageA', 'model': '0.6B', 'session': 2})
         c3 = calib_band_A.claim_first_point(td, {'tag': 'stageA', 'model': '1.7B', 'session': 1}); shutil.rmtree(td, ignore_errors=True)
         check('%s: 初点の名乗り（同じ機種は次のセッション番号でも始められ、ほかの機種は始めない・登録者裁定 D24）' % name, c1[0] is True and c2[0] is True and c3[0] is False, (c1, c2, c3))
+        td2 = tempfile.mkdtemp(prefix='claimA2-')
+        r1 = calib_band_A.claim_first_point(td2, {'tag': 'stageA', 'model': '0.6B', 'session': 1}); r2 = calib_band_A.claim_first_point(td2, {'tag': 'stageA', 'model': '1.7B', 'session': 1})
+        try:
+            calib_band_A.release_first_point(td2, '', 'registrant'); no_reason_stops = False
+        except ValueError:
+            no_reason_stops = True
+        arch = calib_band_A.release_first_point(td2, '0.6B の割当が得られない（合成）', 'registrant'); AR = runs_A.read_json(arch) if arch and os.path.exists(arch) else {}
+        r3 = calib_band_A.claim_first_point(td2, {'tag': 'stageA', 'model': '1.7B', 'session': 1}); shutil.rmtree(td2, ignore_errors=True)
+        check('%s: 初点の名乗りの移し替え（理由の記帳が無ければ止まる・退避の記録に元の名乗りと理由が残る・退避の後に別の機種が名乗れる・登録者裁定 D26）' % name,
+              r1[0] is True and r2[0] is False and no_reason_stops and AR.get('model') == '0.6B' and bool(AR.get('release_reason')) and r3[0] is True, (r1, r2, no_reason_stops, AR, r3))
     else:
         want = {('main', '0.6B', 1): 'first_point', ('main', '1.7B', 1): 'pass', ('main', '4B', 1): 'fired', ('main', '4B', 2): 'retry_pass', ('main', '8B', 1): 'fired', ('main', '8B', 2): 'anomaly',
                 ('bridge', '4B', 1): 'pass'}
@@ -223,7 +234,7 @@ SUM = {'kind': 'synth_gates_A', 'version': VERSION, 'generated_utc': datetime.da
        'clause': '合成の件数は検査のための人工値であり、いかなる読みにも用いない。本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'}
 recp = a.record or os.path.join(REPO, 'records', 'A', 'synth-gates-A-%s' % datetime.date.today().isoformat())
 json.dump(SUM, open(recp + '.json', 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-M = ['# 段階 A 門と校正の器の合成検査（機械生成・`tools/synth_gates_A.py` %s・%s UTC）' % (VERSION, SUM['generated_utc']), '', '- 入力: %s・正本 SHA16 %s' % (json.dumps(SUM['inputs'], ensure_ascii=False), SUM['contrasts_sha16']),
+M = ['# 段階 A 門と校正の器の合成検査（機械生成・`tools/synth_gates_A.py` %s・%s UTC・ファイル名の日付は手元の日付〔日本時間〕）' % (VERSION, SUM['generated_utc']), '', '- 入力: %s・正本 SHA16 %s' % (json.dumps(SUM['inputs'], ensure_ascii=False), SUM['contrasts_sha16']),
      '- 判定: %s（%d 項目中 %d 一致）' % ('PASS' if ok else 'FAIL', len(CHECKS), sum(c['ok'] for c in CHECKS)), '', '| 項目 | 一致 | 詳細（不一致のとき） |', '|---|---|---|']
 M += ['| %s | %s | %s |' % (c['check'], '○' if c['ok'] else '×', '' if c['ok'] else c['detail'].replace('|', '／')) for c in CHECKS] + ['', SUM['clause']]
 open(recp + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(M) + '\n')

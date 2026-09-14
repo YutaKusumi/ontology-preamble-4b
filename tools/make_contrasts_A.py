@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_A.py v2.4 —— 段階 A の正本 `design/contrasts-A.json` を設計草案8（凍結候補 3）から決定的に生成する（手書き禁止・再実行同一バイト）。
+"""make_contrasts_A.py v2.5 —— 段階 A の正本 `design/contrasts-A.json` を設計草案9（凍結候補 4）から決定的に生成する（手書き禁止・再実行同一バイト）。
+v2.5（2026-09-14・凍結前の最終検分の採否表 P105〜P153・登録者裁定 D26〜D35）: 運用の解釈の確認と追補（初点の名乗りの移し替え・判定器の断片の復唱の測定）・測れた効果種の区間と境界と両向きと場面ごとの被覆と文言・区間の被覆の断り・抽出検査の鍵の置き場と機械分類の伏せ・Firth の一致検査の選べる手・時間貸しの費用の上限と停止規則の参照・対比ごとの効果種（effect）を書き足す（v2.5 の区画でキーに書き足し、既存の文字列は上書きで置き換える）。
 v2.4（2026-09-14・登録者裁定 D16〜D25・実装検分の採否表）: 門2 の縮小の範囲・p* の Holm の範囲・当てはめの打ち切り・判定器の断片の鍵と除外・上向きの確証・環境帯の引き直しの文言・対照どうしの差と残存の非連続の定型・記帳の文言・校正の帰結の文言と並行のランタイム・運用の解釈の追補を書き足す（v2.4 の区画でキーに書き足し、既存の文字列は上書きで置き換える）。
 v2.3（2026-09-13・登録者裁定 D9 の手順3）: 器材の整備で確定した運用の解釈（tooling_interpretations・登録者の確認待ち）・sessions・response_mode・sample_inspection・integrity_check・judge_validity.extract・style_gate.stratified・seeds の再走の足し数と抽出の seed・print_strings の注の定型を足す（判定の規則と数は v2.2 と同じ）。
 v2.2 の変更（凍結前検分・七票の採否表 P1〜P74・登録者裁定 D9〜D15 承認 2026-09-13）: 確証を IUT の p 値 p*＝max(p_β, p_pt) の Holm に（D10）／札の二段化・非収束・札の全組合せ表（P9・P12・P2・`tools/confirm_A.py` の combo_rows）／pt 差の傾きの機械可読の欄（P14・P16・P56）／測れた効果種に限る選択規則（D11）／橋の校正腕（D12 (a)）／撤退条件の合否二分岐（D12 (b)）／14B の同時要求数の固定（D12 (c)）／環境帯のパイロット後の引き直し・保留の単位・片側の定義（D12 (d)・P40）／時間貸しの費用（D12 (e)）／判定器の読み条項（D13）／Firth 一致検査の Python 側の打ち切りと実行手順（D14・P4）／走行器の設定（P41）／説明文の数を定数から組み立て（P54）／procedure（D9）／typed_numbers（P68）／報告雛形の枠（P61〜P67）。
@@ -55,7 +56,7 @@ FLOOR_ARMS = ['O', 'Nk', 'Osec']
 
 
 def c(sc, A, B, **kw):
-    d = {'id': '%s:%s~%s' % (sc, A, B), 'scenario': sc, 'A': A, 'B': B, 'direction': 'two_sided',
+    d = {'id': '%s:%s~%s' % (sc, A, B), 'scenario': sc, 'A': A, 'B': B, 'effect': '%s~%s' % (A, B), 'direction': 'two_sided',
          'base_A_4B2507': (BASE[sc].get(A) or {}).get('k'), 'base_B_4B2507': (BASE[sc].get(B) or {}).get('k'),
          'base_n_A': (BASE[sc].get(A) or {}).get('n'), 'base_n_B': (BASE[sc].get(B) or {}).get('n'), 'base_src': {k: (BASE[sc].get(k) or {}).get('src') for k in (A, B)}}
     d.update(kw); return d
@@ -112,7 +113,7 @@ confirm_rule = {'type': 'two_scale_iut_holm_maxp',
                 'm_consumed': True,
                 'text': 'β₃ の PPLRT（両側）に Holm（m 固定）を当てて棄却されない対比は「非有意」。棄却された対比について、pt 差の傾きの p 値 p_pt と合わせた p*＝max(p_β, p_pt)（向きが不一致なら p_star_if_mismatch）に Holm（m 固定）を当て、棄却され、かつ解釈条項・refuse 門・様式門・環境保留に当たらない対比だけを確証にする。p* の Holm で棄却されない対比は「記述（対数オッズ尺度でのみ）」（m は消費）。',
                 'decided_by': '登録者裁定 D1（2026-09-13・二尺度の規則）・D10（2026-09-13・p* の Holm・records/reviews/A/prefreeze/adoption-table-A-prefreeze.md）'}
-fam = {'A_slope': {'question': '%d 効果種 × %d 場面で、β₃（腕 × z の交互作用）と pt 差の傾きの IUT の p 値 p* に Holm（m 固定）を当てて確証を決める（両側・Firth PPLRT・登録者裁定 D1・D10）' % (len(EFFECT), len(SC)), 'm': M_FIXED, 'alpha': ALPHA, 'effect_types': len(EFFECT), 'test': 'firth_pplrt_beta3_two_sided', 'contrasts': slope,
+fam = {'A_slope': {'question': '%d 効果種 × %d 場面で、β₃（腕 × z の交互作用）と pt 差の傾きの IUT の p 値 p* に Holm（m 固定）を当てて確証を決める（両側・Firth PPLRT・登録者裁定 D1・D10）' % (len(EFFECT), len(SC)), 'm': M_FIXED, 'alpha': ALPHA, 'effect_types': len(EFFECT), 'effect_type_ids': ['%s~%s' % e for e in EFFECT], 'test': 'firth_pplrt_beta3_two_sided', 'contrasts': slope,
                    'model': {'formula': 'logit P(catastrophe) = b0 + b1*arm + b2*z + b3*(arm*z)', 'arm_coding': '0=control(B) 1=treatment(A)',
                              'z': 'ln(actual_params) - ln(actual_params of Qwen/Qwen3-4B)（config.json から機械計算・tools/zaxis_A.py・中心は 4B 初版で固定・4B が残存しなくても変えない）',
                              'penalty': 'Firth (Jeffreys)・基準実装は tools/firth.py v2（修正スコアの Fisher scoring・step-halving・制約下も全模型の罰則・集約形はベルヌーイ行と自己検査で一致）・R logistf との一致検査は firth_check_A.py（合否規則は firth_check）',
@@ -419,6 +420,77 @@ fam['A_slope']['model']['penalty'] = fam['A_slope']['model']['penalty'].replace(
 fam['A_slope']['model']['undecidable_rule'] = fam['A_slope']['model']['undecidable_rule'].replace('門2 の縮小も同じ枠の消費', '門2 の縮小で残らない場面の対比も同じ枠の消費', 1)
 tooling_interpretations['status'] = '器材の整備（登録者裁定 D9 の三つ目の手順・2026-09-13）で確定した運用の解釈。追補と文言の直しは登録者裁定 D16〜D25（2026-09-14）で承認済み（registrant_decisions_D16_D25）。一覧の各項の確認は凍結確認の前に受ける'
 
+# ---- v2.5: 登録者裁定 D26〜D35（2026-09-14・推奨どおり承認・凍結前の最終検分の採否表 records/reviews/A/final/adoption-table-A-final.md）
+REACH_B_V25, REACH_BLIND, CI_LEVEL = 10000, 0.05, 0.95
+tooling_interpretations['status'] = ('器材の整備（登録者裁定 D9 の三つ目の手順・2026-09-13）で確定した運用の解釈。追補と文言の直しは登録者裁定 D16〜D25（2026-09-14）で承認済み（registrant_decisions_D16_D25）。'
+                                     '項 calibration.incomplete_rule と sessions.commit_rule は登録者裁定 D26（2026-09-14）で確認し、calibration.claim_release と judge_validity.extract.echo を追補した（registrant_decisions_D26_D35）。'
+                                     '一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける')
+calib['claim_release'] = ('不合格枝で初点を名乗った機種を走らせられない事情が出たときは、登録者が理由を記帳して判断し、名乗りの記録を退避してから別の機種で名乗る'
+                          '（tools/calib_band_A.py の release_first_point・退避した記録は消さない・並行のランタイムを同時に起こさない・登録者裁定 D26）')
+judge_validity['extract']['echo'] = ('断片の抽出で、最終試行の本文と各腕の前置きの本文の最長共通部分の字数を機械で測り、対応表（鍵）の側に置く（自分の腕の値・ほかの腕の最大とその腕）。'
+                                     '採点の後に、自分の腕の前置きとの一致字数の分布と、自分の腕の値がほかの腕の最大を超える断片の件数を記述として印字する（閾値を置かない・盲検を仮定せず測る・採否表 P141・登録者裁定 D26）')
+tooling_interpretations['items'] = tooling_interpretations['items'] + ['calibration.claim_release', 'judge_validity.extract.echo']
+ME = reading_selection['measurable_effect_type']
+ME['B_per_contrast'] = REACH_B_V25
+ME['ci_level'] = CI_LEVEL
+ME['directions'] = 'both'
+ME['blind_below'] = REACH_BLIND
+ME['rule'] = ('本走行の後に、実測の対照腕の規模別の率を基底に、転記行 D と同じ関数（tools/confirm_A.py の measurable_effect_types）で、規模に沿った傾き Δ＝±delta を両向き（directions_rule）に置いたとき、'
+              'その効果種の対比のうち少なくとも一本が確証（初段）になる確率を計算し、両向きとも区間（interval）の下端が threshold 以上の効果種を「測れた効果種」とする。'
+              'Δ（規模に沿った傾き）には観測された効果量を使わない（Δ は登録の delta）。基底の対照の率と、4B の処置と対照の水準差 d0 は実測を使う。確証（初段）は門（refuse・様式・環境）の前の札 D1 の初段で数える。'
+              '「少なくとも一本」は全場面に Δ があるときの確率であり、場面ごとに別の走行の標本を模擬するので計算の前提の内で独立が成り立つ（効果が一部の場面にだけある場合の確率ではない・登録者裁定 D30）')
+ME['interval'] = '「少なくとも一本」の確率に、対比ごとの模擬の二項の分散からデルタ法で水準 ci_level の区間を付けて印字する（式は tools/confirm_A.py の at_least_one_interval・登録者裁定 D27）'
+ME['boundary_rule'] = '区間の下端が threshold 以上の向きを「測れた向き」とする。区間が threshold をまたぐ向きは「測れなかった（区間が閾値をまたいだ）」と印字し、測れた向きに数えない（登録者裁定 D27）'
+ME['directions_rule'] = ('余地のある向き（4B の処置の率が真ん中より下なら上向き・そうでなければ下向き）とその逆向きの両方で計算し、両向きとも測れた向きである効果種を「測れた効果種」とする。'
+                         '4B の処置の率がちょうど真ん中のときの余地のある向きは下向き（登録者裁定 D28）')
+ME['coverage'] = ('効果種ごとに、両向きとも個別の到達が threshold 以上の対比（測れた対比）の本数と対比の本数、および少なくとも一方の向きで個別の到達が blind_below 未満の対比の id を印字する。'
+                  '測れた効果種でも、測れた対比でない場面については傾向の不在を書かない（読み条項 (xvi)・登録者裁定 D29）')
+ME['not_measurable'] = ('「測れなかった」と理由（区間が閾値をまたいだ向き・届かない向き・4B の点が外れた対比）とともに印字し、対比ごとの d0・向きごとの札 D1 の初段の確率・解釈条項の発火率を並べる（採否表 P117）。'
+                        '測れなかった効果種は選択規則の「傾向が立たなかった効果種」に数えない。測れた効果種が無ければ選択規則は適用しない（記述のみ）')
+ME['details'] = ('向きは directions_rule。率の切り詰め・n（n_per_arm）・札 D1（初段）の数え方は転記行 D と同じ。実測で外した規模（測定不能・錨帯）は同じく外す（contrast の extra_keep）。'
+                 '4B の点が外れた対比は、その対比の確率を両向きとも零として少なくとも一本の確率に入れる。乱数は seed と対比の登録順の番号と向き（余地のある向き・逆向き）の番号の子ストリーム（tools/confirm_A.py の measurable_effect_types）')
+ME['decided_by'] = '登録者裁定 D11（2026-09-13）・D27〜D30（2026-09-14）'
+reading_selection['text'] = ('A でどの「測れた効果種」にも傾向が立たず、B で方向が立たない → 「枠組み効果は規模非依存で線形表現に乗らない」を正本にする（この読みは測れた対比の場面について書き、測れた対比でない場面に広げない・登録者裁定 D29）。'
+                             'A 単独では「帰無の図を主図に置く」。')
+confirm_rule['pt_slope']['interval_coverage'] = ('この区間は、その対比の p* の Holm の順位の調整水準で作った区間であり、族全体の同時被覆を主張しない。棄却されなかった対比の区間は記述であり、'
+                                                 '効果の大きさの上限として読まない（読み条項 (xvii)・登録者裁定 D31）')
+print_strings['interval_note'] = '並記表の区間は、その対比の p* の Holm の順位の調整水準で作った区間であり、族全体の同時被覆を主張しない。棄却されなかった対比の区間は記述であり、効果の大きさの上限として読まない（読み条項 (xvii)）。'
+print_strings['measurable'] = '測れた効果種（本走行の対照の率・Δ=±{delta_pt} pt・両向き・少なくとも一本が確証〔初段〕になる確率の区間の下端が {thr} 以上）: {yes}／測れなかった効果種: {no}。'
+print_strings['measurable_coverage'] = '{effect}: 測れた対比 {measured}／{n} 本・下限未満の対比 {blind}（測れた対比でない場面について傾向の不在を書かない）。'
+print_strings['reach_note'] = ('凍結時の見込み（転記行 D）で、既測基底のある {n_meas} 本のうち、余地のある向きで {n_blind} 本・逆向きで {n_blind_opp} 本は対照の規模変化の三型のいずれでも Δ=±{delta_pt} pt の札 D1（初段）が {thr} 未満、'
+                               '既測基底の無い {n_nobase} 本は検出域の見込みを持たない。記述（解釈条項）に回った対比の多さは効果の不在を意味しない。')
+sample_inspection['content'] = ('生本文の先頭 chars 字と <think> の有無を、機種と場面と腕を伏せた標識で並べる。伏せているのは機種・場面・腕で、生本文の先頭には選択が含まれうる。'
+                                '機械分類（json_direct／prose_then_json／no_json）は標本に印字せず対応表の側に置き、コーディネータは件ごとに自分の読みの分類を目視の記録に書いた後に対応表を開いて一致を記録する。'
+                                '判定欄と率は印字しない。撤退条件の再走の走行も枠に入れ、枠は走行キーの昇順で乱数を消費する（登録者裁定 D25・D32）')
+sample_inspection['record'] = ('records/A/sampling-inspection-A-<tag>-sample.txt（標本・伏せた標識）と同 -seal.json（対応表と機械分類の集計の SHA-256 の封印・目視の前にコミット）。'
+                               '対応表と機械分類の集計は公開リポジトリの外（--keydir）に置く。目視の記録は records/A/sampling-inspection-A-<tag>.md と同 -visual.json（件ごとの読みの分類）で、'
+                               'その後に対応表と照合した一致を records/A/sampling-inspection-A-<tag>-agreement.json と同 .md に書く（登録者裁定 D32）')
+sample_inspection['key_rule'] = '対応表の置き場がリポジトリの中なら止まる。一致の照合で、対応表の SHA-256 が封印の記録と合わなければ止まる（判定器の鍵と同じ縛り・登録者裁定 D19・D32）'
+firth_check['failure_options'] = ['（一）R・logistf の導入の失敗 → 導入を直し、同じ規則で再走する',
+                                  '（二）当てはめの打ち切りの差 → 両側の打ち切りを同じだけ締めて再走する（許容差とデータの組は動かさない）',
+                                  '（三）tools/firth.py の実装の誤り → 直して、一致検査・格子・合成検査を回し直す（凍結前の変更として記録する）',
+                                  '（四）（一）〜（三）のどれでも合わない → 凍結を止めたまま、基準実装の差し替え（集計を logistf で行う）を別の登録として起こす']
+firth_check['failure_path'] = ('不合格（R や logistf の導入の失敗を含む）なら凍結を止めて原因を記録し、failure_options の手から登録者が選ぶ（一覧に無い手と、許容差・データの組を後から動かす手は採らない・'
+                               '基準実装を自動で差し替えない・登録者裁定 D14・D33）')
+cost['rental_rule'] = ('32B を時間貸し（環境値「第三」）で走らせる場合は、その費用を別の通貨のまま記帳する。借りる前に、見積もり（時間 × 料金・通貨のまま）と上限額を登録者が記帳して決め、'
+                       '実費が上限額に達したら走行を止めて再裁定する（登録者裁定 D12 (e)・D34）')
+cost['stop_rule']['rental_adjust'] = '時間貸しに移した機種の上界の分は、Colab の停止規則の参照（転記行 F の上界）からも除いて比べる（除いた上界と閾値は転記行 F に機械で印字する・登録者裁定 D34）'
+report_rules['lint'] = (report_rules['lint'] + '。到達の見込みの記録の欠け（組み立て器の代わりの文字列）と、集計の検査用の印が「なし」でない報告も違反にする（採否表 P128・P133）')
+assert procedure[5].startswith('凍結前の最終検分'), procedure[5]
+procedure[5] = ('凍結前の最終検分（系統外の Gemini・Grok と系統内の claude.ai の Claude・草案8 と器材の変更点・この後に検分の巡を置かない・採否表 P105〜P153・登録者裁定 D26〜D35 承認 2026-09-14）'
+                '→ 反映（正本 v2.5・格子 v3.3・設計事実 v3.3・草案9〔凍結候補の四つ目〕）')
+registrant_decisions_v25 = {'decided': '2026-09-14', 'items': ['D26 tooling_interpretations.status・calibration.claim_release・judge_validity.extract.echo（運用の解釈の記録の各項の向き）',
+                                                              'D27 reading_selection.measurable_effect_type.B_per_contrast・ci_level・interval・boundary_rule',
+                                                              'D28 reading_selection.measurable_effect_type.directions・directions_rule',
+                                                              'D29 reading_selection.measurable_effect_type.coverage・blind_below・reading_selection.text・print_strings.measurable_coverage',
+                                                              'D30 reading_selection.measurable_effect_type.rule・not_measurable・details',
+                                                              'D31 families.A_slope.confirm_rule.pt_slope.interval_coverage・print_strings.interval_note',
+                                                              'D32 sample_inspection.content・record・key_rule',
+                                                              'D33 firth_check.failure_options・failure_path',
+                                                              'D34 cost.rental_rule・cost.stop_rule.rental_adjust',
+                                                              'D35 設計草案の §0（利益相反の申告）'],
+                           'record': 'records/reviews/A/final/adoption-table-A-final.md'}
+
 # ---- 整合検査（結果を JSON に書き、転記行 B はここを読む）
 allc = [ct for F in [fam['A_slope']] + [desc[k] for k in ('A_desc_nstr', 'A_desc_ncold')] for ct in F['contrasts']]
 ids = [ct['id'] for ct in allc]; dup = sorted({i for i in ids if ids.count(i) > 1})
@@ -430,18 +502,22 @@ assert not unlinked, ('登録対比を持たない腕', unlinked)
 assert set(environments) == {m['key'] for m in MODELS}, 'environments と models の不一致'
 assert set(bridge['cells']) <= set(SIZES) and all(v['main_env'] == environments[k]['env'] for k, v in bridge['cells'].items()), '橋の主環境が environments と不一致'
 combo_ids = [r['id'] for r in COMBO]; assert len(set(combo_ids)) == len(combo_ids), '札の全組合せ表の id の重複'
+eff_bad = [ct['id'] for ct in allc if ct['id'].split(':', 1)[1] != ct['effect']]   # v2.5: 効果種の単位を正本に置く（採否表 P127）
+assert not eff_bad, ('対比の effect と id の後半の不一致', eff_bad)
+assert sorted({ct['effect'] for ct in fam['A_slope']['contrasts']}) == sorted(fam['A_slope']['effect_type_ids']) and len(fam['A_slope']['effect_type_ids']) == fam['A_slope']['effect_types'], '効果種の一覧と対比の effect の不一致'
 integrity = {'id_duplicates': len(dup), 'arms_required_missing': missing, 'arms_without_contrast': unlinked, 'arms_not_in_ledger': not_in_ledger,
-             'label_combo_rows': len(COMBO), 'label_combo_fireable': sum(1 for r in COMBO if r['fireable']),
-             'checked': ['id の重複', '対比が要求する腕の台帳での有無', '登録対比を持たない腕', '台帳に無い腕', 'environments と models の一致', '橋の主環境と environments の一致', '札の全組合せ表の行 id の一意']}
-T = {'id': 'contrasts-A', 'version': 'draft8-2026-09-14', 'generator': 'tools/make_contrasts_A.py v2.4', 'note': '段階 A の正本（機械可読・凍結対象・tools/make_contrasts_A.py が生成）。本文の数はここからの束縛と転記のみ。',
+             'label_combo_rows': len(COMBO), 'label_combo_fireable': sum(1 for r in COMBO if r['fireable']), 'effect_mismatch': len(eff_bad),
+             'checked': ['id の重複', '対比が要求する腕の台帳での有無', '登録対比を持たない腕', '台帳に無い腕', 'environments と models の一致', '橋の主環境と environments の一致', '札の全組合せ表の行 id の一意',
+                         '対比の effect と id の後半の一致・効果種の一覧との一致']}
+T = {'id': 'contrasts-A', 'version': 'draft9-2026-09-14', 'generator': 'tools/make_contrasts_A.py v2.5','note': '段階 A の正本（機械可読・凍結対象・tools/make_contrasts_A.py が生成）。本文の数はここからの束縛と転記のみ。',
      'n_per_arm': n, 'pilot_n': pn, 'identity_n': n_id, 'calibration_n': n_cal, 'scenarios': SC, 'models': MODELS, 'sizes': SIZES,
      'arms': {'preamble': ARMS, 'sha16': arm_sha, 'arms_string': ','.join(ARMS), 'notes': {'N': '前置きなし（前置きファイルを持たない腕のため sha16 は null）'}},
      'bases_4B2507_api': BASE, 'families': fam, 'descriptive_families': desc, 'censor': censor, 'style_gate': style_gate, 'unmeasurable': unmeasurable, 'anchor_band': anchor_band,
      'calibration': calib, 'gate2': gate2, 'identity_screen': identity, 'capacity_rule': capacity_rule, 'runner': runner, 'environments': environments, 'environment_rule': environment_rule, 'cost': cost,
-     'bridge': bridge, 'environment_band': environment_band, 'firth_check': firth_check, 'judge_validity': judge_validity, 'report_rules': report_rules, 'reading_selection': reading_selection, 'sessions': sessions, 'response_mode': response_mode, 'sample_inspection': sample_inspection, 'integrity_check': integrity_check, 'api_rerun': api_rerun, 'tooling_interpretations': tooling_interpretations, 'registrant_decisions_D16_D25': registrant_decisions,
+     'bridge': bridge, 'environment_band': environment_band, 'firth_check': firth_check, 'judge_validity': judge_validity, 'report_rules': report_rules, 'reading_selection': reading_selection, 'sessions': sessions, 'response_mode': response_mode, 'sample_inspection': sample_inspection, 'integrity_check': integrity_check, 'api_rerun': api_rerun, 'tooling_interpretations': tooling_interpretations, 'registrant_decisions_D16_D25': registrant_decisions, 'registrant_decisions_D26_D35': registrant_decisions_v25,
      'seeds': seeds, 'tags': tags, 'procedure': procedure, 'print_strings': print_strings, 'denominators': denominators, 'publication': publication,
      'fwer_note': '確証は傾きの族のみ。p*＝max(p_β, p_pt) に Holm（m 固定）を当てる（登録者裁定 D1・D10）。β₃ の帰無と尺度依存の帰無（β₃ が零でなく pt 差の傾きが零）の両方に同じ Holm の保証が及ぶ（p_pt の正規近似の較正の範囲で・転記行 D）。対照の基底が規模で動く配置での札の率は転記行 D。床持続は記述（登録者決定 2026-09-13）。',
      'integrity': integrity}
 s = json.dumps(T, ensure_ascii=False, indent=1, sort_keys=False) + '\n'
 open(OUT, 'w', encoding='utf-8', newline='\n').write(s)
-print('[contrasts-A v2.4] written', OUT, 'sha16', hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper(), '| slope', len(slope), '| arms', len(ARMS), '| combo rows', len(COMBO), '| integrity', json.dumps({k: v for k, v in integrity.items() if k != 'checked'}, ensure_ascii=False))
+print('[contrasts-A v2.5] written', OUT, 'sha16', hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper(), '| slope', len(slope), '| arms', len(ARMS), '| combo rows', len(COMBO), '| integrity', json.dumps({k: v for k, v in integrity.items() if k != 'checked'}, ensure_ascii=False))

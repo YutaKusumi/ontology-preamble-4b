@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """confirm_A.py v1.2 —— 段階 A の確証の判定の共通関数（凍結前検分の採否表 P3・P9〜P14・登録者裁定 D1・D10・D11・2026-09-13）。
 v1.2（2026-09-14・登録者裁定 D16・D18・手順4 の採否表 P99・P100）: 門2 の縮小を残らない場面の対比だけに当てる口（shrink_idx）・縮小した対比の p は判定不能の値で Holm に入れる・p* の不一致の値と判定不能の p を正本から読む・β₃ の PPLRT と refuse 門の再フィットの打ち切りを firth_check.python_control にそろえる・自己検査に第一適合の順の独立の照合を足す。
+v1.3（2026-09-14・凍結前の最終検分の採否表 P117・P130・P132・登録者裁定 D27〜D30）: 模擬の名目の数え方を p<α にそろえる（初段は Holm の規則どおり p≤α/m）・門2 の縮小と非収束の重なりを規則に並べる・
+  測れた効果種を両向き（余地のある向きとその逆）で計算し、「少なくとも一本」にデルタ法の区間（at_least_one_interval）と向きの判定（direction_state）・測れた対比の本数・下限未満の対比の id・理由を付す。
 v1.1（登録者裁定 D9 の手順3）: 札の率の模擬（simulate_cell・card_tally・card_summary）と既測基底の行の処置の率・余地のある向き（reach_treatment・reach_direction）を格子から移し、測れた効果種（measurable_effect_types・登録者裁定 D11）を置く。格子（転記行 D）と集計器が同じ関数で数える。判定の論理（contrast 以下）は v1 と同じ。
 格子（power_grid_A）・集計器（analyze_A）・合成検査（synth_A）・正本の生成器（make_contrasts_A の札の全組合せ表）が同じ関数を import する（二重実装をしない）。
 - contrast(): 両腕条件の検閲（整数演算・超）→ 残存規模で β₃ の Firth PPLRT・解釈条項・pt 差の傾き（重み付き最小二乗・連続性補正・固定効果型の se・正規近似）→ p*＝max(p_β, p_pt)（向きが不一致なら 1）。
@@ -20,7 +22,7 @@ from scipy.stats import norm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import firth
 from firth import slope_rows
-VERSION = 'v1.2'
+VERSION = 'v1.3'
 LABEL_KEYS = ('undecidable', 'ns', 'clause', 'scale_only', 'refuse', 'style', 'env', 'confirmed')
 STAGE0_REASONS = ('gate2_shrink', 'residual', 'nonconverged')
 STYLE_STATES = ('none', 'note', 'hold')
@@ -159,6 +161,9 @@ def interval(R, slope, se, level):
 
 CARD_KEYS = ('undecidable', 'nonconverged', 'ok', 'sat2_ok', 'rej_nom', 'rej_h1', 'clause_and_rej', 'd4_nom', 'd4_h1', 'd1_nom', 'd1_h1', 'scale_only_h1', 'kept_sum')
 RATE_CLIP = (0.001, 0.999)
+CI_LEVEL = 0.95   # 区間の水準（測れた効果種の区間・格子の見出しの百分率・正本 reading_selection.measurable_effect_type.ci_level と一致を自己検査で確かめる）
+DIRECTIONS = ('room', 'opposite')
+STATE_TEXT = {'measured': '測れた', 'crosses': '区間が閾値をまたいだ', 'below': '届かない'}
 
 
 def wilson(k, N, zc=1.96):
@@ -170,12 +175,13 @@ def wilson(k, N, zc=1.96):
 
 
 def card_tally(R, cnt, r):
-    """contrast() の戻り値を札の件数に足す。札 草案4＝β₃ が名目（初段）で解釈条項なし。札 D1＝それに加えて pt 差の傾きが同じ水準で立ち同じ向き（初段では p* ≤ α/m）。"""
+    """contrast() の戻り値を札の件数に足す。札 草案4＝β₃ が名目（初段）で解釈条項なし。札 D1＝それに加えて pt 差の傾きが同じ水準で立ち同じ向き（初段では p* ≤ α/m）。
+    名目は p<α（正本 refuse_gate.applies_to の名目有意と同じ・v1.3・採否表 P132）、初段は Holm の規則どおり p≤α/m。"""
     cnt['kept_sum'] += r['kept']
     if r['status'] != 'ok':
         cnt[r['status']] += 1; return
-    cnt['ok'] += 1; S = r['clause']; Rn = r['p_beta'] <= R.alpha; RH = r['p_beta'] <= R.alpha / R.m
-    pt_nom = r['p_pt'] <= R.alpha and r['same']; pt_h1 = r['p_pt'] <= R.alpha / R.m and r['same']
+    cnt['ok'] += 1; S = r['clause']; Rn = r['p_beta'] < R.alpha; RH = r['p_beta'] <= R.alpha / R.m
+    pt_nom = r['p_pt'] < R.alpha and r['same']; pt_h1 = r['p_pt'] <= R.alpha / R.m and r['same']
     cnt['sat2_ok'] += S; cnt['rej_nom'] += Rn; cnt['rej_h1'] += RH; cnt['clause_and_rej'] += (Rn and S)
     cnt['d4_nom'] += Rn and not S; cnt['d4_h1'] += RH and not S
     cnt['d1_nom'] += Rn and not S and pt_nom; cnt['d1_h1'] += RH and not S and pt_h1; cnt['scale_only_h1'] += RH and not S and not pt_h1
@@ -219,25 +225,60 @@ def at_least_one(ps):
     return 1.0 - q
 
 
+def at_least_one_interval(ps, B, level=CI_LEVEL):
+    """「少なくとも一本」の確率と、対比ごとの模擬の二項の分散からのデルタ法の区間（登録者裁定 D27）。偏微分は他の対比の (1−p) の積。戻り値: (確率, 下端, 上端, 半幅)。"""
+    a1 = at_least_one(ps); var = 0.0
+    for i, p in enumerate(ps):
+        d = 1.0
+        for j, q in enumerate(ps):
+            if j != i:
+                d *= 1.0 - q
+        var += d * d * p * (1.0 - p) / B
+    hw = float(norm.isf((1.0 - level) / 2.0)) * math.sqrt(var)
+    return a1, max(0.0, a1 - hw), min(1.0, a1 + hw), hw
+
+
+def direction_state(lo, hi, thr):
+    """向きの判定（登録者裁定 D27）: 区間の下端が閾値以上は measured・区間が閾値をまたげば crosses・上端も閾値未満は below。"""
+    return 'measured' if lo >= thr else ('crosses' if hi >= thr else 'below')
+
+
 def measurable_effect_types(R, T, zs, z_center, zspan, rows, B=None, seed=None):
-    """測れた効果種（登録者裁定 D11・正本 reading_selection.measurable_effect_type）。
+    """測れた効果種（登録者裁定 D11・D27〜D30・正本 reading_selection.measurable_effect_type）。
     rows: 登録順の対比ごとの dict（id・effect・pc〔規模ごとの実測の対照の率〕・rA4・rB4〔4B の処置と対照の実測の率〕・keep〔測定不能・錨帯で外す規模は False・None は外さない〕・at4_ok〔4B の点が残るか〕）。
-    戻り値: (対比ごとの list, 効果種ごとの dict)。観測された効果量は使わない（Δ は正本の delta・向きは余地のある向き）。"""
+    向きは余地のある向き（room）とその逆（opposite・正本 directions が both のとき）。Δ は正本の delta（観測された効果量を使わない）で、基底の対照の率と 4B の水準差 d0 は実測。確率は門の前の札 D1 の初段。
+    乱数は seed と対比の登録順の番号と向きの番号の子ストリーム。
+    戻り値: (対比ごとの list, 効果種ごとの dict)。効果種ごとに、向きごとの「少なくとも一本」と区間と判定・両向きの判定・測れた対比の本数・下限未満の対比の id・理由。"""
     ME = T['reading_selection']['measurable_effect_type']; B = ME['B_per_contrast'] if B is None else B; seed = ME['seed'] if seed is None else seed
+    thr = ME['threshold']; blind = ME['blind_below']; level = ME.get('ci_level', CI_LEVEL); dirs = DIRECTIONS if ME.get('directions') == 'both' else DIRECTIONS[:1]
     per = []; by = {}
     for i, r in enumerate(rows):
+        rec = {'id': r['id'], 'effect': r['effect'], 'd0': None, 'directions': {}}
         if not r['at4_ok']:
-            p = 0.0; det = {'reason': '4B の点が外れた'}
+            for dn in dirs:
+                rec['directions'][dn] = {'p_card_D1_first': 0.0, 'reason': '4B の点が外れた'}
         else:
-            rng = np.random.default_rng([seed, i]); pc = np.asarray(r['pc'], float); pc = np.clip(np.where(np.isfinite(pc), pc, 0.5), RATE_CLIP[0], RATE_CLIP[1])
-            d0 = float(r['rA4'] - r['rB4']); D = ME['delta'] * reach_direction(r['rA4'])
-            pt, clipped = reach_treatment(pc, d0, D, zs, z_center, zspan)
-            det = simulate_cell(R, zs, T['n_per_arm'], pc, pt, B, rng, r.get('keep')); det.update(clipped_sizes=clipped, delta_value=D, d0=d0)
-            p = det['card_D1_holm_first']
-        per.append({'id': r['id'], 'effect': r['effect'], 'p_card_D1_first': p, 'detail': det}); by.setdefault(r['effect'], []).append(p)
+            pc = np.asarray(r['pc'], float); pc = np.clip(np.where(np.isfinite(pc), pc, 0.5), RATE_CLIP[0], RATE_CLIP[1])
+            d0 = float(r['rA4'] - r['rB4']); room = reach_direction(r['rA4']); rec['d0'] = d0
+            for k, dn in enumerate(dirs):
+                D = ME['delta'] * (room if dn == 'room' else -room); pt, clipped = reach_treatment(pc, d0, D, zs, z_center, zspan)
+                det = simulate_cell(R, zs, T['n_per_arm'], pc, pt, B, np.random.default_rng([seed, i, k]), r.get('keep'))
+                rec['directions'][dn] = {'p_card_D1_first': det['card_D1_holm_first'], 'delta_value': D, 'clipped_sizes': clipped, 'clause_rate_among_fit': det['clause_rate_among_fit'],
+                                         'undecidable_censor': det['undecidable_censor'], 'nonconverged': det['nonconverged']}
+        ps = [rec['directions'][dn]['p_card_D1_first'] for dn in dirs]
+        rec['measured_contrast'] = bool(min(ps) >= thr); rec['blind_any_direction'] = bool(min(ps) < blind)
+        per.append(rec); by.setdefault(r['effect'], []).append(rec)
     types = {}
-    for e, ps in by.items():
-        a1 = at_least_one(ps); types[e] = {'n_contrasts': len(ps), 'at_least_one': a1, 'measurable': bool(a1 >= ME['threshold'])}
+    for e, recs in by.items():
+        out = {'n_contrasts': len(recs), 'directions': {}}
+        for dn in dirs:
+            a1, lo_, hi_, hw = at_least_one_interval([x['directions'][dn]['p_card_D1_first'] for x in recs], B, level)
+            out['directions'][dn] = {'at_least_one': a1, 'ci': [lo_, hi_], 'halfwidth': hw, 'state': direction_state(lo_, hi_, thr)}
+        out['measurable'] = all(v['state'] == 'measured' for v in out['directions'].values())
+        out['measured_contrasts'] = sum(1 for x in recs if x['measured_contrast']); out['blind_ids'] = [x['id'] for x in recs if x['blind_any_direction']]
+        out['reasons'] = ['%s: %s' % (dn, STATE_TEXT[v['state']]) for dn, v in out['directions'].items() if v['state'] != 'measured'] + (['4B の点が外れた対比を含む'] if any('reason' in x['directions'][dirs[0]] for x in recs) else [])
+        out['at_least_one'] = min(v['at_least_one'] for v in out['directions'].values())   # 両向きの小さい方（一覧の並びに使う）
+        types[e] = out
     return per, types
 
 
@@ -254,7 +295,8 @@ def label_family(R, results, flags=None, gate2_shrink=False, shrink_idx=None):
         o = {'beta_holm': {'rejected': bool(rb[i]), 'rank': int(kb[i]), 'level': float(lb[i])}, 'star_holm': {'rejected': bool(rs[i]), 'rank': int(ks[i]), 'level': float(ls[i])}}
         if i in shrink or r.get('status') != 'ok':
             reason = 'gate2_shrink' if i in shrink else r.get('reason', 'residual')
-            o.update(label=L['undecidable'], stage=0, row=row_id(0, reason=reason), rules=[reason], upper=None)
+            also = [r['reason']] if (i in shrink and r.get('status') != 'ok' and r.get('reason') and r.get('reason') != reason) else []   # v1.3: 重なった理由も並べる（行 id と札は変えない・採否表 P130）
+            o.update(label=L['undecidable'], stage=0, row=row_id(0, reason=reason), rules=[reason] + also, upper=None)
         elif not rb[i]:
             o.update(label=L['ns'], stage=1, row='NS', rules=['beta_not_rejected'], upper=None)
         else:
@@ -314,8 +356,9 @@ def _selftest():
     s1 = simulate_cell(R, zs, n, pc5, pt5, 5, np.random.default_rng([1, 2])); s2 = simulate_cell(R, zs, n, pc5, pt5, 5, np.random.default_rng([1, 2])); assert s1 == s2 and cl5 == 0, (s1, s2, cl5)
     rows5 = [{'id': 'x%d' % i, 'effect': 'e%d' % (i % 2), 'pc': list(pc5), 'rA4': 0.5, 'rB4': 0.5, 'keep': None, 'at4_ok': i != 1} for i in range(3)]
     per5, types5 = measurable_effect_types(R, T, zs, zc5, zsp5, rows5, B=3, seed=7)
-    assert len(per5) == 3 and per5[1]['p_card_D1_first'] == 0.0 and set(types5) == {'e0', 'e1'} and reach_direction(0.2) == 1.0 and reach_direction(0.5) == -1.0, (per5, types5)
-    lines.append('5 simulate_cell・measurable_effect_types: 同じ乱数で同じ結果・4B の点が外れた対比は零・余地のある向きの境')
+    assert len(per5) == 3 and all(v['p_card_D1_first'] == 0.0 and 'reason' in v for v in per5[1]['directions'].values()) and set(types5) == {'e0', 'e1'} and reach_direction(0.2) == 1.0 and reach_direction(0.5) == -1.0, (per5, types5)
+    assert all(set(v['directions']) == set(DIRECTIONS) and set(v) >= {'measurable', 'measured_contrasts', 'blind_ids', 'reasons'} for v in types5.values()), types5
+    lines.append('5 simulate_cell・measurable_effect_types: 同じ乱数で同じ結果・4B の点が外れた対比は両向きとも零・余地のある向きの境・効果種ごとの両向きの欄')
     # 6. v1.2: 正本から読む定数・門2 の縮小を残らない場面の対比だけに当てる（登録者裁定 D16）・第一適合の順を正本の stage2_first_match から独立に組んで照合（手順4 の採否表 P100）
     assert R.p_star_mismatch == float(T['families']['A_slope']['confirm_rule']['pt_slope']['p_star_if_mismatch']) and R.p_undecidable == float(T['families']['A_slope']['model']['p_undecidable'])
     assert set(R.fit_kw) == {'gtol', 'tol', 'max_iter'} and R.fit_kw['gtol'] == T['firth_check']['python_control']['gtol'], R.fit_kw
@@ -329,6 +372,24 @@ def _selftest():
         want = next(x['label'] for x in first if on[x['rule'].split('（')[0]])
         row = next(r_ for r_ in rows if r_['id'] == row_id(2, clause=clause, star=star, refuse=refuse, style=style, env=env)); assert row['label'] == want, (row, want); oracle_n += 1
     lines.append('6 v1.2: 正本の定数・当てはめの打ち切り・門2 の縮小を一対比だけに当てた札と Holm・第一適合の順を正本から独立に組んだ照合 %d 組' % oracle_n)
+    # 7. v1.3: 模擬の名目は p<α・初段は p≤α/m（採否表 P132）
+    cnt7 = dict.fromkeys(CARD_KEYS, 0); base7 = {'status': 'ok', 'kept': 6, 'clause': False, 'same': True}
+    card_tally(R, cnt7, dict(base7, p_beta=R.alpha, p_pt=R.alpha)); assert cnt7['rej_nom'] == 0 and cnt7['d1_nom'] == 0 and cnt7['rej_h1'] == 0, cnt7
+    card_tally(R, cnt7, dict(base7, p_beta=R.alpha / R.m, p_pt=R.alpha / R.m)); assert cnt7['rej_nom'] == 1 and cnt7['rej_h1'] == 1 and cnt7['d1_h1'] == 1, cnt7
+    lines.append('7 v1.3: 模擬の名目は p<α（p=α ちょうどは名目に数えない）・初段は p≤α/m（採否表 P132）')
+    # 8. v1.3: 門2 の縮小と非収束の重なり（採否表 P130）
+    res8 = [{'status': 'undecidable', 'reason': 'residual', 'kept': 0, 'keep': [], 'censored': []} for _ in range(R.m)]
+    res8[0] = {'status': 'nonconverged', 'reason': 'nonconverged', 'kept': 6, 'keep': [True] * 6, 'censored': [False] * 6}
+    o8 = label_family(R, res8, None, shrink_idx={0})[0]
+    assert o8['row'] == 'U-gate2_shrink' and o8['rules'] == ['gate2_shrink', 'nonconverged'] and o8['label'] == L['undecidable'], o8
+    lines.append('8 v1.3: 門2 の縮小と非収束が重なった対比は、行 id と札を変えずに規則に理由を二つとも並べる（採否表 P130）')
+    # 9. v1.3: 「少なくとも一本」の区間と向きの判定（登録者裁定 D27・D28）
+    ME9 = T['reading_selection']['measurable_effect_type']; assert ME9['ci_level'] == CI_LEVEL and ME9['directions'] == 'both' and 'blind_below' in ME9, ME9
+    k9 = 5; pp = 1 - (1 - ME9['threshold']) ** (1.0 / k9); a9, lo9, hi9, hw9 = at_least_one_interval([pp] * k9, 1000)
+    want9 = float(norm.isf((1 - CI_LEVEL) / 2)) * math.sqrt(k9 * (1 - pp) ** (2 * (k9 - 1)) * pp * (1 - pp) / 1000)
+    assert abs(a9 - ME9['threshold']) < 1e-12 and abs(hw9 - want9) < 1e-12 and abs(lo9 - (a9 - hw9)) < 1e-12, (a9, hw9, want9)
+    assert direction_state(0.81, 0.85, 0.8) == 'measured' and direction_state(0.79, 0.81, 0.8) == 'crosses' and direction_state(0.5, 0.79, 0.8) == 'below'
+    lines.append('9 v1.3: 「少なくとも一本」のデルタ法の区間（等しい確率の場合の式と一致）・向きの判定（下端が閾値以上・またぐ・届かない）・正本の水準と両向き（登録者裁定 D27・D28）')
     print('confirm_A.py %s SELFTEST PASS' % VERSION); print('\n'.join(lines))
 
 

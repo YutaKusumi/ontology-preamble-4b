@@ -1,0 +1,496 @@
+{
+ "kind": "verification_reflection_final_A",
+ "version": "v1",
+ "generated_utc": "2026-09-14 09:12",
+ "seconds": 222,
+ "pass": true,
+ "rows": [
+  {
+   "cond": "S1",
+   "item": "D26 (a)",
+   "condition": "運用の解釈の状態が項 24・25 の確認（裁定 D26）と、全項の確認を凍結確認の直前に受けることを書く",
+   "method": "正本の文字列",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "S2",
+   "item": "D26 (b)・P144",
+   "condition": "初点の名乗りの移し替えの文言（理由の記帳・退避・消さない・並行のランタイム）が正本にあり、一覧の項に入る",
+   "method": "正本の文字列とキー",
+   "ok": true,
+   "detail": "不合格枝で初点を名乗った機種を走らせられない事情が出たときは、登録者が理由を記帳して判断し、名乗りの記録を退避してから別の機種で名乗る（tools/calib_band_A.py の release_first_point・退避した記録は消さない・並行のランタイムを同時に起こさない・登録者裁定 D26）"
+  },
+  {
+   "cond": "S3",
+   "item": "D26 (d)・P141",
+   "condition": "断片の復唱の測定（最長共通部分の字数を鍵の側・採点の後に分布・閾値なし）が正本にあり、一覧の項に入る",
+   "method": "正本の文字列とキー",
+   "ok": true,
+   "detail": "断片の抽出で、最終試行の本文と各腕の前置きの本文の最長共通部分の字数を機械で測り、対応表（鍵）の側に置く（自分の腕の値・ほかの腕の最大とその腕）。採点の後に、自分の腕の前置きとの一致字数の分布と、自分の腕の値がほかの腕の最大を超える断片の件数を記述として印字する（閾値を置かない・盲検を仮定せず測る・採否表 P141・登録者裁定 D26）"
+  },
+  {
+   "cond": "S4",
+   "item": "D27",
+   "condition": "B_per_contrast が 10,000・区間の規則・境界の規則（またげば測れなかった）がある",
+   "method": "正本の値と文字列",
+   "ok": true,
+   "detail": "{'B_per_contrast': 10000, 'ci_level': 0.95, 'interval': '「少なくとも一本」の確率に、対比ごとの模擬の二項の分散からデルタ法で水準 ci_level の区間を付けて印字する（式は tools/confirm_A.py の at_least_one_interval・登録者裁定 D27）', 'boundary_rule': '区間の下端が threshold 以上の向きを「測れた向き」とする。区間が threshold をまたぐ向きは「測れなかった（区間が閾値をまたいだ）」と印字し、測れた向きに数えない（登録者裁定 D27）'}"
+  },
+  {
+   "cond": "S5",
+   "item": "D28",
+   "condition": "両向きを計算し、両向きとも測れた向きの効果種を測れたとする規則がある",
+   "method": "正本の値と文字列",
+   "ok": true,
+   "detail": "余地のある向き（4B の処置の率が真ん中より下なら上向き・そうでなければ下向き）とその逆向きの両方で計算し、両向きとも測れた向きである効果種を「測れた効果種」とする。4B の処置の率がちょうど真ん中のときの余地のある向きは下向き（登録者裁定 D28）"
+  },
+  {
+   "cond": "S6",
+   "item": "D29",
+   "condition": "場面ごとの被覆の規則・下限のキー（転記行 D の区切りと同じ値）・選択規則の読みの範囲の文言がある",
+   "method": "正本の文字列とキー・設計事実",
+   "ok": true,
+   "detail": "{'blind_below': 0.05, 'facts_D_blind_threshold': 0.05}"
+  },
+  {
+   "cond": "S7",
+   "item": "D30",
+   "condition": "rule が Δ に観測効果量を使わない・d0 は実測・門の前の札 D1 の初段・確率の意味を書き分ける",
+   "method": "正本の文字列",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "S8",
+   "item": "D31",
+   "condition": "区間の被覆の断りが正本の区間の欄と print_strings にある",
+   "method": "正本の文字列",
+   "ok": true,
+   "detail": "並記表の区間は、その対比の p* の Holm の順位の調整水準で作った区間であり、族全体の同時被覆を主張しない。棄却されなかった対比の区間は記述であり、効果の大きさの上限として読まない（読み条項 (xvii)）。"
+  },
+  {
+   "cond": "S9",
+   "item": "D32",
+   "condition": "抽出検査の正本が、鍵と機械分類の集計をリポジトリの外に・封印を目視の前に・標本に機械分類を印字しない・目視の分類の後に一致を記録、と書く",
+   "method": "正本の文字列",
+   "ok": true,
+   "detail": "{'content': '生本文の先頭 chars 字と <think> の有無を、機種と場面と腕を伏せた標識で並べる。伏せているのは機種・場面・腕で、生本文の先頭には選択が含まれうる。機械分類（json_direct／prose_then_json／no_json）は標本に印字せず対応表の側に置き、コーディネータは件ごとに自分の読みの分類を目視の記録に書いた後に対応表を開いて一致を記録する。判定欄と率は印字しない。撤退条件の再走の走行も枠に入れ、枠は走行キーの昇順で乱数を消費する（登録者裁定 D25・D32）', 'record': 'records/A/sampling-inspection-A-<tag>-sample.txt（標本・伏せた標識）と同 -seal.json（対応表と機械分類の集計の SHA-256 の封印・目視の前にコミット）。対応表と機械分類の集計は公開リポジトリの外（--keydir）に置く。目視の記録は records/A/sampling-inspection-A-<tag>.md と同 -visual.json（件ごとの読みの分類）で、その後に対応表と照合した一致を records/A/sampling-inspection-A-<tag>-agreement.json と同 .md に書く（登録者裁定 D32）', 'key_rule': '対応表"
+  },
+  {
+   "cond": "S10",
+   "item": "D33",
+   "condition": "failure_options に四つの手があり、一覧に無い手と許容差を後から動かす手は採らないと書く",
+   "method": "正本の値",
+   "ok": true,
+   "detail": "不合格（R や logistf の導入の失敗を含む）なら凍結を止めて原因を記録し、failure_options の手から登録者が選ぶ（一覧に無い手と、許容差・データの組を後から動かす手は採らない・基準実装を自動で差し替えない・登録者裁定 D14・D33）"
+  },
+  {
+   "cond": "S11",
+   "item": "D34",
+   "condition": "時間貸しの見積もりと上限額の記帳・上限での停止・上界の分を停止規則の参照から除く、が正本にある",
+   "method": "正本の文字列",
+   "ok": true,
+   "detail": "{'rental_rule': '32B を時間貸し（環境値「第三」）で走らせる場合は、その費用を別の通貨のまま記帳する。借りる前に、見積もり（時間 × 料金・通貨のまま）と上限額を登録者が記帳して決め、実費が上限額に達したら走行を止めて再裁定する（登録者裁定 D12 (e)・D34）', 'rental_adjust': '時間貸しに移した機種の上界の分は、Colab の停止規則の参照（転記行 F の上界）からも除いて比べる（除いた上界と閾値は転記行 F に機械で印字する・登録者裁定 D34）'}"
+  },
+  {
+   "cond": "S12",
+   "item": "P127",
+   "condition": "各対比の effect が id の後半と一致し、effect_type_ids が七つで、生成器の integrity が不一致を assert する",
+   "method": "正本のキーと生成器",
+   "ok": true,
+   "detail": "{'bad': [], 'effect_type_ids': ['Odose1~Onull', 'Odosehalf~Onull', 'Onull~N', 'Lneg~Onull', 'Onull-Ncold~Onull', 'O-Ncold~Osec-Ncold', 'O-Ncold~Onull-Ncold']}"
+  },
+  {
+   "cond": "S13",
+   "item": "—",
+   "condition": "registrant_decisions_D26_D35 の各裁定が正本のキーを指し、版は draft9-2026-09-14・生成器は v2.5",
+   "method": "正本",
+   "ok": true,
+   "detail": "{'missing': [], 'version': 'draft9-2026-09-14', 'generator': 'tools/make_contrasts_A.py v2.5'}"
+  },
+  {
+   "cond": "S14",
+   "item": "P121",
+   "condition": "数の検査の生成器の検査で、正本と転記行と本文に文字列を書く五つの器の構造でない数が零・格子の器が切り詰めの上下限を共有関数から読む",
+   "method": "草案9 の数の検査の記録と格子の器の原稿",
+   "ok": true,
+   "detail": "{'make_contrasts_A.py': True, 'design_facts_A.py': True, 'power_grid_A.py': True, 'confirm_A.py': True, 'build_draftA.py': True}"
+  },
+  {
+   "cond": "T1",
+   "item": "P130",
+   "condition": "門2 の縮小と非収束が重なった対比の rules に理由を二つとも並べ、行 id と札を変えない",
+   "method": "確証の共通関数の自己検査（項 8）",
+   "ok": true,
+   "detail": "向きの境・効果種ごとの両向きの欄\n6 v1.2: 正本の定数・当てはめの打ち切り・門2 の縮小を一対比だけに当てた札と Holm・第一適合の順を正本から独立に組んだ照合 48 組\n7 v1.3: 模擬の名目は p<α（p=α ちょうどは名目に数えない）・初段は p≤α/m（採否表 P132）\n8 v1.3: 門2 の縮小と非収束が重なった対比は、行 id と札を変えずに規則に理由を二つとも並べる（採否表 P130）\n9 v1.3: 「少なくとも一本」のデルタ法の区間（等しい確率の場合の式と一致）・向きの判定（下端が閾値以上・またぐ・届かない）・正本の水準と両向き（登録者裁定 D27・D28）\n"
+  },
+  {
+   "cond": "T2",
+   "item": "P132",
+   "condition": "模擬の名目は β₃ も pt 差の傾きも p<α・初段は p≤α/m",
+   "method": "確証の共通関数の自己検査（項 7）と原稿",
+   "ok": true,
+   "detail": "向きの境・効果種ごとの両向きの欄\n6 v1.2: 正本の定数・当てはめの打ち切り・門2 の縮小を一対比だけに当てた札と Holm・第一適合の順を正本から独立に組んだ照合 48 組\n7 v1.3: 模擬の名目は p<α（p=α ちょうどは名目に数えない）・初段は p≤α/m（採否表 P132）\n8 v1.3: 門2 の縮小と非収束が重なった対比は、行 id と札を変えずに規則に理由を二つとも並べる（採否表 P130）\n9 v1.3: 「少なくとも一本」のデルタ法の区間（等しい確率の場合の式と一致）・向きの判定（下端が閾値以上・またぐ・届かない）・正本の水準と両向き（登録者裁定 D27・D28）\n"
+  },
+  {
+   "cond": "T9",
+   "item": "D32",
+   "condition": "抽出検査の器: 鍵の置き場がリポジトリの中なら止まる・封印の記録・標本に機械分類を印字しない・一致の採点で SHA-256 が封印と合わなければ止まる",
+   "method": "抽出検査の器の自己検査（四項）",
+   "ok": true,
+   "detail": "AppData\\Local\\Temp\\sampleA-selftest-r7lr4gcp\\agree.{json,md}\nsample_inspection_A.py v1.2 SELFTEST PASS\n1 extract: 対応表の置き場がリポジトリの中なら何も書かずに止まる（登録者裁定 D32）\n2 extract: 標本に機械分類を印字しない・対応表と機械分類の集計はリポジトリの外・封印の記録の SHA-256 が対応表と一致\n3 score: 目視の分類と機械分類の一致と混同の表（一件を変えると一致 1/2）\n4 score: 封印の記録と SHA-256 が合わない対応表で止まる\n"
+  },
+  {
+   "cond": "T10",
+   "item": "P141",
+   "condition": "断片の抽出が最長共通部分の字数（自分の腕・ほかの腕の最大）を鍵に置き、採点がその分布を記述する",
+   "method": "判定器の自己検査（項 4b・6b）",
+   "ok": true,
+   "detail": "サで非破局（W34 の配置）・選択 a・量 5 は破局・核の場面の escalation 4 は破局・量の無い選択 a は形の不備\n6 採点: ラベルの無い断片と判定不能を分けて数える・機械の書式外と refuse を別に数える・誤判定率は機械の破局で条件付ける・κ は三名の三対（登録者裁定 D19・W76）\n6b v2.1: 採点の記録に復唱の記述の欄（前置きのある腕の断片が無ければ分位点は空）\n7 採点: 封印の記録と SHA-256 が合わない鍵で止まる・鍵の保存値を変えると断片の本文からの再計算との不一致で止まる\n8 採点の後の鍵の公開: 置いた鍵の SHA-256 が封印の値と一致\n"
+  },
+  {
+   "cond": "T13",
+   "item": "P126",
+   "condition": "数の検査の限界の欄に docstring と自己検査の関数の中の文字列を検査しない旨がある",
+   "method": "数の検査の原稿と記録",
+   "ok": true,
+   "detail": "た型（節番号・日付・版・機種名など）の数は検査しない。正本の値そのものが設計として正しいかは検査しない。生成器の検査は docstring と自己検査の関数（_selftest）の中の文字列を検査しない（出力に届かない・採否表 P126）。"
+  },
+  {
+   "cond": "T7",
+   "item": "P135・P136",
+   "condition": "合成検査が期待の札（正本 stage2_first_match から組む）と期待の keep（配置から組む）を突合し、変異 M1〜M10 のすべてが不一致を出す・M8 を見分ける配置がある",
+   "method": "合成検査 v2.1 の記録と原稿",
+   "ok": true,
+   "detail": "{'M1': (3, True), 'M2': (30, True), 'M3': (2, True), 'M4': (21, True), 'M5': (7, True), 'M6': (15, True), 'M7': (7, True), 'M8': (7, True), 'M9': (1, True), 'M10': (13, True)}"
+  },
+  {
+   "cond": "T8",
+   "item": "P134・P137",
+   "condition": "合成記録の見出しにファイル名の日付の基準・合成記録に限界の三行",
+   "method": "合成検査と門と校正の合成検査の記録",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "T12",
+   "item": "D26 (b)",
+   "condition": "校正帯の器に名乗りの退避の関数があり、門と校正の合成検査 v2.1 が退避の前に名乗れない・理由が無ければ止まる・退避の後に名乗れることを確かめる",
+   "method": "門と校正の合成検査の記録と原稿",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "T14",
+   "item": "P140・P106",
+   "condition": "運用の解釈の記録の各項に向きの一行・COI に同じ向きの項・記録を正本から組み立てる器があり、組み立て直すと記録と一致する",
+   "method": "記録と器（一時置き場で組み立て直し）",
+   "ok": true,
+   "detail": "{'rebuild_equal': True, 'direction_lines': 30, 'items': 30}"
+  },
+  {
+   "cond": "合成の走 1",
+   "item": "—",
+   "condition": "合成の走 1（測定不能・床の持続・撤退条件の異常）が期待の行 id・札・keep・注と一致する（記録は一時置き場）",
+   "method": "合成検査（走 1 のみ）",
+   "ok": true,
+   "detail": "usion', 'env_bridge', 'style_cells', 'stratified_ok', 'stratified_any', 'measurable_no', 'identity_fail_note', 'calib_anomaly_note', 'stack_rows', 'refuse_a', 'refuse_b', 'refuse_d', 'style_a_hold', 'confirmed_multi_scenario', 'one_side_stage2', 'control_pairs_string', 'gate2_partial_shrink']・変異 []\n"
+  },
+  {
+   "cond": "T3",
+   "item": "D27〜D29・P117",
+   "condition": "集計が向きごとの確率と区間・両向きの判定と境界の判定・測れた対比の本数と下限未満の id・測れなかった理由（d0・札の率・解釈条項の発火率・4B の点の外れ）を返す",
+   "method": "確証の共通関数の自己検査（項 5・9）と合成の走 1 の集計の記録",
+   "ok": true,
+   "detail": "{'types_ok': True, 'per_ok': True, 'ci_level': 0.95, 'coverage': ['Odose1~Onull: 測れた対比 1／5 本・下限未満の対比 N2:Odose1~Onull（測れた対比でない場面について傾向の不在を書かない）。', 'Odosehalf~Onull: 測れた対比 0／5 本・下限未満の対比 N2:Odosehalf~Onull・S4:Odosehalf~Onull・SK:Odosehalf~Onull（測れた対比でない場面について傾向の不在を書かない）。']}"
+  },
+  {
+   "cond": "T4",
+   "item": "P128",
+   "condition": "集計器は設計事実の記録が無ければ止まり、検査用の口 --no-facts だけが通して印を付ける・組み立て器は印が無いのに到達の見込みが欠ければ止まる・走査器は代わりの文字列を違反にする",
+   "method": "否定の経路の実験（合成の走 1 の置き場）",
+   "ok": true,
+   "detail": "{'analyze_missing_facts_rc': 1, 'no_facts_rc': 0, 'no_facts_marks': ['no_identity', 'B_measurable_override', 'synth_nonconverged', 'not_results_root', 'no_facts'], 'report_nofacts_kinds': ['到達の見込みの記録なし', '埋め残し', '検査用の印'], 'builder_missing_reach_rc': 1, 'builder_tail': '[build_report_A] 集計に到達の見込みの記録が無い（設計事実の記録を渡して集計し直す・採否表 P128）'}"
+  },
+  {
+   "cond": "T5",
+   "item": "P133",
+   "condition": "走査器は集計の検査用の印が「なし」でない報告を違反にし、組み立て器の検査用の口は印を報告に残して走査に渡す",
+   "method": "走査器の自己検査（項 7）と合成の集計で組み立て器と走査器",
+   "ok": true,
+   "detail": "{'kinds_without_allow': ['到達の見込みの記録なし', '埋め残し', '検査用の印'], 'kinds_with_allow': ['到達の見込みの記録なし', '埋め残し']}"
+  },
+  {
+   "cond": "T6",
+   "item": "P129",
+   "condition": "合成検査の門の記録が per_scenario と撤退条件の枝の欄を持ち、組み立て器が合成の門の記録でも gate_A の実物の出力でも --gate で通る（走査の違反は埋め残しと検査用の印だけ）",
+   "method": "実験（合成の走 1 の集計・門と校正の合成検査の置き場の gate_A の出力）",
+   "ok": true,
+   "detail": "{'synthetic_gate_keys': ['env_band_recheck', 'gate2', 'kind', 'style_pilot', 'synthetic', 'withdrawal'], 'rc_synth_gate': 1, 'rc_real_gate': 1, 'kinds_synth_gate': ['埋め残し', '検査用の印'], 'kinds_real_gate': ['埋め残し', '検査用の印'], 'tail_a': \"封印予想（・- `tools/freeze_A.py --verify`・| 対比 id | A の基底 |）| 走査の違反 180 {'埋め残し': 179, '検査用の印': 1}\\n[build_report_A] 記入欄の埋め残しのほかの違反 1 件（{'検査用の印': 1}）。組み立てを止める（採否表 P96）\", 'tail_b': \"封印予想（・- `tools/freeze_A.py --verify`・| 対比 id | A の基底 |）| 走査の違反 180 {'埋め残し': 179, '検査用の印': 1}\\n[build_report_A] 記入欄の埋め残しのほかの違反 1 件（{'検査用の印': 1}）。組み立てを止める（採否表 P96）\"}"
+  },
+  {
+   "cond": "T5（走査の型）",
+   "item": "P128・P133",
+   "condition": "合成の集計で組み立てた報告の走査の違反が埋め残しと検査用の印だけ（組み立て器が機械の区画の外に未登録の数を書かない）・--no-facts の集計を --allow-dev-marks で組んだ報告は埋め残しと到達の見込みの欠けだけ",
+   "method": "合成の集計で組み立て器と走査器",
+   "ok": true,
+   "detail": "{'normal': ['埋め残し', '検査用の印'], 'allow_no_facts': ['到達の見込みの記録なし', '埋め残し']}"
+  },
+  {
+   "cond": "T11",
+   "item": "P107・P131・P110",
+   "condition": "凍結器 v3: --check は欠けで終了コード 2・発行の前に自己検査を走らせて合否と器の SHA16 をマニフェストに書く・凍結本文の正本 SHA16 が現物と違えば発行しない・自己検査が通らなければ発行しない・対象一覧に器材の入力六つ",
+   "method": "実験（写しの木・置き物の門0.5 と Firth の記録・草案9 を凍結本文の名で置く）",
+   "ok": true,
+   "detail": "{'check_repo_rc': 2, 'check_clone_rc': 0, 'publish_rc': 0, 'selftests': [('confirm_A.py', 0), ('firth.py', 0), ('bands_A.py', 0), ('numbers_lint.py', 0), ('report_lint.py', 0), ('judge_fragments_A.py', 0), ('sample_inspection_A.py', 0)], 'verify_rc': 0, 'tamper_rc': 1, 'tamper_tail': '[freeze_A] 対象 83・欠け 0・枠の検証 一致\\n凍結本文に書かれた正本の SHA16 0000000000000000 と現物の 8B298F126E77CBE6 が違うので発行しない（採否表 P107）', 'broken_selftest_rc': 1, 'broken_tail': '[freeze_A] 対象 83・欠け 0・枠の検証 一致\\n自己検査が通らない器があるので発行しない: report_lint.py（rc 3）', 'six_inputs_in_scope': {'records/A/power-grid-A.json': True, 'records/A/design-facts-"
+  },
+  {
+   "cond": "G1",
+   "item": "P121・P132・P123",
+   "condition": "格子 v3.3 の既存の節の数値が v3.2（コミット 150dab4）と差のある値零で一致する（E は丸めの前の値を保存し、丸めた値が一致すればよい・足した鍵は比べない）",
+   "method": "節ごとの数値の突合（機械）",
+   "ok": true,
+   "detail": "{'diff_per_section': {'quick': 0, 'z': 0, 'z_span_32B_4B': 0, 'seed': 0, 'streams': 0, 'B': 0, 'levels': 0, 'censor_integer_bounds_n200': 0, 'patterns': 0, 'patterns_clean': 0, 'd0_values': 0, 'delta_values': 0, 'real_base': 0, 'odose_assumed_d0': 0, 'E': 0, 'G': 0, 'H': 0, 'I': 0, 'M': 0, 'JV': 0, 'N': 0, 'N_detection': 0, 'PS': 0, 'R': 0, 'DS': 0, 'DR': 0, 'DC': 0, 'DO': 0, 'D': 0}, 'examples': []}"
+  },
+  {
+   "cond": "G2",
+   "item": "D28",
+   "condition": "格子に逆向きの節（既測基底の対比 × 三型 × 逆向き）があり、乱数は別の子ストリーム",
+   "method": "格子の記録",
+   "ok": true,
+   "detail": "{'rows': 66, 'stream': 10, 'B': 1000, 'keys_equal_room': True, 'n_room_keys': 66}"
+  },
+  {
+   "cond": "G3",
+   "item": "P122",
+   "condition": "格子の G 節に 12 セルをまたいだ率（注・判定保留・独立の近似の注）がある",
+   "method": "格子の記録",
+   "ok": true,
+   "detail": "{'cells_per_contrast': 12, 'union_note': '残存規模 × (a)(b) のセルのどれかが超える率（セルの独立を近似・同じ規模の (a)(b) は同じ試行から数える・真の率を全セルで同じに置く・採否表 P122）'}"
+  },
+  {
+   "cond": "F0",
+   "item": "—",
+   "condition": "設計事実 v3.3 が現行の正本と格子から検査用の印なしで作られた",
+   "method": "設計事実",
+   "ok": true,
+   "detail": "{'generator': 'tools/design_facts_A.py v3.3', 'dev_marks': [], 'contrasts_sha16': '8B298F126E77CBE6', 'power_grid_json_sha16': '33997612AB84E280'}"
+  },
+  {
+   "cond": "F1",
+   "item": "P125",
+   "condition": "転記行 A に校正腕のセッション数の内訳（32B が 2）と下界のセッション数と試行数",
+   "method": "設計事実",
+   "ok": true,
+   "detail": "規模: 門0.5 同一性選別 2,080（N1 × 13 腕 × n=160）／パイロット 18,200（7 機種 × 5 場面 × 13 腕 × n=40）／本走行 91,000（7 機種 × 5 場面 × 13 腕 × n=200）／錨反復 12,000（6 規模 × 5 場面 × 2 腕 × n=200）／校正腕 4,000（セッションごとに n=400・転記行 F の上界のセッション数の合"
+  },
+  {
+   "cond": "F2",
+   "item": "P118・P120・D27〜D29",
+   "condition": "転記行 D に測れた効果種の B と DR 節の B の対応・両向きの効果種ごとの到達と区間と測れた対比の本数・格子の解釈条項の発火率が除外を入れない配置の値である旨",
+   "method": "設計事実",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "F3",
+   "item": "P123",
+   "condition": "転記行 E を生値から一度で丸める（境界の実サイズ 0.0264・単一セル 0.996）",
+   "method": "設計事実",
+   "ok": true,
+   "detail": "床持続（記述）の到達可能性（n=200・棄却域 k≤4〔CP 片側上限 <0.05・境界での実サイズ 0.0264〕）: 真の率 0.005／0.01／0.02／0.03 で 単一セル 0.996／0.948／0.629／0.281・6 規模同時 0.9789／0.7270／0.0618／0.0005・Holm 初段（k≤2・m=15 のとき）0.606990／0.096005／0.000169／"
+  },
+  {
+   "cond": "F4",
+   "item": "D34",
+   "condition": "転記行 F に時間貸しに移す機種を除いた上界とその停止規則の閾値",
+   "method": "設計事実",
+   "ok": true,
+   "detail": "{'models': ['32B'], 'upper_units_without': 123.15906641269427, 'stop_threshold_units_without': 153.94883301586785}"
+  },
+  {
+   "cond": "F5",
+   "item": "P122",
+   "condition": "転記行 G に 12 セルをまたいだ率",
+   "method": "設計事実",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "F6",
+   "item": "P124",
+   "condition": "転記行 M で確証族の 8 腕の値が先、13 腕の値が括弧",
+   "method": "設計事実",
+   "ok": true,
+   "detail": "環境帯（橋の 4B・8B・本走行の N1 対 橋・n=200 同士・腕ごと・「超」・厳密・真の率は 4B-2507 の API 既測〔N1〕・既測の無い腕は 0.5）: 10 pt: 腕あたり（真の率 0.5）4.02e-02・確証族に現れる 8 腕のいずれかが超える確率 0.303（全 13 腕では 0.309）・期待誤保留数 2.76・検出 差 10 pt で 0.481・差 15 pt で "
+  },
+  {
+   "cond": "R1",
+   "item": "D26・D29〜D35",
+   "condition": "草案9 の原稿に §0 の新しい項・読み条項 (xvi) の拡張と (xvii)・測れた効果種の文言・抽出検査・Firth の選べる手・時間貸し・初点の名乗りの移し替え・§5 の D26〜D35",
+   "method": "原稿の文字列",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "R2",
+   "item": "—",
+   "condition": "草案9 の組み立ての数の検査の違反が零・§6 の見出しの正本と格子の SHA16 が現物と一致",
+   "method": "数の検査の記録と組み立て",
+   "ok": true,
+   "detail": "{'lint_total_zero': True, 'section6': ('8B298F126E77CBE6', '33997612AB84E280')}"
+  },
+  {
+   "cond": "R3",
+   "item": "D29・D31・D32・P141・P145・P146",
+   "condition": "雛形に §0-7 と §1 の測れた対比の欄・§4 の到達の表の両向きと区間の列・区間の被覆の断り・抽出検査の一致の行・断片の復唱の行があり、雛形の数の検査の違反が零・組み立て器の到達の表の列数が雛形の見出しと一致",
+   "method": "雛形の原稿と数の検査の記録と合成の集計での組み立て",
+   "ok": true,
+   "detail": "{'missing': [], 'template_lint_zero': True, 'frames': [], 'reach_table_cells': [6, 6, 6, 6, 6, 6, 6, 6, 6]}"
+  },
+  {
+   "cond": "R4",
+   "item": "P111",
+   "condition": "README に草案7・8、実装検分、最終検分、この反映、次の手順が載る",
+   "method": "README",
+   "ok": true,
+   "detail": "[]"
+  },
+  {
+   "cond": "P107（公開物）",
+   "item": "P107",
+   "condition": "凍結器が公開物をコミットと main の両方で照合できる",
+   "method": "凍結器の原稿",
+   "ok": true,
+   "detail": ""
+  }
+ ],
+ "extra": {
+  "confirm_selftest_tail": "confirm_A.py v1.3 SELFTEST PASS\n1 検閲の整数境界: n=1〜500 で率の比較と整数境界が一致\n2 札の全組合せ表: 52 行を判定関数で一度ずつ発火（札と行 id が一致）\n3 Holm の単調性: 乱数 20,000 回で例外 0\n4 contrast・refuse_gate: 中間域の効果で ok（p*≥p_β・向き一致・門の保留なし）・両腕 0 で判定不能（残存 0）\n5 simulate_cell・measurable_effect_types: 同じ乱数で同じ結果・4B の点が外れた対比は両向きとも零・余地のある向きの境・効果種ごとの両向きの欄\n6 v1.2: 正本の定数・当てはめの打ち切り・門2 の縮小を一対比だけに当てた札と Holm・第一適合の順を正本から独立に組んだ照合 48 組\n7 v1.3: 模擬の名目は p<α（p=α ちょうどは名目に数えない）・初段は p≤α/m（採否表 P132）\n8 v1.3: 門2 の縮小と非収束が重なった対比は、行 id と札を変えずに規則に理由を二つとも並べる（採否表 P130）\n9 v1.3: 「少なくとも一本」のデルタ法の区間（等しい確率の場合の式と一致）・向きの判定（下端が閾値以上・またぐ・届かない）・正本の水準と両向き（登録者裁定 D27・D28）\n",
+  "report_lint_selftest_tail": "report_lint.py v2.1 SELFTEST PASS\n1 区画が記録と一致し、雛形と逐語で同じ行の数だけなら違反 0\n2 検分の探り入力（W42）: 偽の区画・code span の数・(2048)・第3章・#12・D99・12 GB・段 7・費用の行の別の数がすべて違反（9 件）\n3 区画の中身の書き換えは記録との不一致・記録が無ければ違反\n4 打ち込んでよい型（費用の行の一つの数・逸脱番号・日付・SHA16）は違反にしない\n5 write_sidecar・sidecar_path の往復\n6 v2.1: 到達の見込みの欄が代わりの文字列の報告は違反（採否表 P128）\n7 v2.1: 集計の検査用の印が「なし」でない報告は違反・検査用の口では許す・「なし」は違反にしない（採否表 P133）\n",
+  "report_reach_table_cells": [
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6,
+   6
+  ],
+  "freeze_clone": {
+   "publish_tail": "け 0・枠の検証 一致\n[freeze_A] written C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\ccb2107c-84ba-4eab-bf7d-83ccce4f059f\\scratchpad\\refl\\verify-work\\freeze-clone\\records\\freeze-A-2026-09-14.json（83 ファイル）",
+   "manifest_files": 83,
+   "selftests": [
+    {
+     "tool": "confirm_A.py",
+     "sha16": "54758AEE98441723",
+     "args": [
+      "--selftest"
+     ],
+     "rc": 0,
+     "tail": " Holm・第一適合の順を正本から独立に組んだ照合 48 組\n7 v1.3: 模擬の名目は p<α（p=α ちょうどは名目に数えない）・初段は p≤α/m（採否表 P132）\n8 v1.3: 門2 の縮小と非収束が重なった対比は、行 id と札を変えずに規則に理由を二つとも並べる（採否表 P130）\n9 v1.3: 「少なくとも一本」のデルタ法の区間（等しい確率の場合の式と一致）・向きの判定（下端が閾値以上・またぐ・届かない）・正本の水準と両向き（登録者裁定 D27・D28）"
+    },
+    {
+     "tool": "firth.py",
+     "sha16": "CE584FDF2AE79930",
+     "args": [
+      "--selftest"
+     ],
+     "rc": 0,
+     "tail": " 1.1423・p 0.2852・収束 True\n4 分離 完全分離（対照すべて 0・処置すべて n）: β₃ 0.2686・統計量 0.0388・p 0.8439・収束 True\n5 あふれ（z × 50・段差のある率）: 全模型 3.7486・制約 3.7486（有限）\n6 converged: max_iter=1 で False・既定で True（反復 5）・max_iter=5（ちょうど収束の反復）で True\nfirth.py v2.1 SELFTEST PASS"
+    },
+    {
+     "tool": "bands_A.py",
+     "sha16": "BFF15C1D51957E26",
+     "args": [
+      "--selftest"
+     ],
+     "rc": 0,
+     "tail": "bands_A.py v1 SELFTEST PASS\n1 一標本の下側: n=1〜500・二つの帯で整数境界と分数の比較が一致\n2 二標本の両側と下側: 乱数 20,000 組で分数の比較と整数演算が一致\n3 diff_tail: 三組で判定関数による逐一の和と一致（差 < 1e-12）"
+    },
+    {
+     "tool": "numbers_lint.py",
+     "sha16": "88B6A53BBEC80602",
+     "args": [
+      "--selftest"
+     ],
+     "rc": 0,
+     "tail": "numbers_lint.py v2.1 SELFTEST PASS（マスクの検査例 11・束縛・未束縛・登録）"
+    },
+    {
+     "tool": "report_lint.py",
+     "sha16": "1F145D63983929EE",
+     "args": [
+      "--selftest"
+     ],
+     "rc": 0,
+     "tail": "・12 GB・段 7・費用の行の別の数がすべて違反（9 件）\n3 区画の中身の書き換えは記録との不一致・記録が無ければ違反\n4 打ち込んでよい型（費用の行の一つの数・逸脱番号・日付・SHA16）は違反にしない\n5 write_sidecar・sidecar_path の往復\n6 v2.1: 到達の見込みの欄が代わりの文字列の報告は違反（採否表 P128）\n7 v2.1: 集計の検査用の印が「なし」でない報告は違反・検査用の口では許す・「なし」は違反にしない（採否表 P133）"
+    },
+    {
+     "tool": "judge_fragments_A.py",
+     "sha16": "349AC74064315680",
+     "args": [
+      "selftest"
+     ],
+     "rc": 0,
+     "tail": " は形の不備\n6 採点: ラベルの無い断片と判定不能を分けて数える・機械の書式外と refuse を別に数える・誤判定率は機械の破局で条件付ける・κ は三名の三対（登録者裁定 D19・W76）\n6b v2.1: 採点の記録に復唱の記述の欄（前置きのある腕の断片が無ければ分位点は空）\n7 採点: 封印の記録と SHA-256 が合わない鍵で止まる・鍵の保存値を変えると断片の本文からの再計算との不一致で止まる\n8 採点の後の鍵の公開: 置いた鍵の SHA-256 が封印の値と一致"
+    },
+    {
+     "tool": "sample_inspection_A.py",
+     "sha16": "3207FE96305D0E5C",
+     "args": [
+      "selftest"
+     ],
+     "rc": 0,
+     "tail": "}\nsample_inspection_A.py v1.2 SELFTEST PASS\n1 extract: 対応表の置き場がリポジトリの中なら何も書かずに止まる（登録者裁定 D32）\n2 extract: 標本に機械分類を印字しない・対応表と機械分類の集計はリポジトリの外・封印の記録の SHA-256 が対応表と一致\n3 score: 目視の分類と機械分類の一致と混同の表（一件を変えると一致 1/2）\n4 score: 封印の記録と SHA-256 が合わない対応表で止まる"
+    }
+   ]
+  },
+  "grid_diff": {
+   "quick": 0,
+   "z": 0,
+   "z_span_32B_4B": 0,
+   "seed": 0,
+   "streams": 0,
+   "B": 0,
+   "levels": 0,
+   "censor_integer_bounds_n200": 0,
+   "patterns": 0,
+   "patterns_clean": 0,
+   "d0_values": 0,
+   "delta_values": 0,
+   "real_base": 0,
+   "odose_assumed_d0": 0,
+   "E": 0,
+   "G": 0,
+   "H": 0,
+   "I": 0,
+   "M": 0,
+   "JV": 0,
+   "N": 0,
+   "N_detection": 0,
+   "PS": 0,
+   "R": 0,
+   "DS": 0,
+   "DR": 0,
+   "DC": 0,
+   "DO": 0,
+   "D": 0
+  },
+  "grid_diff_examples": []
+ },
+ "inputs": {
+  "contrasts_sha16": "8B298F126E77CBE6",
+  "power_grid_sha16": "33997612AB84E280",
+  "design_facts_sha16": "8192244B139A28C5",
+  "grid_base_commit": "150dab464f6b28314528a87c2fbb106d329bf7de",
+  "synth_A": "records/A/synth-A-2026-09-14b.json",
+  "synth_gates_A": "records/A/synth-gates-A-2026-09-14b.json",
+  "draft": "design/design-stageA-draft9.md",
+  "preregistration_sha16": "E65FD5082EB65939"
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

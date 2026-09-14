@@ -16,7 +16,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('--kind', choices=['draft', 'template'], required=True); ap.add_argument('--src', required=True); ap.add_argument('--out', required=True); ap.add_argument('--label', required=True)
 ap.add_argument('--facts', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.json')); ap.add_argument('--facts-md', default=os.path.join(REPO, 'records', 'A', 'design-facts-A.md'))
 ap.add_argument('--json', default=os.path.join(REPO, 'design', 'contrasts-A.json')); ap.add_argument('--lint-report', required=True)
-ap.add_argument('--gen', nargs='*', default=[os.path.join(REPO, 'tools', 'make_contrasts_A.py'), os.path.join(REPO, 'tools', 'design_facts_A.py')])
+ap.add_argument('--gen', nargs='*', default=[os.path.join(REPO, 'tools', nm) for nm in ('make_contrasts_A.py', 'design_facts_A.py', 'power_grid_A.py', 'confirm_A.py', 'build_draftA.py')])   # 転記行と本文に文字列を書く器（採否表 P121）
 a = ap.parse_args()
 sha = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
 rel = lambda p: os.path.relpath(p, REPO).replace('\\', '/')

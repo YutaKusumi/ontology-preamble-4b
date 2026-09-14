@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""power_grid_A.py v3.2 —— 段階 A の検出力格子・実サイズ・帯と門の発火率（転記行 D・E・G・H・I・M・N・O の元）を design/contrasts-A.json・records/A/hf-models-A.json と tools/confirm_A.py・tools/zaxis_A.py・tools/firth.py v2.1 から機械生成する（2026-09-13）。
+"""power_grid_A.py v3.3 —— 段階 A の検出力格子・実サイズ・帯と門の発火率（転記行 D・E・G・H・I・M・N・O の元）を design/contrasts-A.json・records/A/hf-models-A.json と tools/confirm_A.py・tools/zaxis_A.py・tools/firth.py v2.1 から機械生成する（2026-09-13）。
+v3.3（2026-09-14・凍結前の最終検分の採否表 P121・P122・P123・P132・登録者裁定 D28）: 切り詰めの上下限と区間の水準を tools/confirm_A.py の RATE_CLIP・CI_LEVEL から読み、refuse 節と PS 節の標識と md の注を母数から組む（生成器の文字列リテラル検査の範囲に入れる）。
+  既測基底の対比の逆向き（余地のある向きの逆）の節 DR_opp を別の子ストリームで足す。G 節に残存規模 × (a)(b) のセルをまたいだ率（独立の近似）を足す。E 節は丸めの前の値を保存する（md の印字は同じ桁）。
+  名目の数え方は confirm_A v1.3（p<α）にそろえ、refuse 節の名目も p<α にする（既存の節の数値は v3.2 と同じ見込み・回し直して突合する）。
 v3.2（2026-09-14・登録者裁定 D18）: 当てはめの打ち切りは confirm_A v1.2 が firth_check.python_control で行う（格子の算法は v3.1 と同じ）。入力に打ち切りの設定を記帳する。
 v3.1（2026-09-13・登録者裁定 D9 の手順3・D11）: 札の率の模擬（run_cell の中身）と既測基底の行の処置の率・余地のある向きを tools/confirm_A.py v1.1 の simulate_cell・reach_treatment・reach_direction に、帯と門の厳密計算（pmf・diff_tail・lower_tail・一標本の下側の整数境界・環境帯の期待誤保留数）を tools/bands_A.py に移した（集計器の測れた効果種・門と校正帯の器と同じ関数・乱数の消費順と数値は v3 と同じ）。
 v3 の変更（凍結前検分・七票の採否表 P18〜P30・登録者裁定 D10・D12・D13）:
@@ -22,6 +25,7 @@ from scipy.stats import binom, beta as beta_dist, norm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import firth
 import confirm_A
+from confirm_A import RATE_CLIP, CI_LEVEL
 import bands_A
 from zaxis_A import z_map
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -65,8 +69,8 @@ def run_cell(pc, pt, B, rng, R=RULES):
 
 
 def treat(pc, d0, D, sgn):
-    raw = pc + sgn * d0 + sgn * D * (zs - z4) / zspan
-    return np.clip(raw, 0.001, 0.999), int(((raw > 0.999) | (raw < 0.001)).sum())
+    raw = pc + sgn * d0 + sgn * D * (zs - z4) / zspan   # 天井型の符号を持つので共有関数に寄せず、上下限だけを共有する（採否表 P121）
+    return np.clip(raw, RATE_CLIP[0], RATE_CLIP[1]), int(((raw > RATE_CLIP[1]) | (raw < RATE_CLIP[0])).sum())
 
 
 PATTERNS = [('mid_const', np.full(6, 0.5), 1.0), ('floor_const', np.full(6, 0.03), 1.0), ('ceiling_const', np.full(6, 0.97), -1.0),
@@ -93,7 +97,7 @@ def grid_DC():
     rng = stream(5); out = []; t0 = time.time()
     for name, pc in PATTERNS_CLEAN:
         for d0, D in [(0.05, 0.0), (0.10, 0.0), (0.15, 0.0), (0.0, 0.10), (0.0, 0.15)]:
-            raw = pc + d0 + D * (zs - z4) / zspan; clipped = int(((raw > 0.999) | (raw < 0.001)).sum()); pt = np.clip(raw, 0.001, 0.999)
+            pt, clipped = confirm_A.reach_treatment(pc, d0, D, zs, z4, zspan)
             row = {'pattern': name, 'ctrl': [round(float(x), 4) for x in pc], 'd0_pt': d0, 'delta_pt_32B_minus_4B': D, 'clipped_sizes': clipped, 'true_slope_pt': true_slope_pt(pc, pt), 'kind': 'scale_null' if D == 0 else 'effect'}
             row.update(run_cell(pc, pt, a.B_clean, rng)); out.append(row)
     print('[grid DC] done %.0fs' % (time.time() - t0), flush=True)
@@ -103,10 +107,10 @@ def grid_DC():
 def dr_rows(c, bA, bB, B, rng, extra=None):
     out = []; d0 = bA - bB; dirs = confirm_A.reach_direction(bA)
     for trend, sl in (('一定', 0.0), ('上昇', DR_TREND), ('下降', -DR_TREND)):
-        pc = np.clip(bB + sl * (zs - z4) / zspan, 0.001, 0.999)
-        for dlab, D in (('0', 0.0), ('±%g' % DR_DELTA, DR_DELTA * dirs)):
+        pc = np.clip(bB + sl * (zs - z4) / zspan, RATE_CLIP[0], RATE_CLIP[1])
+        for dlab, D in (('%g' % 0.0, 0.0), ('±%g' % DR_DELTA, DR_DELTA * dirs)):
             pt, clipped = confirm_A.reach_treatment(pc, d0, D, zs, z4, zspan)
-            row = {'id': c['id'], 'base_A': round(bA, 4), 'base_B': round(bB, 4), 'd0_pt': round(d0, 4), 'ctrl_trend': trend, 'ctrl_change_32B_minus_4B': sl, 'delta': dlab, 'delta_value': D,
+            row = {'id': c['id'], 'effect': c['effect'], 'base_A': round(bA, 4), 'base_B': round(bB, 4), 'd0_pt': round(d0, 4), 'ctrl_trend': trend, 'ctrl_change_32B_minus_4B': sl, 'delta': dlab, 'delta_value': D,
                    'clipped_sizes': clipped, 'true_slope_pt': true_slope_pt(pc, pt)}
             if extra:
                 row.update(extra)
@@ -124,6 +128,23 @@ def grid_DR():
     return out
 
 
+def grid_DR_opp():
+    """v3.3（登録者裁定 D28）: 既測基底の対比 × 対照の規模変化の三型で、余地のある向きの逆（Δ＝−delta × 余地のある向き）の札の率。別の子ストリームで、DR 節の乱数を動かさない。"""
+    rng = stream(10); out = []; t0 = time.time()
+    for c in FAM['contrasts']:
+        if c['base_A_4B2507'] is None or c['base_B_4B2507'] is None:
+            continue
+        bA = c['base_A_4B2507'] / c['base_n_A']; bB = c['base_B_4B2507'] / c['base_n_B']; d0 = bA - bB; dirs = confirm_A.reach_direction(bA)
+        for trend, sl in (('一定', 0.0), ('上昇', DR_TREND), ('下降', -DR_TREND)):
+            pc = np.clip(bB + sl * (zs - z4) / zspan, RATE_CLIP[0], RATE_CLIP[1]); D = -DR_DELTA * dirs
+            pt, clipped = confirm_A.reach_treatment(pc, d0, D, zs, z4, zspan)
+            row = {'id': c['id'], 'effect': c['effect'], 'base_A': round(bA, 4), 'base_B': round(bB, 4), 'd0_pt': round(d0, 4), 'ctrl_trend': trend, 'ctrl_change_32B_minus_4B': sl, 'delta': '∓%g' % DR_DELTA,
+                   'delta_value': D, 'direction': 'opposite', 'clipped_sizes': clipped, 'true_slope_pt': true_slope_pt(pc, pt)}
+            row.update(run_cell(pc, pt, a.B_real, rng)); out.append(row)
+    print('[grid DR_opp] done %.0fs' % (time.time() - t0), flush=True)
+    return out
+
+
 def grid_DO():
     rng = stream(6); out = []; t0 = time.time()
     for c in FAM['contrasts']:
@@ -131,7 +152,7 @@ def grid_DO():
             continue
         bB = c['base_B_4B2507'] / c['base_n_B']
         for d0 in DO_D0:
-            out += dr_rows(c, float(min(max(bB + d0, 0.001), 0.999)), bB, a.B_odose, rng, extra={'assumed_d0': d0, 'base_A_assumed': True})
+            out += dr_rows(c, float(min(max(bB + d0, RATE_CLIP[0]), RATE_CLIP[1])), bB, a.B_odose, rng, extra={'assumed_d0': d0, 'base_A_assumed': True})
     print('[grid DO] done %.0fs' % (time.time() - t0), flush=True)
     return out
 
@@ -171,7 +192,8 @@ def sim_pt(pc, pt, B, rng, subset=None):
 
 
 def grid_PS():
-    rng = stream(8); t0 = time.time(); subs = [('6', list(range(6))), ('5_no32B', [0, 1, 2, 3, 4]), ('4_to8B', [0, 1, 2, 3]), ('3_small', [0, 1, 2]), ('3_large', [3, 4, 5]), ('3_ends', [0, 2, 5])]
+    rng = stream(8); t0 = time.time()
+    subs = [(nm % len(ix), ix) for nm, ix in (('%d', list(range(6))), ('%d_no32B', [0, 1, 2, 3, 4]), ('%d_to8B', [0, 1, 2, 3]), ('%d_small', [0, 1, 2]), ('%d_large', [3, 4, 5]), ('%d_ends', [0, 2, 5]))]   # 名は残す規模の数から組む（採否表 P121）
     mid = [('ctrl_mid_const', np.full(6, 0.5), 0.15), ('ctrl_rising_080', np.linspace(0.3, 0.8, 6), 0.15), ('ctrl_rising_060', np.linspace(0.2, 0.6, 6), 0.15), ('ctrl_rising_050', np.linspace(0.1, 0.5, 6), 0.10)]
     edge = [('floor_const_d0', np.full(6, 0.03), 0.0), ('floor_const_plus', np.full(6, 0.03), 0.05), ('ceiling_const_d0', np.full(6, 0.97), 0.0), ('near_ceiling_treat', np.linspace(0.35, 0.70, 6), 0.25)]
     rows = []
@@ -195,15 +217,16 @@ def grid_R():
     rng = stream(4); out = []
     lin = (zs - z4) / zspan; idx6 = np.arange(len(SIZES)) / (len(SIZES) - 1)
     cfgs = []
-    pc = np.full(6, 0.45); cfgs.append(('転位なし・効果あり（破局 0.45・refuse 0.10 一定・Δ=+0.15）', pc, np.full(6, 0.10), np.clip(pc + 0.15 * lin, 0.001, 0.899), np.full(6, 0.10)))
-    cfgs.append(('転位なし・効果なし（破局 0.45・refuse 0.10 一定・Δ=0）', pc, np.full(6, 0.10), pc.copy(), np.full(6, 0.10)))
-    pc3 = np.full(6, 0.35); cfgs.append(('転位なし・refuse 0.30 一定・効果あり（Δ=+0.15）', pc3, np.full(6, 0.30), np.clip(pc3 + 0.15 * lin, 0.001, 0.699), np.full(6, 0.30)))
-    rt4 = 0.05 + 0.30 * idx6; ans = 0.45 / 0.95; cfgs.append(('転位あり（処置の refuse が規模とともに 0.05→0.35・答えた分母の破局率は一定）', pc, np.full(6, 0.05), ans * (1 - rt4), rt4))
-    cfgs.append(('転位あり・効果あり（処置の refuse 0.05→0.35・答えた分母の破局率が規模とともに Δ=+0.15）', pc, np.full(6, 0.05), np.clip(ans + 0.15 * lin, 0.001, 0.999) * (1 - rt4), rt4))
+    PCAT, RFX, PCAT3, RFX3, R0, RSPAN = 0.45, 0.10, 0.35, 0.30, 0.05, 0.30   # 標識は母数から組む（採否表 P121・数値は v3.2 と同じ）
+    pc = np.full(6, PCAT); cfgs.append(('転位なし・効果あり（破局 %g・refuse %.2f 一定・Δ=%+g）' % (PCAT, RFX, DR_DELTA), pc, np.full(6, RFX), np.clip(pc + DR_DELTA * lin, RATE_CLIP[0], 0.899), np.full(6, RFX)))
+    cfgs.append(('転位なし・効果なし（破局 %g・refuse %.2f 一定・Δ=%g）' % (PCAT, RFX, 0.0), pc, np.full(6, RFX), pc.copy(), np.full(6, RFX)))
+    pc3 = np.full(6, PCAT3); cfgs.append(('転位なし・refuse %.2f 一定・効果あり（Δ=%+g）' % (RFX3, DR_DELTA), pc3, np.full(6, RFX3), np.clip(pc3 + DR_DELTA * lin, RATE_CLIP[0], 0.699), np.full(6, RFX3)))
+    rt4 = R0 + RSPAN * idx6; ans = 0.45 / 0.95; cfgs.append(('転位あり（処置の refuse が規模とともに %.2f→%.2f・答えた分母の破局率は一定）' % (R0, R0 + RSPAN), pc, np.full(6, R0), ans * (1 - rt4), rt4))
+    cfgs.append(('転位あり・効果あり（処置の refuse %.2f→%.2f・答えた分母の破局率が規模とともに Δ=%+g）' % (R0, R0 + RSPAN, DR_DELTA), pc, np.full(6, R0), np.clip(ans + DR_DELTA * lin, RATE_CLIP[0], RATE_CLIP[1]) * (1 - rt4), rt4))
     bN1 = T['bases_4B2507_api']['N1']; lc = bN1['Onull']['k'] / bN1['Onull']['n']; lcr = bN1['Onull']['refuse'] / bN1['Onull']['n']; lt = bN1['Lneg']['k'] / bN1['Lneg']['n']; ltr = bN1['Lneg']['refuse'] / bN1['Lneg']['n']
     ansL = lt / (1 - ltr)
     cfgs.append(('Lneg の既測（N1・対照 Onull）を基底・効果なし', np.full(6, lc), np.full(6, lcr), np.full(6, lt), np.full(6, ltr)))
-    cfgs.append(('Lneg の既測（N1・対照 Onull）を基底・答えた分母の破局率が規模とともに Δ=+0.15', np.full(6, lc), np.full(6, lcr), np.clip(ansL + 0.15 * lin, 0.001, 0.999) * (1 - ltr), np.full(6, ltr)))
+    cfgs.append(('Lneg の既測（N1・対照 Onull）を基底・答えた分母の破局率が規模とともに Δ=%+g' % DR_DELTA, np.full(6, lc), np.full(6, lcr), np.clip(ansL + DR_DELTA * lin, RATE_CLIP[0], RATE_CLIP[1]) * (1 - ltr), np.full(6, ltr)))
     for name, pcat_c, pref_c, pcat_t, pref_t in cfgs:
         cnt = {'undecidable': 0, 'nonconverged': 0, 'nominal': 0, 'hold': 0, 'hold_a': 0, 'hold_b': 0, 'hold_c': 0, 'hold_d': 0, 'card_D1_h1_no_gate': 0, 'card_D1_h1_after_gate': 0}
         Pc = np.column_stack([pcat_c, pref_c, 1 - pcat_c - pref_c]); Pt = np.column_stack([pcat_t, pref_t, 1 - pcat_t - pref_t])
@@ -215,7 +238,7 @@ def grid_R():
                 cnt[r['status']] += 1; continue
             card = (r['p_beta'] <= ALPHA / HOLM_M) and (not r['clause']) and r['p_pt'] <= ALPHA / HOLM_M and r['same']
             cnt['card_D1_h1_no_gate'] += card
-            if r['p_beta'] > ALPHA:
+            if not r['p_beta'] < ALPHA:   # 名目有意は p_β<α（正本 refuse_gate.applies_to・採否表 P132）
                 continue
             cnt['nominal'] += 1; g = confirm_A.refuse_gate(RULES, zs, kc, kt, rc, rt, NN6, NN6, r)
             for x in 'abcd':
@@ -232,8 +255,8 @@ def grid_R():
 
 def grid_E():
     k4 = max(k for k in range(0, 20) if beta_dist.ppf(0.95, k + 1, n - k) < 0.05); k_h = max(k for k in range(0, 20) if binom.cdf(k, n, 0.05) < 0.05 / 15)
-    rows = [{'true_rate': p, 'single_cell': round(float(binom.cdf(k4, n, p)), 4), 'six_sizes_joint': round(float(binom.cdf(k4, n, p) ** 6), 5), 'holm_first_six': round(float(binom.cdf(k_h, n, p) ** 6), 6)} for p in (0.005, 0.01, 0.02, 0.03)]
-    return {'rows': rows, 'k_max_cp95': k4, 'k_max_holm_first_m15': k_h, 'size_at_k_max': round(float(binom.cdf(k4, n, 0.05)), 5), 'holm_first_boundary_p': [float(binom.cdf(k_h, n, 0.05)), float(binom.cdf(k_h + 1, n, 0.05)), 0.05 / 15]}
+    rows = [{'true_rate': p, 'single_cell': float(binom.cdf(k4, n, p)), 'six_sizes_joint': float(binom.cdf(k4, n, p) ** 6), 'holm_first_six': float(binom.cdf(k_h, n, p) ** 6)} for p in (0.005, 0.01, 0.02, 0.03)]   # 丸めの前の値（採否表 P123）
+    return {'rows': rows, 'k_max_cp95': k4, 'k_max_holm_first_m15': k_h, 'size_at_k_max': float(binom.cdf(k4, n, 0.05)), 'holm_first_boundary_p': [float(binom.cdf(k_h, n, 0.05)), float(binom.cdf(k_h + 1, n, 0.05)), 0.05 / 15]}
 
 
 pmf = bands_A.pmf
@@ -245,8 +268,11 @@ PGRID = [0.1, 0.3, 0.5, 0.7, 0.9]
 
 
 def grid_G():
-    S = T['style_gate']
-    return {'n': n, 'strict': S['strict'], 'bands': {str(b): {str(p): diff_tail(n, p, n, p, b) for p in PGRID} for b in (S['note_pt'], S['hold_pt'])}}
+    S = T['style_gate']; cells = 2 * len(SIZES)
+    bands = {str(b): {str(p): diff_tail(n, p, n, p, b) for p in PGRID} for b in (S['note_pt'], S['hold_pt'])}
+    return {'n': n, 'strict': S['strict'], 'bands': bands, 'cells_per_contrast': cells,
+            'union_independent': {b: {p: 1 - (1 - v) ** cells for p, v in d.items()} for b, d in bands.items()},
+            'union_note': '残存規模 × (a)(b) のセルのどれかが超える率（セルの独立を近似・同じ規模の (a)(b) は同じ試行から数える・真の率を全セルで同じに置く・採否表 P122）'}
 
 
 def grid_H():
@@ -273,7 +299,7 @@ def grid_H():
 def grid_I():
     C = T['calibration']; bb = T['bases_4B2507_api'][C['scenario']][C['arm']]; base = Fraction(bb['k'], bb['n'])
     upper_exceeds = base + Fraction(C['band_pass']['pt'], 100) > 1
-    assert upper_exceeds, '基底＋帯が 1 を超えないなら上側の帯を置く規則に直す'
+    assert upper_exceeds, '基底＋帯が率の上限を超えないなら上側の帯を置く規則に直す'
 
     def lower_k(nn, band_pt):
         return bands_A.lower_k(base, nn, band_pt)
@@ -362,7 +388,7 @@ def grid_JV():
         ncls = ncell * nsc * share
         for e in (0.05, 0.10, 0.20):
             rows.append({'class_share': share, 'n_class_per_size': ncls, 'true_error_rate': e, 'diff_halfwidth95_pt': 100 * 1.96 * math.sqrt(2 * e * (1 - e) / ncls)})
-    return {'n_per_cell': ncell, 'scenarios': nsc, 'rows': rows, 'method': '二規模の方向別の誤判定率の差の 95% 半幅（正規近似・場面を合わせる・機械ラベルの類の割合 class_share）'}
+    return {'n_per_cell': ncell, 'scenarios': nsc, 'rows': rows, 'method': '二規模の方向別の誤判定率の差の %g%% 半幅（正規近似・場面を合わせる・機械ラベルの類の割合 class_share）' % (CI_LEVEL * 100)}
 
 
 os.makedirs(os.path.dirname(a.out), exist_ok=True)
@@ -370,22 +396,23 @@ if a.md_only:
     R = json.load(open(a.out + '.json', encoding='utf-8'))
 else:
     t0 = time.time()
-    R = {'version': 'v3.2', 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'quick': a.quick,
+    R = {'version': 'v3.3','generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'), 'quick': a.quick,
          'inputs': {'contrasts_sha16': sha_file(CPATH), 'hf_models_sha16': sha_file(HPATH), 'firth_version': firth.VERSION, 'firth_sha16': sha_file(os.path.join(REPO, 'tools', 'firth.py')),
                     'confirm_version': confirm_A.VERSION, 'confirm_sha16': sha_file(os.path.join(REPO, 'tools', 'confirm_A.py')), 'zaxis_sha16': sha_file(os.path.join(REPO, 'tools', 'zaxis_A.py')), 'bands_sha16': sha_file(os.path.join(REPO, 'tools', 'bands_A.py')), 'fit_control': RULES.fit_kw, 'power_grid_sha16': sha_file(os.path.abspath(__file__))},
-         'z': {k: Z[k] for k in SIZES}, 'z_span_32B_4B': zspan, 'seed': a.seed, 'streams': {'D': 1, 'DR': 2, 'DS': 3, 'R': 4, 'DC': 5, 'DO': 6, 'N': 7, 'PS': 8, 'N_detection': 9},
-         'B': {'D': a.B, 'DR': a.B_real, 'DS': a.B_sens, 'R': a.B_refuse, 'N': a.B_identity, 'DC': a.B_clean, 'DO': a.B_odose, 'PS': a.B_size},
+         'z': {k: Z[k] for k in SIZES}, 'z_span_32B_4B': zspan, 'seed': a.seed, 'streams': {'D': 1, 'DR': 2, 'DS': 3, 'R': 4, 'DC': 5, 'DO': 6, 'N': 7, 'PS': 8, 'N_detection': 9, 'DR_opp': 10},
+         'B': {'D': a.B, 'DR': a.B_real, 'DS': a.B_sens, 'R': a.B_refuse, 'N': a.B_identity, 'DC': a.B_clean, 'DO': a.B_odose, 'PS': a.B_size, 'DR_opp': a.B_real},
          'levels': {'alpha': ALPHA, 'holm_m': HOLM_M, 'z_nominal': z_nom, 'z_holm_first': z_h1, 'holm_later': [{'step_denominator': j, 'z': float(norm.isf(ALPHA / j / 2))} for j in (HOLM_M, HOLM_M - 1, HOLM_M - 4, HOLM_M - 9, HOLM_M - 19, 2, 1)]},
          'censor_integer_bounds_n200': {'low_if_le': KLO, 'high_if_ge': KHI},
          'patterns': {nm: {'ctrl': [round(float(x), 4) for x in pcv], 'sign': sg} for nm, pcv, sg in PATTERNS}, 'patterns_clean': {nm: [round(float(x), 4) for x in pcv] for nm, pcv in PATTERNS_CLEAN},
          'd0_values': D0S, 'delta_values': DELTAS, 'real_base': {'trend_change_32B_minus_4B': DR_TREND, 'delta': DR_DELTA}, 'odose_assumed_d0': DO_D0}
     R['E'] = grid_E(); R['G'] = grid_G(); R['H'] = grid_H(); R['I'] = grid_I(); R['M'] = grid_M(); R['JV'] = grid_JV(); print('[exact] E G H I M JV done', flush=True)
     R['N'] = grid_N(); R['N_detection'] = grid_N_detection(); print('[grid N] done', flush=True)
-    R['PS'] = grid_PS(); R['R'] = grid_R(); R['DS'] = grid_DS(); R['DR'] = grid_DR(); R['DC'] = grid_DC(); R['DO'] = grid_DO(); R['D'] = grid_D()
+    R['PS'] = grid_PS(); R['R'] = grid_R(); R['DS'] = grid_DS(); R['DR'] = grid_DR(); R['DR_opp'] = grid_DR_opp(); R['DC'] = grid_DC(); R['DO'] = grid_DO(); R['D'] = grid_D()
     R['elapsed_s'] = round(time.time() - t0, 1)
     json.dump(R, open(a.out + '.json', 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 f3 = lambda v: '—' if v is None else ('%.3f' % v)
 ci = lambda v: '—' if (v is None or v[0] is None) else '%.3f〜%.3f' % tuple(v)
+CIP = '%g%%' % (CI_LEVEL * 100); FLOOR_M = T['descriptive_families']['A_desc_floor']['cell_series']   # md の数は母数から組む（採否表 P121）
 L = ['# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` %s・%s UTC%s）' % (R['version'], R['generated_utc'], '・**quick（検査用の小さな B）**' if R.get('quick') else ''), '',
      '- 入力: contrasts-A.json SHA16 %s・hf-models-A.json SHA16 %s・firth.py %s（SHA16 %s）・confirm_A.py %s（SHA16 %s）・zaxis_A.py SHA16 %s・power_grid_A.py SHA16 %s・bands_A.py SHA16 %s' % (
          R['inputs']['contrasts_sha16'], R['inputs']['hf_models_sha16'], R['inputs']['firth_version'], R['inputs']['firth_sha16'], R['inputs']['confirm_version'], R['inputs']['confirm_sha16'], R['inputs']['zaxis_sha16'], R['inputs']['power_grid_sha16'], R['inputs'].get('bands_sha16')),
@@ -395,13 +422,13 @@ L = ['# 段階 A 検出力格子（機械生成・`tools/power_grid_A.py` %s・%
          R['seed'], json.dumps(R['streams']), json.dumps(R['B']), R['levels']['alpha'], R['levels']['holm_m'], R['levels']['z_nominal'], R['levels']['z_holm_first'], '・'.join('α/%d で %.3f' % (x['step_denominator'], x['z']) for x in R['levels']['holm_later']), n, R['censor_integer_bounds_n200']['low_if_le'], R['censor_integer_bounds_n200']['high_if_ge']),
      '- 札 草案4＝名目有意（または初段）∧ 解釈条項の非発火。札 D1＝それに加えて pt 差の傾きが同じ水準で立ち β₃ と同じ向き（初段では p* ≤ α/m と同じ・登録者裁定 D10 の p* の Holm でも初段の値は同じ）。尺度依存＝初段で β₃ が立ち解釈条項は発火せず pt 差の傾きが条件を満たさない。真の pt 差の傾きは切り詰めた後の処置と対照の率の差を z に OLS で回帰した値（pt／z）。', '',
      '## D. 傾きの族（無条件率・B 回あたり）', '',
-     '| 対照の型 | d0 | Δ | 切り詰め規模 | 真の pt 差の傾き | 判定不能（検閲） | 非収束 | n_fit | p<α（無条件・95%区間） | p<α（条件付き・95%区間） | Holm 初段 | 解釈条項の発火（当てはめ内） | 札 草案4（名目／初段） | 札 D1（名目・95%区間） | 札 D1（初段・95%区間） | 尺度依存（初段） |',
+     '| 対照の型 | d0 | Δ | 切り詰め規模 | 真の pt 差の傾き | 判定不能（検閲） | 非収束 | n_fit | p<α（無条件・%s区間） | p<α（条件付き・%s区間） | Holm 初段 | 解釈条項の発火（当てはめ内） | 札 草案4（名目／初段） | 札 D1（名目・%s区間） | 札 D1（初段・%s区間） | 尺度依存（初段） |' % ((CIP,) * 4),
      '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|']
 for r in R['D']:
     if 'dropped' in r:
         L.append('| %s | %.2f | %.2f | %d | %+.3f | 外した（%s） |  |  |  |  |  |  |  |  |  |  |' % (r['pattern'], r['d0_pt'], r['delta_pt_32B_minus_4B'], r['clipped_sizes'], r['true_slope_pt'], r['dropped'])); continue
     L.append('| %s | %.2f | %.2f | %d | %+.3f | %.3f | %.3f | %d | %.3f（%s） | %s（%s） | %.3f | %s | %.3f／%.3f | %.3f（%s） | %.3f（%s） | %.3f |' % (r['pattern'], r['d0_pt'], r['delta_pt_32B_minus_4B'], r['clipped_sizes'], r['true_slope_pt'], r['undecidable_censor'], r['nonconverged'], r['n_fit'], r['reject_nominal'], ci(r['reject_nominal_ci95']), f3(r['reject_nominal_conditional']), ci(r['reject_nominal_conditional_ci95']), r['reject_holm_first'], f3(r['clause_rate_among_fit']), r['card_draft4_nominal'], r['card_draft4_holm_first'], r['card_D1_nominal'], ci(r['card_D1_nominal_ci95']), r['card_D1_holm_first'], ci(r['card_D1_holm_first_ci95']), r['scale_only_holm_first']))
-L += ['', '- 処置の真の率＝clip(対照 ＋ 符号·d0 ＋ 符号·Δ·(z−z_4B)/z_span, 0.001, 0.999)。符号は天井型のみ −1。切り詰めのある行では真の pt 差は全規模で一定ではない（真の pt 差の傾きの列）。', '',
+L += ['', '- 処置の真の率＝clip(対照 ＋ 符号·d0 ＋ 符号·Δ·(z−z_4B)/z_span, %g, %g)。符号は天井型のみ負。切り詰めのある行では真の pt 差は全規模で一定ではない（真の pt 差の傾きの列）。' % RATE_CLIP, '',
       '## DC. 余白のある対照の型（切り詰めなし・無条件率・B=%d）' % R['B']['DC'], '',
       '| 対照の型 | 種別 | d0 | Δ | 切り詰め規模 | 真の pt 差の傾き | p<α | Holm 初段 | 札 草案4（名目／初段） | 札 D1（名目／初段） | 解釈条項の発火（当てはめ内） |', '|---|---|---|---|---|---|---|---|---|---|---|']
 for r in R['DC']:
@@ -410,6 +437,10 @@ L += ['', '## DR. 既測基底を入力にした対比ごと（無条件率・B=
       '| 対比 | A の基底 | B の基底 | d0 | 対照の規模変化 | Δ | 切り詰め | 真の pt 差の傾き | 判定不能 | 非収束 | p<α | 解釈条項の発火（当てはめ内） | 札 草案4（名目／初段） | 札 D1（初段） | 尺度依存（初段） |', '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|']
 for r in R['DR']:
     L.append('| %s | %.3f | %.3f | %+.3f | %s（%+.2f） | %s | %d | %+.3f | %.3f | %.3f | %.3f | %s | %.3f／%.3f | %.3f | %.3f |' % (r['id'], r['base_A'], r['base_B'], r['d0_pt'], r['ctrl_trend'], r['ctrl_change_32B_minus_4B'], r['delta'], r['clipped_sizes'], r['true_slope_pt'], r['undecidable_censor'], r['nonconverged'], r['reject_nominal'], f3(r['clause_rate_among_fit']), r['card_draft4_nominal'], r['card_draft4_holm_first'], r['card_D1_holm_first'], r['scale_only_holm_first']))
+L += ['', '## DR_opp. 既測基底の対比の逆向き（余地のある向きの逆・無条件率・B=%d・登録者裁定 D28）' % R['B']['DR_opp'], '',
+      '| 対比 | 効果種 | 対照の規模変化 | Δ | 切り詰め | 真の pt 差の傾き | 判定不能 | 解釈条項の発火（当てはめ内） | 札 D1（初段） |', '|---|---|---|---|---|---|---|---|---|']
+for r in R['DR_opp']:
+    L.append('| %s | %s | %s（%+.2f） | %s | %d | %+.3f | %.3f | %s | %.3f |' % (r['id'], r['effect'], r['ctrl_trend'], r['ctrl_change_32B_minus_4B'], r['delta'], r['clipped_sizes'], r['true_slope_pt'], r['undecidable_censor'], f3(r['clause_rate_among_fit']), r['card_D1_holm_first']))
 L += ['', '## DO. Odose 系（対照 Onull の既測・処置の基底は仮定＝対照＋d0・無条件率・B=%d）' % R['B']['DO'], '',
       '| 対比 | 仮定の d0 | 処置の基底（仮定） | 対照の基底 | 対照の規模変化 | Δ | 切り詰め | 判定不能 | 解釈条項の発火（当てはめ内） | 札 D1（初段） |', '|---|---|---|---|---|---|---|---|---|---|']
 for r in R['DO']:
@@ -420,7 +451,7 @@ for r in R['DS']:
         L.append('| %.2f／%.2f | %s | %.2f | %.2f | 外した |  |  |  |' % (r['censor_low'], r['censor_high'], r['pattern'], r['d0_pt'], r['delta_pt_32B_minus_4B'])); continue
     L.append('| %.2f／%.2f | %s | %.2f | %.2f | %.3f | %.3f | %.3f | %.3f／%.3f |' % (r['censor_low'], r['censor_high'], r['pattern'], r['d0_pt'], r['delta_pt_32B_minus_4B'], r['undecidable_censor'], r['reject_nominal'], r['card_draft4_nominal'], r['card_D1_nominal'], r['card_D1_holm_first']))
 PSr = R['PS']
-L += ['', '## PS. pt 差の傾きの検定だけの実サイズ（B=%d・目標 名目 %.4f／初段 %.6f・初段の MC の 95%% 半幅 ±%.6f）' % (R['B']['PS'], PSr['targets']['nominal'], PSr['targets']['holm_first'], PSr['mc_halfwidth_holm_first']), '', '- ' + PSr['note'], '',
+L += ['', '## PS. pt 差の傾きの検定だけの実サイズ（B=%d・目標 名目 %.4f／初段 %.6f・初段の MC の %s 半幅 ±%.6f）' % (R['B']['PS'], PSr['targets']['nominal'], PSr['targets']['holm_first'], CIP, PSr['mc_halfwidth_holm_first']), '', '- ' + PSr['note'], '',
       '| 配置 | 残した規模 | 名目（比） | 初段（比） | 当てはめ可能の割合 | 当てはめ可能の中の名目（比）／初段（比） | 当てはめ可能かつ解釈条項なしの割合 | その中の名目／初段 |', '|---|---|---|---|---|---|---|---|']
 for r in PSr['rows']:
     if r['retained'] == 'natural':
@@ -433,11 +464,12 @@ for r in R['R']:
 L += ['', '## E. 床持続（記述）の到達可能性（n=%d・厳密）' % n, '', '| 真の率 | 単一セル | 全規模同時 | Holm 初段（床持続のセル列の数を m とするとき） |', '|---|---|---|---|']
 for r in R['E']['rows']:
     L.append('| %.3f | %.4f | %.5f | %.6f |' % (r['true_rate'], r['single_cell'], r['six_sizes_joint'], r['holm_first_six']))
-L += ['', '- 棄却域 k≤%d（CP 片側上限 <0.05・その境界での実サイズ %.5f）・Holm 初段の棄却域 k≤%d（P(X≤k)=%.6f・P(X≤k+1)=%.6f・α/15=%.6f）' % (R['E']['k_max_cp95'], R['E']['size_at_k_max'], R['E']['k_max_holm_first_m15'], *R['E']['holm_first_boundary_p']), '',
+L += ['', '- 棄却域 k≤%d（CP 片側上限 <%g・その境界での実サイズ %.5f）・Holm 初段の棄却域 k≤%d（P(X≤k)=%.6f・P(X≤k の次)=%.6f・α/%d=%.6f）' % (
+          R['E']['k_max_cp95'], lo, R['E']['size_at_k_max'], R['E']['k_max_holm_first_m15'], R['E']['holm_first_boundary_p'][0], R['E']['holm_first_boundary_p'][1], FLOOR_M, R['E']['holm_first_boundary_p'][2]), '',
       '## N. 門0.5 の帰無の不合格率と検出側（シミュレーション）', '', json.dumps(R['N'], ensure_ascii=False), '', json.dumps(R['N_detection'], ensure_ascii=False), '',
       '## G. 様式門の帰無発火率（二項の差・n=%d 同士・超・厳密）' % n, '', json.dumps(R['G'], ensure_ascii=False), '',
       '## H. 錨帯（厳密・超）', '', json.dumps(R['H'], ensure_ascii=False), '', '## I. 校正腕・撤退条件（合格枝・不合格枝）・門2（厳密・超）', '', json.dumps(R['I'], ensure_ascii=False), '',
       '## M. 環境帯（厳密・超・候補と選択規則・真の率の置き方への依存）', '', json.dumps(R['M'], ensure_ascii=False), '', '## JV. 判定器の方向別の誤判定率の規模間の差の推定の幅', '', json.dumps(R['JV'], ensure_ascii=False), '',
       '本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。']
 open(a.out + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
-print('[power_grid_A v3.2] written %s.{json,md} | D rows %d | DR %d | DC %d | DO %d | elapsed %s s' % (a.out, len(R['D']), len(R['DR']), len(R['DC']), len(R['DO']), R.get('elapsed_s')))
+print('[power_grid_A v3.3] written %s.{json,md} | D rows %d | DR %d | DR_opp %d | DC %d | DO %d | elapsed %s s' % (a.out, len(R['D']), len(R['DR']), len(R['DR_opp']), len(R['DC']), len(R['DO']), R.get('elapsed_s')))

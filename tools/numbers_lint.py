@@ -11,7 +11,7 @@
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, re, sys, ast, json, argparse
-VERSION = 'v2'
+VERSION = 'v2.1'   # v2.1（2026-09-14・採否表 P121・P126）: 生成器の検査で自己検査の関数の中の文字列を除き、限界に記す（組み立て器の既定の範囲に格子の器・共有関数・組み立て器を足した）
 SKIP_CONST = {'bases_4B2507_api', 'contrasts', 'seeds', 'label_combo_table'}
 SKIP_STR = SKIP_CONST | {'formula', 'z', 'cp_upper_rule', 'R_control', 'arms_string', 'id', 'src', 'base_src', 'sha16', 'generator', 'version', 'compared_sources', 'tags', 'models', 'value_word_ban', 'mechanism_word_ban',
                          'weights_formula', 'se_formula', 'interval_formula', 'iut_p', 'holm_rule', 'test', 'python_control', 'runner_sha', 'arm_coding', 'gate'}
@@ -27,7 +27,7 @@ FMT_RE = [re.compile(r'%[-+ #0]*\d*(?:\.\d+)?[sdfegrxiXEG%]'), re.compile(r'\{[A
 NUM = re.compile(r'(?<![A-Za-z0-9_.,])[−\-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?%?')
 KEY_RE = re.compile(r'\{\{([^{}|]+)(?:\|([^{}]+))?\}\}')
 nz = lambda v: '%.10g' % float(v)
-LIMIT = '本器は、原稿の数がキー参照か構造であること（束縛）・文書と正本の説明文の数が正本に登録されていること（登録）・生成器の文字列リテラルに構造でない数が無いこと（生成器）を見る。束縛した数は正本の値に置換されるので、値の取り違えは束縛の対応を誤ったときにしか起きない。構造として除外した型（節番号・日付・版・機種名など）の数は検査しない。正本の値そのものが設計として正しいかは検査しない。'
+LIMIT = '本器は、原稿の数がキー参照か構造であること（束縛）・文書と正本の説明文の数が正本に登録されていること（登録）・生成器の文字列リテラルに構造でない数が無いこと（生成器）を見る。束縛した数は正本の値に置換されるので、値の取り違えは束縛の対応を誤ったときにしか起きない。構造として除外した型（節番号・日付・版・機種名など）の数は検査しない。正本の値そのものが設計として正しいかは検査しない。生成器の検査は docstring と自己検査の関数（_selftest）の中の文字列を検査しない（出力に届かない・採否表 P126）。'
 
 
 def const_set(J):
@@ -178,6 +178,9 @@ def check_gen(path):
     for node in ast.walk(tree):
         if isinstance(node, (ast.Module, ast.FunctionDef, ast.ClassDef)) and node.body and isinstance(node.body[0], ast.Expr) and isinstance(getattr(node.body[0], 'value', None), ast.Constant) and isinstance(node.body[0].value.value, str):
             skip_nodes.add(id(node.body[0].value))
+        if isinstance(node, ast.FunctionDef) and node.name == '_selftest':   # 自己検査の関数の中の文字列は出力に届かない（限界に記す・採否表 P126）
+            for sub in ast.walk(node):
+                skip_nodes.add(id(sub))
         if isinstance(node, ast.Dict):
             for k, v in zip(node.keys, node.values):
                 if isinstance(k, ast.Constant) and k.value in SKIP_STR:

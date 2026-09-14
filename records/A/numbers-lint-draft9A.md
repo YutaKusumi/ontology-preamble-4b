@@ -1,8 +1,8 @@
 # 数の機械検査（機械生成・`tools/numbers_lint.py` v2.1）
 
 - 正本: `design/contrasts-A.json`（説明文 555 件・設計定数の種類 58）
-- 束縛検査（原稿 `records/A/results-report-template-A.src.md`）: 違反 0
-- 登録検査（文書 `records/A/results-report-template-A.md`・§6 と §6-補 を除く）: 未登録 0
+- 束縛検査（原稿 `design/design-stageA-draft9.src.md`）: 違反 0
+- 登録検査（文書 `design/design-stageA-draft9.md`・§6 と §6-補 を除く）: 未登録 0
 - 登録検査（正本の説明文）: 未登録 0
 - 生成器の文字列リテラル検査（`tools/make_contrasts_A.py`）: 構造でない数 0
 - 生成器の文字列リテラル検査（`tools/design_facts_A.py`）: 構造でない数 0
