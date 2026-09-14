@@ -1,4 +1,7 @@
-# firth_check_A.R v1 -- R logistf side of the Firth consistency check (driven by tools/firth_check_A.py; 2026-09-13).
+# firth_check_A.R v1.1 -- R logistf side of the Firth consistency check (driven by tools/firth_check_A.py; 2026-09-13).
+# v1.1 (2026-09-14, deviation D-33, registrant decision (A)): each penalized likelihood ratio test now tests only the named coefficient,
+#   passing its integer index in the ordered effects to logistftest. v1 passed test = ~ . - term, which tests every other coefficient
+#   including the intercept (R df 3 and 6 in run 1). Tolerances, datasets, R control, Python control and the compared quantities are unchanged.
 # Usage: Rscript tools/firth_check_A.R <workdir> "<logistf.control(...) expression from contrasts-A.json firth_check.R_control>"
 # Writes <workdir>/r_results.csv (dataset, quantity, term, value with 17 significant digits), <workdir>/r_session.txt,
 # and exports the bundled datasets (sex2, and endometrial when bundled) to CSV so that firth.py fits the identical data.
@@ -22,7 +25,9 @@ run <- function(ds, fml, dat, terms) {
   for (nm in names(cf)) add(ds, "coef", nm, cf[[nm]])
   add(ds, "loglik_full", "full", full_loglik(f))
   for (tt in terms) {
-    tr <- logistftest(f, test = as.formula(paste("~ . -", tt)), control = ctl)
+    j <- match(tt, names(cf))
+    if (is.na(j)) stop(paste("term not found among the coefficients:", tt))
+    tr <- logistftest(f, test = j, control = ctl)   # v1.1: test only this coefficient (logistf documents integer indexes of the ordered effects); v1 used ~ . - term, which tests all other coefficients including the intercept (deviation D-33)
     ll <- as.numeric(tr$loglik)
     add(ds, "test_loglik_1", tt, ll[1])
     add(ds, "test_loglik_2", tt, ll[2])
