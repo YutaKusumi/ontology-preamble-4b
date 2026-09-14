@@ -1,0 +1,14 @@
+[source] 2026-09-14 05:11:59 UTC transcript line 17667 timestamp 2026-09-14T05:02:27.494Z message chars=68477 sha16(utf-8)=C9BBFB8C20833115
+[verbatim] gemini-1/review.md sha16=E430D4601DE4E5F2 lines=205 bytes=23780 body_chars=12730
+[verbatim] gemini-2/review.md sha16=16CC912FF95B5DA1 lines=141 bytes=14433 body_chars=7033
+[verbatim] grok-1/review.md sha16=544F0EDDADB1894C lines=146 bytes=17569 body_chars=9008
+[verbatim] grok-2/review.md sha16=E807D08C7B82C84F lines=115 bytes=13479 body_chars=6986
+[verbatim] claude-1/review-part1-interim.md sha16=0F55E281D8BAA481 lines=131 bytes=15864 body_chars=7749
+[verbatim] claude-1/review-part2-continued.md sha16=8D99175DC35F6CD0 lines=146 bytes=20123 body_chars=9650
+[verbatim] claude-2/review-chat-summary.md sha16=8BBAB5096237AF63 lines=11 bytes=3098 body_chars=1242
+[verbatim] claude-3/review.md sha16=38120D0396127357 lines=237 bytes=28589 body_chars=13753
+[verbatim] claude-2/review-detail-attached.md sha16=3B3F6461601F1C22 lines=236 bytes=33054 (byte copy of the attached file)
+[prereg] 2026-09-14 05:19:28 UTC preregistration-reproduction-A-final.md sha256=d66d156cfda6d1dfc880f1a033f004dc2666ccd6ba063b353d4a23ab58ff3c9c lines=123 (recorded before any reproduction)
+[run1] 2026-09-14 ~05:55 UTC verify_review_final_A.py (tool sha16=76A2D16F3F85AFB2) -> verification-final-A.md sha16=C3C6EB2F090C4832 json sha16=4FCBFAD99EDD8F69 counts 再現37・一部再現8・再現しない2・検査不能0 (superseded: M10 line not parsed because of nested parentheses; W94 detail flag checked the whole file instead of the build_report call; copy kept outside the repo)
+[fix] 2026-09-14 05:57:11 UTC tool edited (nested-parentheses regex, M8 reason fields, M10 keep/label comparison and verdict, W94 build_report call check) -> tool sha16=769AE45BB414B1D5; run2 started
+[run2] 2026-09-14 06:10:24 UTC verify_review_final_A.py (tool sha16=769AE45BB414B1D5) -> verification-final-A.md sha16=3418699634B8D107 json sha16=8176F132C56CC6B7 generated 2026-09-14 06:09 UTC seconds 743 counts 再現38・一部再現7・再現しない2・検査不能0 tracked-changes before/after: none/none (this run is the record)
