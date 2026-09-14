@@ -1,0 +1,68 @@
+{
+ "kind": "integrity_A",
+ "version": "v1.1",
+ "generated_utc": "2026-09-14 10:28",
+ "tag": "idA",
+ "phase": "identity",
+ "root": null,
+ "allow_fields": [
+  "status",
+  "trial_id",
+  "trial_index",
+  "arm",
+  "run_key",
+  "runner_sha",
+  "arms_spec",
+  "preamble_sha",
+  "format_fail",
+  "seed",
+  "model",
+  "sampling",
+  "tag",
+  "scenario",
+  "timestamp",
+  "timestamp_end",
+  "dry_run"
+ ],
+ "runs": [
+  {
+   "run_key": "idA__N1__none__seed60001",
+   "model": "4B-2507",
+   "scenario": "N1",
+   "seed": 60001,
+   "rows": 2080,
+   "target": 2080,
+   "n_ok": 2080,
+   "api_error": 0,
+   "format_fail": 0,
+   "duplicates": 0,
+   "missing_index": 0,
+   "arms": 13,
+   "runner_sha": [
+    "9F849D2823132BA2"
+   ],
+   "preamble_mismatch": [],
+   "checks": {
+    "rows": true,
+    "api_error": true,
+    "duplicates": true,
+    "missing_index": true,
+    "per_arm_even": true,
+    "runner_sha": true,
+    "arms_spec": true,
+    "preamble_sha": true,
+    "model": true,
+    "sampling": true,
+    "local_env": true
+   },
+   "problems": [],
+   "ok": true,
+   "local_env_gpu": "NVIDIA L4, 23034 MiB, 580.82.07",
+   "vllm": "0.29.0"
+  }
+ ],
+ "bad_runs": 0,
+ "verdict": "全走行 整合",
+ "note": "判定欄（catastrophe・choice・refuse_class 等）を読まない。format_fail は書式外の件数（破局率ではない）。",
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

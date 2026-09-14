@@ -1,0 +1,131 @@
+{
+ "tag": "idA",
+ "model": "4B-2507",
+ "session": 1,
+ "phase": "identity",
+ "run_keys": [
+  "idA__N1__none__seed60001"
+ ],
+ "started": "2026-09-14T09:36:30Z",
+ "runner_rc": {
+  "idA__N1__none__seed60001": [
+   0
+  ]
+ },
+ "preemptions": {
+  "idA__N1__none__seed60001": 0.0
+ },
+ "counts": {
+  "idA__N1__none__seed60001": {
+   "rows": 2080,
+   "n_ok": 2080,
+   "target": 2080,
+   "redo_errors": 0
+  }
+ },
+ "model_rev_full": {
+  "4B-2507": {
+   "id": "Qwen/Qwen3-4B-Instruct-2507",
+   "registered": "cdbee75f17c0",
+   "full": "cdbee75f17c01a7cc42f958dc650907174af0554",
+   "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554"
+  }
+ },
+ "server_args": {
+  "4B-2507": {
+   "dtype": "bfloat16",
+   "max_model_len": 8192,
+   "gpu_memory_utilization": 0.9,
+   "seed": 0,
+   "port": 8000,
+   "served_model_name": "Qwen/Qwen3-4B-Instruct-2507",
+   "vllm": "0.29.0"
+  }
+ },
+ "env_value": "L4",
+ "env_override": null,
+ "gpu": "NVIDIA L4, 23034",
+ "memory_class_gb": 24,
+ "concurrency": 24,
+ "versions": {
+  "vllm": "0.29.0",
+  "torch": "2.13.0",
+  "transformers": "5.16.1",
+  "tokenizers": "0.23.1",
+  "huggingface_hub": "1.29.0",
+  "pip_freeze_sha16": "8552ECB9D2A50ADF"
+ },
+ "pip_freeze_sha16": "8552ECB9D2A50ADF",
+ "repo_head": "c6be5c94cff326b9a8b5c4501b1ce331bc730185",
+ "commit": "c6be5c94cff326b9a8b5c4501b1ce331bc730185",
+ "commit_fixed": true,
+ "runner_sha16": "9F849D2823132BA2",
+ "model_rev": "cdbee75f17c0",
+ "calibration_branch": null,
+ "dev_marks": [],
+ "boot": "v2",
+ "clause": "本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。",
+ "updated": "2026-09-14T10:11:58Z",
+ "log": [
+  {
+   "step": "repo",
+   "t": 32.1,
+   "at": "2026-09-14T09:33:12Z",
+   "head": "c6be5c94cff3",
+   "commit_fixed": true,
+   "runner_sha16": "9F849D2823132BA2",
+   "persist": "/content/drive/MyDrive/op4b-stageA"
+  },
+  {
+   "step": "gpu",
+   "t": 32.1,
+   "at": "2026-09-14T09:33:12Z",
+   "gpu": "NVIDIA L4, 23034",
+   "env_value": "L4",
+   "memory_class_gb": 24
+  },
+  {
+   "step": "pip",
+   "t": 229.6,
+   "at": "2026-09-14T09:36:30Z",
+   "versions": {
+    "vllm": "0.29.0",
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.1",
+    "huggingface_hub": "1.29.0",
+    "pip_freeze_sha16": "8552ECB9D2A50ADF"
+   }
+  },
+  {
+   "step": "server",
+   "t": 517.7,
+   "at": "2026-09-14T09:41:18Z",
+   "model": "4B-2507",
+   "rev": "cdbee75f17c0"
+  },
+  {
+   "step": "run",
+   "t": 2356.3,
+   "at": "2026-09-14T10:11:57Z",
+   "run_key": "idA__N1__none__seed60001",
+   "rc": [
+    0
+   ],
+   "rows": 2080,
+   "n_ok": 2080,
+   "target": 2080,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 1838.6
+  }
+ ],
+ "ended": "2026-09-14T10:11:58Z",
+ "files_sha16_lf": {
+  "idA/idA__N1__none__seed60001/cells.json": "4D2E3FE148840CA6",
+  "idA/idA__N1__none__seed60001/manifest.json": "C2DDD583477340DF",
+  "idA/idA__N1__none__seed60001/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "22B980D2C902F8E1",
+  "idA/idA__N1__none__seed60001/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "5B75C94C6B8955FA"
+ },
+ "wall_s": 2357.3
+}
