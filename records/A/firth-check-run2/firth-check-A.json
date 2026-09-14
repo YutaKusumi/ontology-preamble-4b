@@ -1,0 +1,282 @@
+{
+ "generated_utc": "2026-09-14 12:01",
+ "verdict": "PASS",
+ "tolerances": {
+  "coef_abs": 1e-06,
+  "penalized_loglik_abs": 1e-06,
+  "plr_stat_abs": 1e-05
+ },
+ "rule": "すべての量が許容差の内側なら合格。一つでも外れたら不合格として凍結を止め、原因を記録する（許容差を後から動かさない）。",
+ "R_session": [
+  "R version 4.6.1 (2026-06-24)",
+  "logistf 1.26.1",
+  "endometrial bundled: FALSE"
+ ],
+ "R_control": "logistf.control(maxit=1000, maxhs=50, maxstep=5, lconv=1e-12, gconv=1e-12, xconv=1e-12)",
+ "python_control": {
+  "gtol": 1e-12,
+  "tol": 1e-14,
+  "max_iter": 5000
+ },
+ "firth_py_sha16": "CE584FDF2AE79930",
+ "firth_version": "v2.1",
+ "contrasts_sha16": "8B298F126E77CBE6",
+ "datasets": {
+  "synth_rising_ptconst": {
+   "coef_max_abs_diff": 5.998034280363385e-08,
+   "penalized_loglik_abs_diff": 4.547473508864641e-13,
+   "plr_stat_max_abs_diff": 4.547473508864641e-13,
+   "pass": true,
+   "python": {
+    "coef": {
+     "(Intercept)": 0.29961454344825106,
+     "arm": 0.8893384763075951,
+     "z": 0.6659500274088789,
+     "arm:z": 0.2730157327314316
+    },
+    "loglik_full": -1242.6128288963637,
+    "converged": true,
+    "score_max": 7.602807272633072e-13,
+    "tests": {
+     "arm:z": {
+      "loglik_restricted": -1248.2083780262003,
+      "stat": 11.191098259673254,
+      "converged": true
+     }
+    }
+   },
+   "R": {
+    "coef": {
+     "(Intercept)": 0.29961460342859386,
+     "arm": 0.8893384746798609,
+     "z": 0.6659500337999679,
+     "arm:z": 0.2730157190365874
+    },
+    "loglik_full": {
+     "full": -1242.6128288963641
+    },
+    "test_loglik_1": {
+     "arm:z": -1242.6128288963641
+    },
+    "test_loglik_2": {
+     "arm:z": -1248.2083780262005
+    },
+    "test_stat": {
+     "arm:z": 11.191098259672799
+    },
+    "test_df": {
+     "arm:z": 1.0
+    },
+    "test_prob": {
+     "arm:z": 0.0008219068286819953
+    }
+   }
+  },
+  "synth_mid_delta": {
+   "coef_max_abs_diff": 6.393402871007758e-08,
+   "penalized_loglik_abs_diff": 9.094947017729282e-13,
+   "plr_stat_max_abs_diff": 1.8189894035458565e-12,
+   "pass": true,
+   "python": {
+    "coef": {
+     "(Intercept)": -0.059506231969568564,
+     "arm": 0.1396142103447053,
+     "z": 0.012961878444256803,
+     "arm:z": 0.3425709644550203
+    },
+    "loglik_full": -1615.4847541328086,
+    "converged": true,
+    "score_max": 1.4921397450962104e-13,
+    "tests": {
+     "arm:z": {
+      "loglik_restricted": -1630.536914075607,
+      "stat": 30.10431988559685,
+      "converged": true
+     }
+    }
+   },
+   "R": {
+    "coef": {
+     "(Intercept)": -0.059506168035539854,
+     "arm": 0.13961420304980263,
+     "z": 0.012961878765156495,
+     "arm:z": 0.34257097211958953
+    },
+    "loglik_full": {
+     "full": -1615.4847541328095
+    },
+    "test_loglik_1": {
+     "arm:z": -1615.4847541328095
+    },
+    "test_loglik_2": {
+     "arm:z": -1630.536914075607
+    },
+    "test_stat": {
+     "arm:z": 30.104319885595032
+    },
+    "test_df": {
+     "arm:z": 1.0
+    },
+    "test_prob": {
+     "arm:z": 4.094181904612526e-08
+    }
+   }
+  },
+  "synth_floor_sparse": {
+   "coef_max_abs_diff": 7.743837668328091e-08,
+   "penalized_loglik_abs_diff": 1.7053025658242404e-13,
+   "plr_stat_max_abs_diff": 2.2737367544323206e-13,
+   "pass": true,
+   "python": {
+    "coef": {
+     "(Intercept)": -3.4203521569239492,
+     "arm": -0.15576749384955846,
+     "z": 0.08521590756289225,
+     "arm:z": 0.4416691009698489
+    },
+    "loglik_full": -340.48012221749946,
+    "converged": true,
+    "score_max": 2.7688962234151404e-13,
+    "tests": {
+     "arm:z": {
+      "loglik_restricted": -343.36425722630423,
+      "stat": 5.768270017609552,
+      "converged": true
+     }
+    }
+   },
+   "R": {
+    "coef": {
+     "(Intercept)": -3.42035215337933,
+     "arm": -0.15576741641118177,
+     "z": 0.08521590758321541,
+     "arm:z": 0.44166910366318796
+    },
+    "loglik_full": {
+     "full": -340.4801222174996
+    },
+    "test_loglik_1": {
+     "arm:z": -340.4801222174996
+    },
+    "test_loglik_2": {
+     "arm:z": -343.3642572263045
+    },
+    "test_stat": {
+     "arm:z": 5.76827001760978
+    },
+    "test_df": {
+     "arm:z": 1.0
+    },
+    "test_prob": {
+     "arm:z": 0.016318090794132045
+    }
+   }
+  },
+  "sex2": {
+   "coef_max_abs_diff": 2.537085268400352e-07,
+   "penalized_loglik_abs_diff": 8.810729923425242e-13,
+   "plr_stat_max_abs_diff": 7.389644451905042e-13,
+   "pass": true,
+   "python": {
+    "coef": {
+     "(Intercept)": 0.12025404913384434,
+     "age": -1.1059813313812878,
+     "oc": -0.06881672706192078,
+     "vic": 2.2688746522391368,
+     "vicl": -2.111408185303219,
+     "vis": -0.7883169513966984,
+     "dia": 3.096011827351058
+    },
+    "loglik_full": -132.5393795328443,
+    "converged": true,
+    "score_max": 2.23487894857044e-13,
+    "tests": {
+     "age": {
+      "loglik_restricted": -136.29324499531327,
+      "stat": 7.50773092493796,
+      "converged": true
+     },
+     "oc": {
+      "loglik_restricted": -132.5517147506549,
+      "stat": 0.024670435621203524,
+      "converged": true
+     },
+     "vic": {
+      "loglik_restricted": -144.00507464431692,
+      "stat": 22.931390222945254,
+      "converged": true
+     },
+     "vicl": {
+      "loglik_restricted": -142.09141579351626,
+      "stat": 19.104072521343937,
+      "converged": true
+     },
+     "vis": {
+      "loglik_restricted": -134.38808441022888,
+      "stat": 3.6974097547691827,
+      "converged": true
+     },
+     "dia": {
+      "loglik_restricted": -136.48784522626065,
+      "stat": 7.896931386832705,
+      "converged": true
+     }
+    }
+   },
+   "R": {
+    "coef": {
+     "(Intercept)": 0.1202537954253175,
+     "age": -1.1059812942965277,
+     "oc": -0.06881669325325133,
+     "vic": 2.268874869713963,
+     "vicl": -2.1114083396812307,
+     "vis": -0.7883169531040607,
+     "dia": 3.096012010717043
+    },
+    "loglik_full": {
+     "full": -132.53937953284517
+    },
+    "test_loglik_1": {
+     "age": -132.53937953284517,
+     "oc": -132.53937953284517,
+     "vic": -132.53937953284517,
+     "vicl": -132.53937953284517,
+     "vis": -132.53937953284517,
+     "dia": -132.53937953284517
+    },
+    "test_loglik_2": {
+     "age": -136.29324499531424,
+     "oc": -132.55171475065572,
+     "vic": -144.00507464431743,
+     "vicl": -142.09141579351726,
+     "vis": -134.38808441022985,
+     "dia": -136.48784522626164
+    },
+    "test_stat": {
+     "age": 7.50773092493813,
+     "oc": 0.024670435621089837,
+     "vic": 22.931390222944515,
+     "vicl": 19.104072521344165,
+     "vis": 3.697409754769353,
+     "dia": 7.896931386832932
+    },
+    "test_df": {
+     "age": 1.0,
+     "oc": 1.0,
+     "vic": 1.0,
+     "vicl": 1.0,
+     "vis": 1.0,
+     "dia": 1.0
+    },
+    "test_prob": {
+     "age": 0.006143471845088344,
+     "oc": 0.875191058626484,
+     "vic": 1.6788769586773e-06,
+     "vicl": 1.237804762810324e-05,
+     "vis": 0.054497008061534236,
+     "dia": 0.0049518733863898046
+    }
+   }
+  }
+ }
+}
