@@ -1,0 +1,186 @@
+{
+ "kind": "freeze_A",
+ "version": "v3.1",
+ "generated_utc": "2026-09-15 21:00",
+ "design": "design/design-stageA-FROZEN.md",
+ "sha16_rule": "SHA-256 の先頭 16 桁（CRLF→LF 正規化・strip なし）",
+ "files": {
+  "design/design-stageA-FROZEN.md": "C30AF752D3531904",
+  "design/design-stageA-FROZEN.src.md": "0CB2AA17FBBDC588",
+  "tools/make_contrasts_A.py": "BBC686D06663DF6C",
+  "tools/confirm_A.py": "54758AEE98441723",
+  "tools/bands_A.py": "BFF15C1D51957E26",
+  "tools/runs_A.py": "A57BE1F5EEACBBB2",
+  "tools/zaxis_A.py": "7CEA376E48C38575",
+  "tools/firth.py": "CE584FDF2AE79930",
+  "tools/firth_check_A.py": "941A54BA051CE05F",
+  "tools/firth_check_A.R": "E84594636163FFA2",
+  "tools/power_grid_A.py": "5AFE39E30EFE2301",
+  "tools/design_facts_A.py": "FFA3741ECFDDBBE8",
+  "tools/numbers_lint.py": "88B6A53BBEC80602",
+  "tools/build_draftA.py": "9EB4648F94E3808E",
+  "tools/run_preamble_local.py": "9F849D2823132BA2",
+  "tools/colab/boot_stageA.py": "61EA4467659670B1",
+  "tools/identity_screen_A.py": "759F005CDF01FA6C",
+  "tools/gate_A.py": "61CF8B2467722CDC",
+  "tools/calib_band_A.py": "DEE5EB3EDE884A50",
+  "tools/control_chart_A.py": "1958DFA2CC6F69CE",
+  "tools/analyze_A.py": "15B01F67C4A990B3",
+  "tools/response_mode_A.py": "C3E90B11B62F67A5",
+  "tools/integrity_A.py": "27D1677F28C3A0D9",
+  "tools/sample_inspection_A.py": "3207FE96305D0E5C",
+  "tools/judge_fragments_A.py": "EBBC87C4EF74AC0A",
+  "tools/synth_A.py": "32A2ADB6B5BD20B5",
+  "tools/synth_gates_A.py": "7ECC303483FF4D55",
+  "tools/build_report_A.py": "346783827B574866",
+  "tools/report_lint.py": "1F145D63983929EE",
+  "tools/freeze_A.py": "964B564071A134FD",
+  "tools/cost_facts.py": "9FB5C64C4CB63A80",
+  "tools/response_mode_M.py": "5C57C0ACACB38713",
+  "tools/response_mode_F.py": "3E3838FD69B15E2F",
+  "tools/tooling_interpretations_A.py": "D03A6396627458C3",
+  "tools/make_predictions_form_A.py": "E48D5EAD3D294136",
+  "tools/compare_predictions_A.py": "A179CB8B8E5080FE",
+  "design/contrasts-A.json": "F0C2FF897C78C4C0",
+  "records/A/power-grid-A.json": "58F3B9BA26C6CF61",
+  "records/A/power-grid-A.md": "ACE8A4BDF8815A27",
+  "records/A/design-facts-A.json": "CA116EC39DADEECD",
+  "records/A/design-facts-A.md": "945DD38717F47CAB",
+  "records/A/hf-models-A.json": "D012DE529678C4EE",
+  "records/A/results-report-template-A.src.md": "E8C21539CBD45B8F",
+  "records/A/results-report-template-A.md": "4C34D83163E76402",
+  "records/A/identity-screen-A.json": "8378512CCEEE8CC6",
+  "records/A/identity-screen-A.md": "C1FE7C45A212113B",
+  "records/A/firth-check-A.json": "E613274980F7D67D",
+  "records/A/firth-check-A.md": "84B97CF392548D23",
+  "arms/panel/SHA-LEDGER.json": "DC890AA03AB06EA4",
+  "arms/frozen-from-ryokai-os/app-scenarios.json": "7AD7E49459D5C402",
+  "arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py": "12EAA8B845BC0A2F",
+  "arms/frozen-from-ryokai-os/armsE/preamble-O.md": "F3EE60C33F825575",
+  "arms/frozen-from-ryokai-os/armsE/preamble-Onull.md": "2123B3CD8586E7DF",
+  "arms/frozen-from-ryokai-os/armsE/preamble-Lneg.md": "A16E20E4827D9C86",
+  "design/contrasts-F.json": "F1996D08C2671134",
+  "arms/materials-draft/hei/refuse-rules-v2.json": "22625AEC81875362",
+  "arms/materials-draft/hei/incentive-lexicon-v2.json": "F3D7568C2FDA0BB7",
+  "arms/panelF/SHA-LEDGER-F.json": "F91B2637FE83D3A1",
+  "arms/panelM/SHA-LEDGER-M.json": "1E41B95C71AC1191",
+  "records/F/style-stageF1.json": "F200FC75F45A9017",
+  "records/A/tooling-interpretations-A.md": "E8214D4ACA8EF20D",
+  "records/cost-pilot/cost-facts-2026-09-13.md": "DA4C999F6C1C5D89",
+  "records/predictions/predictions-form-A-v0.8.html": "2B16E8247A86159C",
+  "records/predictions/predictions-form-Vprime-v0.5.html": "FE51333579BFADC1",
+  "arms/panel/Osec.md": "3D0E78BB21133BB0",
+  "arms/panel/Nk.md": "47C3CC833B96F7A3",
+  "arms/panel/Odose1.md": "04CF2F31B6B921B5",
+  "arms/panel/Odosehalf.md": "C8C3EEAF010D4179",
+  "arms/panel/Ncold.md": "E4AB5608C58913E5",
+  "arms/panel/Nstr.md": "84EC1A8C8B931B35",
+  "arms/panel/O-Ncold.md": "060D77170FEC8B06",
+  "arms/panel/Onull-Ncold.md": "A60EB61825C6CCB3",
+  "arms/panel/Osec-Ncold.md": "0AA8B4FDF72E3893",
+  "records/A/synth-A-2026-09-14.json": "EFF5F33E7660FBB0",
+  "records/A/synth-A-2026-09-14b.json": "2F90994D796B5253",
+  "records/A/synth-A-2026-09-14.md": "FAFF9A65F1C066CE",
+  "records/A/synth-A-2026-09-14b.md": "4C3406B1D8E17064",
+  "records/A/synth-gates-A-2026-09-14.json": "5D1C649F27234764",
+  "records/A/synth-gates-A-2026-09-14b.json": "DE10CF9EFA832FD6",
+  "records/A/synth-gates-A-2026-09-14.md": "259D2C35FB99B0EC",
+  "records/A/synth-gates-A-2026-09-14b.md": "0D9F17073AA7BC49",
+  "records/A/numbers-lint-draft5A.md": "16A3B2F11E305D37",
+  "records/A/numbers-lint-draft6A.md": "DC7D39A3052C8FE2",
+  "records/A/numbers-lint-draft7A.md": "CD332DFF2EE7B80C",
+  "records/A/numbers-lint-draft8A.md": "F2F6F734A8B8F305",
+  "records/A/numbers-lint-draft9A.md": "612D964A09A410B7",
+  "records/A/numbers-lint-template-A.md": "203CC883EA35E7D7"
+ },
+ "frames_checked": [
+  "対照腕の基底率",
+  "全対比の並記表",
+  "札 × 状況の読み文",
+  "対比別の検出域",
+  "到達の見込みと測れた効果種",
+  "判定器の妥当性",
+  "感度閾値での札",
+  "圧の内訳",
+  "臨界規模",
+  "降格・保留の三行",
+  "対照どうしの差"
+ ],
+ "design_contrasts_sha16": "F0C2FF897C78C4C0",
+ "selftests": [
+  {
+   "tool": "confirm_A.py",
+   "sha16": "54758AEE98441723",
+   "args": [
+    "--selftest"
+   ],
+   "rc": 0,
+   "tail": " Holm・第一適合の順を正本から独立に組んだ照合 48 組\n7 v1.3: 模擬の名目は p<α（p=α ちょうどは名目に数えない）・初段は p≤α/m（採否表 P132）\n8 v1.3: 門2 の縮小と非収束が重なった対比は、行 id と札を変えずに規則に理由を二つとも並べる（採否表 P130）\n9 v1.3: 「少なくとも一本」のデルタ法の区間（等しい確率の場合の式と一致）・向きの判定（下端が閾値以上・またぐ・届かない）・正本の水準と両向き（登録者裁定 D27・D28）"
+  },
+  {
+   "tool": "firth.py",
+   "sha16": "CE584FDF2AE79930",
+   "args": [
+    "--selftest"
+   ],
+   "rc": 0,
+   "tail": " 1.1423・p 0.2852・収束 True\n4 分離 完全分離（対照すべて 0・処置すべて n）: β₃ 0.2686・統計量 0.0388・p 0.8439・収束 True\n5 あふれ（z × 50・段差のある率）: 全模型 3.7486・制約 3.7486（有限）\n6 converged: max_iter=1 で False・既定で True（反復 5）・max_iter=5（ちょうど収束の反復）で True\nfirth.py v2.1 SELFTEST PASS"
+  },
+  {
+   "tool": "bands_A.py",
+   "sha16": "BFF15C1D51957E26",
+   "args": [
+    "--selftest"
+   ],
+   "rc": 0,
+   "tail": "bands_A.py v1 SELFTEST PASS\n1 一標本の下側: n=1〜500・二つの帯で整数境界と分数の比較が一致\n2 二標本の両側と下側: 乱数 20,000 組で分数の比較と整数演算が一致\n3 diff_tail: 三組で判定関数による逐一の和と一致（差 < 1e-12）"
+  },
+  {
+   "tool": "numbers_lint.py",
+   "sha16": "88B6A53BBEC80602",
+   "args": [
+    "--selftest"
+   ],
+   "rc": 0,
+   "tail": "numbers_lint.py v2.1 SELFTEST PASS（マスクの検査例 11・束縛・未束縛・登録）"
+  },
+  {
+   "tool": "report_lint.py",
+   "sha16": "1F145D63983929EE",
+   "args": [
+    "--selftest"
+   ],
+   "rc": 0,
+   "tail": "・12 GB・段 7・費用の行の別の数がすべて違反（9 件）\n3 区画の中身の書き換えは記録との不一致・記録が無ければ違反\n4 打ち込んでよい型（費用の行の一つの数・逸脱番号・日付・SHA16）は違反にしない\n5 write_sidecar・sidecar_path の往復\n6 v2.1: 到達の見込みの欄が代わりの文字列の報告は違反（採否表 P128）\n7 v2.1: 集計の検査用の印が「なし」でない報告は違反・検査用の口では許す・「なし」は違反にしない（採否表 P133）"
+  },
+  {
+   "tool": "judge_fragments_A.py",
+   "sha16": "EBBC87C4EF74AC0A",
+   "args": [
+    "selftest"
+   ],
+   "rc": 0,
+   "tail": "とめが止まる\n6g v2.3 照合記号: 字の範囲の外の記号が閾値を超えたファイルはやり直しが要る状態になり採点が止まる・やり直しを貼ると ok になり採点が通る・やり直しでも記号の無い行で超えたファイルは読めなかった扱いで、そのラベルは対から外れて件数に出る（登録者裁定 D42）\n7 採点: 封印の記録と SHA-256 が合わない鍵で止まる・鍵の保存値を変えると断片の本文からの再計算との不一致で止まる\n8 採点の後の鍵の公開: 置いた鍵の SHA-256 が封印の値と一致"
+  },
+  {
+   "tool": "sample_inspection_A.py",
+   "sha16": "3207FE96305D0E5C",
+   "args": [
+    "selftest"
+   ],
+   "rc": 0,
+   "tail": "}\nsample_inspection_A.py v1.2 SELFTEST PASS\n1 extract: 対応表の置き場がリポジトリの中なら何も書かずに止まる（登録者裁定 D32）\n2 extract: 標本に機械分類を印字しない・対応表と機械分類の集計はリポジトリの外・封印の記録の SHA-256 が対応表と一致\n3 score: 目視の分類と機械分類の一致と混同の表（一件を変えると一致 1/2）\n4 score: 封印の記録と SHA-256 が合わない対応表で止まる"
+  },
+  {
+   "tool": "compare_predictions_A.py",
+   "sha16": "A179CB8B8E5080FE",
+   "args": [
+    "--selftest"
+   ],
+   "rc": 0,
+   "tail": "SELFTEST PASS（compare_predictions_A v1: 向き・床持続・全体の件数・欠け・選択肢の外・予想者・様式の名・すべて予想しない・帯の端・計算の記録の欠け）"
+  }
+ ],
+ "public_check": "凍結の公開の後に python tools/freeze_A.py --verify-public <このマニフェスト> --commit <公開のコミットの完全な SHA> と --commit main の二度で公開物を照合し、結果を凍結記録に書く（採否表 P107）",
+ "clause": "本マニフェストのいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
