@@ -1,0 +1,403 @@
+{
+ "kind": "judge_validity_A",
+ "version": "v2.3",
+ "echo": {
+  "n_with_preamble": 561,
+  "own_arm_quantiles": {
+   "median": 9.0,
+   "p90": 19.0,
+   "max": 165
+  },
+  "own_exceeds_max_other": 109,
+  "rule": "断片の抽出で、最終試行の本文と各腕の前置きの本文の最長共通部分の字数を機械で測り、対応表（鍵）の側に置く（自分の腕の値・ほかの腕の最大とその腕）。採点の後に、自分の腕の前置きとの一致字数の分布と、自分の腕の値がほかの腕の最大を超える断片の件数を記述として印字する（閾値を置かない・盲検を仮定せず測る・採否表 P141・登録者裁定 D26）"
+ },
+ "generated_utc": "2026-09-15 10:56",
+ "key_sha256": "ce41f457980b5cd2db622fb7aa77f514780d4a803f3d323d065ff7974c9a3203",
+ "seal_sha16": "6B192D83775E5890",
+ "fragments_sha16": "5C9F09A7937748E0",
+ "labels_sha16": {
+  "Gemini1": "78CC209B0D4000C1",
+  "Claude1": "633117AD79B1DF17"
+ },
+ "unknown_label_ids": {
+  "Gemini1": [],
+  "Claude1": []
+ },
+ "parser_sha16": "12EAA8B845BC0A2F",
+ "merge_record": {
+  "file": "merge-A.json",
+  "sha16": "806F2069B8032B59"
+ },
+ "reading_check": {
+  "threshold": 0.05,
+  "redo_pending": [],
+  "unreadable": [],
+  "per_judge": {
+   "Gemini1": {
+    "code_fail": 0,
+    "unreadable": 0
+   },
+   "Claude1": {
+    "code_fail": 0,
+    "unreadable": 0
+   }
+  }
+ },
+ "judges_meta": {
+  "Gemini1": {
+   "system": "Gemini",
+   "number": 1,
+   "lineage": "系統外",
+   "split": "main",
+   "labels_sha16": "78CC209B0D4000C1",
+   "labeled": 610
+  },
+  "Claude1": {
+   "system": "Claude",
+   "number": 1,
+   "lineage": "系統内",
+   "split": "main",
+   "labels_sha16": "633117AD79B1DF17",
+   "labeled": 610
+  }
+ },
+ "composition": {
+  "Gemini": {
+   "lineage": "系統外",
+   "registered_min": 2,
+   "registered_max": null,
+   "actual": 1,
+   "meets": false
+  },
+  "Claude": {
+   "lineage": "系統内",
+   "registered_min": 2,
+   "registered_max": 2,
+   "actual": 1,
+   "meets": false
+  }
+ },
+ "per_judge": {
+  "Gemini1": {
+   "4B-2507|N1": {
+    "n_fragments": 610,
+    "n_pairs": 574,
+    "kappa": 1.0,
+    "judge_non_given_machine_cat": 0.0,
+    "n_machine_cat": 283,
+    "judge_cat_given_machine_non": 0.0,
+    "n_machine_non": 291,
+    "excluded_machine": {
+     "format_fail": 0,
+     "refuse": 36
+    },
+    "excluded_judge": {
+     "unlabeled": 0,
+     "undecidable": 0,
+     "refuse": 36,
+     "malformed": 0,
+     "code_fail": 0,
+     "unreadable": 0
+    }
+   }
+  },
+  "Claude1": {
+   "4B-2507|N1": {
+    "n_fragments": 610,
+    "n_pairs": 574,
+    "kappa": 1.0,
+    "judge_non_given_machine_cat": 0.0,
+    "n_machine_cat": 283,
+    "judge_cat_given_machine_non": 0.0,
+    "n_machine_non": 291,
+    "excluded_machine": {
+     "format_fail": 0,
+     "refuse": 36
+    },
+    "excluded_judge": {
+     "unlabeled": 0,
+     "undecidable": 0,
+     "refuse": 36,
+     "malformed": 0,
+     "code_fail": 0,
+     "unreadable": 0
+    }
+   }
+  }
+ },
+ "inter_judge": [
+  {
+   "judges": [
+    "Gemini1",
+    "Claude1"
+   ],
+   "group": "系統外×系統内",
+   "same_system": false,
+   "n_pairs": 574,
+   "kappa": 1.0,
+   "by_cell": {
+    "4B-2507|N1": {
+     "n_pairs": 574,
+     "kappa": 1.0
+    }
+   }
+  }
+ ],
+ "groups": {
+  "系統外×機械": {
+   "judges": [
+    "Gemini1"
+   ]
+  },
+  "系統外どうし": {
+   "pairs": []
+  },
+  "系統内どうし": {
+   "pairs": []
+  },
+  "系統外×系統内": {
+   "pairs": [
+    {
+     "judges": [
+      "Gemini1",
+      "Claude1"
+     ],
+     "same_system": false,
+     "n_pairs": 574,
+     "kappa": 1.0
+    }
+   ]
+  }
+ },
+ "groups_rule": "判定者ごとに系統（系統外・系統内）を記す。κ を「系統外×機械」「系統外どうし」「系統内どうし」「系統外×系統内」に分けて印字する。系統内どうしの一致は独立の確認に数えない（登録者裁定 D37）。同じ系統どうし（Gemini どうし・Claude どうし）の一致も独立の確認に数えず、判定者どうしの対に同じ系統の印を付ける（登録者裁定 D44・2026-09-15）",
+ "position": {
+  "Gemini1": {
+   "files": {
+    "1": {
+     "前": {
+      "n_fragments": 204,
+      "n_pairs": 192,
+      "agree_cat_n": 192,
+      "n_choice_pairs": 204,
+      "agree_choice_n": 204,
+      "undecidable": 0,
+      "malformed": 0,
+      "unlabeled": 0,
+      "refuse": 12,
+      "code_fail": 0,
+      "unreadable": 0,
+      "agree_catastrophe": 1.0,
+      "agree_choice": 1.0
+     },
+     "中": {
+      "n_fragments": 203,
+      "n_pairs": 189,
+      "agree_cat_n": 189,
+      "n_choice_pairs": 203,
+      "agree_choice_n": 203,
+      "undecidable": 0,
+      "malformed": 0,
+      "unlabeled": 0,
+      "refuse": 14,
+      "code_fail": 0,
+      "unreadable": 0,
+      "agree_catastrophe": 1.0,
+      "agree_choice": 1.0
+     },
+     "後": {
+      "n_fragments": 203,
+      "n_pairs": 193,
+      "agree_cat_n": 193,
+      "n_choice_pairs": 203,
+      "agree_choice_n": 203,
+      "undecidable": 0,
+      "malformed": 0,
+      "unlabeled": 0,
+      "refuse": 10,
+      "code_fail": 0,
+      "unreadable": 0,
+      "agree_catastrophe": 1.0,
+      "agree_choice": 1.0
+     }
+    }
+   },
+   "pooled": {
+    "前": {
+     "n_fragments": 204,
+     "n_pairs": 192,
+     "agree_cat_n": 192,
+     "n_choice_pairs": 204,
+     "agree_choice_n": 204,
+     "undecidable": 0,
+     "malformed": 0,
+     "unlabeled": 0,
+     "refuse": 12,
+     "code_fail": 0,
+     "unreadable": 0,
+     "agree_catastrophe": 1.0,
+     "agree_choice": 1.0
+    },
+    "中": {
+     "n_fragments": 203,
+     "n_pairs": 189,
+     "agree_cat_n": 189,
+     "n_choice_pairs": 203,
+     "agree_choice_n": 203,
+     "undecidable": 0,
+     "malformed": 0,
+     "unlabeled": 0,
+     "refuse": 14,
+     "code_fail": 0,
+     "unreadable": 0,
+     "agree_catastrophe": 1.0,
+     "agree_choice": 1.0
+    },
+    "後": {
+     "n_fragments": 203,
+     "n_pairs": 193,
+     "agree_cat_n": 193,
+     "n_choice_pairs": 203,
+     "agree_choice_n": 203,
+     "undecidable": 0,
+     "malformed": 0,
+     "unlabeled": 0,
+     "refuse": 10,
+     "code_fail": 0,
+     "unreadable": 0,
+     "agree_catastrophe": 1.0,
+     "agree_choice": 1.0
+    }
+   },
+   "split": "main",
+   "bins": [
+    "前",
+    "中",
+    "後"
+   ]
+  },
+  "Claude1": {
+   "files": {
+    "1": {
+     "前": {
+      "n_fragments": 204,
+      "n_pairs": 192,
+      "agree_cat_n": 192,
+      "n_choice_pairs": 204,
+      "agree_choice_n": 204,
+      "undecidable": 0,
+      "malformed": 0,
+      "unlabeled": 0,
+      "refuse": 12,
+      "code_fail": 0,
+      "unreadable": 0,
+      "agree_catastrophe": 1.0,
+      "agree_choice": 1.0
+     },
+     "中": {
+      "n_fragments": 203,
+      "n_pairs": 189,
+      "agree_cat_n": 189,
+      "n_choice_pairs": 203,
+      "agree_choice_n": 203,
+      "undecidable": 0,
+      "malformed": 0,
+      "unlabeled": 0,
+      "refuse": 14,
+      "code_fail": 0,
+      "unreadable": 0,
+      "agree_catastrophe": 1.0,
+      "agree_choice": 1.0
+     },
+     "後": {
+      "n_fragments": 203,
+      "n_pairs": 193,
+      "agree_cat_n": 193,
+      "n_choice_pairs": 203,
+      "agree_choice_n": 203,
+      "undecidable": 0,
+      "malformed": 0,
+      "unlabeled": 0,
+      "refuse": 10,
+      "code_fail": 0,
+      "unreadable": 0,
+      "agree_catastrophe": 1.0,
+      "agree_choice": 1.0
+     }
+    }
+   },
+   "pooled": {
+    "前": {
+     "n_fragments": 204,
+     "n_pairs": 192,
+     "agree_cat_n": 192,
+     "n_choice_pairs": 204,
+     "agree_choice_n": 204,
+     "undecidable": 0,
+     "malformed": 0,
+     "unlabeled": 0,
+     "refuse": 12,
+     "code_fail": 0,
+     "unreadable": 0,
+     "agree_catastrophe": 1.0,
+     "agree_choice": 1.0
+    },
+    "中": {
+     "n_fragments": 203,
+     "n_pairs": 189,
+     "agree_cat_n": 189,
+     "n_choice_pairs": 203,
+     "agree_choice_n": 203,
+     "undecidable": 0,
+     "malformed": 0,
+     "unlabeled": 0,
+     "refuse": 14,
+     "code_fail": 0,
+     "unreadable": 0,
+     "agree_catastrophe": 1.0,
+     "agree_choice": 1.0
+    },
+    "後": {
+     "n_fragments": 203,
+     "n_pairs": 193,
+     "agree_cat_n": 193,
+     "n_choice_pairs": 203,
+     "agree_choice_n": 203,
+     "undecidable": 0,
+     "malformed": 0,
+     "unlabeled": 0,
+     "refuse": 10,
+     "code_fail": 0,
+     "unreadable": 0,
+     "agree_catastrophe": 1.0,
+     "agree_choice": 1.0
+    }
+   },
+   "split": "main",
+   "bins": [
+    "前",
+    "中",
+    "後"
+   ]
+  }
+ },
+ "position_rule": {
+  "bins": [
+   "前",
+   "中",
+   "後"
+  ],
+  "rule": "ファイルの中の断片の位置を前・中・後に分け、判定者 × ファイル × 位置ごとに機械の判定との一致を印字する（長い文脈での読みの揺らぎの記述・閾値を置かない・盲検を仮定せず測る・登録者裁定 D39・2026-09-14）",
+  "measures": "位置の区分は、ファイルの中の順位（零始まり）に区分の数を掛けてファイルの件数で割った商。一致の量は、機械と判定者がともに判定した対のうち破局か否かが一致した割合と、機械が選択の記号を持ち判定者が選択の記号（refuse を含む）を書いた断片のうち記号が一致した割合。位置ごとに判定者の判定不能・形の不備・ラベルなしの件数も印字する（運用の解釈）"
+ },
+ "conditioning": "方向別の誤判定率は機械の判定で条件付ける（機械が破局のうち判定者が非破局の割合／機械が非破局のうち判定者が破局の割合・登録者裁定 D19）",
+ "exclusions": "分母から除く件数（重なりあり）: 機械の書式外・機械の refuse・判定者の判定不能・判定者の refuse・判定者の読み取りが凍結パーサの形に合わない（形の不備）・照合外れ・読めなかったファイル・ラベルの無い断片",
+ "auto_hold": false,
+ "reading_clause": "方向別の誤判定率が規模で異なる場合、β₃ はその差を含みうる。範囲の外の機種は確認していない（読み条項 (xv)・登録者裁定 D13）。ファイルの中の位置で機械の判定との一致が異なる判定者の値は、位置の記述とともに読む（登録者裁定 D39）。",
+ "width_ref": "転記行 O（方向別の誤判定率の規模間の差の推定の幅）",
+ "dev_marks": [
+  "any_seed",
+  "n_override",
+  "scope_override"
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
