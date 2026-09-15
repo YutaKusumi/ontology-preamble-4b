@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""design_facts_A.py v3.5 —— 段階 A の設計事実（転記行 A〜O）を機械生成する（2026-09-13）。
+"""design_facts_A.py v3.6 —— 段階 A の設計事実（転記行 A〜O）を機械生成する（2026-09-13）。
+v3.6（2026-09-15・草案9 の見直しの B 類 R9・登録者の答え）: 転記行 J の器材の対応表と実在の一覧に、凍結前の最終検分の束の器 bundle_final_A.py を足す（数と規則は v3.5 と同じ）。
 v3.5（2026-09-15・登録者裁定 D47）: 転記行 J の器材の対応表と実在の一覧に、予想の様式の生成器と照合の器を足す（数と規則は v3.4 と同じ）。
 v3.4（2026-09-15・登録者裁定 D37）: 転記行 A の判定器の断片の判定者の文言を、系統外に限らない形（正本 judge_validity.judges を指す）に改める（数と規則は v3.3 と同じ）。
 v3.3（2026-09-14・凍結前の最終検分の採否表 P118・P120・P122〜P125・登録者裁定 D27〜D29・D34）: 格子 v3.3 を要求する。転記行 A に校正腕のセッション数の内訳と下界、転記行 D に両向きの到達と区間と測れた対比の本数・測れた効果種の B の対応・格子の解釈条項の発火率の注、
@@ -371,11 +372,11 @@ TOOLS_NOW = [('make_contrasts_A.py', 'tools/make_contrasts_A.py'), ('confirm_A.p
              ('gate_A.py', 'tools/gate_A.py'), ('control_chart_A.py', 'tools/control_chart_A.py'), ('integrity_A.py', 'tools/integrity_A.py'), ('sample_inspection_A.py', 'tools/sample_inspection_A.py'),
              ('judge_fragments_A.py', 'tools/judge_fragments_A.py'), ('synth_A.py', 'tools/synth_A.py'), ('synth_gates_A.py', 'tools/synth_gates_A.py'), ('build_report_A.py', 'tools/build_report_A.py'),
              ('report_lint.py', 'tools/report_lint.py'), ('freeze_A.py', 'tools/freeze_A.py'), ('response_mode_M.py', 'tools/response_mode_M.py'), ('response_mode_F.py', 'tools/response_mode_F.py'),
-             ('tooling_interpretations_A.py', 'tools/tooling_interpretations_A.py'), ('make_predictions_form_A.py', 'tools/make_predictions_form_A.py'), ('compare_predictions_A.py', 'tools/compare_predictions_A.py')]
+             ('tooling_interpretations_A.py', 'tools/tooling_interpretations_A.py'), ('make_predictions_form_A.py', 'tools/make_predictions_form_A.py'), ('compare_predictions_A.py', 'tools/compare_predictions_A.py'), ('bundle_final_A.py', 'tools/bundle_final_A.py')]
 PLANNED = []
 exist = [(nm, sha_file(os.path.join(REPO, p))) for nm, p in TOOLS_NOW + PLANNED if os.path.isfile(os.path.join(REPO, p))]
 still = [nm for nm, p in TOOLS_NOW + PLANNED if not os.path.isfile(os.path.join(REPO, p))]
-F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則・走行器の設定→contrasts-A.json／確証の判定（二尺度・p* の Holm・札の二段・全組合せ表）→confirm_A.py（格子・集計器・合成検査が同じ関数を import・札の率の模擬と測れた効果種を含む）／帯と門の厳密計算→bands_A.py（格子・門・校正帯が共有）／走行記録の読み出し→runs_A.py（器材が共有）／z→zaxis_A.py／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・確証規則・refuse 門・様式門・錨帯・測定不能・環境保留・測れた効果種→analyze_A.py／応答様式 (a)(b) と言及→response_mode_A.py／校正帯とセッションのやり直し・撤退条件・門2→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査（束縛・登録・生成器）→numbers_lint.py／草案と雛形の組み立て→build_draftA.py／整合と抽出（率盲検）→integrity_A.py・sample_inspection_A.py／判定器の断片→judge_fragments_A.py／運用の解釈の記録→tooling_interpretations_A.py／合成検査→synth_A.py（札の全組合せ表の全行と集計器の経路）・synth_gates_A.py（門と校正の器）／報告→報告雛形の原稿と雛形・build_report_A.py・report_lint.py／予想の様式と照合→make_predictions_form_A.py・compare_predictions_A.py／凍結前の検分の束→bundle_prefreeze_A.py／凍結→freeze_A.py。**実在（SHA16）**: %s。**未整備**: %s。' % (
+F['J'] = {'text': '凍結射程と器材の対応表: 腕・場面・環境・同時要求数・帯・規則・走行器の設定→contrasts-A.json／確証の判定（二尺度・p* の Holm・札の二段・全組合せ表）→confirm_A.py（格子・集計器・合成検査が同じ関数を import・札の率の模擬と測れた効果種を含む）／帯と門の厳密計算→bands_A.py（格子・門・校正帯が共有）／走行記録の読み出し→runs_A.py（器材が共有）／z→zaxis_A.py／走行→run_preamble_local.py v2.7・boot_stageA.py／門0.5→identity_screen_A.py／検閲・解釈条項・確証規則・refuse 門・様式門・錨帯・測定不能・環境保留・測れた効果種→analyze_A.py／応答様式 (a)(b) と言及→response_mode_A.py／校正帯とセッションのやり直し・撤退条件・門2→calib_band_A.py・gate_A.py／管理図→control_chart_A.py／転記行→design_facts_A.py・power_grid_A.py・cost_facts.py／Firth の基準実装と R logistf との一致検査→firth.py・firth_check_A.py・firth_check_A.R／本文の数の検査（束縛・登録・生成器）→numbers_lint.py／草案と雛形の組み立て→build_draftA.py／整合と抽出（率盲検）→integrity_A.py・sample_inspection_A.py／判定器の断片→judge_fragments_A.py／運用の解釈の記録→tooling_interpretations_A.py／合成検査→synth_A.py（札の全組合せ表の全行と集計器の経路）・synth_gates_A.py（門と校正の器）／報告→報告雛形の原稿と雛形・build_report_A.py・report_lint.py／予想の様式と照合→make_predictions_form_A.py・compare_predictions_A.py／凍結前の検分の束→bundle_prefreeze_A.py・bundle_final_A.py／凍結→freeze_A.py。**実在（SHA16）**: %s。**未整備**: %s。' % (
     '・'.join('%s %s' % e for e in exist), '・'.join(still) or 'なし'), 'data': {'exist': dict(exist), 'not_yet': still}}
 
 # ---- K: 引数・seed・tag
@@ -407,13 +408,13 @@ F['O'] = {'text': '判定器の方向別の誤判定率の規模間の差の推�
     JVg['n_per_cell'], JVg['scenarios'], JVg['method'], '・'.join('類の割合 %g・誤判定率 %g で ±%.1f pt' % (r['class_share'], r['true_error_rate'], r['diff_halfwidth95_pt']) for r in JVg['rows']), T['judge_validity']['reading_clause']), 'data': JVg}
 
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
-outj = {'generated_utc': now, 'generator': 'tools/design_facts_A.py v3.5', 'contrasts_sha16': sha_file(CPATH), 'power_grid_json_sha16': sha_file(a.pg),
+outj = {'generated_utc': now, 'generator': 'tools/design_facts_A.py v3.6', 'contrasts_sha16': sha_file(CPATH), 'power_grid_json_sha16': sha_file(a.pg),
         'inputs_F_G': {'cost_facts': [os.path.relpath(CF_PATH, REPO).replace(os.sep, '/'), sha_file(CF_PATH)], 'style_stageF1': [os.path.relpath(sp, REPO).replace(os.sep, '/'), sha_file(sp) if os.path.isfile(sp) else None]}, 'z': {k: round(Z[k], 6) for k in SIZES}, 'dev_marks': DEV, 'facts': F}
 os.makedirs(os.path.dirname(a.out), exist_ok=True)
 json.dump(outj, open(a.out + '.json', 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v3.5・%s UTC・正本 contrasts-A.json SHA16 %s・格子 power-grid-A.json SHA16 %s・転記行 F の入力 SHA16 %s・転記行 G の入力 SHA16 %s%s）' % (now, outj['contrasts_sha16'], outj['power_grid_json_sha16'], outj['inputs_F_G']['cost_facts'][1], outj['inputs_F_G']['style_stageF1'][1], ('・**検査用の印 %s**' % '・'.join(DEV)) if DEV else ''), '']
+L = ['# 段階 A 設計事実（機械生成・`tools/design_facts_A.py` v3.6・%s UTC・正本 contrasts-A.json SHA16 %s・格子 power-grid-A.json SHA16 %s・転記行 F の入力 SHA16 %s・転記行 G の入力 SHA16 %s%s）' % (now, outj['contrasts_sha16'], outj['power_grid_json_sha16'], outj['inputs_F_G']['cost_facts'][1], outj['inputs_F_G']['style_stageF1'][1], ('・**検査用の印 %s**' % '・'.join(DEV)) if DEV else ''), '']
 for k in sorted(F):
     L.append('- **転記行 %s** — %s' % (k, F[k]['text'])); L.append('')
 L.append('本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。')
 open(a.out + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
-print('[design_facts_A v3.5] written %s.{md,json}%s' % (a.out, (' dev_marks=' + ','.join(DEV)) if DEV else ''))
+print('[design_facts_A v3.6] written %s.{md,json}%s' % (a.out, (' dev_marks=' + ','.join(DEV)) if DEV else ''))

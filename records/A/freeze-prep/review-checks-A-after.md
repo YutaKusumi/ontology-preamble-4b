@@ -1,9 +1,9 @@
-# 草案9 の見直しの機械の突き合わせ（機械生成・`tools/review_checks_A.py` v1・2026-09-15 20:33 UTC）
+# 草案9 の見直しの機械の突き合わせ（機械生成・`tools/review_checks_A.py` v1・2026-09-15 20:43 UTC）
 
 - 事前登録: `records/A/freeze-prep/preregistration-review-draft9-A.md` の §2 A（M1〜M8）。本器は判定をしない。直すかどうかは見直しの記録で決める。
 - 正本 SHA16 F0C2FF897C78C4C0・§5 の裁定の番号 47 件（重なり なし・欠け なし・段階 B の D4・D5 を除く）
 
-## design/design-stageA-draft9.md（SHA16 15024FA8517382C9）
+## design/design-stageA-draft9.md（SHA16 78ADE9861C32F3A6）
 
 - M1: 101 件のうち要確認 2 件
   - 行 30: {'span': 'config.json', 'token': 'config.json', 'status': 'bare_missing', 'found': None}
@@ -13,7 +13,7 @@
   - 行 84: {'span': 'truncated', 'status': 'absent_word'}
   - 行 90: {'span': 'local_env', 'status': 'absent_word'}
 - M3: 129 件のうち要確認 0 件
-- M4: 251 件のうち要確認 0 件
+- M4: 250 件のうち要確認 0 件
 - M5: 50 件のうち要確認 0 件
 - M6: 13 件のうち要確認 0 件
 - M7: 価値語と機序語の出現 0 件

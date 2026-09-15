@@ -90,7 +90,7 @@ N1・N2・S1・S4・SK（{{len:scenarios}} 場面・全機種・選び直さな�
 生テキスト・三つ組・様式 (a)(b)・検査認識の言及・proc_uuid・バッチ位置・seed・prompt_sha・preamble_sha・runner_sha・`local_env`（GPU 型・メモリ・同時要求数を含む）。ログ確率と隠れ状態は A では取らない。
 
 ### 2.13 器材（凍結マニフェストが正本・未整備は凍結前に整備して合成データで検査・裁定 D9）
-- 正本と転記行: `make_contrasts_A.py` v2.8 → `contrasts-A.json`／`power_grid_A.py` v3.3（格子・逆向きの到達の節と様式門のセルをまたいだ率を含む）→ `design_facts_A.py` v3.5（転記行 A〜O）→ `build_draftA.py`（転記行の置換と束縛）→ `numbers_lint.py` v2.1（束縛・登録・生成器の文字列リテラル〔転記行と本文に文字列を書く器すべて・採否表 P121〕）。
+- 正本と転記行: `make_contrasts_A.py` v2.8 → `contrasts-A.json`／`power_grid_A.py` v3.3（格子・逆向きの到達の節と様式門のセルをまたいだ率を含む）→ `design_facts_A.py` v3.6（転記行 A〜O）→ `build_draftA.py`（転記行の置換と束縛）→ `numbers_lint.py` v2.1（束縛・登録・生成器の文字列リテラル〔転記行と本文に文字列を書く器すべて・採否表 P121〕）。
 - 確証の判定と横軸: `confirm_A.py`（二尺度・p* の Holm・札の二段・札の全組合せ表・札の率の模擬と測れた効果種〔両向き・区間・測れた対比〕）・`zaxis_A.py`（z）・`bands_A.py`（帯と門の厳密計算・格子と門と校正帯が共有）・`runs_A.py`（走行記録の読み出し・器材が共有）。
 - Firth: `firth.py` v2.1（基準実装・自己検査・当てはめの打ち切りを受け渡す）・`firth_check_A.py` と `firth_check_A.R`（R logistf との一致検査・凍結前）。
 - 走行: `run_preamble_local.py` v2.7（凍結）・`boot_stageA.py` v2（重みの完全な版・終了コードと件数と `--redo-errors`・校正の判定は `calib_band_A.py` の関数・初点の名乗り・データを作る相の固定のコミット）・`identity_screen_A.py`。
@@ -222,7 +222,7 @@ N1・N2・S1・S4・SK（{{len:scenarios}} 場面・全機種・選び直さな�
 - 〔転記行 O〕
 
 ## 7. 検分票（kensho・コーディネータ・草案9）
-- 対象: 段階 A 設計草案9（凍結候補の四つ目・原稿・正本 `contrasts-A.json`〔草案9 の作成の時点は生成器 v2.5・現在は v2.8〕・格子 v3.3・設計事実〔作成の時点は v3.3・現在は v3.5〕・確証と帯と読み出しの共通関数・器材一式と合成検査・転記行 A〜O・報告雛形の原稿）。草案8 からの変更は、凍結前の最終検分で再現した所見の反映（採否表 P105〜P153）と、登録者裁定 D26〜D35 の文言。追補（2026-09-15）は、門0.5 と Firth の一致検査の済みの記帳と、判定器の妥当性の運び（登録者裁定 D36〜D40・正本の生成器 v2.6・判定器の器 v2.2・記録 `records/A/judge-arrangement/`）と、試し読みの後の登録者裁定 D41〜D44（正本の生成器 v2.7・判定器の器 v2.3・記録 `records/A/judge-arrangement2/`）と、凍結の前の登録者裁定 D45〜D49（正本の生成器 v2.8・予想の様式 v0.8 と照合の器・凍結器 v3.1・設計事実の器 v3.5・記録 `records/A/freeze-prep/`）と、凍結確認の前の全文の見直し（`records/A/freeze-prep/review-draft9-A.md`）。
+- 対象: 段階 A 設計草案9（凍結候補の四つ目・原稿・正本 `contrasts-A.json`〔草案9 の作成の時点は生成器 v2.5・現在は v2.8〕・格子 v3.3・設計事実〔作成の時点は v3.3・現在は v3.6〕・確証と帯と読み出しの共通関数・器材一式と合成検査・転記行 A〜O・報告雛形の原稿）。草案8 からの変更は、凍結前の最終検分で再現した所見の反映（採否表 P105〜P153）と、登録者裁定 D26〜D35 の文言。追補（2026-09-15）は、門0.5 と Firth の一致検査の済みの記帳と、判定器の妥当性の運び（登録者裁定 D36〜D40・正本の生成器 v2.6・判定器の器 v2.2・記録 `records/A/judge-arrangement/`）と、試し読みの後の登録者裁定 D41〜D44（正本の生成器 v2.7・判定器の器 v2.3・記録 `records/A/judge-arrangement2/`）と、凍結の前の登録者裁定 D45〜D49（正本の生成器 v2.8・予想の様式 v0.8 と照合の器・凍結器 v3.1・設計事実の器 v3.5・記録 `records/A/freeze-prep/`）と、凍結確認の前の全文の見直し（`records/A/freeze-prep/review-draft9-A.md`・B 類の直しで設計事実の器 v3.6）。
 - 段階: 事前登録（設計・結果未見）。最終検分の票の主張は、再現の器（追い問い W77〜W123）の事前登録と照合してから採否を決めた（`records/reviews/A/final/preregistration-reproduction-A-final.md`）。反映の確かめは、直った条件を先に書いてから機械で走らせた（`records/reviews/A/final/preregistration-reflection-final-A.md` → `verification-reflection-final-A.md`）。追補は、変える範囲と確かめの条件と予想を器を書く前に記録した（`records/A/judge-arrangement/preregistration-judge-arrangement-A.md`・`records/A/judge-arrangement2/preregistration-judge-arrangement2-A.md`・`records/A/freeze-prep/preregistration-freeze-prep-A.md`）。全文の見直しは、見方と分け方と直し方を見直しの前に記録した（`records/A/freeze-prep/preregistration-review-draft9-A.md`）。
 - 凍結物の同定: V′ 盤の台帳・ryokai-os 凍結物・凍結走行器 v2.6／v2.7・凍結パーサ・計画案 v2.3（内部）・門0 の実測・段階 F 凍結文書（型）。本草案は凍結物ではない。
 - 盲検の状態: 該当なし（本走行の率を見る前）。抽出検査の対応表をリポジトリの外に置いて封印する規則と、判定器の断片の復唱の測定を器材に入れた。率盲検の外の経路（コーディネータの目に入る率）を §0-8 に開示した。判定器の依頼文に研究の仮説と機種の名を書かない形と、ファイルの中の位置の記述を器材に入れた（裁定 D37・D39）。判定者の読み取りを照合記号で確かめる形を入れた（裁定 D42）。予想の様式の欄は、門0.5 の手元の率と試し読みの鍵がコーディネータの目に入った後に選んだ（§0-8・裁定 D46・D47）。
