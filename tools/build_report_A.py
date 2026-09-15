@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 import report_lint
 REPO = runs_A.REPO
-VERSION = 'v2.2'   # v2.2（2026-09-15・登録者裁定 D37・D39）: 判定器の欄に判定者の系統・κ の群・判定者の構成・取りまとめの記録・位置の記述の行
+VERSION = 'v2.3'   # v2.3（2026-09-15・登録者裁定 D42・D44）: 判定器の除いた件数に照合外れと読めなかったファイル・読み取りの確かめの行・同じ系統の印（v2.2: 系統・κ の群・構成・取りまとめの記録・位置の記述）
 # v2.1（2026-09-14・採否表 P128・P133・登録者裁定 D27〜D31・D32・P141）: 到達の見込みの欠けで止まる・両向きの測れた効果種と測れた対比の本数・区間の被覆の断り・抽出検査の一致・断片の復唱の記述・検査用の口
 
 ap = argparse.ArgumentParser()
@@ -189,9 +189,10 @@ def t_judge(tbl):
         return mb(['（判定器の妥当性の採点の記録なし）'])
     rows = tbl[:2]   # 方向別の誤判定率は機械の判定で条件付ける（登録者裁定 D19）・判定者の欄に系統（登録者裁定 D37）
     for name, out in JUD['per_judge'].items():
-        rows += ['| %s | %d | %d | %s | %s（%d） | %s（%d） | 機械 %d・%d／判定者 %d・%d・%d・%d | %s |' % (
+        rows += ['| %s | %d | %d | %s | %s（%d） | %s（%d） | 機械 %d・%d／判定者 %d・%d・%d・%d・%d・%d | %s |' % (
             cell, v['n_fragments'], v['n_pairs'], f3(v['kappa']), f3(v['judge_non_given_machine_cat']), v['n_machine_cat'], f3(v['judge_cat_given_machine_non']), v['n_machine_non'],
-            v['excluded_machine']['format_fail'], v['excluded_machine']['refuse'], v['excluded_judge']['undecidable'], v['excluded_judge']['refuse'], v['excluded_judge']['malformed'], v['excluded_judge']['unlabeled'], judge_label(name))
+            v['excluded_machine']['format_fail'], v['excluded_machine']['refuse'], v['excluded_judge']['undecidable'], v['excluded_judge']['refuse'], v['excluded_judge']['malformed'],
+            v['excluded_judge'].get('code_fail', 0), v['excluded_judge'].get('unreadable', 0), v['excluded_judge']['unlabeled'], judge_label(name))
                  for cell, v in out.items()]
     return mb(rows)
 
@@ -205,7 +206,8 @@ def r_judge_inter(line):
     if G_:   # κ の四つの群（登録者裁定 D37）
         L_.append('系統外×機械: %s の機種 × 場面の表（上）' % ('・'.join(G_.get('系統外×機械', {}).get('judges') or []) or 'なし'))
         for g in ('系統外どうし', '系統内どうし', '系統外×系統内'):
-            L_.append('%s: %s' % (g, '・'.join('%s 対 %s（対 %d・κ %s）' % (d['judges'][0], d['judges'][1], d['n_pairs'], f3(d['kappa'])) for d in (G_.get(g) or {}).get('pairs') or []) or 'なし'))
+            L_.append('%s: %s' % (g, '・'.join('%s 対 %s（対 %d・κ %s%s）' % (d['judges'][0], d['judges'][1], d['n_pairs'], f3(d['kappa']), '・同じ系統' if d.get('same_system') else '')
+                                               for d in (G_.get(g) or {}).get('pairs') or []) or 'なし'))
     else:
         L_ += ['%s 対 %s: 対 %d・κ %s' % (d['judges'][0], d['judges'][1], d['n_pairs'], f3(d['kappa'])) for d in JUD['inter_judge']]
     L_.append('鍵の SHA-256 %s（封印の記録との一致を採点の器が確かめた）・取りまとめの記録 %s' % (JUD['key_sha256'], ('%s（SHA16 %s）' % (JUD['merge_record']['file'], JUD['merge_record']['sha16'])) if JUD.get('merge_record') else 'なし'))
@@ -213,6 +215,14 @@ def r_judge_inter(line):
         L_.append('断片の本文と自分の腕の前置きの最長共通部分（字数・記述・閾値なし）: %s・自分の腕の値がほかの腕の最大を超える断片 %d/%d' % (
             json.dumps(E_.get('own_arm_quantiles'), ensure_ascii=False), E_.get('own_exceeds_max_other', 0), E_.get('n_with_preamble', 0)))
     return ['- 判定者どうしの κ と判定者の構成と鍵の照合（機械の転記）:'] + mb(L_)
+
+
+def r_judge_reading(line):
+    if not JUD or not JUD.get('reading_check'):
+        return None
+    RC_ = JUD['reading_check']   # 読み取りの確かめ（照合記号・登録者裁定 D42）
+    return ['- 読み取りの確かめ（照合記号・機械の転記）:'] + mb(['閾値 %s・照合外れ（判定者ごと）: %s・読めなかった判定者 × ファイル: %s・やり直し待ち: %s' % (
+        RC_['threshold'], '・'.join('%s %d' % (judge_label(n), v['code_fail']) for n, v in RC_['per_judge'].items()), '・'.join(RC_['unreadable']) or 'なし', '・'.join(RC_['redo_pending']) or 'なし')])
 
 
 def r_judge_position(line):
@@ -395,7 +405,7 @@ LINE_RULES = [('- 前提: 凍結設計', r_premise), ('1. 利益相反（第一�
               ('6. **札の内訳**', r_labels6), ('7. **到達の見込みと測れた効果種**', r_reach7), ('- 測れた対比の本数（効果種ごと', r_coverage),('要約文は次の定型のみ', r_summary_sentence), ('- 器材: 走行器', r_tools), ('- 環境: 機種ごとの GPU 型', r_env),
               ('- 整合: 〔integrity_A', r_integ), ('- 門0.5（凍結前', r_g05), ('- 門2（パイロット・一度）', r_gate2), ('- 校正腕と撤退条件', r_calib), ('- 測定不能（腕 × 規模 × 場面', r_unmeas), ('- 錨帯（', r_anchor),
               ('- 環境（橋・環境帯', r_env3), ('- refuse 門（全分母で名目有意', r_refuse), ('- 様式門（', r_style), ('- 〔対比 id〕: 上限', r_demote), ('〔analyze_A の表', r_bigtable), ('- 確証札の定型', r_label_strings),
-              ('- 残存規模の非連続と端の欠けの注', r_residual_gap), ('- 〔二つの対照を持つ処置腕', r_control_pairs), ('- 判定者どうしの κ（すべての対', r_judge_inter), ('- 位置の記述（`judge_validity.position`', r_judge_position),('〔`print_strings.floor_desc`', r_floor),
+              ('- 残存規模の非連続と端の欠けの注', r_residual_gap), ('- 〔二つの対照を持つ処置腕', r_control_pairs), ('- 判定者どうしの κ（すべての対', r_judge_inter), ('- 位置の記述（`judge_validity.position`', r_judge_position), ('- 読み取りの確かめ（`judge_validity.reading_check`', r_judge_reading), ('〔`print_strings.floor_desc`', r_floor),
               ('- Nstr−Onull・Ncold−N', r_desc_pairs), ('- 応答様式 (a)(b)・検査認識の言及率', r_style_desc), ('- 錨の走行間差', r_anchor_desc), ('- レシピ対', r_recipe), ('- スタック差', r_stack),
               ('- 環境差（橋', r_envdesc), ('- 残った規模の一覧', r_residual), ('- 〔`tools/confirm_A.py` と格子と同じ関数', r_recalc), ('- 測れた効果種の計算の記録', r_measrec), ('- 封印予想（', r_pred), ('- `tools/freeze_A.py --verify`', r_freeze)]
 TABLE_RULES = [('| 族 | m | 判定可能 |', t_summary), ('| 範囲（機種 × 場面） |', t_judge), ('| 場面 | 対照腕 |', t_ctrl), ('| 札 | 件数 | 先置する読み', t_reading), ('| 閾値 | 確証 |', t_sens),
