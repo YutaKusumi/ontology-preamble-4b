@@ -1,0 +1,139 @@
+{
+ "kind": "judge_merge_A",
+ "version": "v2.2",
+ "generated_utc": "2026-09-15 07:22",
+ "seal_sha16": "2CEB48E23ABB2917",
+ "fragments_sha16": "ADFED560D764C308",
+ "n_fragments": 613,
+ "reads_key": false,
+ "judges": {
+  "Claude1": {
+   "labels_file": "Claude1.json",
+   "labels_sha16": "CA52FE9327B9F866",
+   "system": "Claude",
+   "number": 1,
+   "lineage": "系統内",
+   "split": "main",
+   "labeled": 613,
+   "expected": 613,
+   "unparsed_final": 0,
+   "files": [
+    {
+     "attempts": 1,
+     "label_lines": 613,
+     "repeats_same": 0,
+     "conflicts": 0,
+     "out_of_range": 0,
+     "unparsed_lines": 0,
+     "id_not_at_start": 0,
+     "end_marker": 613,
+     "continue_markers": 0,
+     "unparsed_final": 0,
+     "file": "Claude1-1.txt",
+     "split": "main",
+     "k": 1,
+     "attachment": "judge-file-A-1of1.md",
+     "expected": 613,
+     "labeled": 613,
+     "missing": 0,
+     "sha16": "46E811690A867925",
+     "bytes": 17180
+    }
+   ]
+  },
+  "Gemini1": {
+   "labels_file": "Gemini1.json",
+   "labels_sha16": "672C5FE9642C2E2A",
+   "system": "Gemini",
+   "number": 1,
+   "lineage": "系統外",
+   "split": "main",
+   "labeled": 613,
+   "expected": 613,
+   "unparsed_final": 0,
+   "files": [
+    {
+     "attempts": 1,
+     "label_lines": 613,
+     "repeats_same": 0,
+     "conflicts": 0,
+     "out_of_range": 0,
+     "unparsed_lines": 0,
+     "id_not_at_start": 0,
+     "end_marker": 613,
+     "continue_markers": 0,
+     "unparsed_final": 0,
+     "file": "Gemini1-1.txt",
+     "split": "main",
+     "k": 1,
+     "attachment": "judge-file-A-1of1.md",
+     "expected": 613,
+     "labeled": 613,
+     "missing": 0,
+     "sha16": "F59F4E8AFA1AAF2E",
+     "bytes": 17180
+    }
+   ]
+  },
+  "Grok1": {
+   "labels_file": "Grok1.json",
+   "labels_sha16": "6FC23E4F51F203DA",
+   "system": "Grok",
+   "number": 1,
+   "lineage": "系統外",
+   "split": "main",
+   "labeled": 613,
+   "expected": 613,
+   "unparsed_final": 0,
+   "files": [
+    {
+     "attempts": 1,
+     "label_lines": 613,
+     "repeats_same": 0,
+     "conflicts": 0,
+     "out_of_range": 0,
+     "unparsed_lines": 0,
+     "id_not_at_start": 0,
+     "end_marker": 613,
+     "continue_markers": 0,
+     "unparsed_final": 0,
+     "file": "Grok1-1.txt",
+     "split": "main",
+     "k": 1,
+     "attachment": "judge-file-A-1of1.md",
+     "expected": 613,
+     "labeled": 613,
+     "missing": 0,
+     "sha16": "7963E129C1F9A671",
+     "bytes": 17442
+    }
+   ]
+  }
+ },
+ "empty_files": [],
+ "composition": {
+  "Gemini": {
+   "lineage": "系統外",
+   "registered_min": 2,
+   "registered_max": null,
+   "actual": 1,
+   "meets": false
+  },
+  "Grok": {
+   "lineage": "系統外",
+   "registered_min": 2,
+   "registered_max": null,
+   "actual": 1,
+   "meets": false
+  },
+  "Claude": {
+   "lineage": "系統内",
+   "registered_min": 2,
+   "registered_max": 2,
+   "actual": 1,
+   "meets": false
+  }
+ },
+ "rule": "登録者は一つの会話の返信を順に、抽出の器が置いた空のファイル（判定者 × ファイル）に貼る。やり直した会話の返信は、redo_line の行を貼った後に続けて貼る。取りまとめの器は、最後の redo_line の行より後の本文だけを読み、ファイルの番号の範囲にある番号で始まる行を一件として読み取る（字形は NFKC でそろえ、記号は小文字にする）。同じ番号の行が二つ以上あれば後の行を採り、読みが食い違った件数を印字する。範囲の外の番号の行は読まずに件数を印字する。記号を読み取れない行は形の不備とする。取りまとめは鍵を読まない。判定者ごとのラベルの記録と取りまとめの記録を採点の前にコミットし、採点の器はラベルの記録の SHA16 を取りまとめの記録と照合する（運用の解釈）",
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
