@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-"""tooling_interpretations_A.py v1.1 ——運用の解釈の一覧 records/A/tooling-interpretations-A.md を正本 design/contrasts-A.json から組み立てる（2026-09-14・凍結前の最終検分の採否表 P106・P140・登録者裁定 D26）。
+"""tooling_interpretations_A.py v1.3 ——運用の解釈の一覧 records/A/tooling-interpretations-A.md を正本 design/contrasts-A.json から組み立てる（2026-09-14・凍結前の最終検分の採否表 P106・P140・登録者裁定 D26）。
 各項の文言は正本の該当キーからの逐語転記。「なぜ要ったか」「採らなかった案」「向き（§0-1 の引かれる向きとの関係・コーディネータの読み）」は本器に置く（一覧の再現のため公開する）。
 v2.3〜v2.4 の一覧は一時置き場の一回きりの器で組み立てていた。本器はその文言を引き継ぎ、向きの一行（採否表 P140）と追補の二項（calibration.claim_release・judge_validity.extract.echo・登録者裁定 D26）を足す。
+v1.3（2026-09-15・登録者裁定 D45）: 題名・読み方・COI の行の確認待ちの文言を、全項の確認に改める（項の本文は変えない）。
 用法: python tools/tooling_interpretations_A.py [--out records/A/tooling-interpretations-A.md]
 柵: 本器の出力のいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
@@ -9,7 +10,7 @@ import os, sys, json, argparse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v1.2'   # v1.2（2026-09-15・登録者裁定 D42 の器材化）: 照合記号の細目の一項。v1.1（2026-09-15・登録者裁定 D38〜D40 の器材化）: 判定器の妥当性の運びの追補六項の「なぜ要ったか」「採らなかった案」「向き」と COI の一行
+VERSION = 'v1.3'   # v1.3（2026-09-15・登録者裁定 D45）: 全項の確認の文言。v1.2（2026-09-15・登録者裁定 D42 の器材化）: 照合記号の細目の一項。v1.1（2026-09-15・登録者裁定 D38〜D40 の器材化）: 判定器の妥当性の運びの追補六項の「なぜ要ったか」「採らなかった案」「向き」と COI の一行
 SAME = '§0-1 (a) の引かれる向き（傾向が立ってほしい）と同じ側（保留や降格が減り、確証が増えうる）'
 OPP = '§0-1 (a) の引かれる向きと逆の側（判定不能や規模の除外が増え、確証が減りうる）'
 MEAS = '§0-1 (a) の引かれる向きと同じ側（測れた効果種が減り、規模非依存の読みに届きにくい）'
@@ -67,11 +68,11 @@ def build(T):
     TI = T['tooling_interpretations']; missing = [k for k in TI['items'] if k not in WHY]
     assert not missing, ('運用の解釈の項に「なぜ要ったか」が無い', missing)
     same = [k for k in TI['items'] if WHY[k][2] == SAME]; meas = [k for k in TI['items'] if WHY[k][2] == MEAS]
-    out = ['# 器材の整備で確定した運用の解釈（登録者の確認待ち・2026-09-13・登録者裁定 D9 の三つ目の手順・追補と文言の直し 2026-09-14・登録者裁定 D16〜D25・D26・追補 2026-09-15・登録者裁定 D38〜D40 と D42 の器材化）', '',
+    out = ['# 器材の整備で確定した運用の解釈（2026-09-13・登録者裁定 D9 の三つ目の手順・追補と文言の直し 2026-09-14・登録者裁定 D16〜D25・D26・追補 2026-09-15・登録者裁定 D38〜D40 と D42 の器材化・全項の確認 2026-09-15・登録者裁定 D45）', '',
            '- 性格: 登録済みの文言が決めていなかった運用を、器材を一義に動かすために正本 `design/contrasts-A.json`（SHA16 %s）に書き足した。各項の文言は正本の該当キーからの逐語転記（`tools/tooling_interpretations_A.py` %s が組み立てる）。' % (runs_A.sha16_file(runs_A.CPATH), VERSION),
            '- 変えていないもの: 確証の規則・札の定義・閾値・帯の値は変えていない。札の入力を決める運用の読み（門2 の数え方・測定不能の走行・錨帯の比べ方・環境値）を含む（採否表 P103 で文言を改めた）。',
            '- 状態: %s' % TI['status'],
-           '- 読み方: 「なぜ要ったか」は登録の文言の欠け、「採らなかった案」はコーディネータが比べた別の読み（無ければ —）、「向き」は選んだ読みが §0-1 の引かれる向きのどちら側に効くかのコーディネータの読み（採否表 P140）。確認は凍結確認の直前に受け、変える場合は正本と草案と器材と合成検査を作り直す。', '']
+           '- 読み方: 「なぜ要ったか」は登録の文言の欠け、「採らなかった案」はコーディネータが比べた別の読み（無ければ —）、「向き」は選んだ読みが §0-1 の引かれる向きのどちら側に効くかのコーディネータの読み（採否表 P140）。全項の確認は凍結確認の前に受けた（登録者裁定 D45・確認の一覧 records/A/tooling-interpretations-confirmation-A.md）。変える場合は正本と草案と器材と合成検査を作り直す。', '']
     for i, k in enumerate(TI['items'], 1):
         v = get(T, k); why, alt, pull = WHY[k]
         body = ('（値は正本の該当キーを見る・seed は設計定数の数の検査の対象外）' if k.startswith('seeds.') else (json.dumps(v, ensure_ascii=False, indent=1) if isinstance(v, (dict, list)) else str(v)))
@@ -80,7 +81,7 @@ def build(T):
             '- 器材の試走で門0 の既存のデータ（4B-2507 × N1）の腕別の (b) 率と層ごとの破局数が目に入った。閾値と帯は動かしていない。',
             '- 実装検分の反映（2026-09-14）で追補した項のうち、sessions.commit_rule は採否表 P82 の本走行の相を、データを作るすべての相に広げた。calibration.incomplete_rule は採否表 P77・P91 の器材の直しを正本の文言にした。どちらも登録者裁定 D26（2026-09-14）で確認を受けた。',
             '- %s は、いずれも §0-1 (a) の引かれる向きと同じ側（保留や降格が減る）に効く（凍結前の最終検分の Cl1 軽1・Cl2 中7・採否表 P140）。%s も同じ側（測れた効果種が減り、規模非依存の読みに届きにくい・コーディネータの読み）に効く。値は変えていない。' % ('・'.join(same), '・'.join(meas)),
-            '- 登録者裁定 D26（2026-09-14）で calibration.claim_release と judge_validity.extract.echo を追補した。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。',
+            '- 登録者裁定 D26（2026-09-14）で calibration.claim_release と judge_validity.extract.echo を追補した。一覧の全項は、2026-09-15 に登録者が書かれたとおりに確認した（登録者裁定 D45）。確認の前に、§0-1 (a) の引かれる向きと同じ側の四項を名指しで挙げた（提案 records/A/freeze-prep/freeze-prep-proposal-A.md §2-1）。',
             '- 追補（2026-09-15）の六項（judge_validity.files.balance・files.fallback・attachment.request・attachment.reply・attachment.merge・position.measures）は、登録者裁定 D38〜D40 を器材に移すときにコーディネータが決めた細目で、札に効かない（判定器の妥当性は記述）。'
             '登録者の「盲検を複雑にしない」という依頼に合わせて手順を簡単に見せたい向きがあるので、手順書に登録者の操作の数（判定者 × ファイルの会話の数・続きの送信・貼り付け）を書いた。',
             '- 追補（2026-09-15・二回目）の一項（judge_validity.reading_check.code）は、試し読みで Grok が形を守ったまま本文を読まずに埋めた後の登録者裁定 D42 を器材に移すときに、コーディネータが決めた細目で、札に効かない。記号の無い行も照合外れに数える厳しい側を選んだ。', '',

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_A.py v2.7 —— 段階 A の正本 `design/contrasts-A.json` を設計草案9（凍結候補 4）から決定的に生成する（手書き禁止・再実行同一バイト）。
+"""make_contrasts_A.py v2.8 —— 段階 A の正本 `design/contrasts-A.json` を設計草案9（凍結候補 4）から決定的に生成する（手書き禁止・再実行同一バイト）。
+v2.8（2026-09-15・凍結の前の登録者裁定 D45〜D47）: 運用の解釈の全項の確認（tooling_interpretations.status）・予想の様式と照合の規則と封印の順（predictions）・procedure の文言（二回目の試し読みの済み・全項の確認・予想の封印）・登録者裁定の一覧 D45〜D47 を書き足す（v2.8 の区画・記録 records/A/freeze-prep/）。
 v2.7（2026-09-15・試し読みの後の登録者裁定 D41〜D44）: 盲検から Grok を外す・照合記号と照合外れの規則（reading_check）・依頼文と書き出しと取りまとめの文言の照合記号・同じ系統どうしの断り・二回目の試し読み（procedure の文言）・運用の解釈の追補一項を書き足す（v2.7 の区画・記録 records/A/judge-arrangement2/）。
 v2.6（2026-09-15・登録者裁定 D36〜D40〔2026-09-14〕・逸脱 D-33 の裁定 (A)）: 判定器の妥当性の範囲（全機種）・判定者の構成と単位と盲検の条件と κ の分け方・ファイルの区切り（推定トークン数の上限・最小のファイル数）・位置の記述・添付ファイルで依頼する運びと返信の取りまとめ（運用の解釈の追補六項）・Firth の一致検査の状態・procedure の済みの印を書き足す（v2.6 の区画でキーに書き足し、既存の文字列は上書きで置き換える・記録 records/A/judge-arrangement/）。
 v2.5（2026-09-14・凍結前の最終検分の採否表 P105〜P153・登録者裁定 D26〜D35）: 運用の解釈の確認と追補（初点の名乗りの移し替え・判定器の断片の復唱の測定）・測れた効果種の区間と境界と両向きと場面ごとの被覆と文言・区間の被覆の断り・抽出検査の鍵の置き場と機械分類の伏せ・Firth の一致検査の選べる手・時間貸しの費用の上限と停止規則の参照・対比ごとの効果種（effect）を書き足す（v2.5 の区画でキーに書き足し、既存の文字列は上書きで置き換える）。
@@ -590,6 +591,63 @@ registrant_decisions_v27 = {'decided': '2026-09-15',
                                       'D44 judge_validity.groups（同じ系統どうしの一致は独立の確認に数えない）'],
                             'record': 'records/A/judge-arrangement2/judge-arrangement2-A.md', 'trial_record': 'records/A/judge-trial/judge-trial-A.md'}
 
+# ---- v2.8（2026-09-15）: 凍結の前の登録者裁定 D45〜D47（運用の解釈の全項の確認・率盲検の外の経路の追記・予想の様式と照合の規則と封印の順・提案 records/A/freeze-prep/freeze-prep-proposal-A.md・事前登録 records/A/freeze-prep/preregistration-freeze-prep-A.md）
+P8_TAIL = '二回目の試し読み（照合記号つき・登録者裁定 D43）'
+assert procedure[8].endswith(P8_TAIL), procedure[8]
+procedure[8] = procedure[8][:-len(P8_TAIL)] + '二回目の試し読み（照合記号つき・済 2026-09-15・登録者裁定 D43）・運用の解釈の全項の確認（登録者・済 2026-09-15・登録者裁定 D45）・率盲検の外の経路の追記と予想の様式の確定（登録者裁定 D46・D47）'
+assert procedure[10] == '凍結・予想封印・記録先行公開', procedure[10]
+procedure[10] = '凍結・予想封印（コーディネータ → 登録者・様式と照合の規則と封印の順は predictions・登録者裁定 D47）・記録先行公開'
+tooling_interpretations['status'] = tooling_interpretations['status'] + '。全項の確認（2026-09-15）: 一覧の全項を、書かれたとおりに登録者が確認した（登録者裁定 D45・確認の一覧 records/A/tooling-interpretations-confirmation-A.md）'
+PRED_NOT = '予想しない'
+PRED_CONF_EDGES = [[0, 0], [1, 3], [4, 8], [9, 17], [18, fam['A_slope']['m']]]   # 確証の本数の帯（登録者裁定 D47・提案の案 B）
+PRED_MEAS_EDGES = [[0, 0], [1, 2], [3, 5], [6, fam['A_slope']['effect_types']]]   # 測れた効果種の数の帯
+for _E, _top in ((PRED_CONF_EDGES, fam['A_slope']['m']), (PRED_MEAS_EDGES, fam['A_slope']['effect_types'])):
+    assert _E[0][0] == 0 and _E[-1][1] == _top and all(lo_ <= hi_ for lo_, hi_ in _E) and all(_E[i + 1][0] == _E[i][1] + 1 for i in range(len(_E) - 1)), _E
+pred_band = lambda edges, unit: [PRED_NOT] + [('%d %s' % (lo_, unit)) if lo_ == hi_ else ('%d〜%d %s' % (lo_, hi_, unit)) for lo_, hi_ in edges]
+predictions = {
+    'decided_by': '登録者裁定 D47（2026-09-15・提案 records/A/freeze-prep/freeze-prep-proposal-A.md の案 B）',
+    'form': 'records/predictions/predictions-form-A-v0.8.html', 'form_version': 'v0.8',
+    'generator': 'tools/make_predictions_form_A.py', 'compare': 'tools/compare_predictions_A.py', 'js_source': 'records/predictions/predictions-form-Vprime-v0.5.html',
+    'who': ['登録者', 'コーディネータ'],
+    'timing': '凍結の後・パイロットの前・データを作る前',
+    'order': ('凍結 → コーディネータの封印（JSON を records/predictions/ に保存し、SHA-256 をファイルから機械で計算する）→ 登録者の封印（ブラウザで様式を開いて記入し、JSON と SHA-256 を生成し、SHA-256 をチャットに貼り、JSON を添付する。'
+              'コーディネータは JSON を records/predictions/ に逐語で保全し、SHA-256 を機械で計算して貼られた値と照合する）→ 凍結記録に記帳 → 記録先行公開 → パイロット'),
+    'independence': '登録者は、自分の封印までコーディネータの予想のファイルを開かない。コーディネータは、自分の封印の後に登録者の JSON を受け取る',
+    'not_predicted': PRED_NOT,
+    'preset': 'なし（規模ごとの既測が無い・4B-2507 の既測は並びの線に載せない別記号の点）',
+    'fields': {
+        'direction': {'key_prefix': 'a.dir.', 'over': 'families.A_slope.contrasts',
+                      'options': [PRED_NOT, '規模が大きいほど、A の破局率が B に比べて上がる側へ動く', '規模が大きいほど、A の破局率が B に比べて下がる側へ動く', '規模に沿った動きは区別できない（非有意）']},
+        'floor': {'key_prefix': 'a.floor.', 'over': 'descriptive_families.A_desc_floor.cells', 'options': [PRED_NOT, '全規模で上限が censor.low 未満になる', '上限が censor.low 未満にならない規模がある']},
+        'confirmed_band': {'key': 'a.all.confirmed_band', 'what': '確証の本数（傾きの族の対比のうち）', 'unit': '本', 'edges': PRED_CONF_EDGES, 'options': pred_band(PRED_CONF_EDGES, '本')},
+        'measurable_band': {'key': 'a.all.measurable_band', 'what': '測れた効果種の数', 'unit': '種', 'edges': PRED_MEAS_EDGES, 'options': pred_band(PRED_MEAS_EDGES, '種')},
+        'info': {'options': ['読了', '一部', '未読'],
+                 'items': [{'key': 'info.main_read', 'text': '本プログラムの結果報告（records/results/）'}, {'key': 'info.vprime_read', 'text': '追補 V′ の結果報告'},
+                           {'key': 'info.m_read', 'text': '追補 M の結果報告'}, {'key': 'info.f_read', 'text': '段階 F の結果報告'},
+                           {'key': 'info.a_frozen_read', 'text': '段階 A の凍結文書（design/design-stageA-FROZEN.md）'},
+                           {'key': 'info.gate05_read', 'text': '門0.5 の記録（records/A/identity-screen-A.md・records/A/gate05-run-A.md）'},
+                           {'key': 'info.trial_read', 'text': '試し読みの記録（records/A/judge-trial/・records/A/judge-trial2/）'}]},
+        'text': [{'key': 'info.coi', 'text': 'COI（自由記述・望む向きを先に書く）'}, {'key': 'free', 'text': '自由記述'}, {'key': 'date', 'text': '日付'}],
+        'who': {'key': 'who', 'options': ['登録者', 'コーディネータ']}},
+    'compare_rules': {
+        'direction': '集計器の札が confirm_rule.labels.confirmed で β₃ の推定値（result.beta）が正なら選択肢の二つ目、負なら三つ目に写し、札が confirm_rule.labels.ns なら四つ目に写す。ほかの札（記述・判定保留・判定不能）は照合不能',
+        'floor': '集計器の床持続の 0/1（floor の flag）が立てば選択肢の二つ目、立たなければ三つ目に写す。セルが無ければ照合不能',
+        'confirmed_band': '集計器の札の数え（label_counts.confirmed）を edges の帯に写す',
+        'measurable_band': '集計器の測れた効果種（measurable.types の measurable が真の効果種）の数を edges の帯に写す。計算の記録が無ければ照合不能',
+        'not_predicted': '「予想しない」は照合せず、件数を別に数える',
+        'validation': '予想の欄が欠けた JSON・選択肢の外の値を持つ JSON・予想者が who の外の JSON・様式の名が違う JSON は照合せずに止める',
+        'output': '封印予想の JSON ごとに、種別（向き・床持続・全体）ごとの的中・外れ・照合不能・予想しないの件数と、外れと照合不能の一覧を records/A/predictions-check-A.md と同 .json に書き、summary を報告の §7 に機械で転記する'},
+    'fence': '的中は独立の確認ではなく、誰の判断の重みも変えない。照合は記録であり評価ではない。封印予想を事後の向きや読みの根拠に引かない',
+}
+predictions['n_prediction_fields'] = len(fam['A_slope']['contrasts']) + len(desc['A_desc_floor']['cells']) + 2
+registrant_decisions_v28 = {'decided': '2026-09-15',
+                            'timestamps_utc': {'D45': '2026-09-15T11:34Z', 'D46': '2026-09-15T11:34Z', 'D47': '2026-09-15T11:34Z'},
+                            'items': ['D45 tooling_interpretations.status（運用の解釈の全項を書かれたとおりに確認する）',
+                                      'D46 率盲検の外の経路（草案の §0-8）に、門0.5 の手元の率と試し読みの鍵を足す',
+                                      'D47 predictions・procedure（予想の様式・照合の規則・封印の順）'],
+                            'proposal': 'records/A/freeze-prep/freeze-prep-proposal-A.md', 'preregistration': 'records/A/freeze-prep/preregistration-freeze-prep-A.md',
+                            'confirmation_list': 'records/A/tooling-interpretations-confirmation-A.md'}
+
 # ---- 整合検査（結果を JSON に書き、転記行 B はここを読む）
 allc = [ct for F in [fam['A_slope']] + [desc[k] for k in ('A_desc_nstr', 'A_desc_ncold')] for ct in F['contrasts']]
 ids = [ct['id'] for ct in allc]; dup = sorted({i for i in ids if ids.count(i) > 1})
@@ -608,15 +666,15 @@ integrity = {'id_duplicates': len(dup), 'arms_required_missing': missing, 'arms_
              'label_combo_rows': len(COMBO), 'label_combo_fireable': sum(1 for r in COMBO if r['fireable']), 'effect_mismatch': len(eff_bad),
              'checked': ['id の重複', '対比が要求する腕の台帳での有無', '登録対比を持たない腕', '台帳に無い腕', 'environments と models の一致', '橋の主環境と environments の一致', '札の全組合せ表の行 id の一意',
                          '対比の effect と id の後半の一致・効果種の一覧との一致']}
-T = {'id': 'contrasts-A', 'version': 'draft9-2026-09-15', 'generator': 'tools/make_contrasts_A.py v2.7','note': '段階 A の正本（機械可読・凍結対象・tools/make_contrasts_A.py が生成）。本文の数はここからの束縛と転記のみ。',
+T = {'id': 'contrasts-A', 'version': 'draft9-2026-09-15', 'generator': 'tools/make_contrasts_A.py v2.8','note': '段階 A の正本（機械可読・凍結対象・tools/make_contrasts_A.py が生成）。本文の数はここからの束縛と転記のみ。',
      'n_per_arm': n, 'pilot_n': pn, 'identity_n': n_id, 'calibration_n': n_cal, 'scenarios': SC, 'models': MODELS, 'sizes': SIZES,
      'arms': {'preamble': ARMS, 'sha16': arm_sha, 'arms_string': ','.join(ARMS), 'notes': {'N': '前置きなし（前置きファイルを持たない腕のため sha16 は null）'}},
      'bases_4B2507_api': BASE, 'families': fam, 'descriptive_families': desc, 'censor': censor, 'style_gate': style_gate, 'unmeasurable': unmeasurable, 'anchor_band': anchor_band,
      'calibration': calib, 'gate2': gate2, 'identity_screen': identity, 'capacity_rule': capacity_rule, 'runner': runner, 'environments': environments, 'environment_rule': environment_rule, 'cost': cost,
-     'bridge': bridge, 'environment_band': environment_band, 'firth_check': firth_check, 'judge_validity': judge_validity, 'report_rules': report_rules, 'reading_selection': reading_selection, 'sessions': sessions, 'response_mode': response_mode, 'sample_inspection': sample_inspection, 'integrity_check': integrity_check, 'api_rerun': api_rerun, 'tooling_interpretations': tooling_interpretations, 'registrant_decisions_D16_D25': registrant_decisions, 'registrant_decisions_D26_D35': registrant_decisions_v25, 'registrant_decisions_D36_D40': registrant_decisions_v26, 'registrant_decisions_D41_D44': registrant_decisions_v27,
+     'bridge': bridge, 'environment_band': environment_band, 'firth_check': firth_check, 'judge_validity': judge_validity, 'report_rules': report_rules, 'reading_selection': reading_selection, 'sessions': sessions, 'response_mode': response_mode, 'sample_inspection': sample_inspection, 'integrity_check': integrity_check, 'api_rerun': api_rerun, 'tooling_interpretations': tooling_interpretations, 'registrant_decisions_D16_D25': registrant_decisions, 'registrant_decisions_D26_D35': registrant_decisions_v25, 'registrant_decisions_D36_D40': registrant_decisions_v26, 'registrant_decisions_D41_D44': registrant_decisions_v27, 'predictions': predictions, 'registrant_decisions_D45_D47': registrant_decisions_v28,
      'seeds': seeds, 'tags': tags, 'procedure': procedure, 'print_strings': print_strings, 'denominators': denominators, 'publication': publication,
      'fwer_note': '確証は傾きの族のみ。p*＝max(p_β, p_pt) に Holm（m 固定）を当てる（登録者裁定 D1・D10）。β₃ の帰無と尺度依存の帰無（β₃ が零でなく pt 差の傾きが零）の両方に同じ Holm の保証が及ぶ（p_pt の正規近似の較正の範囲で・転記行 D）。対照の基底が規模で動く配置での札の率は転記行 D。床持続は記述（登録者決定 2026-09-13）。',
      'integrity': integrity}
 s = json.dumps(T, ensure_ascii=False, indent=1, sort_keys=False) + '\n'
 open(OUT, 'w', encoding='utf-8', newline='\n').write(s)
-print('[contrasts-A v2.7] written', OUT, 'sha16', hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper(), '| slope', len(slope), '| arms', len(ARMS), '| combo rows', len(COMBO), '| integrity', json.dumps({k: v for k, v in integrity.items() if k != 'checked'}, ensure_ascii=False))
+print('[contrasts-A v2.8] written', OUT, 'sha16', hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper(), '| slope', len(slope), '| arms', len(ARMS), '| combo rows', len(COMBO), '| integrity', json.dumps({k: v for k, v in integrity.items() if k != 'checked'}, ensure_ascii=False))

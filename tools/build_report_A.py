@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 import report_lint
 REPO = runs_A.REPO
-VERSION = 'v2.3'   # v2.3（2026-09-15・登録者裁定 D42・D44）: 判定器の除いた件数に照合外れと読めなかったファイル・読み取りの確かめの行・同じ系統の印（v2.2: 系統・κ の群・構成・取りまとめの記録・位置の記述）
+VERSION = 'v2.4'   # v2.4（2026-09-15・登録者裁定 D47）: 封印予想の照合の行の柵を「的中は独立の確認ではなく、誰の判断の重みも変えない」に改める（段階 A の様式の欄は帯だけではない）。v2.3（2026-09-15・登録者裁定 D42・D44）: 判定器の除いた件数に照合外れと読めなかったファイル・読み取りの確かめの行・同じ系統の印（v2.2: 系統・κ の群・構成・取りまとめの記録・位置の記述）
 # v2.1（2026-09-14・採否表 P128・P133・登録者裁定 D27〜D31・D32・P141）: 到達の見込みの欠けで止まる・両向きの測れた効果種と測れた対比の本数・区間の被覆の断り・抽出検査の一致・断片の復唱の記述・検査用の口
 
 ap = argparse.ArgumentParser()
@@ -392,7 +392,7 @@ def r_measrec(line):
 def r_pred(line):
     if not PRED:
         return None
-    return ['- 封印予想との照合（機械の転記）:'] + mb([json.dumps(PRED.get('summary', PRED), ensure_ascii=False)[:2000]]) + ['- **帯の的中は誰の判断の重みも変えない**。']
+    return ['- 封印予想との照合（機械の転記）:'] + mb([json.dumps(PRED.get('summary', PRED), ensure_ascii=False)[:2000]]) + ['- **的中は独立の確認ではなく、誰の判断の重みも変えない**。']
 
 
 def r_freeze(line):

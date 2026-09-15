@@ -11,20 +11,21 @@ v2（2026-09-14・実装検分の採否表 P98）: 走行器の refuse の規則
       python tools/freeze_A.py --verify-public records/freeze-A-<日付>.json --commit <公開のコミットの完全な SHA または main>（公開物の照合・採否表 P107）
 v3（2026-09-14・凍結前の最終検分の採否表 P107・P131）: 発行の前に共有関数と検査器の自己検査（SELFTESTS）を走らせ、合否と器の SHA16 をマニフェストに書く。凍結本文の §6 の見出しの正本 SHA16 と現物が違えば発行しない。
   --check は欠けがあれば終了コード 2。公開物の照合（--verify-public）を足した。
+v3.1（2026-09-15・登録者裁定 D47）: 凍結範囲に予想の様式の生成器と照合の器と、様式（正本 predictions.form）と様式の JS の出所（predictions.js_source）を足す。自己検査に照合の器を足す。凍結範囲の一覧を印字する口（--list）を足した。
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, re, sys, json, glob, argparse, datetime, subprocess, time, hashlib, urllib.request, urllib.parse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_A
 REPO = runs_A.REPO
-VERSION = 'v3'   # v3（2026-09-14・凍結前の最終検分の採否表 P107・P131）: 発行の前に自己検査を走らせて合否を記帳・凍結本文の正本 SHA16 と現物の一致・--check の欠けは終了コード 2・公開物の照合（--verify-public）
+VERSION = 'v3.1'   # v3.1（2026-09-15・登録者裁定 D47）: 凍結範囲に予想の様式と照合の器・自己検査に照合の器・--list。v3（2026-09-14・凍結前の最終検分の採否表 P107・P131）: 発行の前に自己検査を走らせて合否を記帳・凍結本文の正本 SHA16 と現物の一致・--check の欠けは終了コード 2・公開物の照合（--verify-public）
 PUBLIC_RAW = 'https://raw.githubusercontent.com/YutaKusumi/ontology-preamble-4b'
 SELFTESTS = [('confirm_A.py', ['--selftest']), ('firth.py', ['--selftest']), ('bands_A.py', ['--selftest']), ('numbers_lint.py', ['--selftest']), ('report_lint.py', ['--selftest']),
-             ('judge_fragments_A.py', ['selftest']), ('sample_inspection_A.py', ['selftest'])]
+             ('judge_fragments_A.py', ['selftest']), ('sample_inspection_A.py', ['selftest']), ('compare_predictions_A.py', ['--selftest'])]
 TOOLS = ['make_contrasts_A.py', 'confirm_A.py', 'bands_A.py', 'runs_A.py', 'zaxis_A.py', 'firth.py', 'firth_check_A.py', 'firth_check_A.R', 'power_grid_A.py', 'design_facts_A.py', 'numbers_lint.py', 'build_draftA.py',
          'run_preamble_local.py', 'colab/boot_stageA.py', 'identity_screen_A.py', 'gate_A.py', 'calib_band_A.py', 'control_chart_A.py', 'analyze_A.py', 'response_mode_A.py', 'integrity_A.py',
          'sample_inspection_A.py', 'judge_fragments_A.py', 'synth_A.py', 'synth_gates_A.py', 'build_report_A.py', 'report_lint.py', 'freeze_A.py', 'cost_facts.py', 'response_mode_M.py', 'response_mode_F.py',
-         'tooling_interpretations_A.py']
+         'tooling_interpretations_A.py', 'make_predictions_form_A.py', 'compare_predictions_A.py']
 RECORDS = ['design/contrasts-A.json', 'records/A/power-grid-A.json', 'records/A/power-grid-A.md', 'records/A/design-facts-A.json', 'records/A/design-facts-A.md', 'records/A/hf-models-A.json',
            'records/A/results-report-template-A.src.md', 'records/A/results-report-template-A.md', 'records/A/identity-screen-A.json', 'records/A/identity-screen-A.md', 'records/A/firth-check-A.json', 'records/A/firth-check-A.md',
            'arms/panel/SHA-LEDGER.json', 'arms/frozen-from-ryokai-os/app-scenarios.json', 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -43,6 +44,7 @@ def file_list(design):
     T = runs_A.load_T()
     cost = re.search(r'records/[\w\-./]+\.md', T['cost']['source']).group(0)   # 転記行 F の入力
     fs = [design, src] + ['tools/' + t for t in TOOLS] + RECORDS + [cost]
+    fs += [T['predictions']['form'], T['predictions']['js_source']]   # v3.1: 予想の様式と様式の JS の出所（登録者裁定 D47）
     fs += ['arms/panel/%s.md' % a for a in T['arms']['preamble'] if a not in ('N', 'O', 'Onull', 'Lneg')]
     for g in GLOBS:
         fs += sorted(rel(os.path.relpath(p, REPO)) for p in glob.glob(os.path.join(REPO, g)))
@@ -78,6 +80,7 @@ def design_spec_sha16(design):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser(); ap.add_argument('--design', default='design/design-stageA-FROZEN.md'); ap.add_argument('--verify', default=None); ap.add_argument('--check', action='store_true')
+    ap.add_argument('--list', action='store_true')   # v3.1: 凍結範囲の一覧を印字する
     ap.add_argument('--verify-public', default=None); ap.add_argument('--commit', default=None)
     a = ap.parse_args()
     if a.verify_public:
@@ -108,6 +111,11 @@ if __name__ == '__main__':
             print('  不一致: %s 凍結 %s 現物 %s' % b)
         sys.exit(1 if bad else 0)
     T = runs_A.load_T(); files = file_list(a.design); missing = [f for f in files if not os.path.exists(os.path.join(REPO, f))]; fr = frames_check(T)
+    if a.list:
+        for f in files:
+            print('  対象: %s%s' % (f, '' if os.path.exists(os.path.join(REPO, f)) else '（欠け）'))
+        print('[freeze_A --list] 対象 %d・欠け %d' % (len(files), len(missing)))
+        sys.exit(0)
     print('[freeze_A] 対象 %d・欠け %d・枠の検証 %s' % (len(files), len(missing), '一致' if not fr else '・'.join(fr)))
     for m in missing:
         print('  欠け: %s' % m)

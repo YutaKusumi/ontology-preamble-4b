@@ -1,9 +1,9 @@
-# 器材の整備で確定した運用の解釈（登録者の確認待ち・2026-09-13・登録者裁定 D9 の三つ目の手順・追補と文言の直し 2026-09-14・登録者裁定 D16〜D25・D26・追補 2026-09-15・登録者裁定 D38〜D40 と D42 の器材化）
+# 器材の整備で確定した運用の解釈（2026-09-13・登録者裁定 D9 の三つ目の手順・追補と文言の直し 2026-09-14・登録者裁定 D16〜D25・D26・追補 2026-09-15・登録者裁定 D38〜D40 と D42 の器材化・全項の確認 2026-09-15・登録者裁定 D45）
 
-- 性格: 登録済みの文言が決めていなかった運用を、器材を一義に動かすために正本 `design/contrasts-A.json`（SHA16 677710EC040022BD）に書き足した。各項の文言は正本の該当キーからの逐語転記（`tools/tooling_interpretations_A.py` v1.2 が組み立てる）。
+- 性格: 登録済みの文言が決めていなかった運用を、器材を一義に動かすために正本 `design/contrasts-A.json`（SHA16 F0C2FF897C78C4C0）に書き足した。各項の文言は正本の該当キーからの逐語転記（`tools/tooling_interpretations_A.py` v1.3 が組み立てる）。
 - 変えていないもの: 確証の規則・札の定義・閾値・帯の値は変えていない。札の入力を決める運用の読み（門2 の数え方・測定不能の走行・錨帯の比べ方・環境値）を含む（採否表 P103 で文言を改めた）。
-- 状態: 器材の整備（登録者裁定 D9 の三つ目の手順・2026-09-13）で確定した運用の解釈。追補と文言の直しは登録者裁定 D16〜D25（2026-09-14）で承認済み（registrant_decisions_D16_D25）。項 calibration.incomplete_rule と sessions.commit_rule は登録者裁定 D26（2026-09-14）で確認し、calibration.claim_release と judge_validity.extract.echo を追補した（registrant_decisions_D26_D35）。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。追補（2026-09-15）: 判定器の妥当性の運び（登録者裁定 D38〜D40 の器材化）の六項を足した（確認を受ける項に含める）。追補（2026-09-15・二回目）: 照合記号の細目（reading_check.code）の一項を足した（確認を受ける項に含める）
-- 読み方: 「なぜ要ったか」は登録の文言の欠け、「採らなかった案」はコーディネータが比べた別の読み（無ければ —）、「向き」は選んだ読みが §0-1 の引かれる向きのどちら側に効くかのコーディネータの読み（採否表 P140）。確認は凍結確認の直前に受け、変える場合は正本と草案と器材と合成検査を作り直す。
+- 状態: 器材の整備（登録者裁定 D9 の三つ目の手順・2026-09-13）で確定した運用の解釈。追補と文言の直しは登録者裁定 D16〜D25（2026-09-14）で承認済み（registrant_decisions_D16_D25）。項 calibration.incomplete_rule と sessions.commit_rule は登録者裁定 D26（2026-09-14）で確認し、calibration.claim_release と judge_validity.extract.echo を追補した（registrant_decisions_D26_D35）。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。追補（2026-09-15）: 判定器の妥当性の運び（登録者裁定 D38〜D40 の器材化）の六項を足した（確認を受ける項に含める）。追補（2026-09-15・二回目）: 照合記号の細目（reading_check.code）の一項を足した（確認を受ける項に含める）。全項の確認（2026-09-15）: 一覧の全項を、書かれたとおりに登録者が確認した（登録者裁定 D45・確認の一覧 records/A/tooling-interpretations-confirmation-A.md）
+- 読み方: 「なぜ要ったか」は登録の文言の欠け、「採らなかった案」はコーディネータが比べた別の読み（無ければ —）、「向き」は選んだ読みが §0-1 の引かれる向きのどちら側に効くかのコーディネータの読み（採否表 P140）。全項の確認は凍結確認の前に受けた（登録者裁定 D45・確認の一覧 records/A/tooling-interpretations-confirmation-A.md）。変える場合は正本と草案と器材と合成検査を作り直す。
 
 ## 1. `gate2.unit_rule`
 
@@ -534,7 +534,7 @@ Qwen3 初版レシピの六機種（思考モードを持つ）。4B-2507 は思
 - 器材の試走で門0 の既存のデータ（4B-2507 × N1）の腕別の (b) 率と層ごとの破局数が目に入った。閾値と帯は動かしていない。
 - 実装検分の反映（2026-09-14）で追補した項のうち、sessions.commit_rule は採否表 P82 の本走行の相を、データを作るすべての相に広げた。calibration.incomplete_rule は採否表 P77・P91 の器材の直しを正本の文言にした。どちらも登録者裁定 D26（2026-09-14）で確認を受けた。
 - style_gate.applies_sizes・families.A_slope.interpretation_clause.count_after・families.A_slope.refuse_gate.denominator_detail は、いずれも §0-1 (a) の引かれる向きと同じ側（保留や降格が減る）に効く（凍結前の最終検分の Cl1 軽1・Cl2 中7・採否表 P140）。reading_selection.measurable_effect_type.details も同じ側（測れた効果種が減り、規模非依存の読みに届きにくい・コーディネータの読み）に効く。値は変えていない。
-- 登録者裁定 D26（2026-09-14）で calibration.claim_release と judge_validity.extract.echo を追補した。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。
+- 登録者裁定 D26（2026-09-14）で calibration.claim_release と judge_validity.extract.echo を追補した。一覧の全項は、2026-09-15 に登録者が書かれたとおりに確認した（登録者裁定 D45）。確認の前に、§0-1 (a) の引かれる向きと同じ側の四項を名指しで挙げた（提案 records/A/freeze-prep/freeze-prep-proposal-A.md §2-1）。
 - 追補（2026-09-15）の六項（judge_validity.files.balance・files.fallback・attachment.request・attachment.reply・attachment.merge・position.measures）は、登録者裁定 D38〜D40 を器材に移すときにコーディネータが決めた細目で、札に効かない（判定器の妥当性は記述）。登録者の「盲検を複雑にしない」という依頼に合わせて手順を簡単に見せたい向きがあるので、手順書に登録者の操作の数（判定者 × ファイルの会話の数・続きの送信・貼り付け）を書いた。
 - 追補（2026-09-15・二回目）の一項（judge_validity.reading_check.code）は、試し読みで Grok が形を守ったまま本文を読まずに埋めた後の登録者裁定 D42 を器材に移すときに、コーディネータが決めた細目で、札に効かない。記号の無い行も照合外れに数える厳しい側を選んだ。
 

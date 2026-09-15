@@ -1,7 +1,7 @@
 {
  "id": "contrasts-A",
  "version": "draft9-2026-09-15",
- "generator": "tools/make_contrasts_A.py v2.7",
+ "generator": "tools/make_contrasts_A.py v2.8",
  "note": "段階 A の正本（機械可読・凍結対象・tools/make_contrasts_A.py が生成）。本文の数はここからの束縛と転記のみ。",
  "n_per_arm": 200,
  "pilot_n": 40,
@@ -3493,7 +3493,7 @@
   "runner": "tools/run_preamble_local.py（provider は local 以外・鍵は登録者の環境の変数から読み、値を表示しない）"
  },
  "tooling_interpretations": {
-  "status": "器材の整備（登録者裁定 D9 の三つ目の手順・2026-09-13）で確定した運用の解釈。追補と文言の直しは登録者裁定 D16〜D25（2026-09-14）で承認済み（registrant_decisions_D16_D25）。項 calibration.incomplete_rule と sessions.commit_rule は登録者裁定 D26（2026-09-14）で確認し、calibration.claim_release と judge_validity.extract.echo を追補した（registrant_decisions_D26_D35）。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。追補（2026-09-15）: 判定器の妥当性の運び（登録者裁定 D38〜D40 の器材化）の六項を足した（確認を受ける項に含める）。追補（2026-09-15・二回目）: 照合記号の細目（reading_check.code）の一項を足した（確認を受ける項に含める）",
+  "status": "器材の整備（登録者裁定 D9 の三つ目の手順・2026-09-13）で確定した運用の解釈。追補と文言の直しは登録者裁定 D16〜D25（2026-09-14）で承認済み（registrant_decisions_D16_D25）。項 calibration.incomplete_rule と sessions.commit_rule は登録者裁定 D26（2026-09-14）で確認し、calibration.claim_release と judge_validity.extract.echo を追補した（registrant_decisions_D26_D35）。一覧の全項の確認は、反映の後の版で凍結確認の直前に受ける。追補（2026-09-15）: 判定器の妥当性の運び（登録者裁定 D38〜D40 の器材化）の六項を足した（確認を受ける項に含める）。追補（2026-09-15・二回目）: 照合記号の細目（reading_check.code）の一項を足した（確認を受ける項に含める）。全項の確認（2026-09-15）: 一覧の全項を、書かれたとおりに登録者が確認した（登録者裁定 D45・確認の一覧 records/A/tooling-interpretations-confirmation-A.md）",
   "items": [
    "gate2.unit_rule",
    "unmeasurable.applied_on",
@@ -3602,6 +3602,194 @@
   ],
   "record": "records/A/judge-arrangement2/judge-arrangement2-A.md",
   "trial_record": "records/A/judge-trial/judge-trial-A.md"
+ },
+ "predictions": {
+  "decided_by": "登録者裁定 D47（2026-09-15・提案 records/A/freeze-prep/freeze-prep-proposal-A.md の案 B）",
+  "form": "records/predictions/predictions-form-A-v0.8.html",
+  "form_version": "v0.8",
+  "generator": "tools/make_predictions_form_A.py",
+  "compare": "tools/compare_predictions_A.py",
+  "js_source": "records/predictions/predictions-form-Vprime-v0.5.html",
+  "who": [
+   "登録者",
+   "コーディネータ"
+  ],
+  "timing": "凍結の後・パイロットの前・データを作る前",
+  "order": "凍結 → コーディネータの封印（JSON を records/predictions/ に保存し、SHA-256 をファイルから機械で計算する）→ 登録者の封印（ブラウザで様式を開いて記入し、JSON と SHA-256 を生成し、SHA-256 をチャットに貼り、JSON を添付する。コーディネータは JSON を records/predictions/ に逐語で保全し、SHA-256 を機械で計算して貼られた値と照合する）→ 凍結記録に記帳 → 記録先行公開 → パイロット",
+  "independence": "登録者は、自分の封印までコーディネータの予想のファイルを開かない。コーディネータは、自分の封印の後に登録者の JSON を受け取る",
+  "not_predicted": "予想しない",
+  "preset": "なし（規模ごとの既測が無い・4B-2507 の既測は並びの線に載せない別記号の点）",
+  "fields": {
+   "direction": {
+    "key_prefix": "a.dir.",
+    "over": "families.A_slope.contrasts",
+    "options": [
+     "予想しない",
+     "規模が大きいほど、A の破局率が B に比べて上がる側へ動く",
+     "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+     "規模に沿った動きは区別できない（非有意）"
+    ]
+   },
+   "floor": {
+    "key_prefix": "a.floor.",
+    "over": "descriptive_families.A_desc_floor.cells",
+    "options": [
+     "予想しない",
+     "全規模で上限が censor.low 未満になる",
+     "上限が censor.low 未満にならない規模がある"
+    ]
+   },
+   "confirmed_band": {
+    "key": "a.all.confirmed_band",
+    "what": "確証の本数（傾きの族の対比のうち）",
+    "unit": "本",
+    "edges": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      3
+     ],
+     [
+      4,
+      8
+     ],
+     [
+      9,
+      17
+     ],
+     [
+      18,
+      35
+     ]
+    ],
+    "options": [
+     "予想しない",
+     "0 本",
+     "1〜3 本",
+     "4〜8 本",
+     "9〜17 本",
+     "18〜35 本"
+    ]
+   },
+   "measurable_band": {
+    "key": "a.all.measurable_band",
+    "what": "測れた効果種の数",
+    "unit": "種",
+    "edges": [
+     [
+      0,
+      0
+     ],
+     [
+      1,
+      2
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      6,
+      7
+     ]
+    ],
+    "options": [
+     "予想しない",
+     "0 種",
+     "1〜2 種",
+     "3〜5 種",
+     "6〜7 種"
+    ]
+   },
+   "info": {
+    "options": [
+     "読了",
+     "一部",
+     "未読"
+    ],
+    "items": [
+     {
+      "key": "info.main_read",
+      "text": "本プログラムの結果報告（records/results/）"
+     },
+     {
+      "key": "info.vprime_read",
+      "text": "追補 V′ の結果報告"
+     },
+     {
+      "key": "info.m_read",
+      "text": "追補 M の結果報告"
+     },
+     {
+      "key": "info.f_read",
+      "text": "段階 F の結果報告"
+     },
+     {
+      "key": "info.a_frozen_read",
+      "text": "段階 A の凍結文書（design/design-stageA-FROZEN.md）"
+     },
+     {
+      "key": "info.gate05_read",
+      "text": "門0.5 の記録（records/A/identity-screen-A.md・records/A/gate05-run-A.md）"
+     },
+     {
+      "key": "info.trial_read",
+      "text": "試し読みの記録（records/A/judge-trial/・records/A/judge-trial2/）"
+     }
+    ]
+   },
+   "text": [
+    {
+     "key": "info.coi",
+     "text": "COI（自由記述・望む向きを先に書く）"
+    },
+    {
+     "key": "free",
+     "text": "自由記述"
+    },
+    {
+     "key": "date",
+     "text": "日付"
+    }
+   ],
+   "who": {
+    "key": "who",
+    "options": [
+     "登録者",
+     "コーディネータ"
+    ]
+   }
+  },
+  "compare_rules": {
+   "direction": "集計器の札が confirm_rule.labels.confirmed で β₃ の推定値（result.beta）が正なら選択肢の二つ目、負なら三つ目に写し、札が confirm_rule.labels.ns なら四つ目に写す。ほかの札（記述・判定保留・判定不能）は照合不能",
+   "floor": "集計器の床持続の 0/1（floor の flag）が立てば選択肢の二つ目、立たなければ三つ目に写す。セルが無ければ照合不能",
+   "confirmed_band": "集計器の札の数え（label_counts.confirmed）を edges の帯に写す",
+   "measurable_band": "集計器の測れた効果種（measurable.types の measurable が真の効果種）の数を edges の帯に写す。計算の記録が無ければ照合不能",
+   "not_predicted": "「予想しない」は照合せず、件数を別に数える",
+   "validation": "予想の欄が欠けた JSON・選択肢の外の値を持つ JSON・予想者が who の外の JSON・様式の名が違う JSON は照合せずに止める",
+   "output": "封印予想の JSON ごとに、種別（向き・床持続・全体）ごとの的中・外れ・照合不能・予想しないの件数と、外れと照合不能の一覧を records/A/predictions-check-A.md と同 .json に書き、summary を報告の §7 に機械で転記する"
+  },
+  "fence": "的中は独立の確認ではなく、誰の判断の重みも変えない。照合は記録であり評価ではない。封印予想を事後の向きや読みの根拠に引かない",
+  "n_prediction_fields": 52
+ },
+ "registrant_decisions_D45_D47": {
+  "decided": "2026-09-15",
+  "timestamps_utc": {
+   "D45": "2026-09-15T11:34Z",
+   "D46": "2026-09-15T11:34Z",
+   "D47": "2026-09-15T11:34Z"
+  },
+  "items": [
+   "D45 tooling_interpretations.status（運用の解釈の全項を書かれたとおりに確認する）",
+   "D46 率盲検の外の経路（草案の §0-8）に、門0.5 の手元の率と試し読みの鍵を足す",
+   "D47 predictions・procedure（予想の様式・照合の規則・封印の順）"
+  ],
+  "proposal": "records/A/freeze-prep/freeze-prep-proposal-A.md",
+  "preregistration": "records/A/freeze-prep/preregistration-freeze-prep-A.md",
+  "confirmation_list": "records/A/tooling-interpretations-confirmation-A.md"
  },
  "seeds": {
   "identity": 60001,
@@ -3802,9 +3990,9 @@
   "凍結前の最終検分（系統外の Gemini・Grok と系統内の claude.ai の Claude・草案8 と器材の変更点・この後に検分の巡を置かない・採否表 P105〜P153・登録者裁定 D26〜D35 承認 2026-09-14）→ 反映（正本 v2.5・格子 v3.3・設計事実 v3.3・草案9〔凍結候補の四つ目〕）",
   "門0.5 同一性選別（凍結前・N1 × 13 腕 × n=160・vLLM L4・済 2026-09-14・合格・records/A/identity-screen-A.md）",
   "Firth の一致検査（凍結前・Colab の R・合否規則は firth_check・済 2026-09-14・二回目で合格・逸脱 D-33）",
-  "判定器の妥当性の範囲と判定者とファイルの確定（登録者・済 2026-09-14・登録者裁定 D36〜D40）・試し読み（済 2026-09-15）・Grok を外し照合記号を足す（登録者裁定 D41・D42・D44）・二回目の試し読み（照合記号つき・登録者裁定 D43）",
+  "判定器の妥当性の範囲と判定者とファイルの確定（登録者・済 2026-09-14・登録者裁定 D36〜D40）・試し読み（済 2026-09-15）・Grok を外し照合記号を足す（登録者裁定 D41・D42・D44）・二回目の試し読み（照合記号つき・済 2026-09-15・登録者裁定 D43）・運用の解釈の全項の確認（登録者・済 2026-09-15・登録者裁定 D45）・率盲検の外の経路の追記と予想の様式の確定（登録者裁定 D46・D47）",
   "登録者の凍結確認（直前に正本・格子の見出し・転記行・本文・lint を再生成）",
-  "凍結・予想封印・記録先行公開",
+  "凍結・予想封印（コーディネータ → 登録者・様式と照合の規則と封印の順は predictions・登録者裁定 D47）・記録先行公開",
   "パイロット（7 機種 × 5 場面 × 13 腕 × n=40・撤退条件・測定不能率・断片の抽出・開始時点の診断・機種ごとの処理量の実測と費用の停止規則・環境帯の選択規則の引き直し）",
   "門2（一度）",
   "本走行（7 機種 × 5 場面 × 13 腕 × n=200・校正腕を機種セッションごとに・最初のセッションの校正腕を手元系列の初点に）",

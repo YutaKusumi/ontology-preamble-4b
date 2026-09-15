@@ -1,7 +1,7 @@
 # 段階 A 結果報告 雛形（率を見る前に先置・凍結に含める・原稿から組み立て・2026-09-13・改訂 2026-09-14）
 
 - 性格: 結果報告の骨格（節の順序・表の構成・各札の定型文・札 × 状況の読み文の表・限界と「確認していないこと」の欄）を、コーディネータがパイロットと本走行の率・判定欄を見る前に固定するもの。結果は本雛形の欄を埋める形でのみ書き、節の順序・強調・札の文言を結果を見てから選ばない。F の雛形（`records/F/results-report-template-F.md`）の型を継承し、段階 A の確証の規則（p* の Holm）・札の二段と全組合せ表・解釈条項による降格の並記（`report_rules.demoted_table`）・測れた効果種（裁定 D11）を最初から枠として持つ。凍結マニフェスト（`tools/freeze_A.py`）に含め、`freeze_A.py` は `report_rules.frames` の枠の見出しの実在（見出しの名の完全一致）を機械検証する。改訂（2026-09-14・実装検分の採否表 P95〜P97・登録者裁定 D16・D19・D20・D22〜D24）: 上向きの確証の定義・判定器の妥当性の列（機械の判定で条件付けた誤判定率・除いた件数・全対の κ・鍵の照合）・対照どうしの差の枠・残存規模の非連続の注・門2 の縮小の範囲・記帳の出所・並行のセッションの逸脱。改訂（2026-09-14・凍結前の最終検分の採否表 P117・P128・P133・P141・P145・P146・登録者裁定 D26〜D32）: 測れた効果種の両向きと区間と測れた対比の本数・測れなかった理由の列・区間の被覆の断り・抽出検査の目視の分類と機械分類の一致・判定器の断片の復唱の記述・到達の見込みの欠けと検査用の印の走査・報告の公開の前の走査器の確かめ・橋の 8B の交絡の書き方。
-- 組み立て: 原稿 `records/A/results-report-template-A.src.md` の数はすべて正本のキー参照で、`tools/build_draftA.py` が正本の値で置換する。束縛: 原稿 `records/A/results-report-template-A.src.md`（SHA16 11CABA7DE4B46759）のキー参照を正本 `design/contrasts-A.json`（SHA16 677710EC040022BD）の値で置換した（`tools/build_draftA.py`・件数は組み立ての標準出力・数の検査の記録 `records/A/numbers-lint-template-A.md`）。
+- 組み立て: 原稿 `records/A/results-report-template-A.src.md` の数はすべて正本のキー参照で、`tools/build_draftA.py` が正本の値で置換する。束縛: 原稿 `records/A/results-report-template-A.src.md`（SHA16 E8C21539CBD45B8F）のキー参照を正本 `design/contrasts-A.json`（SHA16 F0C2FF897C78C4C0）の値で置換した（`tools/build_draftA.py`・件数は組み立ての標準出力・数の検査の記録 `records/A/numbers-lint-template-A.md`）。
 - 埋め方: 〔 〕は機械集計（`tools/analyze_A.py`・`tools/gate_A.py`・`tools/calib_band_A.py`・`tools/control_chart_A.py`・`tools/identity_screen_A.py`・`tools/integrity_A.py`・`tools/sample_inspection_A.py`・`tools/response_mode_A.py`・`tools/design_facts_A.py`・`tools/power_grid_A.py`）の逐語転記で、`tools/build_report_A.py` が一次記録から取得して埋める。散文に手計算の数を書かない。組み立て器は雛形の行を消さず、機械の区画の後に雛形の行をそのまま残す（機械の区画で足りる行は起草者が削るか埋める）。機械の区画の中身の SHA16 は組み立て器が別の記録（報告と同じ名の `-machine.json`）に書き、`report_lint.py` が突合する。起草者が打ち込んでよい数は `report_rules.typed_numbers` に限り（日付・SHA16・SHA-256〔封印予想の記帳値〕・費用の実績〔登録者申告〕・逸脱番号・雛形の SHA16）、組み立て器が一覧を冒頭に印字する。対比の参照は `design/contrasts-A.json` の id で書く。価値語・機序語と未登録の数は `report_lint.py` が走査し、検出すれば組み立てを止める（`report_rules.lint`）。報告は、走査器が違反も埋め残しも無しに終わることを確かめてから公開する（採否表 P145）。組み立て器の検査用の口（`--allow-dev-marks`）で組んだ報告は公開に使わない（採否表 P133）。
 - 前提: 凍結設計 `design/design-stageA-FROZEN.md`〔SHA16〕・正本 `design/contrasts-A.json`〔SHA16〕・門0.5 の記録〔SHA16〕・門2 の記録〔SHA16〕・Firth の一致検査 `records/A/firth-check-A.md`〔判定・SHA16〕・封印予想（登録者・コーディネータ）〔SHA-256〕。
 
@@ -159,7 +159,7 @@
 
 - 〔`tools/confirm_A.py` と格子と同じ関数で、転記行 D と同じ Δ の格子のまま、基底の対照の率と 4B の処置と対照の水準差 d0 だけを実測に差し替えた併記（両向き・観測された効果量は使わない・採否表 P63・P117・登録者裁定 D28・D30）〕。
 - 測れた効果種の計算の記録（`reading_selection.measurable_effect_type`・seed・B・向き・区間の水準・下限）〔 〕。
-- 封印予想（登録者・コーディネータ・SHA-256〔 〕）との照合: 〔的中／外れ／照合不能の数・欄別〕。**帯の的中は誰の判断の重みも変えない**。
+- 封印予想（登録者・コーディネータ・SHA-256〔 〕）との照合: 〔的中／外れ／照合不能の数・欄別〕。**的中は独立の確認ではなく、誰の判断の重みも変えない**。
 
 ## 8. 凍結物の検証・逸脱
 
