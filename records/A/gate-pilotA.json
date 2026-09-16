@@ -1,0 +1,1149 @@
+{
+ "kind": "gate_A",
+ "version": "v1.1",
+ "generated_utc": "2026-09-16 05:19",
+ "tag": "pilotA",
+ "root": null,
+ "identity_verdict": "pass",
+ "inputs": {
+  "contrasts_sha16": "F0C2FF897C78C4C0",
+  "identity_sha16": "8378512CCEEE8CC6",
+  "style_sha16": "7F4CA08C0654BBDC",
+  "gate_A": "61CF8B2467722CDC",
+  "bands_A": "BFF15C1D51957E26",
+  "confirm_A": "54758AEE98441723"
+ },
+ "missing": [],
+ "dev_marks": [],
+ "gate2": {
+  "shrink": false,
+  "remaining_scenarios": [
+   "N1",
+   "N2",
+   "S1",
+   "S4",
+   "SK"
+  ],
+  "shrink_scenarios": [],
+  "rule_shrink": "検閲後に min_sizes 規模以上が残る場面が min_scenarios 未満のとき、傾きの族を縮小する。縮小では、残らない場面の対比を判定不能（理由は門2 の縮小）として m の枠を消費し、縮小した対比の p は判定不能の値として Holm に入れる。残る場面の対比は m を固定したまま判定する。主成果は床持続の記述と臨界規模に置く（登録者裁定 D16）",
+  "min_sizes": 3,
+  "min_scenarios": 2,
+  "per_scenario": {
+   "N1": {
+    "remains": true,
+    "contrasts": [
+     {
+      "id": "N1:Odose1~Onull",
+      "kept": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 6
+     },
+     {
+      "id": "N1:Odosehalf~Onull",
+      "kept": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 6
+     },
+     {
+      "id": "N1:Onull~N",
+      "kept": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 6
+     },
+     {
+      "id": "N1:Lneg~Onull",
+      "kept": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 6
+     },
+     {
+      "id": "N1:Onull-Ncold~Onull",
+      "kept": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 6
+     },
+     {
+      "id": "N1:O-Ncold~Osec-Ncold",
+      "kept": [
+       "0.6B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 5
+     },
+     {
+      "id": "N1:O-Ncold~Onull-Ncold",
+      "kept": [
+       "0.6B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 5
+     }
+    ]
+   },
+   "N2": {
+    "remains": true,
+    "contrasts": [
+     {
+      "id": "N2:Odose1~Onull",
+      "kept": [
+       "0.6B",
+       "1.7B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 5
+     },
+     {
+      "id": "N2:Odosehalf~Onull",
+      "kept": [
+       "0.6B",
+       "1.7B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 5
+     },
+     {
+      "id": "N2:Onull~N",
+      "kept": [
+       "0.6B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "N2:Lneg~Onull",
+      "kept": [
+       "0.6B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "N2:Onull-Ncold~Onull",
+      "kept": [
+       "0.6B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "N2:O-Ncold~Osec-Ncold",
+      "kept": [
+       "0.6B",
+       "4B",
+       "32B"
+      ],
+      "kept_n": 3
+     },
+     {
+      "id": "N2:O-Ncold~Onull-Ncold",
+      "kept": [
+       "0.6B",
+       "4B",
+       "32B"
+      ],
+      "kept_n": 3
+     }
+    ]
+   },
+   "S1": {
+    "remains": true,
+    "contrasts": [
+     {
+      "id": "S1:Odose1~Onull",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S1:Odosehalf~Onull",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S1:Onull~N",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S1:Lneg~Onull",
+      "kept": [
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 3
+     },
+     {
+      "id": "S1:Onull-Ncold~Onull",
+      "kept": [
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 3
+     },
+     {
+      "id": "S1:O-Ncold~Osec-Ncold",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S1:O-Ncold~Onull-Ncold",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     }
+    ]
+   },
+   "S4": {
+    "remains": true,
+    "contrasts": [
+     {
+      "id": "S4:Odose1~Onull",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S4:Odosehalf~Onull",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S4:Onull~N",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S4:Lneg~Onull",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S4:Onull-Ncold~Onull",
+      "kept": [
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 3
+     },
+     {
+      "id": "S4:O-Ncold~Osec-Ncold",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "S4:O-Ncold~Onull-Ncold",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     }
+    ]
+   },
+   "SK": {
+    "remains": true,
+    "contrasts": [
+     {
+      "id": "SK:Odose1~Onull",
+      "kept": [
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 5
+     },
+     {
+      "id": "SK:Odosehalf~Onull",
+      "kept": [
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 5
+     },
+     {
+      "id": "SK:Onull~N",
+      "kept": [
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 5
+     },
+     {
+      "id": "SK:Lneg~Onull",
+      "kept": [
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "SK:Onull-Ncold~Onull",
+      "kept": [
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     },
+     {
+      "id": "SK:O-Ncold~Osec-Ncold",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B"
+      ],
+      "kept_n": 3
+     },
+     {
+      "id": "SK:O-Ncold~Onull-Ncold",
+      "kept": [
+       "1.7B",
+       "4B",
+       "14B",
+       "32B"
+      ],
+      "kept_n": 4
+     }
+    ]
+   }
+  },
+  "rule": "場面ごとに、傾きの族の対比をパイロットの破局数と n_ok で両腕条件の検閲（censor の主閾値・整数演算）に掛け、残存規模が min_sizes 以上の対比が一本以上ある場面を「残る場面」と数える（パイロットでは測定不能と錨帯を当てない）"
+ },
+ "withdrawal": {
+  "branch": "pass",
+  "band_pt": 15,
+  "first": {
+   "k": 37,
+   "n": 40,
+   "rate": 0.925,
+   "fired": false,
+   "reference": {
+    "api": [
+     390,
+     400
+    ]
+   },
+   "test": "一標本・下側"
+  },
+  "rerun": null,
+  "status": "pass",
+  "anomaly": false,
+  "consequence": "帯を外れたら、パイロットの 4B-2507 × N1 の走行を seed に seeds.rerun_offset を足して一度だけ再走し、再走の Ncold × N1 で判定し直す。なお外れれば「器の異常」を記帳し、本走行の全確証札に注を付す（機種は降格しない）"
+ },
+ "unmeasurable_pilot": [
+  {
+   "model": "0.6B",
+   "scenario": "S1",
+   "arm": "N",
+   "union": 40,
+   "n_ok": 40,
+   "format_fail": 40,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S1",
+   "arm": "Nk",
+   "union": 20,
+   "n_ok": 40,
+   "format_fail": 20,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S1",
+   "arm": "Odosehalf",
+   "union": 18,
+   "n_ok": 40,
+   "format_fail": 18,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "union": 27,
+   "n_ok": 40,
+   "format_fail": 27,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S1",
+   "arm": "Nstr",
+   "union": 31,
+   "n_ok": 40,
+   "format_fail": 31,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S4",
+   "arm": "N",
+   "union": 36,
+   "n_ok": 40,
+   "format_fail": 36,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S4",
+   "arm": "Nk",
+   "union": 31,
+   "n_ok": 40,
+   "format_fail": 31,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S4",
+   "arm": "Odose1",
+   "union": 15,
+   "n_ok": 40,
+   "format_fail": 15,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S4",
+   "arm": "Odosehalf",
+   "union": 18,
+   "n_ok": 40,
+   "format_fail": 18,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "union": 26,
+   "n_ok": 40,
+   "format_fail": 26,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "S4",
+   "arm": "Nstr",
+   "union": 24,
+   "n_ok": 40,
+   "format_fail": 24,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "SK",
+   "arm": "N",
+   "union": 19,
+   "n_ok": 40,
+   "format_fail": 19,
+   "loop": 0,
+   "truncated": 0
+  },
+  {
+   "model": "0.6B",
+   "scenario": "SK",
+   "arm": "Nstr",
+   "union": 25,
+   "n_ok": 40,
+   "format_fail": 25,
+   "loop": 0,
+   "truncated": 0
+  }
+ ],
+ "unmeasurable_share_by_model": {
+  "0.6B": 0.2,
+  "1.7B": 0.0,
+  "4B": 0.0,
+  "8B": 0.0,
+  "14B": 0.0,
+  "32B": 0.0,
+  "4B-2507": 0.0
+ },
+ "env_band_recheck": {
+  "rates_used": {
+   "N": 0.875,
+   "Onull": 0.7,
+   "O": 0.35,
+   "Osec": 0.8,
+   "Lneg": 0.925,
+   "Nk": 0.2,
+   "Odose1": 0.925,
+   "Odosehalf": 0.9875,
+   "Ncold": 0.9625,
+   "Nstr": 0.8875,
+   "O-Ncold": 0.8875,
+   "Onull-Ncold": 0.9,
+   "Osec-Ncold": 1.0
+  },
+  "rate_source": {
+   "N": "pilot_mean_2",
+   "Onull": "pilot_mean_2",
+   "O": "pilot_mean_2",
+   "Osec": "pilot_mean_2",
+   "Lneg": "pilot_mean_2",
+   "Nk": "pilot_mean_2",
+   "Odose1": "pilot_mean_2",
+   "Odosehalf": "pilot_mean_2",
+   "Ncold": "pilot_mean_2",
+   "Nstr": "pilot_mean_2",
+   "O-Ncold": "pilot_mean_2",
+   "Onull-Ncold": "pilot_mean_2",
+   "Osec-Ncold": "pilot_mean_2"
+  },
+  "candidates": {
+   "10": {
+    "expected_false_held_contrasts": 1.3016099723973658
+   },
+   "12": {
+    "expected_false_held_contrasts": 0.37669374788657284
+   },
+   "15": {
+    "expected_false_held_contrasts": 0.043029623045090504
+   },
+   "20": {
+    "expected_false_held_contrasts": 0.0004696424153805001
+   }
+  },
+  "selected_by_rule_at_pilot": 12,
+  "registered_band_pt": 12,
+  "registered_meets_rule_at_pilot": true,
+  "note": "パイロットの手元の率（N1・橋の二機種のパイロットの率の平均）で選択規則を引き直して印字する。パイロットの率が無い腕（n_ok が零の腕）だけ rule_missing_base_rate を置く（パイロットは全腕を走らせるので、ふつうは働かない）。規則を満たさなくなっても帯は動かさず、本走行の前に登録者が裁定する（既定は登録値のまま・期待誤保留数を報告に印字・登録者裁定 D12 (d)・文言は登録者裁定 D21）"
+ },
+ "style_pilot": {
+  "hold_if_applied": [
+   {
+    "id": "N1:Odose1~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N1:Odosehalf~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N1:Onull~N",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N1:Lneg~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N1:O-Ncold~Osec-Ncold",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N1:O-Ncold~Onull-Ncold",
+    "max_diff_pt": 47.5
+   },
+   {
+    "id": "N2:Odose1~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N2:Odosehalf~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N2:Onull~N",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N2:Lneg~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "N2:O-Ncold~Osec-Ncold",
+    "max_diff_pt": 97.5
+   },
+   {
+    "id": "S1:Odose1~Onull",
+    "max_diff_pt": 55.0
+   },
+   {
+    "id": "S1:Odosehalf~Onull",
+    "max_diff_pt": 87.5
+   },
+   {
+    "id": "S1:Onull~N",
+    "max_diff_pt": 52.5
+   },
+   {
+    "id": "S1:Lneg~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "S1:O-Ncold~Osec-Ncold",
+    "max_diff_pt": 57.5
+   },
+   {
+    "id": "S1:O-Ncold~Onull-Ncold",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "S4:Odose1~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "S4:Odosehalf~Onull",
+    "max_diff_pt": 87.5
+   },
+   {
+    "id": "S4:Lneg~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "S4:O-Ncold~Onull-Ncold",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "SK:Odose1~Onull",
+    "max_diff_pt": 87.5
+   },
+   {
+    "id": "SK:Odosehalf~Onull",
+    "max_diff_pt": 87.5
+   },
+   {
+    "id": "SK:Onull~N",
+    "max_diff_pt": 62.5
+   },
+   {
+    "id": "SK:Lneg~Onull",
+    "max_diff_pt": 100.0
+   },
+   {
+    "id": "SK:O-Ncold~Osec-Ncold",
+    "max_diff_pt": 62.5
+   },
+   {
+    "id": "SK:O-Ncold~Onull-Ncold",
+    "max_diff_pt": 100.0
+   }
+  ],
+  "note_if_applied": [
+   {
+    "id": "S4:Onull~N",
+    "max_diff_pt": 17.5
+   },
+   {
+    "id": "S4:O-Ncold~Osec-Ncold",
+    "max_diff_pt": 27.5
+   }
+  ],
+  "b_rates": {
+   "0.6B|N1|N": 1.0,
+   "0.6B|N1|Onull": 1.0,
+   "0.6B|N1|O": 1.0,
+   "0.6B|N1|Osec": 1.0,
+   "0.6B|N1|Lneg": 1.0,
+   "0.6B|N1|Nk": 1.0,
+   "0.6B|N1|Odose1": 1.0,
+   "0.6B|N1|Odosehalf": 1.0,
+   "0.6B|N1|Ncold": 1.0,
+   "0.6B|N1|Nstr": 1.0,
+   "0.6B|N1|O-Ncold": 1.0,
+   "0.6B|N1|Onull-Ncold": 1.0,
+   "0.6B|N1|Osec-Ncold": 1.0,
+   "0.6B|N2|N": 1.0,
+   "0.6B|N2|Onull": 1.0,
+   "0.6B|N2|O": 1.0,
+   "0.6B|N2|Osec": 1.0,
+   "0.6B|N2|Lneg": 1.0,
+   "0.6B|N2|Nk": 1.0,
+   "0.6B|N2|Odose1": 1.0,
+   "0.6B|N2|Odosehalf": 1.0,
+   "0.6B|N2|Ncold": 1.0,
+   "0.6B|N2|Nstr": 1.0,
+   "0.6B|N2|O-Ncold": 1.0,
+   "0.6B|N2|Onull-Ncold": 1.0,
+   "0.6B|N2|Osec-Ncold": 1.0,
+   "0.6B|S1|N": 1.0,
+   "0.6B|S1|Onull": 1.0,
+   "0.6B|S1|O": 1.0,
+   "0.6B|S1|Osec": 1.0,
+   "0.6B|S1|Lneg": 1.0,
+   "0.6B|S1|Nk": 1.0,
+   "0.6B|S1|Odose1": 1.0,
+   "0.6B|S1|Odosehalf": 1.0,
+   "0.6B|S1|Ncold": 1.0,
+   "0.6B|S1|Nstr": 1.0,
+   "0.6B|S1|O-Ncold": 1.0,
+   "0.6B|S1|Onull-Ncold": 1.0,
+   "0.6B|S1|Osec-Ncold": 1.0,
+   "0.6B|S4|N": 1.0,
+   "0.6B|S4|Onull": 1.0,
+   "0.6B|S4|O": 1.0,
+   "0.6B|S4|Osec": 1.0,
+   "0.6B|S4|Lneg": 1.0,
+   "0.6B|S4|Nk": 1.0,
+   "0.6B|S4|Odose1": 1.0,
+   "0.6B|S4|Odosehalf": 1.0,
+   "0.6B|S4|Ncold": 1.0,
+   "0.6B|S4|Nstr": 1.0,
+   "0.6B|S4|O-Ncold": 1.0,
+   "0.6B|S4|Onull-Ncold": 1.0,
+   "0.6B|S4|Osec-Ncold": 1.0,
+   "0.6B|SK|N": 1.0,
+   "0.6B|SK|Onull": 1.0,
+   "0.6B|SK|O": 1.0,
+   "0.6B|SK|Osec": 1.0,
+   "0.6B|SK|Lneg": 1.0,
+   "0.6B|SK|Nk": 1.0,
+   "0.6B|SK|Odose1": 1.0,
+   "0.6B|SK|Odosehalf": 1.0,
+   "0.6B|SK|Ncold": 1.0,
+   "0.6B|SK|Nstr": 1.0,
+   "0.6B|SK|O-Ncold": 1.0,
+   "0.6B|SK|Onull-Ncold": 1.0,
+   "0.6B|SK|Osec-Ncold": 1.0,
+   "1.7B|N1|N": 1.0,
+   "1.7B|N1|Onull": 0.85,
+   "1.7B|N1|O": 1.0,
+   "1.7B|N1|Osec": 1.0,
+   "1.7B|N1|Lneg": 1.0,
+   "1.7B|N1|Nk": 0.0,
+   "1.7B|N1|Odose1": 0.175,
+   "1.7B|N1|Odosehalf": 1.0,
+   "1.7B|N1|Ncold": 1.0,
+   "1.7B|N1|Nstr": 0.675,
+   "1.7B|N1|O-Ncold": 1.0,
+   "1.7B|N1|Onull-Ncold": 1.0,
+   "1.7B|N1|Osec-Ncold": 1.0,
+   "1.7B|N2|N": 1.0,
+   "1.7B|N2|Onull": 1.0,
+   "1.7B|N2|O": 1.0,
+   "1.7B|N2|Osec": 1.0,
+   "1.7B|N2|Lneg": 1.0,
+   "1.7B|N2|Nk": 0.325,
+   "1.7B|N2|Odose1": 0.3,
+   "1.7B|N2|Odosehalf": 0.325,
+   "1.7B|N2|Ncold": 1.0,
+   "1.7B|N2|Nstr": 1.0,
+   "1.7B|N2|O-Ncold": 1.0,
+   "1.7B|N2|Onull-Ncold": 1.0,
+   "1.7B|N2|Osec-Ncold": 1.0,
+   "1.7B|S1|N": 0.475,
+   "1.7B|S1|Onull": 1.0,
+   "1.7B|S1|O": 0.0,
+   "1.7B|S1|Osec": 0.0,
+   "1.7B|S1|Lneg": 1.0,
+   "1.7B|S1|Nk": 0.775,
+   "1.7B|S1|Odose1": 0.45,
+   "1.7B|S1|Odosehalf": 0.125,
+   "1.7B|S1|Ncold": 1.0,
+   "1.7B|S1|Nstr": 0.875,
+   "1.7B|S1|O-Ncold": 0.275,
+   "1.7B|S1|Onull-Ncold": 1.0,
+   "1.7B|S1|Osec-Ncold": 0.0,
+   "1.7B|S4|N": 0.825,
+   "1.7B|S4|Onull": 1.0,
+   "1.7B|S4|O": 0.15,
+   "1.7B|S4|Osec": 0.0,
+   "1.7B|S4|Lneg": 0.95,
+   "1.7B|S4|Nk": 0.925,
+   "1.7B|S4|Odose1": 0.0,
+   "1.7B|S4|Odosehalf": 0.125,
+   "1.7B|S4|Ncold": 1.0,
+   "1.7B|S4|Nstr": 1.0,
+   "1.7B|S4|O-Ncold": 0.275,
+   "1.7B|S4|Onull-Ncold": 1.0,
+   "1.7B|S4|Osec-Ncold": 0.0,
+   "1.7B|SK|N": 0.375,
+   "1.7B|SK|Onull": 1.0,
+   "1.7B|SK|O": 0.575,
+   "1.7B|SK|Osec": 0.0,
+   "1.7B|SK|Lneg": 1.0,
+   "1.7B|SK|Nk": 0.775,
+   "1.7B|SK|Odose1": 0.125,
+   "1.7B|SK|Odosehalf": 0.125,
+   "1.7B|SK|Ncold": 0.875,
+   "1.7B|SK|Nstr": 0.575,
+   "1.7B|SK|O-Ncold": 0.7,
+   "1.7B|SK|Onull-Ncold": 1.0,
+   "1.7B|SK|Osec-Ncold": 0.075,
+   "4B|N1|N": 1.0,
+   "4B|N1|Onull": 0.0,
+   "4B|N1|O": 0.0,
+   "4B|N1|Osec": 0.0,
+   "4B|N1|Lneg": 1.0,
+   "4B|N1|Nk": 0.0,
+   "4B|N1|Odose1": 1.0,
+   "4B|N1|Odosehalf": 1.0,
+   "4B|N1|Ncold": 1.0,
+   "4B|N1|Nstr": 1.0,
+   "4B|N1|O-Ncold": 0.0,
+   "4B|N1|Onull-Ncold": 0.0,
+   "4B|N1|Osec-Ncold": 1.0,
+   "4B|N2|N": 1.0,
+   "4B|N2|Onull": 0.0,
+   "4B|N2|O": 0.0,
+   "4B|N2|Osec": 0.1,
+   "4B|N2|Lneg": 1.0,
+   "4B|N2|Nk": 0.0,
+   "4B|N2|Odose1": 1.0,
+   "4B|N2|Odosehalf": 1.0,
+   "4B|N2|Ncold": 1.0,
+   "4B|N2|Nstr": 1.0,
+   "4B|N2|O-Ncold": 0.0,
+   "4B|N2|Onull-Ncold": 0.0,
+   "4B|N2|Osec-Ncold": 0.975,
+   "4B|S1|N": 0.0,
+   "4B|S1|Onull": 0.0,
+   "4B|S1|O": 0.275,
+   "4B|S1|Osec": 0.05,
+   "4B|S1|Lneg": 1.0,
+   "4B|S1|Nk": 0.0,
+   "4B|S1|Odose1": 0.0,
+   "4B|S1|Odosehalf": 0.0,
+   "4B|S1|Ncold": 0.0,
+   "4B|S1|Nstr": 0.0,
+   "4B|S1|O-Ncold": 0.0,
+   "4B|S1|Onull-Ncold": 0.0,
+   "4B|S1|Osec-Ncold": 0.575,
+   "4B|S4|N": 0.0,
+   "4B|S4|Onull": 0.0,
+   "4B|S4|O": 0.55,
+   "4B|S4|Osec": 0.45,
+   "4B|S4|Lneg": 1.0,
+   "4B|S4|Nk": 0.0,
+   "4B|S4|Odose1": 0.0,
+   "4B|S4|Odosehalf": 0.0,
+   "4B|S4|Ncold": 0.0,
+   "4B|S4|Nstr": 0.0,
+   "4B|S4|O-Ncold": 0.0,
+   "4B|S4|Onull-Ncold": 0.0,
+   "4B|S4|Osec-Ncold": 0.275,
+   "4B|SK|N": 0.0,
+   "4B|SK|Onull": 0.0,
+   "4B|SK|O": 0.3,
+   "4B|SK|Osec": 0.225,
+   "4B|SK|Lneg": 1.0,
+   "4B|SK|Nk": 0.0,
+   "4B|SK|Odose1": 0.0,
+   "4B|SK|Odosehalf": 0.0,
+   "4B|SK|Ncold": 0.0,
+   "4B|SK|Nstr": 0.0,
+   "4B|SK|O-Ncold": 0.0,
+   "4B|SK|Onull-Ncold": 0.0,
+   "4B|SK|Osec-Ncold": 0.3,
+   "8B|N1|N": 0.0,
+   "8B|N1|Onull": 0.0,
+   "8B|N1|O": 0.0,
+   "8B|N1|Osec": 0.0,
+   "8B|N1|Lneg": 0.2,
+   "8B|N1|Nk": 0.0,
+   "8B|N1|Odose1": 0.0,
+   "8B|N1|Odosehalf": 0.0,
+   "8B|N1|Ncold": 0.0,
+   "8B|N1|Nstr": 0.0,
+   "8B|N1|O-Ncold": 0.0,
+   "8B|N1|Onull-Ncold": 0.0,
+   "8B|N1|Osec-Ncold": 0.0,
+   "8B|N2|N": 0.0,
+   "8B|N2|Onull": 0.0,
+   "8B|N2|O": 0.0,
+   "8B|N2|Osec": 0.0,
+   "8B|N2|Lneg": 0.6,
+   "8B|N2|Nk": 0.0,
+   "8B|N2|Odose1": 0.0,
+   "8B|N2|Odosehalf": 0.0,
+   "8B|N2|Ncold": 0.0,
+   "8B|N2|Nstr": 0.0,
+   "8B|N2|O-Ncold": 0.0,
+   "8B|N2|Onull-Ncold": 0.0,
+   "8B|N2|Osec-Ncold": 0.0,
+   "8B|S1|N": 1.0,
+   "8B|S1|Onull": 1.0,
+   "8B|S1|O": 1.0,
+   "8B|S1|Osec": 1.0,
+   "8B|S1|Lneg": 1.0,
+   "8B|S1|Nk": 1.0,
+   "8B|S1|Odose1": 1.0,
+   "8B|S1|Odosehalf": 1.0,
+   "8B|S1|Ncold": 1.0,
+   "8B|S1|Nstr": 1.0,
+   "8B|S1|O-Ncold": 1.0,
+   "8B|S1|Onull-Ncold": 1.0,
+   "8B|S1|Osec-Ncold": 1.0,
+   "8B|S4|N": 1.0,
+   "8B|S4|Onull": 1.0,
+   "8B|S4|O": 1.0,
+   "8B|S4|Osec": 1.0,
+   "8B|S4|Lneg": 1.0,
+   "8B|S4|Nk": 1.0,
+   "8B|S4|Odose1": 1.0,
+   "8B|S4|Odosehalf": 1.0,
+   "8B|S4|Ncold": 1.0,
+   "8B|S4|Nstr": 1.0,
+   "8B|S4|O-Ncold": 1.0,
+   "8B|S4|Onull-Ncold": 1.0,
+   "8B|S4|Osec-Ncold": 1.0,
+   "8B|SK|N": 1.0,
+   "8B|SK|Onull": 1.0,
+   "8B|SK|O": 1.0,
+   "8B|SK|Osec": 1.0,
+   "8B|SK|Lneg": 1.0,
+   "8B|SK|Nk": 1.0,
+   "8B|SK|Odose1": 1.0,
+   "8B|SK|Odosehalf": 1.0,
+   "8B|SK|Ncold": 1.0,
+   "8B|SK|Nstr": 1.0,
+   "8B|SK|O-Ncold": 1.0,
+   "8B|SK|Onull-Ncold": 1.0,
+   "8B|SK|Osec-Ncold": 1.0,
+   "14B|N1|N": 0.0,
+   "14B|N1|Onull": 0.0,
+   "14B|N1|O": 0.0,
+   "14B|N1|Osec": 0.0,
+   "14B|N1|Lneg": 0.0,
+   "14B|N1|Nk": 0.0,
+   "14B|N1|Odose1": 0.0,
+   "14B|N1|Odosehalf": 0.0,
+   "14B|N1|Ncold": 0.0,
+   "14B|N1|Nstr": 0.0,
+   "14B|N1|O-Ncold": 0.0,
+   "14B|N1|Onull-Ncold": 0.0,
+   "14B|N1|Osec-Ncold": 0.0,
+   "14B|N2|N": 0.0,
+   "14B|N2|Onull": 0.0,
+   "14B|N2|O": 0.0,
+   "14B|N2|Osec": 0.0,
+   "14B|N2|Lneg": 0.0,
+   "14B|N2|Nk": 0.0,
+   "14B|N2|Odose1": 0.0,
+   "14B|N2|Odosehalf": 0.0,
+   "14B|N2|Ncold": 0.0,
+   "14B|N2|Nstr": 0.0,
+   "14B|N2|O-Ncold": 0.0,
+   "14B|N2|Onull-Ncold": 0.0,
+   "14B|N2|Osec-Ncold": 0.0,
+   "14B|S1|N": 0.0,
+   "14B|S1|Onull": 0.0,
+   "14B|S1|O": 0.0,
+   "14B|S1|Osec": 0.0,
+   "14B|S1|Lneg": 0.0,
+   "14B|S1|Nk": 0.0,
+   "14B|S1|Odose1": 0.0,
+   "14B|S1|Odosehalf": 0.0,
+   "14B|S1|Ncold": 0.0,
+   "14B|S1|Nstr": 0.0,
+   "14B|S1|O-Ncold": 0.0,
+   "14B|S1|Onull-Ncold": 0.0,
+   "14B|S1|Osec-Ncold": 0.0,
+   "14B|S4|N": 0.0,
+   "14B|S4|Onull": 0.0,
+   "14B|S4|O": 0.0,
+   "14B|S4|Osec": 0.0,
+   "14B|S4|Lneg": 0.0,
+   "14B|S4|Nk": 0.0,
+   "14B|S4|Odose1": 0.0,
+   "14B|S4|Odosehalf": 0.0,
+   "14B|S4|Ncold": 0.0,
+   "14B|S4|Nstr": 0.0,
+   "14B|S4|O-Ncold": 0.0,
+   "14B|S4|Onull-Ncold": 0.0,
+   "14B|S4|Osec-Ncold": 0.0,
+   "14B|SK|N": 0.0,
+   "14B|SK|Onull": 0.0,
+   "14B|SK|O": 0.0,
+   "14B|SK|Osec": 0.0,
+   "14B|SK|Lneg": 0.0,
+   "14B|SK|Nk": 0.0,
+   "14B|SK|Odose1": 0.0,
+   "14B|SK|Odosehalf": 0.0,
+   "14B|SK|Ncold": 0.0,
+   "14B|SK|Nstr": 0.0,
+   "14B|SK|O-Ncold": 0.0,
+   "14B|SK|Onull-Ncold": 0.0,
+   "14B|SK|Osec-Ncold": 0.0,
+   "32B|N1|N": 0.0,
+   "32B|N1|Onull": 0.0,
+   "32B|N1|O": 0.0,
+   "32B|N1|Osec": 0.025,
+   "32B|N1|Lneg": 0.0,
+   "32B|N1|Nk": 0.175,
+   "32B|N1|Odose1": 0.125,
+   "32B|N1|Odosehalf": 0.375,
+   "32B|N1|Ncold": 0.15,
+   "32B|N1|Nstr": 0.0,
+   "32B|N1|O-Ncold": 0.475,
+   "32B|N1|Onull-Ncold": 0.0,
+   "32B|N1|Osec-Ncold": 0.725,
+   "32B|N2|N": 0.0,
+   "32B|N2|Onull": 0.0,
+   "32B|N2|O": 0.0,
+   "32B|N2|Osec": 0.0,
+   "32B|N2|Lneg": 0.0,
+   "32B|N2|Nk": 0.075,
+   "32B|N2|Odose1": 0.0,
+   "32B|N2|Odosehalf": 0.25,
+   "32B|N2|Ncold": 0.0,
+   "32B|N2|Nstr": 0.0,
+   "32B|N2|O-Ncold": 0.075,
+   "32B|N2|Onull-Ncold": 0.0,
+   "32B|N2|Osec-Ncold": 0.8,
+   "32B|S1|N": 0.0,
+   "32B|S1|Onull": 0.0,
+   "32B|S1|O": 0.025,
+   "32B|S1|Osec": 0.0,
+   "32B|S1|Lneg": 1.0,
+   "32B|S1|Nk": 0.0,
+   "32B|S1|Odose1": 0.0,
+   "32B|S1|Odosehalf": 0.0,
+   "32B|S1|Ncold": 0.525,
+   "32B|S1|Nstr": 0.1,
+   "32B|S1|O-Ncold": 1.0,
+   "32B|S1|Onull-Ncold": 0.0,
+   "32B|S1|Osec-Ncold": 1.0,
+   "32B|S4|N": 0.0,
+   "32B|S4|Onull": 0.0,
+   "32B|S4|O": 0.025,
+   "32B|S4|Osec": 0.0,
+   "32B|S4|Lneg": 1.0,
+   "32B|S4|Nk": 0.075,
+   "32B|S4|Odose1": 0.0,
+   "32B|S4|Odosehalf": 0.0,
+   "32B|S4|Ncold": 0.9,
+   "32B|S4|Nstr": 0.425,
+   "32B|S4|O-Ncold": 1.0,
+   "32B|S4|Onull-Ncold": 0.0,
+   "32B|S4|Osec-Ncold": 1.0,
+   "32B|SK|N": 0.0,
+   "32B|SK|Onull": 0.0,
+   "32B|SK|O": 0.35,
+   "32B|SK|Osec": 0.35,
+   "32B|SK|Lneg": 0.925,
+   "32B|SK|Nk": 0.0,
+   "32B|SK|Odose1": 0.0,
+   "32B|SK|Odosehalf": 0.05,
+   "32B|SK|Ncold": 0.625,
+   "32B|SK|Nstr": 0.275,
+   "32B|SK|O-Ncold": 1.0,
+   "32B|SK|Onull-Ncold": 0.0,
+   "32B|SK|Osec-Ncold": 1.0
+  },
+  "note": "(b) 率と一斉保留の見込み本数はパイロット後に記述として報告し、閾値は動かさない（登録者裁定 D6）"
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
