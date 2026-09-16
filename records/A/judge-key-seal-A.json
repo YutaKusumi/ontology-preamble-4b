@@ -1,0 +1,75 @@
+{
+ "kind": "judge_key_seal_A",
+ "version": "v2.3",
+ "generated_utc": "2026-09-16 05:35",
+ "key_file": "judge-key-A.json",
+ "key_sha256": "13021eea13b5602fde5bbb7d9d13159c9f2185f1c74919faabeafe81ebb061ae",
+ "fragments_file": "judge-fragments-A.json",
+ "fragments_sha16": "B11A35F0F6F7BF8B",
+ "n": 2100,
+ "tag": "pilotA",
+ "parser_sha16": "12EAA8B845BC0A2F",
+ "dev_marks": [],
+ "rule": "断片 id と trial_id・機種・場面・腕・機械判定の対応表（鍵）は、判定と採点が済むまで公開リポジトリの外（登録者の手元の置き場）に置き、鍵の SHA-256 を判定の前に記帳する。採点の器は記帳の値と鍵を照合し、合わなければ止まる。採点の後に鍵を公開する（登録者裁定 D19）",
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。",
+ "split": {
+  "cap_est_tokens": 600000,
+  "estimate": "ファイルの全文（依頼文と書き出しの形を含む）の推定トークン数＝ASCII でない字の数＋ASCII の字の数を三で割って切り上げた数（多めの換算）",
+  "rule": "断片を番号の順に連続した区切りで分け、各ファイルの推定トークン数が cap_est_tokens 以下になる最小のファイル数にする。全件が収まれば一つのファイルにする。区切りは抽出の器が機械で決め、判定の前に封印の記録に書く（登録者裁定 D38・2026-09-14）",
+  "balance": "最小のファイル数のもとで、最大のファイルの推定トークン数が最も小さくなる上限を求め、その上限で前から詰めて区切る（前から上限まで詰めると後ろのファイルだけが小さくなるため・運用の解釈）",
+  "n_files": 3
+ },
+ "files": [
+  {
+   "file": "judge-file-A-1of3.md",
+   "k": 1,
+   "K": 3,
+   "split": "main",
+   "first_id": "F0001",
+   "last_id": "F0701",
+   "n": 701,
+   "est_tokens": 521623,
+   "bytes": 1564868,
+   "sha16": "E8E8E6CC1383B3F1"
+  },
+  {
+   "file": "judge-file-A-2of3.md",
+   "k": 2,
+   "K": 3,
+   "split": "main",
+   "first_id": "F0702",
+   "last_id": "F1400",
+   "n": 699,
+   "est_tokens": 521527,
+   "bytes": 1564579,
+   "sha16": "DF0CA4D1179FF360"
+  },
+  {
+   "file": "judge-file-A-3of3.md",
+   "k": 3,
+   "K": 3,
+   "split": "main",
+   "first_id": "F1401",
+   "last_id": "F2100",
+   "n": 700,
+   "est_tokens": 521179,
+   "bytes": 1563535,
+   "sha16": "02A25BBC09AFB03B"
+  }
+ ],
+ "file_dir": "judge-files",
+ "reply_dir": "judge-replies",
+ "procedure_file": "judge-procedure-A.md",
+ "procedure_sha16": "2CDD5E730C5B3BAD",
+ "messages": {
+  "start": "添付ファイルの冒頭の依頼を読み、そのとおりに作業してください。",
+  "continue": "続けてください。"
+ },
+ "redo_line": "=== やり直し ===",
+ "reading_check": {
+  "threshold": 0.05,
+  "code_len": 4,
+  "alphabet": "ACDEFGHJKLMNPQRTUVWXY3479",
+  "rule": "各断片の終わりの行に照合記号を置き、判定者は書き出しの各行に code=照合記号 を足す。取りまとめの器は記号を突合し、記号が合わない行と記号の無い行の断片を照合外れとして数え、そのラベルを採点の対から外して件数を印字する。一つの判定者 × ファイルで照合外れが件数に占める割合が threshold を超えたら、同じ系統の新しい会話でそのファイルをやり直す。やり直しでも超えたら、その判定者 × ファイルは読めなかったものとして記録し、そのファイルのラベルを使わない（登録者裁定 D42・2026-09-15）"
+ }
+}
