@@ -1,0 +1,251 @@
+{
+ "tag": "pilotA",
+ "model": "4B",
+ "session": 1,
+ "phase": "pilot",
+ "run_keys": [
+  "pilotA__N1__none__seed61301",
+  "pilotA__N2__none__seed61302",
+  "pilotA__S1__none__seed61303",
+  "pilotA__S4__none__seed61304",
+  "pilotA__SK__none__seed61305"
+ ],
+ "started": "2026-09-15T22:49:15Z",
+ "runner_rc": {
+  "pilotA__N1__none__seed61301": [
+   0
+  ],
+  "pilotA__N2__none__seed61302": [
+   0
+  ],
+  "pilotA__S1__none__seed61303": [
+   0
+  ],
+  "pilotA__S4__none__seed61304": [
+   0
+  ],
+  "pilotA__SK__none__seed61305": [
+   0
+  ]
+ },
+ "preemptions": {
+  "pilotA__N1__none__seed61301": 0.0,
+  "pilotA__N2__none__seed61302": 0.0,
+  "pilotA__S1__none__seed61303": 0.0,
+  "pilotA__S4__none__seed61304": 0.0,
+  "pilotA__SK__none__seed61305": 0.0
+ },
+ "counts": {
+  "pilotA__N1__none__seed61301": {
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo_errors": 0
+  },
+  "pilotA__N2__none__seed61302": {
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo_errors": 0
+  },
+  "pilotA__S1__none__seed61303": {
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo_errors": 0
+  },
+  "pilotA__S4__none__seed61304": {
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo_errors": 0
+  },
+  "pilotA__SK__none__seed61305": {
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo_errors": 0
+  }
+ },
+ "model_rev_full": {
+  "4B": {
+   "id": "Qwen/Qwen3-4B",
+   "registered": "1cfa9a720891",
+   "full": "1cfa9a7208912126459214e8b04321603b3df60c",
+   "snapshot": "1cfa9a7208912126459214e8b04321603b3df60c"
+  }
+ },
+ "server_args": {
+  "4B": {
+   "dtype": "bfloat16",
+   "max_model_len": 8192,
+   "gpu_memory_utilization": 0.9,
+   "seed": 0,
+   "port": 8000,
+   "served_model_name": "Qwen/Qwen3-4B",
+   "vllm": "0.29.0"
+  }
+ },
+ "env_value": "L4",
+ "env_override": null,
+ "gpu": "NVIDIA L4, 23034",
+ "memory_class_gb": 24,
+ "concurrency": 24,
+ "versions": {
+  "vllm": "0.29.0",
+  "torch": "2.13.0",
+  "transformers": "5.16.1",
+  "tokenizers": "0.23.1",
+  "huggingface_hub": "1.29.0",
+  "pip_freeze_sha16": "C64B7D0E40293DAE"
+ },
+ "pip_freeze_sha16": "C64B7D0E40293DAE",
+ "repo_head": "608244c873d5bd58175f7e0cc0fd7942eb1ed87e",
+ "commit": "608244c873d5bd58175f7e0cc0fd7942eb1ed87e",
+ "commit_fixed": true,
+ "runner_sha16": "9F849D2823132BA2",
+ "model_rev": "1cfa9a720891",
+ "calibration_branch": null,
+ "dev_marks": [],
+ "boot": "v2",
+ "clause": "本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。",
+ "updated": "2026-09-15T23:10:00Z",
+ "log": [
+  {
+   "step": "repo",
+   "t": 0.0,
+   "at": "2026-09-15T22:49:14Z",
+   "head": "608244c873d5",
+   "commit_fixed": true,
+   "runner_sha16": "9F849D2823132BA2",
+   "persist": "/content/drive/MyDrive/op4b-stageA"
+  },
+  {
+   "step": "gpu",
+   "t": 0.0,
+   "at": "2026-09-15T22:49:14Z",
+   "gpu": "NVIDIA L4, 23034",
+   "env_value": "L4",
+   "memory_class_gb": 24
+  },
+  {
+   "step": "pip",
+   "t": 1.5,
+   "at": "2026-09-15T22:49:15Z",
+   "versions": {
+    "vllm": "0.29.0",
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.1",
+    "huggingface_hub": "1.29.0",
+    "pip_freeze_sha16": "C64B7D0E40293DAE"
+   }
+  },
+  {
+   "step": "server",
+   "t": 149.3,
+   "at": "2026-09-15T22:51:43Z",
+   "model": "4B",
+   "rev": "1cfa9a720891"
+  },
+  {
+   "step": "run",
+   "t": 331.0,
+   "at": "2026-09-15T22:54:45Z",
+   "run_key": "pilotA__N1__none__seed61301",
+   "rc": [
+    0
+   ],
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 181.7
+  },
+  {
+   "step": "run",
+   "t": 517.5,
+   "at": "2026-09-15T22:57:51Z",
+   "run_key": "pilotA__N2__none__seed61302",
+   "rc": [
+    0
+   ],
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 186.5
+  },
+  {
+   "step": "run",
+   "t": 753.9,
+   "at": "2026-09-15T23:01:47Z",
+   "run_key": "pilotA__S1__none__seed61303",
+   "rc": [
+    0
+   ],
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 236.4
+  },
+  {
+   "step": "run",
+   "t": 996.8,
+   "at": "2026-09-15T23:05:50Z",
+   "run_key": "pilotA__S4__none__seed61304",
+   "rc": [
+    0
+   ],
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 242.9
+  },
+  {
+   "step": "run",
+   "t": 1245.3,
+   "at": "2026-09-15T23:09:59Z",
+   "run_key": "pilotA__SK__none__seed61305",
+   "rc": [
+    0
+   ],
+   "rows": 520,
+   "n_ok": 520,
+   "target": 520,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 248.4
+  }
+ ],
+ "ended": "2026-09-15T23:10:00Z",
+ "files_sha16_lf": {
+  "pilotA/pilotA__N1__none__seed61301/cells.json": "55C74774F4D1402E",
+  "pilotA/pilotA__N1__none__seed61301/manifest.json": "3223A63AA6D81F6E",
+  "pilotA/pilotA__N1__none__seed61301/raw-Qwen_Qwen3-4B.jsonl": "3F70F5760B4BBB7B",
+  "pilotA/pilotA__N1__none__seed61301/trials-Qwen_Qwen3-4B.jsonl": "6AB94BCDDBD7EDD6",
+  "pilotA/pilotA__N2__none__seed61302/cells.json": "C624DDFE7FE08D53",
+  "pilotA/pilotA__N2__none__seed61302/manifest.json": "503CB5B7F9ACA1F2",
+  "pilotA/pilotA__N2__none__seed61302/raw-Qwen_Qwen3-4B.jsonl": "F86BCA1970EEEA20",
+  "pilotA/pilotA__N2__none__seed61302/trials-Qwen_Qwen3-4B.jsonl": "DF0A82D1E9A027D7",
+  "pilotA/pilotA__S1__none__seed61303/cells.json": "AFC66F2973EFACC4",
+  "pilotA/pilotA__S1__none__seed61303/manifest.json": "39365CF4EAA38AE0",
+  "pilotA/pilotA__S1__none__seed61303/raw-Qwen_Qwen3-4B.jsonl": "7C4BA2F0AD9F368D",
+  "pilotA/pilotA__S1__none__seed61303/trials-Qwen_Qwen3-4B.jsonl": "7952E60407651539",
+  "pilotA/pilotA__S4__none__seed61304/cells.json": "DA256D36358450D8",
+  "pilotA/pilotA__S4__none__seed61304/manifest.json": "801CC8C3DB2597E8",
+  "pilotA/pilotA__S4__none__seed61304/raw-Qwen_Qwen3-4B.jsonl": "5C7ECDD6AC113C1A",
+  "pilotA/pilotA__S4__none__seed61304/trials-Qwen_Qwen3-4B.jsonl": "1FAC30371B9E2399",
+  "pilotA/pilotA__SK__none__seed61305/cells.json": "97BAD4E39444110C",
+  "pilotA/pilotA__SK__none__seed61305/manifest.json": "623E952B642FC6AD",
+  "pilotA/pilotA__SK__none__seed61305/raw-Qwen_Qwen3-4B.jsonl": "D48DD48A9A7F0E0E",
+  "pilotA/pilotA__SK__none__seed61305/trials-Qwen_Qwen3-4B.jsonl": "F0199ACB686A35B7"
+ },
+ "wall_s": 1246.3
+}
