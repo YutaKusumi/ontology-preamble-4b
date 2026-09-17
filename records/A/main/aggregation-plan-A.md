@@ -68,6 +68,13 @@
 - 報告の組み立て器と走査器が、`missing` に一項のある集計の出力で最後まで通るか（手順 20 で確かめる・走査器の行の上では「足りない記録」は違反に数えない）。
 - 系統外の目（本段取りは Claude 系のコーディネータだけで書いた）。
 
+## 8. 追記（2026-09-17・走らせている途中・率を見る前）
+
+- 段取りの 1〜4 番目は済んだ: 凍結物の照合 87/87（直前にもう一度）、応答様式 `records/A/style-stageA.json`（走行器の登録と一致）、校正帯 `records/A/calib-stageA-calib.{json,md}`（合格枝・9 本すべて合格・器の異常 0・起動器の判定と k がすべて一致）、管理図 `records/control-chart.md`（10 行）。
+- `<think>` の残骸は応答様式の記録で 7 機種とも 0（91,000 件中 0）。あわせて、手元の走行（本走行・錨反復・橋・校正腕）の全試行で走行器の記帳 `reasoning_chars` が 0 であることを確かめた（API 再走行の教訓による追加の確認）。
+- **5 番目の集計の器が、入力の検査で止まった**（門0.5 の記録の正本 SHA16 が凍結した正本と違う・止める規則 §4-1）。率は読まれていない。登録者裁定（甲）により、門0.5 の記録を凍結した器と正本で別の置き場に作り直し（`records/A/main/identity-screen-A-regen-2026-09-17.{json,md}`）、凍結物の記録と比べて正本 SHA16 と作成時刻のほかは全項目一致を確かめた（逸脱 D-40）。**5 番目の `--identity` は、この作り直した記録に替える**: `python tools/analyze_A.py --tag stageA --gate records/A/gate-pilotA.json --identity records/A/main/identity-screen-A-regen-2026-09-17.json --calib records/A/calib-stageA-calib.json --style records/A/style-stageA.json`。6 番目の予想の照合は変わらない。
+- 本追記と作り直した記録を、集計の器を走らせる前にコミットする。
+
 ## 検分票
 
 - 対象: 手順 19 の段取り（走らせる前）。
