@@ -1,0 +1,242 @@
+{
+ "kind": "verify_round2_A",
+ "version": "v1.1",
+ "generated_utc": "2026-09-17 10:17",
+ "head": "161a3fead17f2de00b16f5dff5399cb71ab1650c",
+ "draft4_sha16": "AE5678309977243F",
+ "tool_sha16": "889C8705A747332B",
+ "tracked_changes_before": " M records/reviews/A/results/round2/verify.log\n",
+ "tracked_changes_after": " M records/reviews/A/results/round2/verify.log\n",
+ "counts": {
+  "一部再現": 3,
+  "再現": 5
+ },
+ "items": [
+  {
+   "w": "W154",
+   "finding": "票が示した草案4 の行番号",
+   "checked": "草案4 の行を読み、票の述べる中身が当たるかを見る",
+   "verdict": "一部再現（19 か所のうち 16 か所が合い、3 か所がずれる）",
+   "detail": {
+    "mismatch": [
+     [
+      "一致点1（並記表の札）",
+      "548 以降"
+     ],
+     [
+      "一致点3（§6 の応答様式の表）",
+      "1161 以降"
+     ],
+     [
+      "一致点4（破局/n の区画）",
+      "566 以降"
+     ]
+    ],
+    "actual_positions": {
+     "並記表の見出し": [
+      484
+     ],
+     "並記表の N2:Onull~N の行": [
+      495
+     ],
+     "並記表の S1:Onull-Ncold~Onull の行": [
+      504
+     ],
+     "破局/n の見出し": [
+      524
+     ],
+     "§6 の応答様式の表の見出し": [
+      1223
+     ],
+     "566 行の中身": "- N1:Odose1~Onull: Odose1 対 Onull は Odos",
+     "548 行の中身": "- S4:Onull~N: A 0/200 200/200 166/200 20",
+     "1161 行の中身": ""
+    }
+   }
+  },
+  {
+   "w": "W155",
+   "finding": "感度閾値の上向きの二本の名・主閾値の札・残った規模（一致点1）",
+   "checked": "第一巡の再現の記録の W130 と機械集計の札",
+   "verdict": "再現",
+   "detail": {
+    "sensitivity": [
+     0.03,
+     0.97
+    ],
+    "upward": [
+     "N2:Onull~N",
+     "S1:Onull-Ncold~Onull"
+    ],
+    "main_labels": {
+     "N2:Onull~N": "判定不能",
+     "S1:Onull-Ncold~Onull": "記述（解釈条項）"
+    },
+    "kept": {
+     "N2:Onull~N": [
+      "0.6B",
+      "14B",
+      "32B"
+     ],
+     "S1:Onull-Ncold~Onull": [
+      "4B",
+      "14B",
+      "32B"
+     ]
+    }
+   }
+  },
+  {
+   "w": "W156",
+   "finding": "確証の一本の数（一致点6）",
+   "checked": "様式の記録の言及の件数と (b)・機械集計の環境・臨界規模・14B の N",
+   "verdict": "再現",
+   "detail": {
+    "c2_counts": {
+     "4B|N": 144,
+     "4B|Onull": 89,
+     "14B|N": 5,
+     "14B|Onull": 2,
+     "32B|N": 4,
+     "32B|Onull": 52
+    },
+    "b_final_Onull_N": {
+     "0.6B": [
+      200,
+      200
+     ],
+     "1.7B": [
+      200,
+      200
+     ],
+     "4B": [
+      0,
+      0
+     ],
+     "8B": [
+      200,
+      200
+     ],
+     "14B": [
+      0,
+      0
+     ],
+     "32B": [
+      0,
+      0
+     ]
+    }
+   }
+  },
+  {
+   "w": "W157",
+   "finding": "漢数字の件数（指摘1）",
+   "checked": "草案4 の区画の外の漢数字の件数・正本 typed_numbers・走査器の数の拾い方",
+   "verdict": "再現（件数は順番の名「第一巡」を含む数え方）",
+   "detail": {
+    "count_draft4": 66,
+    "by_token": {
+     "一巡": 12,
+     "二票": 2,
+     "一つ": 5,
+     "一行": 2,
+     "二本": 7,
+     "三行": 1,
+     "一本": 14,
+     "三規模": 3,
+     "二つ": 6,
+     "三対比": 4,
+     "三本": 1,
+     "一件": 1,
+     "二規模": 2,
+     "一規模": 1,
+     "四票": 2,
+     "二名": 2,
+     "一票": 1
+    },
+    "ordinal_round_names": 12,
+    "typed_numbers": "報告に打ち込む数は日付・SHA16・SHA-256（封印予想の記帳値）・費用の実績（登録者申告）・逸脱番号・雛形の SHA16 に限り、冒頭に一覧を印字する（採否表 P68）",
+    "numbers_lint_NUM_matches_kanji": false,
+    "numbers_lint_NUM_matches_digits": true
+   }
+  },
+  {
+   "w": "W158",
+   "finding": "上向きの二本の残存の欠け方（指摘2）",
+   "checked": "感度閾値の下の残った規模を、非連続・端の欠け・間の欠けに分ける",
+   "verdict": "一部再現（N2 は両端があり間を欠く〔票どおり〕。S1 は小さい側の端を欠くうえに間の 8B も欠く〔票は端の欠けだけを書く〕）",
+   "detail": {
+    "N2:Onull~N": {
+     "non_contiguous": true,
+     "ends_missing": [],
+     "gaps": [
+      "1.7B",
+      "4B",
+      "8B"
+     ]
+    },
+    "S1:Onull-Ncold~Onull": {
+     "non_contiguous": true,
+     "ends_missing": [
+      "0.6B"
+     ],
+     "gaps": [
+      "8B"
+     ]
+    }
+   }
+  },
+  {
+   "w": "W159",
+   "finding": "照合の記録の md の読み違いのおそれ（指摘3）",
+   "checked": "md の冒頭の件数の表・明細の的中の行・JSON の的中の行・README の言及",
+   "verdict": "一部再現（md の明細に的中の行は無いが、冒頭の件数の表に的中の数がある）",
+   "detail": {
+    "md_summary_rows": [
+     "| 向き | 9 | 1 | 25 | 0 |",
+     "| 床持続 | 5 | 10 | 0 | 0 |",
+     "| 全体 | 0 | 2 | 0 | 0 |",
+     "| 向き | 2 | 8 | 25 | 0 |",
+     "| 床持続 | 15 | 0 | 0 | 0 |",
+     "| 全体 | 0 | 2 | 0 | 0 |"
+    ],
+    "md_detail_rows_with_hit": 0,
+    "json_hits": {
+     "predictions-registrant-A-2026-09-16-v2.json": 14,
+     "predictions-coordinator-A-2026-09-16.json": 17
+    },
+    "readme_mentions_predictions_check_A": 0,
+    "readme_mentions_stage_A_report": 0
+   }
+  },
+  {
+   "w": "W160",
+   "finding": "段階 B の前の器の改訂の候補の追跡（条件 B2）",
+   "checked": "手順表の手順 20・公開の置き場の申し送りのファイル・第一巡の採否表 §6",
+   "verdict": "再現（手順 20 に反映メモ A があり、まだ書いていない。候補は第一巡の採否表 §6 にだけある）",
+   "detail": {
+    "procedure_step20": "報告草案 → 検分 → 公開 → 反映メモ A",
+    "public_files_named_memo_or_carryover": [],
+    "records_B_files": [
+     "records/B/design-facts-B.json",
+     "records/B/design-facts-B.md"
+    ],
+    "adoption_round1_section6": true
+   }
+  },
+  {
+   "w": "W161",
+   "finding": "公開の対象を「コミット 92c2495 の草案4」とする判定 A",
+   "checked": "92c2495 の草案4 と現在の草案4 のバイト・歯止めの記録",
+   "verdict": "再現",
+   "detail": {
+    "same_bytes_as_92c2495": true,
+    "draft4_sha16": "AE5678309977243F",
+    "guard_report_sha16": "AE5678309977243F",
+    "guard_pass": true,
+    "changed_since_92c2495": ""
+   }
+  }
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
