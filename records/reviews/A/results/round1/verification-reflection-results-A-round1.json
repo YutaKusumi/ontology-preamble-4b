@@ -1,0 +1,140 @@
+{
+ "kind": "verify_reflection_results_A_round1",
+ "version": "v1",
+ "generated_utc": "2026-09-17 09:13",
+ "base": "94887bd",
+ "head": "94887bdf04b62108d38d0a3ae5581d169972b581",
+ "draft3_sha16": "F0E97ABB16C13A29",
+ "draft4_sha16": "AE5678309977243F",
+ "ledger_sha16": "A67675BDCCA95703",
+ "tool_sha16": "632F6B8C938C9FEB",
+ "counts": {
+  "通る": 13
+ },
+ "items": [
+  {
+   "q": "Q1",
+   "cond": "歯止めが PASS（草案4 の現在の SHA16 について・違反は登録の六つ）",
+   "result": "通る",
+   "detail": {
+    "pass": true,
+    "report_sha16": "AE5678309977243F",
+    "violations": 6,
+    "all_blank_inside_blocks": true,
+    "blocks_match_sidecar": true,
+    "blank_strings_match_registered": true,
+    "draft4_sha16_now": "AE5678309977243F"
+   }
+  },
+  {
+   "q": "Q2",
+   "cond": "区画の中身の列が草案3 と同じ",
+   "result": "通る",
+   "detail": {
+    "blocks3": 48,
+    "blocks4": 48
+   }
+  },
+  {
+   "q": "Q3",
+   "cond": "変わった行はすべて区画の外",
+   "result": "通る",
+   "detail": {
+    "changed_line_spans": 66,
+    "inside_changes": []
+   }
+  },
+  {
+   "q": "Q4",
+   "cond": "区画の外にコミットの短い名と時刻が無い・冒頭の一覧に「時刻」「コミット」の語が無い",
+   "result": "通る",
+   "detail": {
+    "commits": [],
+    "times": []
+   }
+  },
+  {
+   "q": "Q5",
+   "cond": "冒頭の一覧と §8 の範囲が台帳の最終の番号まで・§8 に D-41〜D-44",
+   "result": "通る",
+   "detail": {
+    "ledger_last": 44
+   }
+  },
+  {
+   "q": "Q6",
+   "cond": "採用項ごとの要の句がある（P171 は区画の外の「3.」で始まる行が一つ）",
+   "result": "通る",
+   "detail": {
+    "phrases": 42,
+    "missing": [],
+    "lines_starting_3": [
+     28
+    ]
+   }
+  },
+  {
+   "q": "Q7",
+   "cond": "散文層の対応の文が JSON の並びと一致",
+   "result": "通る",
+   "detail": {
+    "mapping": "N1（Odose1 対 Onull・Odosehalf 対 Onull・Onull 対 N・Lneg 対 Onull・Onull-Ncold 対 Onull・O-Ncold 対 Osec-Ncold・O-Ncold 対 Onull-Ncold）／S1（Odose1 対 Onull・Odosehalf 対 Onull・Onull 対 N・O-Ncold 対 Osec-Ncold）／S4（Odose1 対 Onull・Odosehalf 対 Onull・O-Ncold 対 Osec-Ncold）／SK（Odose1 対 Onull・Odosehalf 対 Onull・Onull 対 N・O-Ncold 対 Osec-Ncold）"
+   }
+  },
+  {
+   "q": "Q8",
+   "cond": "「判定器の妥当性の範囲の外」の句が無い",
+   "result": "通る",
+   "detail": {
+    "count": 0
+   }
+  },
+  {
+   "q": "Q9",
+   "cond": "感度閾値の上向きの二本の文が §0 と §9 にあり、どちらにも「主閾値の札を主とする」",
+   "result": "通る",
+   "detail": {
+    "names_in_s0": true,
+    "names_in_s9": true,
+    "primacy_in_s0": true,
+    "primacy_in_s9": true
+   }
+  },
+  {
+   "q": "Q10",
+   "cond": "台帳の差分は D-41 の行の書き足しと末尾の三行だけ",
+   "result": "通る",
+   "detail": {
+    "old_lines": 47,
+    "new_lines": 50
+   }
+  },
+  {
+   "q": "Q11",
+   "cond": "凍結物の照合が全件一致（反映の後）",
+   "result": "通る",
+   "detail": {
+    "rc": 0,
+    "result": "[freeze_A --verify] 87/87 一致"
+   }
+  },
+  {
+   "q": "Q12",
+   "cond": "公開した歯止めの器の写しが一時置き場の器とバイトで同じ",
+   "result": "通る",
+   "detail": {
+    "sha16": "979862092B44AE50"
+   }
+  },
+  {
+   "q": "Q13",
+   "cond": "採否表の差分は末尾の「裁定の結果」の節だけ",
+   "result": "通る",
+   "detail": {
+    "old_chars": 13257,
+    "new_chars": 13887
+   }
+  }
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
