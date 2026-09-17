@@ -1,0 +1,200 @@
+{
+ "tag": "stageA-bridge",
+ "model": "8B",
+ "session": 1,
+ "phase": "bridge",
+ "run_keys": [
+  "stageA-bridge__N1__none__seed64003"
+ ],
+ "started": "2026-09-17T01:26:09Z",
+ "runner_rc": {
+  "stageA-calib__N1__none__seed65901": [
+   0
+  ],
+  "stageA-bridge__N1__none__seed64003": [
+   0
+  ]
+ },
+ "preemptions": {
+  "stageA-calib__N1__none__seed65901": 0.0,
+  "stageA-bridge__N1__none__seed64003": 0.0
+ },
+ "counts": {
+  "stageA-calib__N1__none__seed65901": {
+   "rows": 400,
+   "n_ok": 400,
+   "target": 400,
+   "redo_errors": 0
+  },
+  "stageA-bridge__N1__none__seed64003": {
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo_errors": 0
+  }
+ },
+ "model_rev_full": {
+  "4B-2507": {
+   "id": "Qwen/Qwen3-4B-Instruct-2507",
+   "registered": "cdbee75f17c0",
+   "full": "cdbee75f17c01a7cc42f958dc650907174af0554",
+   "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554"
+  },
+  "8B": {
+   "id": "Qwen/Qwen3-8B",
+   "registered": "b968826d9c46",
+   "full": "b968826d9c46dd6066d109eabc6255188de91218",
+   "snapshot": "b968826d9c46dd6066d109eabc6255188de91218"
+  }
+ },
+ "server_args": {
+  "4B-2507": {
+   "dtype": "bfloat16",
+   "max_model_len": 8192,
+   "gpu_memory_utilization": 0.9,
+   "seed": 0,
+   "port": 8000,
+   "served_model_name": "Qwen/Qwen3-4B-Instruct-2507",
+   "vllm": "0.29.0"
+  },
+  "8B": {
+   "dtype": "bfloat16",
+   "max_model_len": 8192,
+   "gpu_memory_utilization": 0.9,
+   "seed": 0,
+   "port": 8000,
+   "served_model_name": "Qwen/Qwen3-8B",
+   "vllm": "0.29.0"
+  }
+ },
+ "env_value": "L4",
+ "env_override": null,
+ "gpu": "NVIDIA L4, 23034",
+ "memory_class_gb": 24,
+ "concurrency": 12,
+ "versions": {
+  "vllm": "0.29.0",
+  "torch": "2.13.0",
+  "transformers": "5.16.1",
+  "tokenizers": "0.23.1",
+  "huggingface_hub": "1.29.0",
+  "pip_freeze_sha16": "104046D3EDBBD2DC"
+ },
+ "pip_freeze_sha16": "104046D3EDBBD2DC",
+ "repo_head": "c933c97a7a1d975259930fb647c156003accb51d",
+ "commit": "c933c97a7a1d975259930fb647c156003accb51d",
+ "commit_fixed": true,
+ "runner_sha16": "9F849D2823132BA2",
+ "model_rev": "b968826d9c46",
+ "calibration_branch": "pass",
+ "dev_marks": [],
+ "boot": "v2",
+ "clause": "本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。",
+ "updated": "2026-09-17T03:03:09Z",
+ "log": [
+  {
+   "step": "repo",
+   "t": 8.0,
+   "at": "2026-09-17T01:23:01Z",
+   "head": "c933c97a7a1d",
+   "commit_fixed": true,
+   "runner_sha16": "9F849D2823132BA2",
+   "persist": "/content/drive/MyDrive/op4b-stageA"
+  },
+  {
+   "step": "gpu",
+   "t": 8.1,
+   "at": "2026-09-17T01:23:01Z",
+   "gpu": "NVIDIA L4, 23034",
+   "env_value": "L4",
+   "memory_class_gb": 24
+  },
+  {
+   "step": "pip",
+   "t": 195.3,
+   "at": "2026-09-17T01:26:08Z",
+   "versions": {
+    "vllm": "0.29.0",
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.1",
+    "huggingface_hub": "1.29.0",
+    "pip_freeze_sha16": "104046D3EDBBD2DC"
+   }
+  },
+  {
+   "step": "server",
+   "t": 499.0,
+   "at": "2026-09-17T01:31:12Z",
+   "model": "4B-2507",
+   "rev": "cdbee75f17c0"
+  },
+  {
+   "step": "run",
+   "t": 891.2,
+   "at": "2026-09-17T01:37:44Z",
+   "run_key": "stageA-calib__N1__none__seed65901",
+   "rc": [
+    0
+   ],
+   "rows": 400,
+   "n_ok": 400,
+   "target": 400,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 392.2
+  },
+  {
+   "step": "calibration",
+   "t": 924.9,
+   "at": "2026-09-17T01:38:18Z",
+   "verdict": "pass",
+   "judged": "band_pass_lower",
+   "k": 383,
+   "n": 400,
+   "branch": "pass"
+  },
+  {
+   "step": "server",
+   "t": 1141.6,
+   "at": "2026-09-17T01:41:55Z",
+   "model": "8B",
+   "rev": "b968826d9c46"
+  },
+  {
+   "step": "run",
+   "t": 6014.8,
+   "at": "2026-09-17T03:03:08Z",
+   "run_key": "stageA-bridge__N1__none__seed64003",
+   "rc": [
+    0
+   ],
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 4873.2
+  }
+ ],
+ "calibration_run_key": "stageA-calib__N1__none__seed65901",
+ "calibration_verdict": "pass",
+ "calibration_judged": "band_pass_lower",
+ "calibration_counts": [
+  383,
+  400
+ ],
+ "calibration_seed_rule_ok": true,
+ "ended": "2026-09-17T03:03:09Z",
+ "files_sha16_lf": {
+  "stageA-calib/stageA-calib__N1__none__seed65901/cells.json": "E00797E80D85EFF3",
+  "stageA-calib/stageA-calib__N1__none__seed65901/manifest.json": "44ACC8ABAC80A083",
+  "stageA-calib/stageA-calib__N1__none__seed65901/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "CC18B6AECD979F33",
+  "stageA-calib/stageA-calib__N1__none__seed65901/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "05F3539B05C09EF8",
+  "stageA-bridge/stageA-bridge__N1__none__seed64003/cells.json": "1873926D85734269",
+  "stageA-bridge/stageA-bridge__N1__none__seed64003/manifest.json": "966418A28E4DCEBA",
+  "stageA-bridge/stageA-bridge__N1__none__seed64003/raw-Qwen_Qwen3-8B.jsonl": "7B21E213DCCE9A80",
+  "stageA-bridge/stageA-bridge__N1__none__seed64003/trials-Qwen_Qwen3-8B.jsonl": "BEF0B00CFD47BCCF"
+ },
+ "wall_s": 6015.8
+}

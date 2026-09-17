@@ -20,7 +20,7 @@
 | 14B | 有 | Qwen/Qwen3-14B | 一致 | BF16 | $0.07 ／ $0.20 |
 | 32B | 有 | Qwen/Qwen3-32B | 一致 | BF16 | $0.08 ／ $0.25 |
 
-- 事業者: Nscale（serverless）。エンドポイントは `https://inference.api.nscale.com/v1/chat/completions`、鍵は環境の変数 `NSCALE_SERVICE_TOKEN`（**値は本記録に書かない**）。
+- 事業者: Nscale（serverless）。エンドポイントは `https://inference.api.nscale.com/v1/chat/completions`、鍵は環境の変数 `NSCALE_API_KEY`（**値は本記録に書かない**）。**訂正（2026-09-17）**: 初版はこの名を `NSCALE_SERVICE_TOKEN` と書いたが誤りだった。走行器 `tools/run_preamble_local.py`:42 が読む名は `NSCALE_API_KEY` で、登録者の環境のファイルにある名もこちらである（名の有無だけを機械で確かめ、値は表示していない）。段取り `records/A/main/main-plan-A.md` §7 は初めから `NSCALE_API_KEY` と書いていた。
 - 画面の記載で符合した点: データ型 BF16 は手元の走行のサーバ引数（`dtype` bfloat16）と同じ。32B の「Memory Used 65.54」は、手元で取得した重み 65.5 GB と符合する。
 - 画面に**無かった**もの: 重みの版（revision）、トークンの数え方の定義、チャット雛形の版。
 

@@ -1,0 +1,298 @@
+{
+ "tag": "stageA",
+ "model": "4B-2507",
+ "session": 1,
+ "phase": "main",
+ "run_keys": [
+  "stageA__N1__none__seed62701",
+  "stageA__N2__none__seed62702",
+  "stageA__S1__none__seed62703",
+  "stageA__S4__none__seed62704",
+  "stageA__SK__none__seed62705"
+ ],
+ "started": "2026-09-16T12:32:50Z",
+ "runner_rc": {
+  "stageA-calib__N1__none__seed65701": [
+   0
+  ],
+  "stageA__N1__none__seed62701": [
+   0
+  ],
+  "stageA__N2__none__seed62702": [
+   0
+  ],
+  "stageA__S1__none__seed62703": [
+   0
+  ],
+  "stageA__S4__none__seed62704": [
+   0
+  ],
+  "stageA__SK__none__seed62705": [
+   0
+  ]
+ },
+ "preemptions": {
+  "stageA-calib__N1__none__seed65701": 0.0,
+  "stageA__N1__none__seed62701": 0.0,
+  "stageA__N2__none__seed62702": 0.0,
+  "stageA__S1__none__seed62703": 0.0,
+  "stageA__S4__none__seed62704": 0.0,
+  "stageA__SK__none__seed62705": 0.0
+ },
+ "counts": {
+  "stageA-calib__N1__none__seed65701": {
+   "rows": 400,
+   "n_ok": 400,
+   "target": 400,
+   "redo_errors": 0
+  },
+  "stageA__N1__none__seed62701": {
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo_errors": 0
+  },
+  "stageA__N2__none__seed62702": {
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo_errors": 0
+  },
+  "stageA__S1__none__seed62703": {
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo_errors": 0
+  },
+  "stageA__S4__none__seed62704": {
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo_errors": 0
+  },
+  "stageA__SK__none__seed62705": {
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo_errors": 0
+  }
+ },
+ "model_rev_full": {
+  "4B-2507": {
+   "id": "Qwen/Qwen3-4B-Instruct-2507",
+   "registered": "cdbee75f17c0",
+   "full": "cdbee75f17c01a7cc42f958dc650907174af0554",
+   "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554"
+  }
+ },
+ "server_args": {
+  "4B-2507": {
+   "dtype": "bfloat16",
+   "max_model_len": 8192,
+   "gpu_memory_utilization": 0.9,
+   "seed": 0,
+   "port": 8000,
+   "served_model_name": "Qwen/Qwen3-4B-Instruct-2507",
+   "vllm": "0.29.0"
+  }
+ },
+ "env_value": "L4",
+ "env_override": null,
+ "gpu": "NVIDIA L4, 23034",
+ "memory_class_gb": 24,
+ "concurrency": 24,
+ "versions": {
+  "vllm": "0.29.0",
+  "torch": "2.13.0",
+  "transformers": "5.16.1",
+  "tokenizers": "0.23.1",
+  "huggingface_hub": "1.29.0",
+  "pip_freeze_sha16": "C64B7D0E40293DAE"
+ },
+ "pip_freeze_sha16": "C64B7D0E40293DAE",
+ "repo_head": "c933c97a7a1d975259930fb647c156003accb51d",
+ "commit": "c933c97a7a1d975259930fb647c156003accb51d",
+ "commit_fixed": true,
+ "runner_sha16": "9F849D2823132BA2",
+ "model_rev": "cdbee75f17c0",
+ "calibration_branch": "pass",
+ "dev_marks": [],
+ "boot": "v2",
+ "clause": "本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。",
+ "updated": "2026-09-16T15:38:07Z",
+ "log": [
+  {
+   "step": "repo",
+   "t": 0.0,
+   "at": "2026-09-16T12:32:48Z",
+   "head": "c933c97a7a1d",
+   "commit_fixed": true,
+   "runner_sha16": "9F849D2823132BA2",
+   "persist": "/content/drive/MyDrive/op4b-stageA"
+  },
+  {
+   "step": "gpu",
+   "t": 0.0,
+   "at": "2026-09-16T12:32:48Z",
+   "gpu": "NVIDIA L4, 23034",
+   "env_value": "L4",
+   "memory_class_gb": 24
+  },
+  {
+   "step": "pip",
+   "t": 1.6,
+   "at": "2026-09-16T12:32:50Z",
+   "versions": {
+    "vllm": "0.29.0",
+    "torch": "2.13.0",
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.1",
+    "huggingface_hub": "1.29.0",
+    "pip_freeze_sha16": "C64B7D0E40293DAE"
+   }
+  },
+  {
+   "step": "server",
+   "t": 66.8,
+   "at": "2026-09-16T12:33:55Z",
+   "model": "4B-2507",
+   "rev": "cdbee75f17c0"
+  },
+  {
+   "step": "run",
+   "t": 466.0,
+   "at": "2026-09-16T12:40:34Z",
+   "run_key": "stageA-calib__N1__none__seed65701",
+   "rc": [
+    0
+   ],
+   "rows": 400,
+   "n_ok": 400,
+   "target": 400,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 399.2
+  },
+  {
+   "step": "calibration",
+   "t": 466.1,
+   "at": "2026-09-16T12:40:34Z",
+   "verdict": "pass",
+   "judged": "band_pass_lower",
+   "k": 383,
+   "n": 400,
+   "branch": "pass"
+  },
+  {
+   "step": "run",
+   "t": 2804.9,
+   "at": "2026-09-16T13:19:33Z",
+   "run_key": "stageA__N1__none__seed62701",
+   "rc": [
+    0
+   ],
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 2338.8
+  },
+  {
+   "step": "run",
+   "t": 5277.0,
+   "at": "2026-09-16T14:00:45Z",
+   "run_key": "stageA__N2__none__seed62702",
+   "rc": [
+    0
+   ],
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 2472.1
+  },
+  {
+   "step": "run",
+   "t": 7361.5,
+   "at": "2026-09-16T14:35:30Z",
+   "run_key": "stageA__S1__none__seed62703",
+   "rc": [
+    0
+   ],
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 2084.4
+  },
+  {
+   "step": "run",
+   "t": 8978.3,
+   "at": "2026-09-16T15:02:27Z",
+   "run_key": "stageA__S4__none__seed62704",
+   "rc": [
+    0
+   ],
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 1616.9
+  },
+  {
+   "step": "run",
+   "t": 11117.4,
+   "at": "2026-09-16T15:38:06Z",
+   "run_key": "stageA__SK__none__seed62705",
+   "rc": [
+    0
+   ],
+   "rows": 2600,
+   "n_ok": 2600,
+   "target": 2600,
+   "redo": 0,
+   "preemptions": 0.0,
+   "seconds": 2139.1
+  }
+ ],
+ "calibration_run_key": "stageA-calib__N1__none__seed65701",
+ "calibration_verdict": "pass",
+ "calibration_judged": "band_pass_lower",
+ "calibration_counts": [
+  383,
+  400
+ ],
+ "calibration_seed_rule_ok": true,
+ "ended": "2026-09-16T15:38:07Z",
+ "files_sha16_lf": {
+  "stageA-calib/stageA-calib__N1__none__seed65701/cells.json": "70E7CDDE46A1C867",
+  "stageA-calib/stageA-calib__N1__none__seed65701/manifest.json": "FCFCA6CB977647CB",
+  "stageA-calib/stageA-calib__N1__none__seed65701/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "35AC3D25B1328B12",
+  "stageA-calib/stageA-calib__N1__none__seed65701/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "3119BCBB47E96077",
+  "stageA/stageA__N1__none__seed62701/cells.json": "EB246619D51C9454",
+  "stageA/stageA__N1__none__seed62701/manifest.json": "74C79AED1AFA4D48",
+  "stageA/stageA__N1__none__seed62701/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "9C6F24ACA24EA666",
+  "stageA/stageA__N1__none__seed62701/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "9CAFAD759B0DFB07",
+  "stageA/stageA__N2__none__seed62702/cells.json": "A035E4412EEEA06E",
+  "stageA/stageA__N2__none__seed62702/manifest.json": "1AA3CEBEAA6F0C9C",
+  "stageA/stageA__N2__none__seed62702/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "11C9FCA86A7ED54F",
+  "stageA/stageA__N2__none__seed62702/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "9359648490F90E81",
+  "stageA/stageA__S1__none__seed62703/cells.json": "87B344D4B5F06828",
+  "stageA/stageA__S1__none__seed62703/manifest.json": "086135EDFA5DE519",
+  "stageA/stageA__S1__none__seed62703/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "0D59EC307834A80A",
+  "stageA/stageA__S1__none__seed62703/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "AAECF5AD5FE9EEC0",
+  "stageA/stageA__S4__none__seed62704/cells.json": "EEA79C91BE17EF10",
+  "stageA/stageA__S4__none__seed62704/manifest.json": "DC0711D39808E067",
+  "stageA/stageA__S4__none__seed62704/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "D0147B3ABBC8D150",
+  "stageA/stageA__S4__none__seed62704/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "213193845E76F03E",
+  "stageA/stageA__SK__none__seed62705/cells.json": "8391BFF406F85844",
+  "stageA/stageA__SK__none__seed62705/manifest.json": "14DB589BE2206F77",
+  "stageA/stageA__SK__none__seed62705/raw-Qwen_Qwen3-4B-Instruct-2507.jsonl": "A4AAE34C5CA5100E",
+  "stageA/stageA__SK__none__seed62705/trials-Qwen_Qwen3-4B-Instruct-2507.jsonl": "79EC269ABD939F54"
+ },
+ "wall_s": 11118.7
+}
