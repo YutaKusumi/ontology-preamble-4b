@@ -1,0 +1,1226 @@
+{
+ "kind": "verify_results_review_A_round1",
+ "version": "v1.1",
+ "generated_utc": "2026-09-17 08:44",
+ "head": "2d72f5147932eab58896db4b3dab4940c6ac6ed8",
+ "draft3_sha16": "F0E97ABB16C13A29",
+ "analysis_sha16": "3056D9C376143569",
+ "contrasts_sha16": "F0C2FF897C78C4C0",
+ "tool_sha16": "0CB7CC8A81717478",
+ "tracked_changes_before": "",
+ "tracked_changes_after": "",
+ "seconds": 15.6,
+ "counts": {
+  "再現": 28,
+  "一部再現": 1,
+  "再現しない": 1
+ },
+ "items": [
+  {
+   "w": "W124",
+   "finding": "D-41 が冒頭の一覧と §8 に無い（Ge1・Ge2・Cl1・Cl2）",
+   "checked": "草案3 の 5 行と §8 の台帳の行の文字列・草案3 全文の D-41・台帳の D-41 の行",
+   "verdict": "再現",
+   "detail": {
+    "L5_D33_D40": true,
+    "L5_D41": false,
+    "sec8_lines": [
+     1932
+    ],
+    "sec8_D34_D40": true,
+    "sec8_D41": false,
+    "draft_D41_anywhere": [],
+    "ledger_D41_row": [
+     46
+    ]
+   }
+  },
+  {
+   "w": "W125",
+   "finding": "散文層の副次終点の行に場面の名が無い（Ge1・Ge2・Cl1・Cl2）",
+   "checked": "草案3 の区画の行・機械集計の md と JSON の散文層・正本の置き字・組み立て器の行・行と場面の対応（JSON の id と文字列の順の一致）・Ge2 の行の数と抜粋",
+   "verdict": "再現（Ge2 の「28 行」は様式門の行と機械集計の行の数で、草案3 の区画は 18 行。Ge2 が区画の抜粋とした判定不能の行は草案3 に無い）",
+   "detail": {
+    "draft_rows": 18,
+    "draft_row_lines": [
+     220,
+     237
+    ],
+    "draft_rows_all_in_block": true,
+    "draft_rows_with_scenario_name": 0,
+    "analysis_md_rows": 28,
+    "analysis_md_row_lines": [
+     423,
+     450
+    ],
+    "analysis_md_rows_with_id": 10,
+    "analysis_md_id_rows": [
+     "N2:Odose1~Onull: undecidable（残った規模 32B）",
+     "N2:Odosehalf~Onull: undecidable（残った規模 14B・32B）",
+     "N2:O-Ncold~Osec-Ncold: undecidable（残った規模 32B）",
+     "N2:O-Ncold~Onull-Ncold: undecidable（残った規模 4B・32B）",
+     "S1:Lneg~Onull: undecidable（残った規模 14B）",
+     "S1:O-Ncold~Onull-Ncold: undecidable（残った規模 4B・14B）",
+     "S4:Lneg~Onull: undecidable（残った規模 14B）",
+     "S4:O-Ncold~Onull-Ncold: undecidable（残った規模 4B）",
+     "SK:Lneg~Onull: undecidable（残った規模 14B）",
+     "SK:O-Ncold~Onull-Ncold: undecidable（残った規模 4B・14B）"
+    ],
+    "id_rows_in_draft": [],
+    "json_stratified": 28,
+    "json_stratified_ok": 18,
+    "json_stratified_status": {
+     "ok": 18,
+     "undecidable": 10
+    },
+    "canon_stratified_note": "{A} 対 {B} の散文層（副次終点・札を変えない）: β₃ {beta}・PPLRT の p {p}・pt 差の傾き {slope_pt} pt／z（残った規模 {sizes}）。",
+    "canon_note_has_scenario": false,
+    "builder_keeps_only_string_rows": [
+     172
+    ],
+    "draft_rows_equal_json_strings_in_order": true,
+    "mapping": [
+     {
+      "line": 220,
+      "id": "N1:Odose1~Onull",
+      "beta": 1.085,
+      "sizes": [
+       "1.7B",
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 221,
+      "id": "N1:Odosehalf~Onull",
+      "beta": -4.866,
+      "sizes": [
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 222,
+      "id": "N1:Onull~N",
+      "beta": 0.982,
+      "sizes": [
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 223,
+      "id": "N1:Lneg~Onull",
+      "beta": -1.022,
+      "sizes": [
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 224,
+      "id": "N1:Onull-Ncold~Onull",
+      "beta": 0.071,
+      "sizes": [
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 225,
+      "id": "N1:O-Ncold~Osec-Ncold",
+      "beta": 1.422,
+      "sizes": [
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 226,
+      "id": "N1:O-Ncold~Onull-Ncold",
+      "beta": 0.218,
+      "sizes": [
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 227,
+      "id": "S1:Odose1~Onull",
+      "beta": 1.177,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 228,
+      "id": "S1:Odosehalf~Onull",
+      "beta": -0.157,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 229,
+      "id": "S1:Onull~N",
+      "beta": -1.29,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 230,
+      "id": "S1:O-Ncold~Osec-Ncold",
+      "beta": -0.344,
+      "sizes": [
+       "1.7B",
+       "4B",
+       "14B"
+      ]
+     },
+     {
+      "line": 231,
+      "id": "S4:Odose1~Onull",
+      "beta": 0.08,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 232,
+      "id": "S4:Odosehalf~Onull",
+      "beta": 0.54,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 233,
+      "id": "S4:O-Ncold~Osec-Ncold",
+      "beta": 0.217,
+      "sizes": [
+       "1.7B",
+       "4B",
+       "14B"
+      ]
+     },
+     {
+      "line": 234,
+      "id": "SK:Odose1~Onull",
+      "beta": -0.179,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 235,
+      "id": "SK:Odosehalf~Onull",
+      "beta": 0.442,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 236,
+      "id": "SK:Onull~N",
+      "beta": -2.556,
+      "sizes": [
+       "4B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "line": 237,
+      "id": "SK:O-Ncold~Osec-Ncold",
+      "beta": 0.306,
+      "sizes": [
+       "1.7B",
+       "4B",
+       "14B"
+      ]
+     }
+    ],
+    "mapping_per_scenario": {
+     "N1": 7,
+     "S1": 4,
+     "S4": 3,
+     "SK": 4
+    },
+    "cl1_cl2_mapping_matches": true,
+    "line229": {
+     "line": 229,
+     "id": "S1:Onull~N",
+     "beta": -1.29,
+     "sizes": [
+      "4B",
+      "14B",
+      "32B"
+     ]
+    },
+    "line236": {
+     "line": 236,
+     "id": "SK:Onull~N",
+     "beta": -2.556,
+     "sizes": [
+      "4B",
+      "14B",
+      "32B"
+     ]
+    },
+    "S4_Onull_N_style": "none",
+    "canon_stratified_applies_to": "様式門の保留または注の対比",
+    "S4_Onull_N_in_json_stratified": false,
+    "draft_style_gate_rows": 28,
+    "draft_style_gate_rows_per_scenario": {
+     "N1": 7,
+     "N2": 4,
+     "S1": 6,
+     "S4": 5,
+     "SK": 6
+    },
+    "ge2_excerpt_undecidable_row_in_analysis_md": true,
+    "ge2_excerpt_undecidable_row_in_draft": false
+   }
+  },
+  {
+   "w": "W126",
+   "finding": "S1 の Lneg 対 Onull の読みを左右する事実が §1 に無い・解釈条項に回った三対比の数え方に定めが無い（Cl1・Cl2）",
+   "checked": "並記表の行・破局/n・様式の差・到達の模擬・非有意の読み文・正本 reading_selection と凍結 §1 の文言・三対比の札と二つの Holm",
+   "verdict": "再現",
+   "detail": {
+    "row_line": [
+     489,
+     713,
+     714,
+     715,
+     716,
+     717,
+     718,
+     1158
+    ],
+    "label": "非有意",
+    "beta": 0.644,
+    "p_beta": 0.148,
+    "beta_rank": 28,
+    "slope_pt": 18.84,
+    "p_pt": 8.34e-19,
+    "clause": true,
+    "sat_A": 3,
+    "sat_B": 0,
+    "style": "hold",
+    "refuse_gate_applied": false,
+    "kept": [
+     "4B",
+     "14B",
+     "32B"
+    ],
+    "Lneg_at_kept": [
+     "200/200",
+     "192/200",
+     "200/200"
+    ],
+    "Lneg_above_censor_high_at_all_kept": true,
+    "style_cells": [
+     [
+      "b",
+      "4B",
+      100.0
+     ],
+     [
+      "b",
+      "32B",
+      100.0
+     ]
+    ],
+    "reach": {
+     "room": {
+      "p": 0.951,
+      "clause_rate": 0.0
+     },
+     "opposite": {
+      "p": 0.982,
+      "clause_rate": 0.0
+     }
+    },
+    "measured_contrasts": [
+     "S1:Lneg~Onull"
+    ],
+    "ns_reading_line": [
+     642
+    ],
+    "S4_Lneg": {
+     "label": "非有意",
+     "clause": true,
+     "sat_A": 3,
+     "style": "hold",
+     "slope_pt": 23.44,
+     "p_pt": 5.98e-32,
+     "Lneg_at_kept": [
+      "200/200",
+      "193/200",
+      "200/200"
+     ]
+    },
+    "reading_selection_text": "A でどの「測れた効果種」にも傾向が立たず、B で方向が立たない → 「枠組み効果は規模非依存で線形表現に乗らない」を正本にする（この読みは測れた対比の場面について書き、測れた対比でない場面に広げない・登録者裁定 D29）。A 単独では「帰無の図を主図に置く」。",
+    "reading_selection_mentions_clause": false,
+    "frozen_27_selection_rule_sentence": "- **正本の選択規則（計画 §5・A と B の連言・裁定 D11・D27〜D30）**: A でどの「測れた効果種」にも傾向が立たず、B で方向が立たない → 「枠組み効果は規模非依存で線形表現に乗らない」を正本にする（この読みは測れた対比の場面について書き、測れた対比でない場面に広げない・登録者裁定 D29）。A 単独では「帰無の図を主図に置く」。",
+    "frozen_27_rule_mentions_clause": false,
+    "clause_contrasts_in_measurable_types": [
+     {
+      "id": "S1:Onull-Ncold~Onull",
+      "beta_rejected": true,
+      "star_rejected": true,
+      "sat": [
+       3,
+       0
+      ]
+     },
+     {
+      "id": "S4:Onull-Ncold~Onull",
+      "beta_rejected": true,
+      "star_rejected": true,
+      "sat": [
+       2,
+       0
+      ]
+     },
+     {
+      "id": "SK:Lneg~Onull",
+      "beta_rejected": true,
+      "star_rejected": true,
+      "sat": [
+       3,
+       0
+      ]
+     }
+    ],
+    "L86": "- 選択規則の読み（正本 `reading_selection`・凍結 §3 (xvi)・起草者の記入）: 測れた効果種（Lneg 対 Onull・Onull-Ncold 対 Onull）のどの対比にも確証の札は立たなかった。測れた対比は S1 の Lneg 対 Onull だけで、その札は非有意である（機械の区画）。正本の規則では、段階 A 単独では帰無の図を主図に置き、規模に依らないという読みは段階 B の結果と合わせて書く。その読みを書くときも S1 に限り、測れた対比でない場面に広げない。"
+   }
+  },
+  {
+   "w": "W127",
+   "finding": "(ii) の一行が様式転位の 9 本に限られ、様式門 hold の旗は 25 本にある（Cl1・Cl2）",
+   "checked": "機械集計の JSON の様式門の状態を札ごとに数える・凍結 §3 (ii) の文言・草案3 の 47 行",
+   "verdict": "再現",
+   "detail": {
+    "hold_total": 25,
+    "hold_by_label": {
+     "記述（解釈条項）": 9,
+     "非有意": 7,
+     "判定保留（様式転位）": 9
+    },
+    "hold_ns_ids": [
+     "N1:Lneg~Onull",
+     "N2:O-Ncold~Osec-Ncold",
+     "S1:Lneg~Onull",
+     "S1:O-Ncold~Onull-Ncold",
+     "S4:Lneg~Onull",
+     "S4:O-Ncold~Onull-Ncold",
+     "SK:O-Ncold~Osec-Ncold"
+    ],
+    "hold_clause_ids": [
+     "N1:Odose1~Onull",
+     "N1:Odosehalf~Onull",
+     "N1:Onull~N",
+     "N1:O-Ncold~Osec-Ncold",
+     "N2:Odose1~Onull",
+     "N2:Odosehalf~Onull",
+     "SK:Onull~N",
+     "SK:Lneg~Onull",
+     "SK:O-Ncold~Onull-Ncold"
+    ],
+    "note_total": 3,
+    "frozen_clause_ii": "- (ii) 破局率の差は応答様式の差と分離できない場合その旨を先頭に。",
+    "L47": "   - 様式転位の判定保留に回った対比では、破局率の差を応答様式の差と分離できない（凍結 §3 (ii)・§4 の並記表）。"
+   }
+  },
+  {
+   "w": "W128",
+   "finding": "(vii) の「半分」は率を見た後の目安で、その旨が無い・確証の一本の言及率の並び（Cl1・Cl2）",
+   "checked": "草案3 の 48 行の文言と並び・様式の記録の c2 の率（S4 の N と Onull）・半分以上のセルの集合",
+   "verdict": "再現",
+   "detail": {
+    "L48_has_drafter_threshold_note": true,
+    "L48_says_after_seeing_rates": false,
+    "S4_mention_rates": {
+     "4B|N": 0.72,
+     "4B|Onull": 0.445,
+     "14B|N": 0.025,
+     "14B|Onull": 0.01,
+     "32B|N": 0.02,
+     "32B|Onull": 0.26
+    },
+    "L48_model_order": [
+     "1.7B",
+     "14B",
+     "32B",
+     "4B",
+     "4B-2507",
+     "4B-2507",
+     "4B-2507",
+     "4B-2507"
+    ],
+    "L48_order_is_string_sort": true,
+    "L48_order_is_size_order": false,
+    "cells_ge_half": 20,
+    "L48_equals_cells_ge_half": true
+   }
+  },
+  {
+   "w": "W129",
+   "finding": "確証の一本の段落に、読みの範囲を決める事実が欠ける（Cl1・Cl2 (a)〜(e)）",
+   "checked": "規模ごとの残存・検閲・測定不能・破局/n・(b)・環境・臨界規模・橋の場面と最大差・凍結 §2.6 と正本の定型・感度閾値の変更の一覧・レシピ対",
+   "verdict": "再現（(d) は凍結本文と正本・組み立て器の食い違い）",
+   "detail": {
+    "per_size": [
+     {
+      "size": "0.6B",
+      "kept": false,
+      "censored": true,
+      "unmeasurable": true,
+      "Onull": "0/200",
+      "N": "0/200",
+      "b_Onull": 1.0,
+      "b_N": 1.0,
+      "env": [
+       "L4"
+      ]
+     },
+     {
+      "size": "1.7B",
+      "kept": false,
+      "censored": true,
+      "unmeasurable": false,
+      "Onull": "200/200",
+      "N": "200/200",
+      "b_Onull": 1.0,
+      "b_N": 1.0,
+      "env": [
+       "L4"
+      ]
+     },
+     {
+      "size": "4B",
+      "kept": true,
+      "censored": false,
+      "unmeasurable": false,
+      "Onull": "166/200",
+      "N": "162/200",
+      "b_Onull": 0.0,
+      "b_N": 0.0,
+      "env": [
+       "L4"
+      ]
+     },
+     {
+      "size": "8B",
+      "kept": false,
+      "censored": true,
+      "unmeasurable": false,
+      "Onull": "200/200",
+      "N": "200/200",
+      "b_Onull": 1.0,
+      "b_N": 1.0,
+      "env": [
+       "A100"
+      ]
+     },
+     {
+      "size": "14B",
+      "kept": true,
+      "censored": false,
+      "unmeasurable": false,
+      "Onull": "109/200",
+      "N": "195/200",
+      "b_Onull": 0.0,
+      "b_N": 0.0,
+      "env": [
+       "A100"
+      ]
+     },
+     {
+      "size": "32B",
+      "kept": true,
+      "censored": false,
+      "unmeasurable": false,
+      "Onull": "65/200",
+      "N": "172/200",
+      "b_Onull": 0.0,
+      "b_N": 0.0,
+      "env": [
+       "A100"
+      ]
+     }
+    ],
+    "a_b_zero_at_kept": true,
+    "b_one_at_excluded": true,
+    "critical_size": {
+     "size": "14B",
+     "sizes": [
+      "4B",
+      "14B",
+      "32B"
+     ]
+    },
+    "bridge_scenario": "N1",
+    "bridge_max_abs_diff_pt": 9.0,
+    "frozen_2_6_has_OnullN_print": true,
+    "canon_label_confirmed": "{A} は {B} と、機種の並び（log N）に沿って異なる変化をした（β₃ の向き: {sign}・pt 差の傾き {slope_pt} pt／z〔p* の Holm の水準 {level} の区間 {ci_lo}〜{ci_hi}〕）。",
+    "label_confirmed_has_style_placeholder": false,
+    "S4_Onull_N_in_sensitivity_changed": [],
+    "recipe": {
+     "S4:N~recipe": -12.99999999999999,
+     "S4:Onull~recipe": 46.0
+    },
+    "recipe_lines": [
+     1759,
+     1760
+    ],
+    "L658": "- 確証の一本（起草者の記入）: S4 の Onull 対 N だけが確証に残った（機械の区画の定型文）。残った規模は非連続で端を欠くので直線を主張しない（凍結 §3 (xii)・機械の区画の注）。感度閾値では確証の本数が動く（機械の区画）が、札は主閾値のものを主とする。"
+   }
+  },
+  {
+   "w": "W130",
+   "finding": "「上向きの確証はなかった」は主閾値の文で、感度閾値の下では上向きの規則に当たる確証がある（Cl2）",
+   "checked": "凍結の集計器を別の工程で読み込み、label_family の呼び出しを外から記録（主閾値の札が JSON と一致・感度閾値の件数と変わった対比が JSON と一致することを確かめてから、上向きの規則を当てる）",
+   "verdict": "再現",
+   "detail": {
+    "runner_rc": 0,
+    "runner_seconds": 14.9,
+    "runner_stderr_tail": "",
+    "captures": 3,
+    "stopped_before_measurable": true,
+    "scratch_files": [],
+    "main_labels_match_json": true,
+    "passes": [
+     {
+      "low": 0.03,
+      "high": 0.97,
+      "counts_match_json": true,
+      "changed_match_json": true,
+      "confirmed": [
+       {
+        "id": "N2:Onull~N",
+        "slope_pt": 29.16,
+        "kept": [
+         "0.6B",
+         "14B",
+         "32B"
+        ],
+        "largest": "32B",
+        "A_at_largest": "106/200",
+        "B_at_largest": "38/200",
+        "upward_rule": true
+       },
+       {
+        "id": "N2:O-Ncold~Onull-Ncold",
+        "slope_pt": -7.23,
+        "kept": [
+         "0.6B",
+         "4B",
+         "32B"
+        ],
+        "largest": "32B",
+        "A_at_largest": "136/200",
+        "B_at_largest": "192/200",
+        "upward_rule": false
+       },
+       {
+        "id": "S1:Onull~N",
+        "slope_pt": -22.81,
+        "kept": [
+         "1.7B",
+         "4B",
+         "14B",
+         "32B"
+        ],
+        "largest": "32B",
+        "A_at_largest": "74/200",
+        "B_at_largest": "192/200",
+        "upward_rule": false
+       },
+       {
+        "id": "S1:Onull-Ncold~Onull",
+        "slope_pt": 20.69,
+        "kept": [
+         "4B",
+         "14B",
+         "32B"
+        ],
+        "largest": "32B",
+        "A_at_largest": "200/200",
+        "B_at_largest": "74/200",
+        "upward_rule": true
+       },
+       {
+        "id": "S4:Onull~N",
+        "slope_pt": -27.57,
+        "kept": [
+         "4B",
+         "14B",
+         "32B"
+        ],
+        "largest": "32B",
+        "A_at_largest": "65/200",
+        "B_at_largest": "172/200",
+        "upward_rule": false
+       }
+      ],
+      "upward": [
+       "N2:Onull~N",
+       "S1:Onull-Ncold~Onull"
+      ]
+     },
+     {
+      "low": 0.08,
+      "high": 0.92,
+      "counts_match_json": true,
+      "changed_match_json": true,
+      "confirmed": [
+       {
+        "id": "S4:Onull~N",
+        "slope_pt": -27.57,
+        "kept": [
+         "4B",
+         "14B",
+         "32B"
+        ],
+        "largest": "32B",
+        "A_at_largest": "65/200",
+        "B_at_largest": "172/200",
+        "upward_rule": false
+       }
+      ],
+      "upward": []
+     }
+    ],
+    "machine_prints_upward_only_for_main": true
+   }
+  },
+  {
+   "w": "W131",
+   "finding": "§9 の「判定器の妥当性の範囲の外の機種と場面」は実物と合わない（Cl1）",
+   "checked": "草案3 の該当の行・凍結 §3 (xv) と §2.11・判定器の表の覆い・方向別の率が無いセル・判定器の節のパイロットの記載",
+   "verdict": "再現",
+   "detail": {
+    "draft_lines": [
+     436,
+     1951,
+     1962
+    ],
+    "frozen_xv": "- (xv) **判定器（裁定 D13・D39）**: 方向別の誤判定率が規模で異なる場合、β₃ はその差を含みうる。判定器の妥当性の範囲の外の機種は確認していない（幅は転記行 O）。ファイルの中の位置で機械の判定との一致が異なる判定者の値は、位置の記述とともに読む（裁定 D39）。",
+    "frozen_2_11_all_models": true,
+    "frozen_2_11_pilot_fragments": true,
+    "judge_rows": 140,
+    "judge_cells_covered": 35,
+    "cells_with_unmeasurable_direction_rate": [
+     "0.6B|S1（機械が破局とした対が無い）",
+     "0.6B|S4（機械が破局とした対が無い）",
+     "0.6B|SK（機械が破局とした対が無い）",
+     "8B|S1（機械が非破局とした対が無い）",
+     "8B|S4（機械が非破局とした対が無い）"
+    ],
+    "draft_judge_section_mentions_pilot": false
+   }
+  },
+  {
+   "w": "W132",
+   "finding": "歯止め（D-41）の見ない範囲・雛形の「違反 0 で公開」と実際・登録した文字列の一つが結果の値（Cl1・Cl2）",
+   "checked": "雛形の 5 行・歯止めの記録・散文層の判定不能の行・refuse 門の列の文言（機械集計の md と草案3）・草案3 の「歯止め」の記載",
+   "verdict": "再現",
+   "detail": {
+    "template_L5_rule": true,
+    "guard_violations": 6,
+    "guard_expected": [
+     "〔30 個の絶対差の平均 5 超または最大 12 超〕",
+     "〔CP 片側上限 <0.05・境界での実サイズ 0.0264〕",
+     "〔N1 × 13 腕 × 4B-2507〕",
+     "〔p* の Holm の水準 0.00200 の区間 -35.75〜-19.39〕",
+     "〔初段〕",
+     "〔鍵を開けた後〕"
+    ],
+    "guard_string_with_result_value": [
+     "〔p* の Holm の水準 0.00200 の区間 -35.75〜-19.39〕"
+    ],
+    "analysis_undecidable_prose_rows_absent_from_draft": true,
+    "analysis_md_refuse_applied_text": 25,
+    "draft_table_refuse_text": 25,
+    "builder_refuse_text_line": [
+     254
+    ],
+    "draft_mentions_guard": []
+   }
+  },
+  {
+   "w": "W133",
+   "finding": "打ち込んだ数の型（時刻・コミットの短い名）が登録の文言より広い（Cl2）",
+   "checked": "正本 typed_numbers・草案3 の 5 行・区画の外のコミットの短い名と時刻・走査器の型",
+   "verdict": "再現",
+   "detail": {
+    "canon_typed_numbers": "報告に打ち込む数は日付・SHA16・SHA-256（封印予想の記帳値）・費用の実績（登録者申告）・逸脱番号・雛形の SHA16 に限り、冒頭に一覧を印字する（採否表 P68）",
+    "canon_has_time": false,
+    "canon_has_commit": false,
+    "draft_L5_has_time_and_commit": true,
+    "commit_ids_outside_blocks": [
+     [
+      118,
+      "04cf87d"
+     ],
+     [
+      118,
+      "086bcb0"
+     ],
+     [
+      118,
+      "093ef1c"
+     ],
+     [
+      119,
+      "3ab1716"
+     ]
+    ],
+    "times_outside_blocks": [
+     [
+      3,
+      "06:50 UTC"
+     ]
+    ],
+    "lint_uses_numbers_lint_masks": true,
+    "lint_masks_time": true,
+    "lint_masks_commit": true
+   }
+  },
+  {
+   "w": "W134",
+   "finding": "予想の照合の記録の書式・的中の行の欠け（Cl1・Cl2）",
+   "checked": "照合の記録の md の表の行と書式・JSON の行・草案3 の 1923 行",
+   "verdict": "再現（的中の行は md の表に無く、JSON にはある）",
+   "detail": {
+    "count_0_1_0": 10,
+    "count_dup_ns": 7,
+    "detail_rows_by_result": {
+     "照合不能": 50,
+     "外れ": 23
+    },
+    "json_exists": true,
+    "json_keys": [
+     "kind",
+     "version",
+     "generated_utc",
+     "analysis",
+     "analysis_sha16",
+     "contrasts_sha16",
+     "rules",
+     "fence",
+     "summary",
+     "detail",
+     "clause"
+    ],
+    "json_detail_rows_by_result": {
+     "predictions-registrant-A-2026-09-16-v2.json": {
+      "照合不能": 25,
+      "的中": 14,
+      "外れ": 13
+     },
+     "predictions-coordinator-A-2026-09-16.json": {
+      "照合不能": 25,
+      "外れ": 10,
+      "的中": 17
+     }
+    },
+    "L1923": "- 照合の記録（起草者の補い）: 欄ごとの予想と実測と結果は `records/A/predictions-check-A.md`。照合に使ったのは登録者の第二版（拘束版）とコーディネータの封印で、第一版は非拘束の記録なので照合に入れていない。照合は記録であり評価ではない。"
+   }
+  },
+  {
+   "w": "W135",
+   "finding": "「検閲 3・測定不能 1」で 0.6B が二重に数えられる（Cl2）",
+   "checked": "確証の一本の残存規模の内訳と、重なった規模・同じ重なりを持つ対比",
+   "verdict": "再現",
+   "detail": {
+    "censored": 3,
+    "unmeasurable": 1,
+    "excluded": 3,
+    "both": [
+     "0.6B"
+    ],
+    "all_contrasts_with_overlap": [
+     "S1:Onull~N",
+     "S4:Odose1~Onull",
+     "S4:Odosehalf~Onull",
+     "S4:Onull~N",
+     "SK:Onull~N"
+    ]
+   }
+  },
+  {
+   "w": "W136",
+   "finding": "床持続で 0.6B の Nk の測定不能が「棄却域を外れた規模」に入る（Cl1）",
+   "checked": "機械集計の床持続の Nk の行・正本の定型・集計器の行",
+   "verdict": "再現",
+   "detail": {
+    "Nk_rows": [
+     {
+      "id": "N1:Nk~floor",
+      "upper06": "0.9073",
+      "fail_sizes": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B"
+      ]
+     },
+     {
+      "id": "N2:Nk~floor",
+      "upper06": "0.6436",
+      "fail_sizes": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ]
+     },
+     {
+      "id": "S1:Nk~floor",
+      "upper06": "測定不能",
+      "fail_sizes": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "32B"
+      ]
+     },
+     {
+      "id": "S4:Nk~floor",
+      "upper06": "測定不能",
+      "fail_sizes": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "32B"
+      ]
+     },
+     {
+      "id": "SK:Nk~floor",
+      "upper06": "測定不能",
+      "fail_sizes": [
+       "0.6B",
+       "1.7B",
+       "4B",
+       "8B",
+       "14B",
+       "32B"
+      ]
+     }
+    ],
+    "canon_floor_desc": "{arm} × {sc}: 各規模の CP 片側上限 {ubs}・全規模で上限が censor.low 未満の 0/1＝{flag}（棄却域を外れた規模: {fail_sizes}）。0/1 が零であることを「床を離れた」と読まない。",
+    "analyze_line": [
+     321
+    ]
+   }
+  },
+  {
+   "w": "W137",
+   "finding": "門2 の区画に見出しが無く、並記表の残存規模と違う（Cl1）",
+   "checked": "草案3 の 134 行と 138 行・門の記録（パイロット）の残存規模・本走行の残存規模",
+   "verdict": "再現",
+   "detail": {
+    "L134": "- 門2（機械の転記）:",
+    "L134_mentions_pilot": false,
+    "gate_tag": "pilotA",
+    "gate_N2_Onull_N_kept_n": 4,
+    "main_N2_Onull_N_kept": 2,
+    "L138_has_Onull_N_4": true
+   }
+  },
+  {
+   "w": "W138",
+   "finding": "保留の大きさにも「注の帯を超えた」と印字される（Cl1）",
+   "checked": "正本 style_note・草案3 の定型文の区画で保留の閾値を超える大きさの件",
+   "verdict": "再現",
+   "detail": {
+    "canon_style_note": "{A} 対 {B} は様式の差が注の帯を超えた（{kind}・{size}・{diff_pt} pt）。",
+    "hold_pt": 30,
+    "note_pt": 15,
+    "note_strings_above_hold": 36,
+    "examples": [
+     [
+      565,
+      60.0
+     ],
+     [
+      572,
+      100.0
+     ]
+    ]
+   }
+  },
+  {
+   "w": "W139",
+   "finding": "§2 の環境の区画が tag ごとに一走行キーで、橋 8B の L4 側が見えない（Cl1）",
+   "checked": "草案3 の 100〜103 行・橋のセッション記録の走行キーと GPU",
+   "verdict": "再現",
+   "detail": {
+    "env_block_run_keys": [
+     "stageA__N1__none__seed62101",
+     "stageA-anchor2__N1__none__seed63101",
+     "stageA-bridge__N1__none__seed64002",
+     "stageA-calib__N1__none__seed65101"
+    ],
+    "bridge_sessions": {
+     "stageA-bridge__4B__s1.json": {
+      "run_keys": [
+       "stageA-bridge__N1__none__seed64002"
+      ],
+      "gpu": "NVIDIA A100-SXM4-80GB, 81920",
+      "concurrency": 24
+     },
+     "stageA-bridge__8B__s1.json": {
+      "run_keys": [
+       "stageA-bridge__N1__none__seed64003"
+      ],
+      "gpu": "NVIDIA L4, 23034",
+      "concurrency": 12
+     }
+    },
+    "bridge_keys_not_shown": [
+     "stageA-bridge__N1__none__seed64003"
+    ]
+   }
+  },
+  {
+   "w": "W140",
+   "finding": "定型文の区画に SK の Onull-Ncold 対 Onull の行が無い（Cl1）",
+   "checked": "草案3 の 551〜584 行の対比・無い対比の札と定型の有無",
+   "verdict": "再現",
+   "detail": {
+    "label_block_lines": 34,
+    "missing_ids": [
+     "SK:Onull-Ncold~Onull"
+    ],
+    "missing_detail": [
+     {
+      "id": "SK:Onull-Ncold~Onull",
+      "label": "非有意",
+      "style": "none",
+      "env": false,
+      "strings": [
+       "residual_sizes",
+       "critical_size"
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "w": "W141",
+   "finding": "§0 の番号「3.」の重複（Cl1）",
+   "checked": "草案3 の 28・32・75 行",
+   "verdict": "再現",
+   "detail": {
+    "L28": "3. 走行の事実の一行:",
+    "L32": "3. 走行の事実の一行（起草者の補い）: 機種は Qwen3",
+    "L75": "続けて §0-6 と §0-7 の定型を置く（§0 の機械の区画）。"
+   }
+  },
+  {
+   "w": "W142",
+   "finding": "「率は…初めて読んだ」と抽出検査の標本の本文（Cl1）",
+   "checked": "草案3 の 119 行・走行記録 §8・草案3 の 1982 行",
+   "verdict": "再現",
+   "detail": {
+    "L119_first_read": true,
+    "run_record_sec8_sample_text": [
+     149
+    ],
+    "L1982": "- 盲検の状態: 率盲検は集計の器を走らせた時点まで保った（§2）。判定器の断片は盲検で採点した（§3）。抽出検査は伏せた標識で目視したが、本文から場面は分かり、腕も推し量れる件があった（§9）。"
+   }
+  },
+  {
+   "w": "W143",
+   "finding": "セッション順の変更と、橋 4B の同じ番号での走らせ直しが台帳に無い（Cl1）",
+   "checked": "走行記録 §1 の該当の項・台帳の D-34〜D-41",
+   "verdict": "再現",
+   "detail": {
+    "run_record_bridge4B_same_number": [
+     10
+    ],
+    "run_record_session_order": [
+     21
+    ],
+    "ledger_mentions": []
+   }
+  },
+  {
+   "w": "W144",
+   "finding": "除外した API の記録を手元の走行と比べない旨（Cl1）",
+   "checked": "草案3 の 1790 行・API 再走行の記録",
+   "verdict": "再現",
+   "detail": {
+    "L1790_says_not_compared": false,
+    "api_record_says": [
+     10
+    ]
+   }
+  },
+  {
+   "w": "W145",
+   "finding": "圧の内訳の記録の最上級の語と、見出し「凍結の表の逐語」（Cl1・Cl2）",
+   "checked": "圧の内訳の記録の本文・草案3 の 1868・1870 行",
+   "verdict": "再現",
+   "detail": {
+    "pressure_superlatives": [
+     [
+      19,
+      [
+       "最強",
+       "最も高い"
+      ]
+     ]
+    ],
+    "L1868": "| 場面 | 軸ごとの圧（凍結の表の逐語） |",
+    "L1868_says_frozen_table_verbatim": true,
+    "pressure_record_says_table_not_in_frozen": true,
+    "L1870_notes_superlatives": false
+   }
+  },
+  {
+   "w": "W146",
+   "finding": "書式外を全分母で非破局に数える限界が §9 に無い（Cl1）",
+   "checked": "正本の書式外の扱いの文言・草案3 §9",
+   "verdict": "再現",
+   "detail": {
+    "canon_format_fail_rules": [
+     "n_ok（style_gate.denominator と同じ・書式外の試行も分母に入れ、分子は本文の先頭だけで決める）",
+     "判定者の判定不能と refuse・機械の書式外と refuse（凍結パーサで破局の判定を持たない）は分母から除き、件数は別々に印字する"
+    ],
+    "draft_sec9_mentions_format_fail_denominator": false
+   }
+  },
+  {
+   "w": "W147",
+   "finding": "非思考の確かめとして reasoning_chars 0 を指していない（Cl2）",
+   "checked": "集計の段取りの記録・草案3 全文",
+   "verdict": "再現",
+   "detail": {
+    "aggregation_plan": [
+     74
+    ],
+    "draft_mentions": []
+   }
+  },
+  {
+   "w": "W148",
+   "finding": "冒頭の門0.5 の記録の SHA16 が作り直した記録のもの（Cl2）",
+   "checked": "草案3 の 8 行と 133 行・二つの記録の SHA16・集計の入力",
+   "verdict": "再現",
+   "detail": {
+    "L8_sha": "64FFB57B64B3C75E",
+    "regen": "64FFB57B64B3C75E",
+    "frozen_record": "8378512CCEEE8CC6",
+    "analysis_input": "64FFB57B64B3C75E",
+    "L133_has_sha": false
+   }
+  },
+  {
+   "w": "W149",
+   "finding": "判定器の κ 1.000 の意味の断り（Cl2）",
+   "checked": "正本 judge_validity の文言・草案3 の判定器の表と位置の記述",
+   "verdict": "一部再現（κ は機械の判定と判定者の判定の一致で、全範囲で 1.000 か算出不能。何の一致かの断りは §9 に無い）",
+   "detail": {
+    "judge_validity_rule": "凍結前に登録者が系統外の判定者の都合を確かめ、合わなければ fallback_scope を登録する（登録者最終確認 2026-09-13 で推奨どおり承認）",
+    "judge_validity_report": "κ と方向別の誤判定率",
+    "judge_validity_reading_check": "{'rule': '各断片の終わりの行に照合記号を置き、判定者は書き出しの各行に code=照合記号 を足す。取りまとめの器は記号を突合し、記号が合わない行と記号の無い行の断片を照合外れとして数え、そのラベルを採点の対から外して件数を印字する。一つの判定者 × ファイルで照合外れが件数に占める割合が threshold を超えたら、同じ系統の新しい会話でそのファイルをやり直す。やり直しでも超えたら、その判定者 × ファイルは読めなかったものとして記録し、そのファイルのラベルを使わない（登録者裁定 D42・2026-09-15）', 'threshold': 0.05, 'code': '照合記号は四字で、取り違えやすい字を除いた英大文字と数字から選ぶ。記号は抽出の乱数（seeds.judge_extract の子ストリーム）で断片ごとに決め、断片の記録（公開）に置く。突合は大文字小文字を問",
+    "kappa_values_in_draft": [
+     "1.000",
+     "—"
+    ],
+    "draft_position_rows_have_both_agreements": true
+   }
+  },
+  {
+   "w": "W150",
+   "finding": "書式の再試行の理由の未精査の範囲（Ge2）",
+   "checked": "草案3 の 1969 行・API 再走行の記録の表・目視の記録",
+   "verdict": "再現",
+   "detail": {
+    "L1969": "  - 書式の再試行が起きた理由と、その全体の件数（抽出検査の標本に区切りを含む件がある）。",
+    "api_8B_retries": "18",
+    "sample_retry_line": [
+     35,
+     51
+    ]
+   }
+  },
+  {
+   "w": "W151",
+   "finding": "橋 8B の壁時計の超過の開示（Ge1）",
+   "checked": "走行記録 §6 の表・草案3 §9 と 124 行",
+   "verdict": "再現（数は走行記録にあり、草案3 は §2 で記録を指すが §9 に言及なし）",
+   "detail": {
+    "run_record_row": "| 9 | bridge:8B | #9・L4 | NVIDIA L4 | 0.32 | 1.67 | 5.22 |",
+    "draft_sec9_mentions_overrun": false,
+    "draft_L124_points": true
+   }
+  },
+  {
+   "w": "W152",
+   "finding": "設計事実の SHA16 が二つある（Cl1 の未解決）",
+   "checked": "設計事実の json と md の SHA16",
+   "verdict": "再現しない（食い違いではない: CA116… は json・945D… は md）",
+   "detail": {
+    "json": "CA116EC39DADEECD",
+    "md": "945DD38717F47CAB",
+    "analysis_input": "CA116EC39DADEECD",
+    "frozen_line_208": "## 6. 転記行（機械生成・逐語・`records/A/design-facts-A.md`〔SHA16 945DD38717F47CAB〕・`design/contrasts-A.json`〔SHA16 F0C2FF897C78C4C0"
+   }
+  },
+  {
+   "w": "W153",
+   "finding": "票の行の指し方の検査（Cl2 の部品ごとの足し算）",
+   "checked": "bundle の部品の書き出しの行（部品の本文の 1 行目 = 足し算の値 + 1）",
+   "verdict": "再現",
+   "detail": {
+    "offsets": {
+     "2": 79,
+     "3": 2075,
+     "6": 2235,
+     "10": 17,
+     "11": 474,
+     "13": 739,
+     "14": 16,
+     "15": 204
+    },
+    "cl2_offsets_match": true
+   }
+  }
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
