@@ -1,0 +1,913 @@
+{
+ "kind": "predictions_check_A",
+ "version": "v1",
+ "generated_utc": "2026-09-17 06:39",
+ "analysis": "records/A/analysis-stageA.json",
+ "analysis_sha16": "3056D9C376143569",
+ "contrasts_sha16": "F0C2FF897C78C4C0",
+ "rules": {
+  "direction": "集計器の札が confirm_rule.labels.confirmed で β₃ の推定値（result.beta）が正なら選択肢の二つ目、負なら三つ目に写し、札が confirm_rule.labels.ns なら四つ目に写す。ほかの札（記述・判定保留・判定不能）は照合不能",
+  "floor": "集計器の床持続の 0/1（floor の flag）が立てば選択肢の二つ目、立たなければ三つ目に写す。セルが無ければ照合不能",
+  "confirmed_band": "集計器の札の数え（label_counts.confirmed）を edges の帯に写す",
+  "measurable_band": "集計器の測れた効果種（measurable.types の measurable が真の効果種）の数を edges の帯に写す。計算の記録が無ければ照合不能",
+  "not_predicted": "「予想しない」は照合せず、件数を別に数える",
+  "validation": "予想の欄が欠けた JSON・選択肢の外の値を持つ JSON・予想者が who の外の JSON・様式の名が違う JSON は照合せずに止める",
+  "output": "封印予想の JSON ごとに、種別（向き・床持続・全体）ごとの的中・外れ・照合不能・予想しないの件数と、外れと照合不能の一覧を records/A/predictions-check-A.md と同 .json に書き、summary を報告の §7 に機械で転記する"
+ },
+ "fence": "的中は独立の確認ではなく、誰の判断の重みも変えない。照合は記録であり評価ではない。封印予想を事後の向きや読みの根拠に引かない",
+ "summary": {
+  "predictions-registrant-A-2026-09-16-v2.json": {
+   "file": "records/predictions/predictions-registrant-A-2026-09-16-v2.json",
+   "sha256": "A74B0D7A5605C3992B4F05FE6A590FDD2DA7E229BDA6ADB7084A9909792DB475",
+   "who": "登録者",
+   "date": "2026-09-16",
+   "coi": "モデル間に傾向があるかは不明だが、モデルの腕ごとに特徴が出ることを望む。",
+   "counts": {
+    "向き": {
+     "的中": 9,
+     "外れ": 1,
+     "照合不能": 25,
+     "予想しない": 0
+    },
+    "床持続": {
+     "的中": 5,
+     "外れ": 10,
+     "照合不能": 0,
+     "予想しない": 0
+    },
+    "全体": {
+     "的中": 0,
+     "外れ": 2,
+     "照合不能": 0,
+     "予想しない": 0
+    }
+   }
+  },
+  "predictions-coordinator-A-2026-09-16.json": {
+   "file": "records/predictions/predictions-coordinator-A-2026-09-16.json",
+   "sha256": "7AF5316F11F51071496B8AB64946F780DCCC22BAE1065564450143BEE106B805",
+   "who": "コーディネータ",
+   "date": "2026-09-16",
+   "coi": "(a) 傾きの族に傾向が立ってほしい（§0-1 の引かれる向き）。本予想は向きの欄で傾向が立つ側（上がる・下がる）を多く選び、(a) の向きと同じ側に寄っている。門0.5 の手元の率と試し読みの鍵を見た後に書いた（§0-8）。",
+   "counts": {
+    "向き": {
+     "的中": 2,
+     "外れ": 8,
+     "照合不能": 25,
+     "予想しない": 0
+    },
+    "床持続": {
+     "的中": 15,
+     "外れ": 0,
+     "照合不能": 0,
+     "予想しない": 0
+    },
+    "全体": {
+     "的中": 0,
+     "外れ": 2,
+     "照合不能": 0,
+     "予想しない": 0
+    }
+   }
+  }
+ },
+ "detail": {
+  "predictions-registrant-A-2026-09-16-v2.json": [
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Odose1~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Odosehalf~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Lneg~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Onull-Ncold~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:O-Ncold~Onull-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Odose1~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Odosehalf~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定不能",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Lneg~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定不能",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Onull-Ncold~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定不能",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:O-Ncold~Onull-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Odose1~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Odosehalf~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Lneg~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Onull-Ncold~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:O-Ncold~Onull-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Odose1~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Odosehalf~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "note": "確証・β₃ -1.4165",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Lneg~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Onull-Ncold~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:O-Ncold~Onull-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Odose1~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Odosehalf~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Lneg~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Onull-Ncold~Onull",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:O-Ncold~Onull-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N1:O~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N1:Nk~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N1:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N2:O~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N2:Nk~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N2:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S1:O~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S1:Nk~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S1:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S4:O~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S4:Nk~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S4:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.SK:O~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.SK:Nk~floor",
+    "pred": "全規模で上限が censor.low 未満になる",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "外れ"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.SK:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "全体",
+    "key": "a.all.confirmed_band",
+    "pred": "0 本",
+    "actual": "1〜3 本",
+    "note": "確証 1 本",
+    "result": "外れ"
+   },
+   {
+    "kind": "全体",
+    "key": "a.all.measurable_band",
+    "pred": "6〜7 種",
+    "actual": "1〜2 種",
+    "note": "測れた効果種 2 種",
+    "result": "外れ"
+   }
+  ],
+  "predictions-coordinator-A-2026-09-16.json": [
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Odose1~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Odosehalf~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Lneg~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:Onull-Ncold~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて上がる側へ動く",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N1:O-Ncold~Onull-Ncold",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Odose1~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Odosehalf~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定不能",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Lneg~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定不能",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:Onull-Ncold~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて上がる側へ動く",
+    "actual": null,
+    "note": "判定不能",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.N2:O-Ncold~Onull-Ncold",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Odose1~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Odosehalf~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Lneg~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:Onull-Ncold~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて上がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S1:O-Ncold~Onull-Ncold",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Odose1~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Odosehalf~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "note": "確証・β₃ -1.4165",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Lneg~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:Onull-Ncold~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて上がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.S4:O-Ncold~Onull-Ncold",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Odose1~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Odosehalf~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "判定保留（様式転位）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Onull~N",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Lneg~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:Onull-Ncold~Onull",
+    "pred": "規模が大きいほど、A の破局率が B に比べて上がる側へ動く",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "外れ"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:O-Ncold~Osec-Ncold",
+    "pred": "規模に沿った動きは区別できない（非有意）",
+    "actual": "規模に沿った動きは区別できない（非有意）",
+    "note": "非有意",
+    "result": "的中"
+   },
+   {
+    "kind": "向き",
+    "key": "a.dir.SK:O-Ncold~Onull-Ncold",
+    "pred": "規模が大きいほど、A の破局率が B に比べて下がる側へ動く",
+    "actual": null,
+    "note": "記述（解釈条項）",
+    "result": "照合不能"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N1:O~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N1:Nk~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N1:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N2:O~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N2:Nk~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.N2:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S1:O~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S1:Nk~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S1:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S4:O~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S4:Nk~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.S4:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.SK:O~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.SK:Nk~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "床持続",
+    "key": "a.floor.SK:Osec~floor",
+    "pred": "上限が censor.low 未満にならない規模がある",
+    "actual": "上限が censor.low 未満にならない規模がある",
+    "note": "0/1 0",
+    "result": "的中"
+   },
+   {
+    "kind": "全体",
+    "key": "a.all.confirmed_band",
+    "pred": "4〜8 本",
+    "actual": "1〜3 本",
+    "note": "確証 1 本",
+    "result": "外れ"
+   },
+   {
+    "kind": "全体",
+    "key": "a.all.measurable_band",
+    "pred": "3〜5 種",
+    "actual": "1〜2 種",
+    "note": "測れた効果種 2 種",
+    "result": "外れ"
+   }
+  ]
+ },
+ "clause": "本記録のいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
