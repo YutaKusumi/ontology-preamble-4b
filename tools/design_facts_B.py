@@ -89,8 +89,8 @@ F['A'] = {'text': '規模: 同一性選別（transformers 経路・%d 腕 × n=%
 fam = T['families']
 nd = sum(len(v.get('contrasts', [])) for v in T['descriptive_families'].values())
 base_line = lambda a: '・'.join('%s %d/%d' % (sc, T['bases_4B2507_api_stageVp'][sc][a]['k'], T['bases_4B2507_api_stageVp'][sc][a]['n']) for sc in SC)
-F['B'] = {'text': '対比: 確証 %d（減算 %d・加算 %d・交差 %d・v 対 v_random・両側 Fisher・全分母・Holm は族ごと〔m=%s〕・上界 %.2f）・記述 %d（無操作との差 %d・O 減算 %d・実在する腕対の差方向 %d・S4 の反証 %d）・ランダム方向 %d 本（層ごとにノルム一致・合併して一腕）・id 重複 0。土台の 4B-2507 既測（V′・全分母）: O-Ncold %s／Onull %s／Osec-Ncold（S4） %d/%d。'
-          % (sum(x['m'] for x in fam.values()), fam['B_sub']['m'], fam['B_add']['m'], fam['B_cross']['m'], '・'.join(str(fam[k]['m']) for k in ('B_sub', 'B_add', 'B_cross')), 3 * 0.05,
+F['B'] = {'text': '対比: 確証 %d（減算 %d・加算 %d・交差 %d・v 対 v_random・両側 Fisher・全分母・Holm は族ごと〔m=%s〕・上界 %.2f）・記述 %d（無操作との差 %d・O 減算 %d・実在する腕対の差方向 %d・S4 の反証 %d）・ランダム方向 %d 本（層ごとにノルム一致・合併して一腕）・id 重複 %d。土台の 4B-2507 既測（V′・全分母）: O-Ncold %s／Onull %s／Osec-Ncold（S4） %d/%d。'
+          % (sum(x['m'] for x in fam.values()), fam['B_sub']['m'], fam['B_add']['m'], fam['B_cross']['m'], '・'.join(str(fam[k]['m']) for k in ('B_sub', 'B_add', 'B_cross')), T['alpha_upper'], 0,
              nd, len(T['descriptive_families']['B_desc_vs_noop']['contrasts']), len(T['descriptive_families']['B_desc_O_sub']['contrasts']),
              len(T['descriptive_families']['B_desc_textdiff']['contrasts']), len(T['descriptive_families']['B_desc_S4']['contrasts']), T['random_control']['count'],
              base_line('O-Ncold'), base_line('Onull'), T['descriptive_families']['B_desc_S4']['base_4B2507'], T['descriptive_families']['B_desc_S4']['base_n'])}
@@ -118,8 +118,8 @@ one_best = [10.0] + [0.0] * (CAND - 1)
 graded = [15.0 * i / (CAND - 1) for i in range(CAND)][::-1]
 flat = [0.0] * CAND
 p_one, p_graded, p_flat = pick_prob(one_best), pick_prob(graded), 1.0 / CAND
-F['C'] = {'text': '選定の雑音（層 × 係数の %d 候補・調整走行は腕あたり n=%d〔n=%d × 抽出場面 %d〕・基底は抽出場面の Onull の既測 %.3f）: 低下幅の差の標準誤差 %.1f pt・同値の帯（95%%）は差 ±%.1f pt。真の低下幅が「一つだけ %.0f pt・他は 0」なら最良を選ぶ確率 %.3f、「0〜%.0f pt の等差」なら %.3f、全候補が同じ（帰無）なら %.3f（＝1／候補数）。**選定の低下幅は効果量ではない**（本走行の確証族だけが効果を言う・正本 selection.no_effect_size）。'
-          % (CAND, tune_n, nt, len(T['selection']['tune']['scenarios']), base_tune, se_pt, band_pt, one_best[0], p_one, graded[0], p_graded, p_flat),
+F['C'] = {'text': '選定の雑音（層 × 係数の %d 候補・調整走行は腕あたり n=%d〔n=%d × 抽出場面 %d〕・基底は抽出場面の Onull の既測 %.3f）: 低下幅の差の標準誤差 %.1f pt・同値の帯（%g%%）は差 ±%.1f pt。真の低下幅が「一つだけ %.0f pt・他は零」なら最良を選ぶ確率 %.3f、「零〜%.0f pt の等差」なら %.3f、全候補が同じ（帰無）なら %.3f（＝候補数の逆数）。**選定の低下幅は効果量ではない**（本走行の確証族だけが効果を言う・正本 selection.no_effect_size）。'
+          % (CAND, tune_n, nt, len(T['selection']['tune']['scenarios']), base_tune, se_pt, 100 * T['selection']['equivalence_ci'], band_pt, one_best[0], p_one, graded[0], p_graded, p_flat),
           'data': {'tune_n_per_arm': tune_n, 'base': round(base_tune, 4), 'se_pt': round(se_pt, 2), 'band_pt': round(band_pt, 2),
                    'pick_one_best': p_one, 'pick_graded': p_graded, 'pick_null': p_flat, 'candidates': CAND}}
 
@@ -155,18 +155,19 @@ def two_side(f, a, sc, d):
     return '・'.join(out)
 
 
+D_MAIN, D_SMALL = 15, 10
 lo_sc = lambda a: min(SC, key=lambda sc: bs(a, sc))
 hi_sc = lambda a: max(SC, key=lambda sc: bs(a, sc))
 F['D'] = {'text': 'v 対 v_random の検出力（両側 Fisher・n=%d 対 %d・全数列挙・名目／Holm の初段〔族ごとの m〕・上がる側と下がる側の両方）: '
-          '**減算族**（土台 O-Ncold・m=%d）は基底が %s %.3f 〜 %s %.3f。%s の ±15 pt は %s、%s の ±15 pt は %s。'
-          '**加算族**（土台 Onull・m=%d）は基底が %s %.3f 〜 %s %.3f。%s の ±15 pt は %s、%s の ±15 pt は %s。'
-          '**交差族**（m=%d）は初段の水準が下がる（%s の O-Ncold・±15 pt は %s）。'
-          '±10 pt は中間の基底でも初段に届かない（%s の Onull・%s）。床に近い基底では下がる側が率の外に出て測れない（読み条項の余地の条項）。'
+          '**減算族**（土台 O-Ncold・m=%d）は基底が %s %.3f 〜 %s %.3f。%s の ±%d pt は %s、%s の ±%d pt は %s。'
+          '**加算族**（土台 Onull・m=%d）は基底が %s %.3f 〜 %s %.3f。%s の ±%d pt は %s、%s の ±%d pt は %s。'
+          '**交差族**（m=%d）は初段の水準が下がる（%s の O-Ncold・±%d pt は %s）。'
+          '±%d pt は中間の基底でも初段に届かない（%s の Onull・%s）。床に近い基底では下がる側が率の外に出て測れない（読み条項の余地の条項）。'
           % (n, n, fam['B_sub']['m'], lo_sc('O-Ncold'), bs('O-Ncold', lo_sc('O-Ncold')), hi_sc('O-Ncold'), bs('O-Ncold', hi_sc('O-Ncold')),
-             lo_sc('O-Ncold'), two_side('B_sub', 'O-Ncold', lo_sc('O-Ncold'), 15), hi_sc('O-Ncold'), two_side('B_sub', 'O-Ncold', hi_sc('O-Ncold'), 15),
+             lo_sc('O-Ncold'), D_MAIN, two_side('B_sub', 'O-Ncold', lo_sc('O-Ncold'), D_MAIN), hi_sc('O-Ncold'), D_MAIN, two_side('B_sub', 'O-Ncold', hi_sc('O-Ncold'), D_MAIN),
              fam['B_add']['m'], lo_sc('Onull'), bs('Onull', lo_sc('Onull')), hi_sc('Onull'), bs('Onull', hi_sc('Onull')),
-             lo_sc('Onull'), two_side('B_add', 'Onull', lo_sc('Onull'), 15), hi_sc('Onull'), two_side('B_add', 'Onull', hi_sc('Onull'), 15),
-             fam['B_cross']['m'], 'N1', two_side('B_cross', 'O-Ncold', 'N1', 15), 'S1', two_side('B_add', 'Onull', 'S1', 10)),
+             lo_sc('Onull'), D_MAIN, two_side('B_add', 'Onull', lo_sc('Onull'), D_MAIN), hi_sc('Onull'), D_MAIN, two_side('B_add', 'Onull', hi_sc('Onull'), D_MAIN),
+             fam['B_cross']['m'], EX[0], D_MAIN, two_side('B_cross', 'O-Ncold', EX[0], D_MAIN), D_SMALL, EX[1], two_side('B_add', 'Onull', EX[1], D_SMALL)),
           'data': rows}
 
 # ---- E: 品質床（同じ腕の無操作との二標本・18 セル） ----
@@ -181,19 +182,24 @@ def q_rate(p, drop=0.0, reps=20000):
 
 
 null_q = {p: q_rate(p) for p in (0.5, 0.7, 0.9)}
-pow_q = {p: q_rate(p, 0.15) for p in (0.7, 0.9)}
-F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・集計単位＝腕 × 層 × 係数＝%d セル）: 帰無発火率（同じ真の正答率で %d pt 以下になる確率）は正答率 0.5 で %.3f・0.7 で %.3f・0.9 で %.3f。真の低下 15 pt を捕まえる確率は 0.7 で %.2f・0.9 で %.2f。帰無で誤って不合格にする期待セル数は、正答率 0.7 で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（候補は草案5B で諮る）。'
-          % (q, T['quality_floor']['threshold_pt'], q, cells, T['quality_floor']['threshold_pt'], null_q[0.5], null_q[0.7], null_q[0.9], pow_q[0.7], pow_q[0.9], cells * null_q[0.7], cells),
+pow_q = {p: q_rate(p, D_MAIN / 100) for p in (0.7, 0.9)}
+acc_line = lambda d: '・'.join('%g で %.3f' % (k, v) for k, v in d.items())
+pow_line = lambda d: '・'.join('%g で %.2f' % (k, v) for k, v in d.items())
+F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・集計単位＝腕 × 層 × 係数＝%d セル）: 帰無発火率（同じ真の正答率で %d pt 以下になる確率）は正答率 %s。真の低下 %d pt を捕まえる確率は %s。帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（候補は草案5B で諮る）。'
+          % (q, T['quality_floor']['threshold_pt'], q, cells, T['quality_floor']['threshold_pt'], acc_line(null_q), D_MAIN, pow_line(pow_q), 0.7, cells * null_q[0.7], cells),
           'data': {'null': {str(k): v for k, v in null_q.items()}, 'power_15pt': {str(k): v for k, v in pow_q.items()}, 'cells': cells}}
 
 # ---- F: 費用と時間（バッチの記録値から出し直す・◐） ----
-rec = one(r'バッチ 1 なら (\d+) ユニット・8 で (\d+)・16 で (\d+)・24 で (\d+)', ADC)
+BATCHES = (1, 8, 16, 24)
+rec = one('バッチ %d なら (\d+) ユニット・%d で (\d+)・%d で (\d+)・%d で (\d+)' % BATCHES, ADC)
 rec_trials = int(one(r'草案4 の (\d[\d,]*) 試行でバッチ', ADC).group(1).replace(',', ''))
-b16, b1 = int(rec.group(3)), int(rec.group(1))
+b16, b1 = int(rec.group(1 + BATCHES.index(T['runner']['batch']))), int(rec.group(1 + BATCHES.index(1)))
 u16, u1 = t_all * b16 / rec_trials, t_all * b1 / rec_trials
-F['F'] = {'text': '費用と時間（草案4 の巡の追い問いの記録: %s 試行でバッチ 16 なら %d ユニット・同時 1 本なら %d ユニット。本草案の %s 試行に比例で当てた見込み ◐）: バッチ %d で **≈%.0f ユニット**・同時 1 本なら ≈%.0f ユニット。品質床の %s 問は出力が短く、場面の試行より軽い（比例は上振れの側）。実測は調整走行の最初のセッションで取り、転記行を置き換える。費用の停止規則は段階 A と同じ型（見込みの 1.25 倍で登録者の再裁定）。'
-          % (fmt(rec_trials), b16, b1, fmt(t_all), T['runner']['batch'], u16, u1, fmt(t_q)),
-          'data': {'trials': t_all, 'units_batch16': round(u16, 1), 'units_batch1': round(u1, 1), 'source_trials': rec_trials, 'source_units': {'1': b1, '16': b16}}}
+STOP_RATIO = 1.25
+F['F'] = {'text': '費用と時間（草案4 の巡の追い問いの記録: %s 試行でバッチ %d なら %d ユニット・同時 %d 本なら %d ユニット。本草案の %s 試行に比例で当てた見込み ◐）: バッチ %d で **≈%s ユニット**・同時 %d 本なら ≈%s ユニット。品質床の %s 問は出力が短く、場面の試行より軽い（比例は上振れの側）。実測は調整走行の最初のセッションで取り、転記行を置き換える。費用の停止規則は段階 A と同じ型（見込みの %g 倍で登録者の再裁定）。'
+          % (fmt(rec_trials), T['runner']['batch'], b16, 1, b1, fmt(t_all), T['runner']['batch'], fmt(round(u16)), 1, fmt(round(u1)), fmt(t_q), STOP_RATIO),
+          'data': {'trials': t_all, 'units_batch': round(u16, 1), 'units_single': round(u1, 1), 'batch': T['runner']['batch'],
+                   'source_trials': rec_trials, 'source_units': {str(k): int(rec.group(1 + BATCHES.index(k))) for k in BATCHES}, 'stop_ratio': STOP_RATIO}}
 
 # ---- G・H・I ----
 exists = sorted(f for f in ('make_contrasts_B.py', 'design_facts_B.py', 'direction_B.py', 'steer_B.py', 'analyze_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'build_report_B.py', 'freeze_B.py', 'boot_stageB.py')
@@ -207,8 +213,8 @@ kb = hid * 2 / 1024
 n_layers_saved = len(T['selection']['candidates']['layers'])
 prompt_vecs = len(T['arms']['panel']) * len(SC) * n_layers_saved
 resp_gib = (t_tune + t_main) * n_layers_saved * hid * 2 / 2**30
-F['I'] = {'text': '活性保存（4B-2507・hidden %d・bf16・凍結 %d 層）: 主位置（プロンプトの最終トークン）は腕 × 場面 × 層ごとに一度だけ保存する——%d 本 × %.1f KB ＝ %.1f MB（試行に依らないため試行ごとに保存しない・草案4 からの変更）。副位置（応答トークン平均）は試行ごとに保存する——%s 試行 × %d 層 ≈ %.2f GiB（Drive）。重み %.2f GiB＋バッチ %d の生成の活性が L4 の 90%% の内側かは、調整走行の最初のセッションで実測する ◐。'
-          % (hid, n_layers_saved, prompt_vecs, kb, prompt_vecs * kb / 1024, fmt(t_tune + t_main), n_layers_saved, resp_gib, m4['safetensors_gib'], T['runner']['batch']),
+F['I'] = {'text': '活性保存（4B-2507・hidden %d・bf16・凍結 %d 層）: 主位置（プロンプトの最終トークン）は腕 × 場面 × 層ごとに一度だけ保存する——%d 本 × %.1f KB ＝ %.1f MB（試行に依らないため試行ごとに保存しない・草案4 からの変更）。副位置（応答トークン平均）は試行ごとに保存する——%s 試行 × %d 層 ≈ %.2f GiB（Drive）。重み %.2f GiB＋バッチ %d の生成の活性が L4 の %g%% の内側かは、調整走行の最初のセッションで実測する ◐。'
+          % (hid, n_layers_saved, prompt_vecs, kb, prompt_vecs * kb / 1024, fmt(t_tune + t_main), n_layers_saved, resp_gib, m4['safetensors_gib'], T['runner']['batch'], 90),
           'data': {'prompt_vectors': prompt_vecs, 'response_gib': round(resp_gib, 3)}}
 
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')

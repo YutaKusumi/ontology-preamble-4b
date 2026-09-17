@@ -40,7 +40,8 @@
 ## 段階 B（機構層・設計中・2026-09-18 再開・O の枠組みに対応する方向の加減で破局率は動くか）
 - **いまどこか**: 設計の途中である（凍結していない・データは無い）。草案4（2026-09-13）の主抽出位置が成り立たないことが検分の追い問いで判明し、登録者裁定で再設計した。次は草案5B と設計の検分。
 - **再開の記録（ここから読む）**: [`records/B/stageB-restart-2026-09-18.md`](records/B/stageB-restart-2026-09-18.md)——時系列・登録者裁定 D57〜D61 の逐語・正本と器の改訂・次の段取り・未決・不利な材料。
-- 正本 JSON `design/contrasts-B.json`（draft5-2026-09-18・SHA16 75287495C49A4ACB・生成器 `tools/make_contrasts_B.py` v2）／転記行 `records/B/design-facts-B.md`（SHA16 64E35D5533766DED・生成器 `tools/design_facts_B.py` v2）。
+- 正本 JSON `design/contrasts-B.json`（draft5-2026-09-18・SHA16 C7DAD2F14A87614A・生成器 `tools/make_contrasts_B.py` v2）／転記行 `records/B/design-facts-B.md`（SHA16 F2847E689D7843F8・生成器 `tools/design_facts_B.py` v2）。
+- 設計草案5B: [`design/design-stageB-draft5.md`](design/design-stageB-draft5.md)（SHA16 447695A1B5BB942E・原稿からの機械組み立て `tools/build_draftB.py`・本文の数は正本からの束縛のみ・検査の記録 [`records/B/numbers-lint-draft5B.md`](records/B/numbers-lint-draft5B.md)）。次は設計の検分（裁定 D59 の一段目）。
 - 設計: Qwen3-4B-Instruct-2507（bf16・transformers・Colab）・場面 N1・S1・SK・S4・確証の族は 16 対比（減算・加算・交差。いずれも「方向 v 対 ノルム一致ランダム方向」）・n=200／腕。規模は合計 20,680 試行の見込み。
 - 段階 A との関係: 段階 A の結果は方向の抽出にも効果の根拠にも使わない（反映メモ A・再開の記録 §1 の D57・D58）。段階 A は初版の重み、段階 B は 2507 の重みである。
 - 検分の予定（裁定 D59）: 設計の検分 → 器材の実装検分 → 凍結前の最終検分。各段に系統外を二名以上。
