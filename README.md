@@ -22,6 +22,21 @@
 - 凍結設計 `design/design-v1.0-FROZEN.md`（SHA D7963FE1C011341B）・凍結記録 `records/FREEZE-RECORD.md`・逸脱台帳 `records/DEVIATIONS.md`・パイロット門（旧版と訂正版）`records/pilot/`
 - 生データ: `results/<stage>/`（各走行の manifest・cells・trials・raw。raw の応答本文は器物の出力であり、AI の自己報告ではない）
 
+## 段階 A（2026-09-16 凍結・2026-09-17 結果公開・前置きの腕の差が機種の並びに沿って変わるか）
+- 凍結設計 `design/design-stageA-FROZEN.md`（SHA16 C30AF752D3531904）・正本 JSON `design/contrasts-A.json`（SHA16 F0C2FF897C78C4C0）・凍結マニフェスト `records/freeze-A-2026-09-16.json`。
+- 問い: Qwen3 の稠密系列 0.6B・1.7B・4B・8B・14B・32B（初版・非思考モード・手元の vLLM）と錨 4B-2507 に、13 の前置きの腕 × 5 場面 × n=200（総試行 111,800）を走らせ、破局率の腕の差が「機種の並び（log N）」に沿って変わるかを、7 効果種 × 5 場面の 35 対比で判定した（β₃ の Firth PPLRT と pt 差の傾きの二尺度・p* の Holm・m=35 固定・札の二段）。
+- **結果報告（最終版・2026-09-17 公開）**: [`records/A/results-report-A-FINAL-2026-09-17.md`](records/A/results-report-A-FINAL-2026-09-17.md)——先頭は次のとおり。
+  - 主閾値の札: 確証 1（S4 の Onull 対 N・pt 差の傾きは負で上向きではない・残った規模 4B・14B・32B は非連続で端を欠く）・判定不能 3・記述（解釈条項）13・判定保留（様式転位）9・非有意 9。主閾値で上向きの確証は無い。
+  - 感度閾値のうち検閲の閾値を両端へ広げた側（0.03／0.97）では、N2 の Onull 対 N と S1 の Onull-Ncold 対 Onull が上向きの規則の定義に当たる（機械の区画には無く、公開前検分の再現で凍結した集計器の関数から出し直した・主閾値の札を主とする）。
+  - 測れた効果種は 7 種のうち 2。測れた対比は S1 の Lneg 対 Onull だけで、札は非有意（処置腕が残った三規模とも天井）。解釈条項に回った三対比の数え方は段階 B の設計で決める。
+  - 様式転位と検査認識の言及率・環境と規模の重なり・判定器の読み取りの範囲などの限界は、報告の §0 と §9。API 再走行は「条件を満たす提供なし」（D-38）。
+- 機械集計 `records/A/analysis-stageA.md`（凍結器 `tools/analyze_A.py` v2.1・解釈なし）／走行記録 `records/A/main/main-run-A.md`／集計の段取り `records/A/main/aggregation-plan-A.md`／報告の走査の歯止め `records/A/main/report_lint_guard_A.py`（記録は `records/A/main/report-lint-guard-*.json`）。
+- 封印予想の照合（的中は誰の判断の重みも変えない）: 全行は `records/A/predictions-check-A.json`。`records/A/predictions-check-A.md` の明細の表は的中の行を載せない（冒頭の件数の表に的中の数がある）。
+- 公開前検分: 第一巡（系統外 Gemini 3.8 Flash × 2・系統内 claude.ai の Claude Opus 5 × 2〔起草者と同一系列で一票〕・全票 条件つき・`records/reviews/A/results/round1/`）と、最終検分（系統外 Gemini 3.8 Flash × 1・新規の会話・草案4 について条件つき〔公開の前の条件なし〕・`records/reviews/A/results/round2/`）。最終検分の後に起草者が全文を見直し（`records/reviews/A/results/final-read/`・機械の区画を凍結した組み立て器で組み直して一致を確かめた・記入の直しは草案5・外の目は通っていない）。票は逐語保全し、所見は一次記録と凍結した器で出し直してから採否表で扱った。検分の数は独立な確認の数ではない（系統内 COI）。
+- 逸脱台帳 D-33〜D-45（凍結の前の Firth の一致検査・パイロット・本走行・API 再走行・集計・報告の段）。
+- 両用性の柵（凍結 §2.15）: 台帳の逐語文字列と腕別率表は全公開。上昇を招く操作の再現手順を本文・要約・表題に書かず、腕を効き目順に並べない。
+- いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
+
 ## 次段の準備（段階 A／B・門0 費用パイロット・2026-09-12〜）
 - 計画案（内部・v2.2）の順序に従い、A・B の凍結前に **費用パイロット（門0）** を置く: Colab の L4 と A100 40GB で各 1 セッション、Qwen3-4B-Instruct-2507 を vLLM（bf16）で N1 × 12 腕 × n=40 走らせ、ユニットあたりの試行数・出力トークン長の分布・セッション経費を実測する。手順書と事前登録（seed・tag・測定表・決定木・外挿の係数）は `records/cost-pilot/cost-pilot-plan-2026-09-12.md`。率は記述であり確証ではない。
 - 器材: `tools/make_runner_local.py` → `tools/run_preamble_local.py` v2.7（凍結走行器 v2.6 から機械生成・provider local・採点経路は関数単位で同一）／`tools/colab/boot_cost_pilot.py`（登録者が Colab で一行 exec）／`tools/cost_facts.py`（実測から §6 の転記行を生成）。走行は登録者の Chrome 越しにコーディネータが操作し、Drive の同意・ダウンロード・支払いは登録者が行う（2026-09-13 打ち合わせ・boot v2）。
