@@ -29,13 +29,13 @@ INTERV = sorted(a for a in T['arms']['main'] if '+v' in a or '-v' in a)
 NOOP_BASE = {a: a.split('+v')[0].split('-v')[0] for a in INTERV}
 
 
-def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style_b, mention, correct=None, layer=None, coef=None, status='ok'):
+def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style_b, mention, correct=None, layer=None, coef=None, status='ok', sampling=None):
     return {'trial_id': '%s__%s__%04d' % (run_key, arm, i), 'trial_index': i, 'arm': arm, 'scenario': scenario, 'tag': tag,
             'status': status, 'catastrophe': (None if status != 'ok' else bool(cat)), 'choice': ('refuse' if refuse else 'A'),
             'format_fail': bool(ff), 'style_a': bool(style_a), 'style_b': bool(style_b), 'mention': bool(mention),
             'loop_flag': False, 'truncated': False, 'correct': (None if correct is None else bool(correct)),
             'seed': seed, 'run_key': run_key, 'runner_sha': 'SYNTH', 'arms_spec': arm, 'preamble_sha': 'SYNTH',
-            'model': 'stub/dry-run', 'sampling': dict(T['runner']['generation']), 'layer': layer, 'coef': coef,
+            'model': 'stub/dry-run', 'sampling': dict(sampling or T['runner']['generation']), 'layer': layer, 'coef': coef,
             'direction_id': 'synth', 'batch_pos': i % T['runner']['batch'], 'proc_uuid': 'synth', 'dry_run': True}
 
 
@@ -173,7 +173,7 @@ def build(case, out_root):
     q = spec['quality']
     tag_q = T['tags']['quality']
     for base in QF_ARMS + ['O', 'Osec-Ncold']:
-        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'],
+        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'], sampling=T['quality_floor']['generation'],
                              run_key='%s__noop__%s' % (tag_q, base))
         write_run(out_root, tag_q, 'selection__%s__noop' % base, {'stage': 'selection', 'arm': base, 'layer': None, 'coef': None, 'n': N_Q,
                                                                   'seed': T['seeds']['quality']}, trials)
@@ -181,19 +181,19 @@ def build(case, out_root):
         arm = base + QF_OPS[base]
         for (l, c) in CANDS:
             bad = (q['fail_selection'] == 'all') or (arm in (q['fail_selection'] or []))
-            trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2}, arm=arm, scenario='quality', tag=tag_q,
+            trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2}, arm=arm, scenario='quality', tag=tag_q, sampling=T['quality_floor']['generation'],
                                  seed=T['seeds']['quality'], layer=l, coef=c, run_key='%s__%s__L%sC%s' % (tag_q, arm, l, c))
             write_run(out_root, tag_q, 'selection__%s__L%sC%s' % (arm, l, c), {'stage': 'selection', 'arm': arm, 'layer': l, 'coef': c,
                                                                               'n': N_Q, 'seed': T['seeds']['quality']}, trials)
     pick = spec['tune'].get('best') or (LAYERS[1], COEFS[1])
     for arm in INTERV:
         bad = arm in (q['fail_post'] or [])
-        trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2}, arm=arm, scenario='quality', tag=tag_q,
+        trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2}, arm=arm, scenario='quality', tag=tag_q, sampling=T['quality_floor']['generation'],
                              seed=T['seeds']['quality'], layer=pick[0], coef=pick[1], run_key='%s__post__%s' % (tag_q, arm))
         write_run(out_root, tag_q, 'post__%s' % arm, {'stage': 'post', 'arm': arm, 'layer': pick[0], 'coef': pick[1], 'n': N_Q,
                                                       'seed': T['seeds']['quality']}, trials)
     for base in sorted(set(NOOP_BASE.values())):
-        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'],
+        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'], sampling=T['quality_floor']['generation'],
                              run_key='%s__post__noop__%s' % (tag_q, base))
         write_run(out_root, tag_q, 'post__%s__noop' % base, {'stage': 'post', 'arm': base, 'layer': None, 'coef': None, 'n': N_Q,
                                                              'seed': T['seeds']['quality']}, trials)
