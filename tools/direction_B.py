@@ -43,6 +43,48 @@ def hidden_states_index(layer_idx):
     return layer_idx + 1
 
 
+def decoder_layers(model):
+    """hook を掛ける層の並びを、**一箇所で**決める（裁定 D117・2026-09-18）。
+
+    抽出器（`hidden_states[idx+1]` を取る）と走行器（`layers[idx]` に hook を掛ける）が**同じ層を指す**ことが要る。
+    `hidden_states[idx+1]` は「`layers[idx]` の出力」と等しい——この対応が崩れると、
+    **抽出した層と介入した層が違う**まま誰も気づけない（系統内の検分の是認 A3 が「走行器が `layers[i]` に掛けることが条件」と断った箇所）。
+    `assert_layer_alignment` で実機のたびに確かめる。
+    """
+    for path in (('model', 'layers'), ('transformer', 'h'), ('model', 'decoder', 'layers')):
+        o = model
+        for p in path:
+            o = getattr(o, p, None)
+            if o is None:
+                break
+        if o is not None:
+            return o
+    raise SystemExit('この機種の層の並びを見つけられない（`decoder_layers` に経路を足す）')
+
+
+def assert_layer_alignment(model, input_ids, attention_mask, layer_idx, atol=0.0):
+    """**`hidden_states[idx+1]` が `layers[idx]` の出力と同じ**ことを、実機で確かめる（裁定 D117・D122）。
+
+    恒真にならないよう、hook で実際に受け取ったテンソルと、`output_hidden_states` の該当位置を突き合わせる。
+    """
+    import torch
+    got = {}
+
+    def _h(module, inputs, output):
+        got['h'] = (output[0] if isinstance(output, tuple) else output).detach().float().cpu()
+
+    hd = decoder_layers(model)[layer_idx].register_forward_hook(_h)
+    try:
+        with torch.no_grad():
+            out = model(input_ids=input_ids, attention_mask=attention_mask, output_hidden_states=True)
+    finally:
+        hd.remove()
+    hs = out.hidden_states[hidden_states_index(layer_idx)].detach().float().cpu()
+    d = float((got['h'] - hs).abs().max())
+    assert d <= atol, ('hidden_states[idx+1] と layers[idx] の出力が一致しない（層の対応が崩れている）', layer_idx, d)
+    return d
+
+
 def write_layer_record(out_dir, n_layers):
     """総層数と層の添字を**記帳**する（正本 `layer_index_rule` が求める・採否表 P283）。"""
     rec = {'num_hidden_layers': n_layers, 'ratios': LAYER_RATIOS,
@@ -214,9 +256,82 @@ if __name__ == '__main__':
     n_layers = model.config.num_hidden_layers
     idxs = {r: layer_index(r, n_layers) for r in LAYER_RATIOS}
 
-    def prompts_for(arm, sc):
-        raise SystemExit('場面と腕の本文の組み方は器材の段で確定する（--scenarios-dir の凍結素材から組む）。'
-                         'この版は骨組みで、実際の組み立ては凍結の前に埋める（正本 quality_floor.input と同じ扱い）。')
+    # ---- 本体（裁定 D117・2026-09-18） ----
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import steer_B
+    import run_stageB_local as RUN
 
-    print('[direction_B] 総層数 %d・層の添字 %s（正本の割合 %s）' % (n_layers, idxs, LAYER_RATIOS))
-    print('[direction_B] 本文の組み立てはまだ埋めていない（凍結の前に確定する）。--selftest で規則だけ確かめられる。')
+    AT = {k: v['text'] for k, v in RUN.arm_texts().items()}          # 腕の素材は SHA16 で引き当てる
+    PANEL_ARMS = list(T['arms']['panel'])
+    EXTRACT = list(T['extraction_scenarios'])
+
+    def prompt_ids(arm, sc):
+        """一つの (腕, 場面) の**組み立て済みのトークン列**（正本 `runner.prompt_assembly`・`runner.chat_template`）。"""
+        scen, inst = RUN.scenario_and_instruction(sc)
+        msg = RUN.user_message(AT[arm], scen['text'], inst)
+        return steer_B.apply_chat(tok, msg)
+
+    def main_position_activation(ids, layer_idx):
+        """**主位置（プロンプトの最終トークン）**の活性（正本 `selection.position.main`）。
+
+        左詰めのバッチでは最終トークンは列の最後にあるが、ここは一本ずつ流すので詰めは無い。
+        `hidden_states[idx+1]` を取る——`layers[idx]` の出力と同じであることは `assert_layer_alignment` で確かめる。
+        """
+        t = torch.tensor([ids], device=model.device)
+        am = torch.ones_like(t)
+        with torch.no_grad():
+            out = model(input_ids=t, attention_mask=am, output_hidden_states=True)
+        hs = out.hidden_states[hidden_states_index(layer_idx)]
+        return hs[0, -1, :].detach().float().cpu().numpy()
+
+    def collect(order):
+        """腕 × 場面 × 層の主位置の活性を集める。order は腕の並べ方（決定性の検査に使う）。"""
+        H = {}
+        for arm in order:
+            for sc in EXTRACT:
+                ids = prompt_ids(arm, sc)
+                for r in LAYER_RATIOS:
+                    H[(arm, sc, r)] = main_position_activation(ids, idxs[r])
+        return H
+
+    # (1) 層の対応を実機で確かめる（抽出した層と介入する層が同じであること）
+    _ids = prompt_ids(PANEL_ARMS[0], EXTRACT[0])
+    _t = torch.tensor([_ids], device=model.device)
+    align = {str(r): assert_layer_alignment(model, _t, torch.ones_like(_t), idxs[r]) for r in LAYER_RATIOS}
+    print('[direction_B] 層の対応を確かめた（hidden_states[idx+1] と layers[idx] の最大差 %s）' % align)
+
+    # (2) 活性を二度取る（決定性の二条・裁定 D91）
+    H1 = collect(PANEL_ARMS)
+    H2 = collect(PANEL_ARMS)                       # 同じ並べ方
+    H3 = collect(list(reversed(PANEL_ARMS)))       # 並べ方を変えた
+    ok_same, bad_same = determinism_same_order(H1, H2)
+    ok_cross, rows_cross = determinism_cross_order(H1, H3)
+    if not ok_same:
+        raise SystemExit('決定性 (i)（同じ並べ方で完全一致）に落ちた: %s' % bad_same[:4])
+    print('[direction_B] 決定性 (i) 完全一致・(ii) 許容差の内側 %s' % ok_cross)
+
+    # (3) 方向を作る（全方向を ‖v̂〕に合わせる・裁定 D102）
+    dirs, stats = build_directions(H1)
+    nv = {r: float(np.linalg.norm(dirs[('static', r)])) for r in LAYER_RATIOS}
+    for (name, r), v in dirs.items():
+        if name != 'static':
+            d = abs(float(np.linalg.norm(v)) - nv[r])
+            assert d < 1e-6 * max(nv[r], 1.0), ('方向のノルムが ‖v̂〕に合っていない（裁定 D102）', name, r, d)
+
+    # (4) 書き出す（npz・要約統計・層の記帳）
+    npz = os.path.join(out_dir, 'directions.npz')
+    np.savez(npz, **{'%s__%s' % (name, r): v for (name, r), v in dirs.items()})
+    sha = hashlib.sha256(open(npz, 'rb').read()).hexdigest().upper()
+    write_layer_record(out_dir, n_layers)
+    rec = {'kind': 'direction_B', 'version': VERSION, 'model': a.model, 'dtype': a.dtype,
+           'num_hidden_layers': n_layers, 'layer_indices': {str(r): idxs[r] for r in LAYER_RATIOS},
+           'alignment_max_abs': align, 'determinism_same_order': bool(ok_same),
+           'determinism_cross_order': {'ok': bool(ok_cross), 'rows': rows_cross},
+           'stats': {str(r): stats[r] for r in LAYER_RATIOS}, 'npz_sha256': sha,
+           'arms': PANEL_ARMS, 'extraction_scenarios': EXTRACT,
+           'contrasts_sha16': runs_B.sha16_file(runs_B.CPATH)}
+    json.dump(rec, open(os.path.join(out_dir, 'directions.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('[direction_B] 方向を書いた: %s（SHA-256 %s…）' % (npz, sha[:16]))
+    print('[direction_B] 総層数 %d・層の添字 %s・合わせる前の比 %s'
+          % (n_layers, idxs, {str(r): stats[r].get('raw_norm_ratio') for r in LAYER_RATIOS}))
+    sys.exit(0 if ok_cross else 2)      # (ii) は止めない条だが、外れたら非零で知らせる（裁定 D91）

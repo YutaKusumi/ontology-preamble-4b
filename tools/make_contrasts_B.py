@@ -312,9 +312,14 @@ identity = {'gate': '0.5（段階 A と共用）', 'stacks': ['API', 'vLLM', 'tr
             'b_panel_arms_compared': ('**B の八腕のうち、選別で比べたのは七腕である**（裁定 D130・2026-09-18）。`compared_arms` に Osec-Ncold が無いため。V′ に N1 の既測はあるので、足すか、七腕である旨を印字するかを凍結の前に決める（系統内の検分・採否表 P372）'),
             'b_panel_note': 'B が使う前置きの腕は %d 本で、選別の %d 腕の一部である。選別は %d 腕で走らせたうえで、**B の %d 腕に絞った平均差・最大差も同じ表に印字する**（試行は増えない・採否表 P256）' % (len(PANEL), len(_idA['arms_run']), len(_idA['arms_run']), len(PANEL)),
             'fail_reading': '不合格でも B は別個体の内側で完結する測定として実施できる（A の錨の点を規模の線に転記しないことは A の凍結どおり）'}
-GEN_ALL = {'top_k': 0, 'min_p': 0.0, 'repetition_penalty': 1.0, 'presence_penalty': 0.0, 'frequency_penalty': 0.0}
+# **この機関（transformers の generate）が受け取る設定だけを登録する**（裁定 D127・端から端までの検査で捕まえた）。
+# presence_penalty・frequency_penalty は API の側の設定で、transformers の GenerationConfig には無い——
+# 渡すと例外で止まる。段階 A の経路（vLLM）との違いを、not_applicable に書いて残す。
+GEN_ALL = {'top_k': 0, 'min_p': 0.0, 'repetition_penalty': 1.0, 'no_repeat_ngram_size': 0}
+GEN_NA = {'not_applicable': ['presence_penalty', 'frequency_penalty'],
+          'why': 'API の側の設定で、transformers の `GenerationConfig` に無い（渡すと例外で止まる）。段階 A は別の経路（vLLM）で走ったので、この二つが段階 A で効いていたかは**確かめていない**'}
 runner = {'batch': 16,
-          'generation_explicit': dict(GEN_ALL, note=('**標本化の設定はすべて正本に登録し、明示で渡す**（裁定 D127・2026-09-18）。渡さない設定は**重みに同梱の既定が効く**ので、「段階 A と同じ値」という主張が崩れる。\n器は `generate` にこの一覧をそのまま渡し、**実効の設定とトークナイザの版を manifest に記帳して照合する**。前は temperature・top_p・最大トークン数の三つしか登録しておらず、ほかは機種の既定のままだった（系統外の検分・採否表 P358）')), 'batch_rule': 'バッチ生成 %d を設計定数にする（裁定 D3 (d)・調整走行の最初のセッションで実測し、転記行を置き換える）' % 16,
+          'generation_explicit': dict(GEN_ALL, **GEN_NA, note=('**標本化の設定はすべて正本に登録し、明示で渡す**（裁定 D127・2026-09-18）。渡さない設定は**重みに同梱の既定が効く**ので、「段階 A と同じ値」という主張が崩れる。\n器は `generate` にこの一覧をそのまま渡し、**実効の設定とトークナイザの版を manifest に記帳して照合する**。前は temperature・top_p・最大トークン数の三つしか登録しておらず、ほかは機種の既定のままだった（系統外の検分・採否表 P358）')), 'batch_rule': 'バッチ生成 %d を設計定数にする（裁定 D3 (d)・調整走行の最初のセッションで実測し、転記行を置き換える）' % 16,
           'engine': 'transformers（bf16・hook を掛けるため vLLM を使わない）', 'environment': 'Colab L4 を主・A100 は予備',
           'generation': dict(GEN, applies_to='同一性選別・調整走行・本走行（場面の試行）', source='段階 A の正本 runner と同じ値（裁定 D78・2026-09-18）。品質床だけは貪欲（quality_floor.generation）'),
           'padding': 'バッチの詰めは**左詰め**とし、主位置（プロンプトの最終トークン）は、詰めでない最後の位置から取る（詰めの位置から取らない）。詰めの向きとバッチの並べ方は器材の段の検査項目にする（採否表 P241）',

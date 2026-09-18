@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""run_stageB_local.py v3 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+"""run_stageB_local.py v4 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
 
 段階 A の走行器（`run_preamble_local.py` v2.7・vLLM の OpenAI 互換サーバ）は凍結物なので触らない。
 B は hook を掛けるため transformers を直に使うが、**プロンプトの組み立てと採点の経路は凍結物に合わせる**:
@@ -20,7 +20,7 @@ import numpy as np
 import runs_B
 import steer_B
 
-VERSION = 'v3'
+VERSION = 'v4'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FROZEN_RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
@@ -197,6 +197,144 @@ def _selftest():
           '試行の記録の欄 %d・hook の帯と復号の段: すべて通った' % (sha, sco['parser_sha16'], len(fields)))
 
 
+
+
+# ---- 本体（裁定 D117・2026-09-18） ----
+def load_directions(npz_path, json_path=None):
+    """凍結した方向を読み、**ノルムが ‖v̂〕に合っていることを実機で確かめる**（裁定 D102・D117）。
+
+    方向を作る器の自己検査は「作るとき」しか見られない。npz が差し替わっていたら、ここでしか捕まらない。
+    """
+    import numpy as _np
+    z = _np.load(npz_path)
+    dirs = {}
+    for k in z.files:
+        name, ratio = k.split('__')
+        dirs[(name, float(ratio))] = z[k]
+    bad = []
+    for ratio in {r for _, r in dirs}:
+        nv = float(_np.linalg.norm(dirs[('static', ratio)]))
+        for name in {n for n, r in dirs if r == ratio} - {'static'}:
+            d = abs(float(_np.linalg.norm(dirs[(name, ratio)])) - nv)
+            if d > 1e-6 * max(nv, 1.0):
+                bad.append('%s 層%s: ノルムの差 %.6g' % (name, ratio, d))
+    if bad:
+        raise SystemExit('凍結した方向のノルムが ‖v̂〕に合っていない（正本 selection.candidates.coefficient_ref・裁定 D102）: %s'
+                         % '・'.join(bad))
+    meta = json.load(open(json_path, encoding='utf-8')) if json_path and os.path.exists(json_path) else {}
+    return dirs, meta
+
+
+def register_hook(model, layer_idx, hook):
+    """hook を一本だけ掛け、**掛かっている本数を確かめる**（裁定 D114・D117）。"""
+    import direction_B
+    layer = direction_B.decoder_layers(model)[layer_idx]
+    n_before = len(getattr(layer, '_forward_hooks', {}) or {})
+    if n_before:
+        raise SystemExit('この層に hook が既に %d 本掛かっている（前のバッチで外し損ねている・裁定 D114）' % n_before)
+    handle = layer.register_forward_hook(hook)
+    n_after = len(getattr(layer, '_forward_hooks', {}) or {})
+    if n_after != 1:
+        handle.remove()
+        raise SystemExit('hook が一本になっていない（%d 本）' % n_after)
+    return handle
+
+
+def assert_no_hooks(model, layer_idx):
+    import direction_B
+    n = len(getattr(direction_B.decoder_layers(model)[layer_idx], '_forward_hooks', {}) or {})
+    if n:
+        raise SystemExit('バッチの後に hook が %d 本残っている（裁定 D114）' % n)
+
+
+def batch_seed(cell_seed_value, batch_index):
+    """バッチの種（正本 `seeds.unit_D127`・裁定 D127）。**試行単位の再現は主張しない。**"""
+    import numpy as _np
+    return int(_np.random.SeedSequence([int(cell_seed_value), int(batch_index)]).generate_state(1)[0])
+
+
+def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value, tag, run_key,
+             dirs=None, layer_idx=None, gen=None, batch=None, start=0):
+    """一つのセル（場面 × 腕 × 層 × 係数）を走らせて、試行の記録の一覧を返す。
+
+    **一つのバッチは一つの場面 × 一つの腕**（正本 `selection.batch_composition`・裁定 D124）なので、
+    バッチ内の入力は同一で詰めは起きない。帯の起点は**主位置（列の最後）**。
+    """
+    import torch
+    import steer_B
+    T_ = T
+    batch = batch or T_['runner']['batch']
+    gen = dict(gen or steer_B.main_generation())
+    # **この機関が受け取る鍵だけを渡す**（裁定 D127・端から端までの検査で捕まえた）。
+    _na = set((T_['runner'].get('generation_explicit') or {}).get('not_applicable') or [])
+    gen.update({k: v for k, v in (T_['runner'].get('generation_explicit') or {}).items()
+                if k not in ('note', 'not_applicable', 'why') and k not in _na})
+    scen, inst = scenario_and_instruction(scenario)
+    at = arm_texts()[base_arm_of(arm)]['text']
+    ids = steer_B.apply_chat(tok, user_message(at, scen['text'], inst))
+    plan = arm_plan(arm)
+    sco = scoring()
+    out, bi = [], 0
+    while start + len(out) < n:
+        k = min(batch, n - (start + len(out)))
+        inp = torch.tensor([ids] * k, device=model.device)
+        am = torch.ones_like(inp)
+        starts = [inp.shape[1] - 1] * k                 # **主位置**（裁定 D124・詰めは起きない）
+        steer_B.assert_batch_uniform([at] * k, [scenario] * k)
+        handle = None
+        v = None if plan is None else dirs[(plan['kind'], layer_ratio)]
+        try:
+            if plan is not None:
+                handle = register_hook(model, layer_idx, make_hook(v, coef, plan['sign'], starts))
+            torch.manual_seed(batch_seed(cell_seed_value, bi))
+            with torch.no_grad():
+                gen_out = model.generate(input_ids=inp, attention_mask=am, **gen)
+        finally:
+            if handle is not None:
+                handle.remove()
+                assert_no_hooks(model, layer_idx)
+        texts = tok.batch_decode(gen_out[:, inp.shape[1]:], skip_special_tokens=True)
+        fam = scen.get('family')
+        parsed = [sco['parse_app_v2'](t, fam) for t in texts]
+        # **書式外は一度だけ引き直し、最終試行だけを採点する**（凍結走行器と同じ手順・裁定 D117）。
+        # 持たないと書式外率が段階 A と別物になり、希釈の門が見るものが変わる。
+        need = [j for j, o in enumerate(parsed) if o is None]
+        raws = list(texts)
+        if need:
+            inp2 = torch.tensor([ids] * len(need), device=model.device)
+            am2 = torch.ones_like(inp2)
+            h2 = None
+            try:
+                if plan is not None:
+                    h2 = register_hook(model, layer_idx, make_hook(v, coef, plan['sign'], [inp2.shape[1] - 1] * len(need)))
+                torch.manual_seed(batch_seed(cell_seed_value, bi) + 1)
+                with torch.no_grad():
+                    g2 = model.generate(input_ids=inp2, attention_mask=am2, **gen)
+            finally:
+                if h2 is not None:
+                    h2.remove()
+                    assert_no_hooks(model, layer_idx)
+            t2 = tok.batch_decode(g2[:, inp2.shape[1]:], skip_special_tokens=True)
+            for m_, j in enumerate(need):
+                parsed[j] = sco['parse_app_v2'](t2[m_], fam)     # 最終試行のみ採点（凍結パーサ規約）
+                raws[j] = raws[j] + '\n===RETRY===\n' + t2[m_]
+        for j, txt in enumerate(texts):
+            i = start + len(out)
+            o = parsed[j]
+            cat = sco['is_catastrophic'](o, fam)
+            out.append(trial_record(
+                trial_id='%s__%s__%04d' % (run_key, arm, i), trial_index=i, arm=arm, scenario=scenario, tag=tag,
+                status='ok', catastrophe=cat, choice=(o or {}).get('choice'), refuse_class=None,
+                format_fail=(o is None), style_a=None, style_b=None, mention=None,
+                loop_flag=False, truncated=False, correct=None, logprobs=None, resp_mean_path=None,
+                seed=batch_seed(cell_seed_value, bi), run_key=run_key, runner_sha=None, arms_spec=arm,
+                preamble_sha=arm_texts()[base_arm_of(arm)]['sha16'], model=None, sampling=gen,
+                layer=layer_ratio, coef=coef, direction_id=('fixed' if plan is None else plan['kind']),
+                batch_pos=j, proc_uuid=None, dry_run=False))
+        bi += 1
+    return out
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--selftest', action='store_true')
@@ -216,5 +354,19 @@ if __name__ == '__main__':
         from transformers import AutoModelForCausalLM, AutoTokenizer
     except Exception as e:
         sys.exit('torch／transformers が無い: %s（この器は GPU の上で走らせる。手元の検査は --selftest）' % e)
-    sys.exit('走行の本体（バッチ生成・hook の登録・採点・記録の書き出し）は Colab の段で埋める。'
-             '規則の検査は --selftest、札の経路の検査は tools/dry_run_B.py（合成データ）で済ませてある。')
+    if not a.directions:
+        sys.exit('--directions（tools/direction_B.py が凍結した npz）が要る')
+    import direction_B
+    tok = AutoTokenizer.from_pretrained(os.environ.get('OP4B_TOKENIZER_DIR') or a.model)
+    tok.padding_side = 'left'                                   # 正本 runner.padding
+    model = AutoModelForCausalLM.from_pretrained(a.model, torch_dtype=torch.bfloat16, device_map='auto')
+    model.eval()
+    dirs, dmeta = load_directions(a.directions, os.path.splitext(a.directions)[0] + '.json')
+    n_layers = model.config.num_hidden_layers
+    if dmeta.get('num_hidden_layers') not in (None, n_layers):
+        sys.exit('方向を抽出した機種の総層数（%s）が、いまの機種（%s）と違う' % (dmeta.get('num_hidden_layers'), n_layers))
+    print('[run_stageB_local] 方向を読んだ（%d 本・総層数 %d）。走らせる相・セルは起動器（Colab の段）から渡す。'
+          % (len(dirs), n_layers))
+    print('[run_stageB_local] 一つのセルを走らせるには `run_cell(...)` を呼ぶ（正本 selection.batch_composition のとおり'
+          '一つのバッチは一つの場面 × 一つの腕）。')
+    sys.exit(0)

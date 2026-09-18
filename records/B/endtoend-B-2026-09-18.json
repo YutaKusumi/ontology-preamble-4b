@@ -1,0 +1,64 @@
+{
+ "kind": "endtoend_B",
+ "version": "v1",
+ "generated_utc": "2026-09-18T12:55:58Z",
+ "model": {
+  "layers": 4,
+  "hidden": 64,
+  "random_init": true
+ },
+ "checks": [
+  {
+   "name": "(1) hidden_states[idx+1] ＝ layers[idx] の出力",
+   "ok": true,
+   "detail": "最大差 0"
+  },
+  {
+   "name": "(6) ノルムの崩れた方向を読み込みで止める",
+   "ok": true,
+   "detail": "凍結した方向のノルムが ‖v̂〕に合っていない（正本 selection.candidates.coefficient_ref・裁定 D102）: Nk 層0."
+  },
+  {
+   "name": "(6b) 正しい方向は読める",
+   "ok": true,
+   "detail": "12 本"
+  },
+  {
+   "name": "(2) 係数 0 の hook は結果を変えない",
+   "ok": true,
+   "detail": "一致 True"
+  },
+  {
+   "name": "(2b) 大きな係数は結果を変える",
+   "ok": true,
+   "detail": "違う True"
+  },
+  {
+   "name": "(3) prefill は主位置にだけ加わる",
+   "ok": true,
+   "detail": "主位置の差 6.1e-05・それ以外の差 0"
+  },
+  {
+   "name": "(3b) 復号の各段に加わる",
+   "ok": true,
+   "detail": "復号の段 3 回"
+  },
+  {
+   "name": "(4) バッチの後に hook が零本",
+   "ok": true,
+   "detail": "零本"
+  },
+  {
+   "name": "(5) 腕が混ざったバッチを止める",
+   "ok": true,
+   "detail": "止まった"
+  },
+  {
+   "name": "(7) セルを走らせて記録の欄がそろう",
+   "ok": true,
+   "detail": "3 行・欠けた欄 なし"
+  }
+ ],
+ "failed": 0,
+ "total": 10
+}
