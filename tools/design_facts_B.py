@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""design_facts_B.py v4 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+"""design_facts_B.py v5 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
 v3 からの変更（検分の二段目・四票の採否 P212〜P256・裁定 D75〜D86）: 転記行 C に**選定 × 確証の合成検出力**（採否表 P229）と、抽出場面を二層に分けない前提の但し書き（P245）、
 同点の割り方を正本の登録（無作為・selection.tie_break）に合わせた模擬を置く（P228）。転記行 D に **S4 の反証の検出力**と三分岐の線（裁定 D81）を足す。
 転記行 E に二標本で比べる旨と相手の共有の注（P256）、転記行 I に「全腕」の意味と内訳（P256）と決定性の検査で二度保存する容量（P235）を足す。費用の停止の倍率は正本 `cost` から引く（P251）。
@@ -86,15 +86,17 @@ base_of_arm = lambda a: re.split(r'[+\-]v', a)[0]
 noop_bases = sorted({base_of_arm(a) for a in interv})
 q_cells_sel = T['quality_floor']['selection_cells']                                   # 選定の段（土台 × 層 × 係数）
 q_cells_post = len(interv) - len(T['quality_floor']['arms'])                          # 選ばれた組で、残りの介入の腕に当てる（裁定 D69）
-q_cells = q_cells_sel + q_cells_post + len(noop_bases)                                # ＋相手の無操作
+q_noop_sel = len(T['quality_floor']['arms'])                                          # 選定の段の相手（確証族の二つの土台の無操作）
+q_noop_post = len(noop_bases)                                                         # 選定後の段の相手（介入の腕の土台すべての無操作）
+q_cells = q_cells_sel + q_cells_post + q_noop_sel + q_noop_post                       # 相手の無操作は**段ごとに走らせる**（裁定 D88）
 t_q = q_items * q_cells
 t_main = sum(c['n'] for c in T['main_cells'])
 t_all = t_id + t_tune + t_main + t_q
-F['A'] = {'text': '規模: 同一性選別（transformers 経路・%d 腕 × n=%d × N1）%s／調整走行 %s（%d 候補〔層 %d × 係数 %d〕× %d 腕 × n=%d × 抽出場面 %d）／本走行 %s（%d セル＝場面 × 腕・n=%d・%s）／品質床 %s 問（%d 問 × 〔選定 %d セル＋選ばれた組での残りの介入 %d セル＋無操作の相手 %d セル〕）＝**合計 %s 試行**。'
+F['A'] = {'text': '規模: 同一性選別（transformers 経路・%d 腕 × n=%d × N1）%s／調整走行 %s（%d 候補〔層 %d × 係数 %d〕× %d 腕 × n=%d × 抽出場面 %d）／本走行 %s（%d セル＝場面 × 腕・n=%d・%s）／品質床 %s 問（%d 問 × 〔選定 %d セル＋選ばれた組での残りの介入 %d セル＋無操作の相手 %d セル〔選定の段〕＋%d セル〔選定後の段・裁定 D88〕〕）＝**合計 %s 試行**。'
           % (T['identity_screen']['arms'], T['identity_screen']['n'], fmt(t_id), fmt(t_tune), CAND, len(T['selection']['candidates']['layers']), len(T['selection']['candidates']['coefficients']),
              len(T['selection']['tune']['arms']), nt, len(T['selection']['tune']['scenarios']), fmt(t_main), len(T['main_cells']), n,
-             '・'.join('%s %d 腕' % (sc, len(T['arms']['by_scenario'][sc])) for sc in SC), fmt(t_q), q_items, q_cells_sel, q_cells_post, len(noop_bases), fmt(t_all)),
-          'data': {'identity': t_id, 'tune': t_tune, 'main': t_main, 'quality': t_q, 'quality_cells': q_cells, 'total': t_all}}
+             '・'.join('%s %d 腕' % (sc, len(T['arms']['by_scenario'][sc])) for sc in SC), fmt(t_q), q_items, q_cells_sel, q_cells_post, q_noop_sel, q_noop_post, fmt(t_all)),
+          'data': {'identity': t_id, 'tune': t_tune, 'main': t_main, 'quality': t_q, 'quality_cells': q_cells, 'quality_noop_selection': q_noop_sel, 'quality_noop_post': q_noop_post, 'total': t_all}}
 
 # ---- B: 対比 ----
 fam = T['families']
@@ -268,11 +270,11 @@ null_q = {p: q_null_exact(p) for p in (0.5, 0.7, 0.9)}
 pow_q = {p: q_power_exact(p, D_PICK * 1.5 / 100) for p in (0.7, 0.9)}
 acc_line = lambda d: '・'.join('%g で %.4f' % (k, v) for k, v in d.items())
 pow_line = lambda d: '・'.join('%g で %.3f' % (k, v) for k, v in d.items())
-F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・境目はちょうどの値を不合格とする）: 射程は選定の %d セル（土台 × 層 × 係数）に加え、選ばれた組での残りの介入 %d セルと相手の無操作 %d セル（裁定 D69）。帰無発火率（同じ真の正答率で閾値以下になる確率・二項の畳み込みで厳密）は正答率 %s。真の低下 %.0f pt を捕まえる確率は %s。帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（裁定 D66・候補は器材の整備の段）。'
+F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・境目はちょうどの値を不合格とする）: 射程は選定の %d セル（土台 × 層 × 係数）に加え、選ばれた組での残りの介入 %d セルと、相手の無操作 %d セル（選定の段）＋%d セル（選定後の段・裁定 D88）。帰無発火率（同じ真の正答率で閾値以下になる確率・二項の畳み込みで厳密）は正答率 %s。真の低下 %.0f pt を捕まえる確率は %s。帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（裁定 D66・候補は器材の整備の段）。'
           '**同じ問いを使うが二標本で比べる**ので、この行の帰無発火率と検出力は対にして読むより保守側である（採否表 P256）。無操作の相手は土台ごとに一つで多くのセルが共有するため、帰無での不合格は相関して塊で出る。課題は**無操作の正答率が %g 以上**のものを選ぶ（裁定 D85）。'
-          % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, len(noop_bases), acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells, T['quality_floor']['base_min']),
+          % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, q_noop_sel, q_noop_post, acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells, T['quality_floor']['base_min']),
           'data': {'null_exact': {str(k): v for k, v in null_q.items()}, 'power_exact': {str(k): v for k, v in pow_q.items()},
-                   'cells': q_cells, 'cells_selection': q_cells_sel, 'cells_post': q_cells_post, 'cells_noop': len(noop_bases)}}
+                   'cells': q_cells, 'cells_selection': q_cells_sel, 'cells_post': q_cells_post, 'cells_noop_selection': q_noop_sel, 'cells_noop_post': q_noop_post}}
 
 # ---- F: 費用と時間（バッチの記録値から出し直す・◐） ----
 BATCHES = (1, 8, 16, 24)
@@ -308,9 +310,9 @@ F['I'] = {'text': '活性保存（4B-2507・hidden %d・bf16・凍結 %d 層）:
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
 os.makedirs(os.path.join(REPO, 'records', 'B'), exist_ok=True)
 csha = sha(rd('design', 'contrasts-B.json'))
-json.dump({'generated_utc': now, 'tool': 'tools/design_facts_B.py v4', 'contrasts_sha16': csha, 'facts': F},
+json.dump({'generated_utc': now, 'tool': 'tools/design_facts_B.py v5', 'contrasts_sha16': csha, 'facts': F},
           open(os.path.join(REPO, 'records', 'B', 'design-facts-B.json'), 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-L = ['# 段階 B 設計事実（機械生成・`tools/design_facts_B.py` v4・%s UTC・正本 contrasts-B.json SHA16 %s）' % (now, csha), '']
+L = ['# 段階 B 設計事実（機械生成・`tools/design_facts_B.py` v5・%s UTC・正本 contrasts-B.json SHA16 %s）' % (now, csha), '']
 for k in 'ABCDEFGHI':
     L.append('- **転記行 %s** — %s' % (k, F[k]['text']))
     L.append('')

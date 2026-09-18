@@ -57,8 +57,16 @@ def cell_trials(n, spec, **kw):
 def write_run(root, tag, name, manifest, trials):
     d = os.path.join(root, tag, '%s__%s__dryrun' % (tag, name))
     os.makedirs(d, exist_ok=True)
-    manifest = dict(manifest, tag=tag, run_key=os.path.basename(d), dry_run=True, model='stub/dry-run',
-                    runner_sha='SYNTH', generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'))
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+    # 正本 runner.manifest_fields（裁定 D89）の欄をそろえる（整合検査がこの一覧を読む）
+    common = {'tag': tag, 'run_key': os.path.basename(d), 'session': manifest.get('session', 1), 'n': manifest.get('n'),
+              'seed': manifest.get('seed'), 'batch': T['runner']['batch'], 'padding': 'left', 'model': 'stub/dry-run',
+              'model_rev': 'SYNTH', 'tokenizer_rev': 'SYNTH', 'runner_sha': 'SYNTH', 'pip_freeze_sha16': 'SYNTH',
+              'gpu': 'synth', 'started': stamp, 'ended': stamp, 'dry_run': True}
+    extra = {'direction_ids': ['synth'], 'arms': manifest.get('arms', []), 'task_source_sha16': 'SYNTH'}
+    phase = next(k for k, v in T['tags'].items() if v == tag)
+    need = list((T['runner'].get('manifest_fields') or {}).get(phase, []))
+    manifest = dict({k: extra[k] for k in need if k in extra}, **dict(manifest, **common, generated=stamp))
     json.dump(manifest, open(os.path.join(d, 'manifest.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     with open(os.path.join(d, 'trials-synth.jsonl'), 'w', encoding='utf-8', newline='\n') as f:
         for t in trials:
@@ -149,8 +157,10 @@ def build(case, out_root):
             s = spec['main'][(sc, arm)]
             trials += cell_trials(N_MAIN, s, arm=arm, scenario=sc, tag=T['tags']['main'], seed=T['seeds']['main'][sc],
                                   run_key='%s__%s__s1' % (T['tags']['main'], sc))
+        _pick = spec['tune'].get('best') or (LAYERS[1], COEFS[1])
         write_run(out_root, T['tags']['main'], '%s__s1' % sc, {'scenario': sc, 'session': 1, 'n': N_MAIN, 'seed': T['seeds']['main'][sc],
-                                                               'arms': T['arms']['by_scenario'][sc], 'batch': T['runner']['batch']}, trials)
+                                                               'arms': T['arms']['by_scenario'][sc], 'batch': T['runner']['batch'],
+                                                               'layer': _pick[0], 'coef': _pick[1]}, trials)
     # ---- 調整走行 ----
     tu = spec['tune']
     base_cat = 100                       # n_ok=200（抽出場面をまとめて）→ 一腕あたり 100 ずつ

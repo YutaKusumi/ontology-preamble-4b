@@ -99,10 +99,15 @@ def check_cell(rec):
                     problems.append('%s × %s: 層 × 係数 %s が候補の格子に無い' % (rk, arm, (l, cf)))
         if PHASE == 'main' and arm not in T['arms']['by_scenario'].get(m.get('scenario'), []):
             problems.append('%s: 腕 %s が場面 %s の登録に無い' % (rk, arm, m.get('scenario')))
+    MF = T['runner'].get('manifest_fields') or {}
+    need = list(MF.get('common', [])) + list(MF.get(PHASE, []))
+    lack = [f for f in need if f not in m]
+    if lack:
+        problems.append('%s: manifest に欄が無い（正本 runner.manifest_fields・裁定 D89）: %s' % (rk, '・'.join(lack)))
     if m.get('batch') and m['batch'] != T['runner']['batch']:
         problems.append('%s: バッチ %s が設計定数（%s）と違う' % (rk, m['batch'], T['runner']['batch']))
-    if PHASE in ('main', 'tune') and not m.get('padding') and 'padding' in T['runner']:
-        notes.append('%s: manifest に詰めの向き（padding）が無い（正本 runner.padding の記帳を器材で入れる）' % rk)
+    if m.get('padding') and m['padding'] not in ('left',):
+        problems.append('%s: 詰めの向きが左でない（正本 runner.padding）: %s' % (rk, m['padding']))
     if PHASE == 'main' and rk not in sessions:
         problems.append('%s: セッション記録が無い（sessions.missing_rule）' % rk)
     if rec['dry_marks']:

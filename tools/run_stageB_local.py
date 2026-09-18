@@ -30,10 +30,13 @@ ASSEMBLY_EXPR = "(t + '\\n\\n' + SCEN_TEXT + INST) if t else (SCEN_TEXT + INST)"
 
 
 def check_assembly_matches_frozen():
-    """組み立ての式が凍結走行器と同じであることを確かめる（食い違えば止まる）。"""
+    """組み立ての式が凍結走行器と同じであり、正本にも登録されていることを確かめる（裁定 D87・食い違えば止まる）。"""
     src = open(FROZEN_RUNNER, encoding='utf-8').read()
     if ASSEMBLY_EXPR not in src:
         raise SystemExit('凍結走行器の組み立ての式と違う（凍結物が変わったか、この器が古い）: %s' % FROZEN_RUNNER)
+    reg = (T['runner'].get('prompt_assembly') or '')
+    if '前置き' not in reg or '場面の本文' not in reg or '指示' not in reg:
+        raise SystemExit('正本 runner.prompt_assembly に組み立ての式が無い（裁定 D87）')
     return runs_B.sha16_file(FROZEN_RUNNER)
 
 

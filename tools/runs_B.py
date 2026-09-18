@@ -82,14 +82,17 @@ def index_runs(T, tag, root=None, key=None, allow_multi=True, allow_dry=False):
 
     key は manifest を受けて鍵を返す関数。allow_multi なら同じ鍵に複数の走行（セッションを跨いだ中断と再開）を list で持つ。"""
     if key is None:
+        tags = {v: k for k, v in T['tags'].items()}
+
         def key(m):
-            if 'stack' in m:                       # 同一性選別
+            phase = tags.get(m.get('tag'))
+            if phase == 'identity' or (phase is None and 'stack' in m):
                 return (m['stack'], m['scenario'])
-            if 'stage' in m:                       # 品質床（段・腕・層・係数。無操作の相手は層と係数が None）
+            if phase == 'quality' or (phase is None and 'stage' in m):
                 return (m['stage'], m['arm'], m.get('layer'), m.get('coef'))
-            if 'layer' in m:                       # 調整走行（場面 × 層 × 係数・腕は中で分かれる）
+            if phase == 'tune' or (phase is None and 'layer' in m and 'arm' in m):
                 return (m['scenario'], m['layer'], m['coef'])
-            return (m['scenario'],)                # 本走行
+            return (m['scenario'],)                # 本走行（選ばれた層 × 係数は manifest の欄にあるが、鍵は場面だけ）
     out = {}
     for d in run_dirs(tag, root):
         rec = _rec(d, allow_dry)

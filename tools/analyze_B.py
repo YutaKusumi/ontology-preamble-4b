@@ -52,9 +52,10 @@ for (stage, arm, l, c), cell in sorted(CQ.items()):
     if stage != 'post':
         continue
     base = arm.split('+v')[0].split('-v')[0]
-    noop = CQ.get(('post', base, None, None)) or CQ.get(('selection', base, None, None))
+    noop = CQ.get(('post', base, None, None))      # 相手は**段ごと**に走らせる（裁定 D88・選定の段のものを使い回さない）
     if noop is None:
-        QF_ROWS.append({'arm': arm, 'missing_partner': True})
+        QF_ROWS.append({'arm': arm, 'missing_partner': True,
+                        'note': '選定後の段の無操作の相手が無い（裁定 D88・段ごとに走らせる）'})
         continue
     d_pt = 100.0 * (cell['correct'] - noop['correct']) / QF['denominator']
     ok = d_pt > QF['threshold_pt']
