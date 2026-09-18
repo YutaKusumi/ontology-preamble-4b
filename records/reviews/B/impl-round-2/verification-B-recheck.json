@@ -1,0 +1,257 @@
+{
+ "kind": "verify_B_recheck",
+ "generated_utc": "2026-09-18T06:50:20Z",
+ "contrasts_sha16": "403D896F40B39305",
+ "items": [
+  {
+   "K": "K97",
+   "source": "一体目 3-A（採否表 P263 は「採用・甲」）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "整合検査が門の記録を読む箇所 0 件・本走行は層と係数の検査から外れている（True）・集計器は選定を印字するだけ（[331] 行）"
+  },
+  {
+   "K": "K98",
+   "source": "一体目 3-B（採否表 P268 は「採用・甲」）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "門も集計器も分母は正本の固定値 200（[\"n = QF['denominator']\"] ／ [\"d_pt = 100.0 * (cell['correct'] - noop['correct']) / QF['denominator']\"]）・gate_B に api_error の語は **無い**。正本 format_fail_rule は「api_error は分母から除いて件数を印字する」と書く"
+  },
+  {
+   "K": "K99",
+   "source": "一体目 N1",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "凍結パーサ `is_catastrophic` は refuse に None を返す（両族で確認）。採点欠落の判定は [\"if (not ff) and r['catastrophe'] is None and r.get('correct') is None:\"] ——本走行の試行は正答が空なので、**refuse が全件この札に落ちる**"
+  },
+  {
+   "K": "K100",
+   "source": "一体目 N3",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "集計器は ['k0 = sorted(cells)[0]'] で黙って一件だけ採る。門には同じ場所に `len(cells) > 1` の番人が**有る**（True）が、集計器には**無い**（False）"
+  },
+  {
+   "K": "K101",
+   "source": "一体目 N5／二体目 F2（採否表 P258 は「採用・甲」）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "器材で `apply_chat_template` を呼ぶ箇所 0 件・`band_starts` の呼び手 零件。登録機種の実トークナイザで四場面 × 八腕の三十二組を刻むと、器の起点は真の起点より**一律に三トークン手前**。腕 N では帯が `<|im_start|>user\\n` に掛かる（下の「実際に当てた結果」を見よ）"
+  },
+  {
+   "K": "K102",
+   "source": "二体目 F1",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "方向を作る器は [\"if name == 'td':\"] ——td にしか合わせない。`match_to_static` の呼び手は ['steer_B.py:143']（自己検査だけ）。正本 `coefficient_ref` は「**すべての方向（v̂・Nk・td・(6b)・ランダム方向）を同じ ‖v̂‖ に合わせてから**、係数を一度だけ掛ける」と明記している"
+  },
+  {
+   "K": "K103",
+   "source": "二体目 F3（採否表 P301 の後半）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "経路の判定は [\"if ff_cat == 0 and case == 'dilution_causal':\"]。書式外の試行は破局の判定を持たないよう直したので **ff_cat は恒に零**——この条件は「場合の名が一致するか」だけになり、中身に関わりなく発火する"
+  },
+  {
+   "K": "K104",
+   "source": "一体目 N7 対 二体目 F1",
+   "kind": "己（裁きを要する）",
+   "reproduced": true,
+   "evidence": "同じ件に一体目は軽微・二体目は重大を付けた。**正本の条で裁く**——`coefficient_ref` は方向の別なく合わせよと明記し、交差族は確証 16 対比のうち 8（`families.B_cross.m` = 8）、S4 の反証も (6b) を使う。走行の本体が未実装であることは「安く直せる」理由であって「軽い」理由ではない。**二体目の読み（重大）を採る**"
+  },
+  {
+   "K": "K105",
+   "source": "一体目 3-C（裁定 D99）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "正本 `seeds.derivation_formula` を読む器は ['make_contrasts_B.py'] ——**正本を書く側だけ**。整合検査は走行の種と直に比べる。正本が明示的になった分、いまは「器が正本に違反している」形である"
+  },
+  {
+   "K": "K106",
+   "source": "一体目 3-D（採否表 P269 の後半）",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "整合検査は許可表の欄しか読まない。正答は許可表に**無く**盲検の欄に**有る**ので、`r.get('correct')` は恒に空——この一行は**決して発火しない**。しかも行のコメントは「整合検査が止める」と書く"
+  },
+  {
+   "K": "K107",
+   "source": "一体目 3-E（採否表 P274 の残り）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "口上が照合すると書く欄のうち ['runner_sha', 'arms_spec', 'model'] は**本体に一度も出ない**。しかも許可表からも落ちたので、いまの整合検査はその欄を読むことすらできない"
+  },
+  {
+   "K": "K108",
+   "source": "一体目 3-F（採否表 P276）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "正本 `random_control.pooling` は「合併の前に 3 方向の率を印字し、二項の等質性を記述で確かめる」。読み口に方向ごとの計数の口は **無い**"
+  },
+  {
+   "K": "K109",
+   "source": "一体目 3-G（正本 calibration.consequence）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "正本は「帯を外れたら…その走行を含む対比の確証札に注を付す」と書く。管理図の記録を読む集計器・報告器は **無い**"
+  },
+  {
+   "K": "K110",
+   "source": "一体目 3-J（正本 sessions.missing_rule）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "`load_sessions` を呼ぶ B の器は ['integrity_B.py:43']。正本は「記録が無いとき集計器は止まる」と書くが、門も集計器も読まない。**裁定 D92 でセッション番号は門1 の合否を決める量になった**ので、前の巡より重い"
+  },
+  {
+   "K": "K111",
+   "source": "一体目 3-K",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "集計器が門の判定に触るのは [330] 行（**印字だけ**）・報告器は 零件。**注意**: `verdict` の素朴な検索は S4 の判定に当たる——当該行を読んで分けた（前の巡の偽の「再現しない」を避けるため）"
+  },
+  {
+   "K": "K112",
+   "source": "一体目 N2",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "判定は「破局が空**かつ**正答が空」の連言。品質床の試行は破局が偽で書かれるので、正答が未採点でも数えられない。そのうえ門は `scoring_gap` を一度も読まない"
+  },
+  {
+   "K": "K113",
+   "source": "一体目 N4",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "裁定 D92 の直しは manifest のセッションの**値**に全面的に依存する。番号が同じ二本は合算される。相手の側に重複の番人は無い"
+  },
+  {
+   "K": "K114",
+   "source": "二体目 F4（採否表 P283）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "`write_layer_record` の呼び手は零件。正本 `layer_index_rule` は「総層数は重みの config から読んで凍結時に記帳する」と求めるが、凍結の器は人手の json 頼みのままで、器が出した値と突き合わせる経路が無い"
+  },
+  {
+   "K": "K115",
+   "source": "二体目 F5",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "止める門は 97 行・古さの検査は 110 行（**門のあと**）。そのため記録が書かれ、終了コードは 2 になる。しかも見出しの文言（119 行）は `blockers` の有無だけで決まり `--allow-missing` を見ないので、**渡していないのに「点検であり凍結ではない」と書く**"
+  },
+  {
+   "K": "K116",
+   "source": "二体目 F6",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "経路の表にも報告にも管理図は無い。自己検査も無い。**段階 A には合成データで管理図を走らせる経路がある**（`synth_gates_A.py`）ので、これは退行である"
+  },
+  {
+   "K": "K117",
+   "source": "二体目 F7",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "率が空（使える試行が零）の点で [\"d = (p['rate'] or 0) - (base['rate'] or 0)\"] が空を零と読み、差を計算する。厳密検定にも零分母の表を渡す。結果、**測れなかった点に「器の異常」の札が付き**、正本 `calibration.consequence` により確証の対比の注に伝播する"
+  },
+  {
+   "K": "K118",
+   "source": "二体目 F8（裁定 D91）",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "同じ並べ方の側は鍵の集合の一致を先に見る（True）が、並べ方を変えた側は交わりだけを回す（True）——**鍵の欠けを黙って無視する**。二条に割ったときに片側だけ守りが落ちた"
+  },
+  {
+   "K": "K119",
+   "source": "二体目 F9（採否表 P292 は「採用・甲」）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "雛形の当該行に手打ちの数が残る。組み立て器の `n_conf` はソース中 1 回——**定義だけで一度も参照されない**"
+  },
+  {
+   "K": "K120",
+   "source": "二体目 F10（採否表 P291 は「採用・甲」）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "口上は「走査器を走らせる口を持つ（--lint）」と書くが、argparse の口は ['--analysis', '--gate', '--integrity', '--sampling', '--allow-dry', '--force-problems', '--template', '--out', '--force'] ——`--lint` は**無い**。`tools/report_lint.py` は存在するが口上は段階 A を名乗り、機械の区画の突合は `build_report_A.py` の記録を見る。**一体目は軽微（説明文の食い違い）、二体目は中（採用が未着手）と置いた**——扱いは同じ（直すか、不採用として理由を残すか）"
+  },
+  {
+   "K": "K121",
+   "source": "二体目 F11",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "生成の設定の変換が空の値を落とすので、出力は {'do_sample': False}。実機の既定で走り、例外も警告も出ない。正本 `quality_floor.generation.max_tokens` は裁定 D66 が未決のため空である"
+  },
+  {
+   "K": "K122",
+   "source": "二体目 F12（採否表 P302 の残り）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "合成データで `session` に 2 以上を渡す箇所は 1 件あるが、それは**本走行**の再開の場合である。品質床の走行はすべてセッション 1（現物の manifest を数えた）。裁定 D92 の**不合格側**が未検査のまま"
+  },
+  {
+   "K": "K123",
+   "source": "一体目 N6",
+   "kind": "丙",
+   "reproduced": true,
+   "evidence": "hook は起点の数と行数の一致を確かめない。復号の段は起点を見ずにバッチの全行に加える——**バッチに無操作の腕が混ざれば、その行にも介入が入る**。「一つのバッチは一つの腕」という取り決めは正本にも器にも無い"
+  },
+  {
+   "K": "K124",
+   "source": "一体目 3-H",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "対比を持たない記述の族は、名前すら出ずに黙って飛ばされる"
+  },
+  {
+   "K": "K125",
+   "source": "一体目 3-I（正本 report_rules.band_edge）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "境目の印が付くのは品質床の帯だけ（['gate_B.py', 'analyze_B.py']）。正本が名指しする様式門・検閲・同値の帯には無い"
+  },
+  {
+   "K": "K126",
+   "source": "一体目 3-L（P299 の再発）",
+   "kind": "甲",
+   "reproduced": true,
+   "evidence": "整備の記録が引く合成検査の記録の SHA16 は 5174DDF7AC2D5F07、現物は 7967F79EEF2D7437 ——**食い違う**。記録を書いた後にその記録が引く文書を作り直した順の問題。器材十三本の SHA16 は全件一致している"
+  },
+  {
+   "K": "K127",
+   "source": "一体目 N8（**自分の所見の降格**）",
+   "kind": "丁（降格は成り立つ）",
+   "reproduced": true,
+   "evidence": "降格の主張は「凍結パーサの下では refuse かつ破局の組み合わせが作られない」。総当たりで当てた結果、その組み合わせを返す入力は 0 件——**主張は成り立つ**。ただし一行の assert を置く値打ちは変わらない（K99 の直しで分母の取り方が動くため）"
+  },
+  {
+   "K": "K128",
+   "source": "二体目 G1〜G8",
+   "kind": "軽微の束",
+   "reproduced": true,
+   "evidence": "報告の refuse 欄に丸めない浮動小数が出る・上書き検査の欠け・安定性の場面が二つ固定・dry-run の印が先頭一行だけ・凍結の器に空回りの繰り返しが残る・書式外の試行が様式の層に入る・正本の引用が四十字で切れる・トークナイザの取得が Hub に問い合わせる（**私もこの巡で実際に当たった**）"
+  },
+  {
+   "K": "K129",
+   "source": "両票の是認",
+   "kind": "丁",
+   "reproduced": true,
+   "evidence": "一体目 二十二件（見出しの申告は二十一件——**機械の数え上げと食い違う**）／二体目 八節と一行ずつの表。重点のうち**ランダム統制の合成**と**復号の段の hook** は二体が実機の模型で当てて直っていることを確かめた。決定性の二条も三層・二つの数値形式で通った。是認は次の巡の検査対象に残す"
+  }
+ ],
+ "experiments": [
+  [
+   "元の合成データ",
+   "確証 3・判定不能（採点欠落） 0",
+   0
+  ],
+  [
+   "K99: refuse の 1180 行を凍結パーサの規約に合わせた",
+   "確証 0・判定不能（採点欠落） 16",
+   0
+  ],
+  [
+   "K97: 本走行 5 件の層と係数を 0.75／2.0 に書き換えた（選定は 0.5／1.0）",
+   "不整合 0 ・集計器は確証 3・終了コード 0",
+   0
+  ]
+ ],
+ "reproduced": 33,
+ "total": 33
+}
