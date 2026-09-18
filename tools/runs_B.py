@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""runs_B.py v2 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
+"""runs_B.py v3 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
 
 段階 B の相（正本 `tags`）と置き場:
   同一性選別 `idB`      : results/idB/idB__<スタック>__<場面>__<印>/      （manifest の stack・scenario）
@@ -17,7 +17,7 @@ import os, re, sys, json, glob, hashlib
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CPATH = os.path.join(REPO, 'design', 'contrasts-B.json')
-VERSION = 'v2'
+VERSION = 'v3'
 COUNT_FIELDS = ('trial_id', 'arm', 'status', 'catastrophe', 'choice', 'format_fail', 'style_a', 'style_b', 'mention', 'loop_flag', 'truncated', 'correct')
 
 
@@ -70,8 +70,9 @@ def dry_marks(d, m, trials_path):
     marks = [x for x, on in (('manifest.dry_run', bool(m.get('dry_run'))), ('manifest.model', m.get('model') in ('stub/dry-run', 'stub')),
                              ('dir._dryrun', '_dryrun' in os.path.normpath(d).split(os.sep) or os.path.basename(d).endswith('__dryrun')),
                              ('dir._synth', '_synth' in os.path.normpath(d).split(os.sep))) if on]
-    first = next(iter_jsonl(trials_path, ('dry_run',)), None)
-    if first is not None and first.get('dry_run'):
+    # **先頭一行だけを見ない**（裁定 D115・採否表 P328）。合成の行が途中に混ざっても捕まえる。
+    any_dry = any(r.get('dry_run') for r in iter_jsonl(trials_path, ('dry_run',)))
+    if any_dry:
         marks.append('trials.dry_run')
     return marks
 
@@ -116,8 +117,10 @@ def index_runs(T, tag, root=None, key=None, allow_multi=True, allow_dry=False):
     return out
 
 
-def cell_counts(trials_path, acc=None):
-    """腕ごとの件数（acc に足し込める——中断と再開でセルが複数のセッションにまたがるため）。"""
+def cell_counts(trials_path, acc=None, phase='main'):
+    """腕ごとの件数（acc に足し込める——中断と再開でセルが複数のセッションにまたがるため）。
+
+    phase は採点欠落の判定に効く（裁定 D103）——本走行は選択の欄、品質床は正答の欄で見る。"""
     out = acc if acc is not None else {}
     for r in iter_jsonl(trials_path, COUNT_FIELDS):
         c = out.setdefault(r['arm'], dict(ZERO))
@@ -127,9 +130,13 @@ def cell_counts(trials_path, acc=None):
             continue
         ff, lp, tr = bool(r['format_fail']), bool(r['loop_flag']), bool(r['truncated'])
         c['n_ok'] += 1
-        if (not ff) and r['catastrophe'] is None and r.get('correct') is None:
-            c['scoring_gap'] += 1                  # 判定欄が空（採点前・採点漏れ）——裁定 D96
-            # 書式外の試行は判定を持たないのが正しいので、ここには数えない（実装検分の直しの後の自分の誤り）
+        # **「まだ採点していない」と「採点した結果として当てはまらない」を分ける**（裁定 D103・採否表 P307・P320）。
+        # 凍結パーサ `is_catastrophic` は refuse に破局の判定を返さない規約なので、破局の欄の空で数えると
+        # refuse が全件この札に落ち、確証の族が丸ごと判定不能になる（直しの確認の巡で実際に零になった）。
+        # 書式外の試行は判定を持たないのが正しいので、ここには数えない。
+        if not ff:
+            if (r.get('correct') is None) if phase == 'quality' else (r.get('choice') is None):
+                c['scoring_gap'] += 1              # 判定欄が空（採点前・採点漏れ）——裁定 D96・D103
         c['cat'] += (r['catastrophe'] is True)
         c['refuse'] += (r['choice'] == 'refuse')
         c['ff'] += ff
@@ -152,7 +159,7 @@ def counts_main(T, tag=None, root=None, allow_dry=False):
     for (sc,), recs in idx.items():
         acc = {}
         for rec in recs:
-            cell_counts(rec['trials_path'], acc)
+            cell_counts(rec['trials_path'], acc, phase='main')
         for arm, c in acc.items():
             C[(sc, arm)] = c
     return C, idx
@@ -166,7 +173,7 @@ def counts_tune(T, tag=None, root=None, allow_dry=False):
     for (sc, layer, coef), recs in idx.items():
         acc = {}
         for rec in recs:
-            cell_counts(rec['trials_path'], acc)
+            cell_counts(rec['trials_path'], acc, phase='tune')
         for arm, c in acc.items():
             C[(sc, layer, coef, arm)] = c
     return C, idx
@@ -180,14 +187,92 @@ def counts_quality(T, tag=None, root=None, allow_dry=False):
     for k, recs in idx.items():
         acc = {}
         for rec in recs:
-            cell_counts(rec['trials_path'], acc)
+            cell_counts(rec['trials_path'], acc, phase='quality')
         for arm, c in acc.items():
             C[(k[0], arm, k[2], k[3], k[4] if len(k) > 4 else None)] = c
     return C, idx
 
 
+def cell_index(T, phase, key):
+    """セルの番号（正本 `seeds.cell_index_rule`・裁定 D107）。相ごとに決まった鍵の組の**登録順の添字**（零始まり）。
+
+    同一性選別と本走行は（場面, 腕）、調整走行は（場面, 腕, 層, 係数）、品質床は（段, 腕, 層, 係数）。
+    """
+    SCEN = list(T['scenarios'])
+    LAY, COE = list(T['selection']['candidates']['layers']), list(T['selection']['candidates']['coefficients'])
+    ARMS = list(T['arms']['panel'])
+    for src in (T['arms']['main'], T['identity_screen'].get('arms_run') or [], T['identity_screen'].get('compared_arms') or []):
+        for x in src:
+            if x not in ARMS:
+                ARMS.append(x)
+    STAGES = ['selection', 'post']
+    def _ai(arm):
+        if arm in ARMS:
+            return ARMS.index(arm)
+        import hashlib as _h
+        return len(ARMS) + int(_h.sha256(str(arm).encode('utf-8')).hexdigest()[:8], 16) % 997   # 登録に無い腕も決定的に一意な番号を持つ
+    if phase == 'identity':
+        sc, arm = key
+        return (SCEN.index(sc) if sc in SCEN else len(SCEN)) * (len(ARMS) + 997) + _ai(arm)
+    if phase == 'main':
+        sc, arm = key
+        return SCEN.index(sc) * (len(ARMS) + 997) + _ai(arm)
+    if phase == 'tune':
+        sc, arm, l, c = key
+        return ((SCEN.index(sc) * (len(ARMS) + 997) + _ai(arm)) * len(LAY) + LAY.index(l)) * len(COE) + COE.index(c)
+    if phase == 'quality':
+        stage, arm, l, c = key
+        li = LAY.index(l) if l in LAY else len(LAY)      # 無操作の相手は層・係数を持たない
+        ci = COE.index(c) if c in COE else len(COE)
+        return ((STAGES.index(stage) * (len(ARMS) + 997) + _ai(arm)) * (len(LAY) + 1) + li) * (len(COE) + 1) + ci
+    raise SystemExit('相の名が正本に無い: %s' % phase)
+
+
+def cell_seed(T, run_seed, phase, key):
+    """セルの種（正本 `seeds.derivation_formula`・裁定 D107・D99）。"""
+    import numpy as _np
+    idx = cell_index(T, phase, key)
+    return int(_np.random.SeedSequence([int(run_seed), int(T['seeds']['phase_index'][phase]), int(idx)]).generate_state(1)[0])
+
+
+def trial_seed(cell_s, trial_index):
+    """試行の種（正本 `seeds.derivation_formula`）。"""
+    import numpy as _np
+    return int(_np.random.SeedSequence([int(cell_s), int(trial_index)]).generate_state(1)[0])
+
+
+def counts_main_by_direction(T, tag=None, root=None, allow_dry=False):
+    """本走行の**方向ごと**の件数（正本 `random_control.pooling`・裁定 D110・採否表 P311）。
+
+    合併する前に三本のランダム方向の率を出すために要る。{(場面, 腕, 方向の id): 件数}。"""
+    tag = tag or T['tags']['main']
+    idx = index_runs(T, tag, root, allow_dry=allow_dry)
+    C = {}
+    for (sc,), recs in sorted(idx.items()):
+        for rec in recs:
+            for r in iter_jsonl(rec['trials_path'], COUNT_FIELDS + ('direction_id',)):
+                did = r.get('direction_id')
+                if did is None:
+                    continue
+                c = C.setdefault((sc, r['arm'], did), dict(ZERO))
+                c['n'] += 1
+                if r['status'] != 'ok':
+                    c['api_error'] += 1
+                    continue
+                c['n_ok'] += 1
+                c['cat'] += (r['catastrophe'] is True)
+                c['ff'] += bool(r['format_fail'])
+                c['refuse'] += (r['choice'] == 'refuse')
+    return C
+
+
 def stratum_of(r):
-    """様式の層（正本 style_gate.stratified.strata）。JSON 直答なら json_direct・そうでなければ prose。"""
+    """様式の層（正本 style_gate.stratified.strata）。JSON 直答なら json_direct・そうでなければ prose。
+
+    **書式外の試行は層に入れない**（答えが読めないので様式も読めない・裁定 D115・採否表 P328）。
+    前は合成データの書式外の行が様式の欄を持っていたため、読めない試行が json_direct の層に入っていた。"""
+    if r.get('format_fail'):
+        return None
     return 'json_direct' if bool(r.get('style_b')) else 'prose'
 
 
@@ -199,7 +284,10 @@ def counts_main_strata(T, tag=None, root=None, allow_dry=False):
     for (sc,), recs in idx.items():
         for rec in recs:
             for r in iter_jsonl(rec['trials_path'], COUNT_FIELDS):
-                k = (sc, r['arm'], stratum_of(r))
+                st_ = stratum_of(r)
+                if st_ is None:
+                    continue
+                k = (sc, r['arm'], st_)
                 c = C.setdefault(k, dict(ZERO))
                 c['n'] += 1
                 if r['status'] != 'ok':

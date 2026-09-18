@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""gate_B.py v2 —— 段階 B の**門1 と選定**（品質床の判定・希釈の門・床と天井・操作有効性・同値の帯・同点の割り方・非正の停止）。
+"""gate_B.py v3 —— 段階 B の**門1 と選定**（品質床の判定・希釈の門・床と天井・操作有効性・同値の帯・同点の割り方・非正の停止）。
 
 正本 `design/contrasts-B.json` の `quality_floor`・`dilution_gate`・`selection`・`gate1`・`censor`・`print_strings` に従う。
 入力: 調整走行（tag `tuneB`）と品質床の**選定の段**（tag `stageB-quality`・stage=selection）の走行の記録。
@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--root', default=None)
@@ -83,10 +83,23 @@ for base in QF_ARMS:
             qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
                           'note': '走行の記録が無い（%s）' % ('セル' if cell is None else '同じセッションの相手')})
             continue
-        n = QF['denominator']
-        d_pt = 100.0 * (cell['correct'] - noop['correct']) / n
+        gap = cell.get('scoring_gap', 0) + noop.get('scoring_gap', 0)
+        if gap:                                   # **採点欠落があれば判定しない**（裁定 D103・採否表 P320）
+            qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True, 'scoring_gap': gap,
+                          'note': '判定欄が空の試行が %d 件ある（採点が済むまで判定しない・裁定 D103）' % gap})
+            continue
+        if not cell['n_ok'] or not noop['n_ok']:  # 使えた試行が零（裁定 D110 と同じ扱い）
+            qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
+                          'note': '使えた試行が零（測れなかった）'})
+            continue
+        # **分母は、腕と相手のそれぞれで使えた試行**（裁定 D104・採否表 P305）。
+        # 固定の 200 を分母にすると、荒れたセッションがそのまま「介入が課題を壊した」に化け、選ばれる層 × 係数まで変わる。
+        d_pt = 100.0 * (cell['correct'] / cell['n_ok'] - noop['correct'] / noop['n_ok'])
         qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': False,
-                      'correct': cell['correct'], 'noop_correct': noop['correct'], 'n': n,
+                      'correct': cell['correct'], 'noop_correct': noop['correct'],
+                      'n_ok': cell['n_ok'], 'noop_n_ok': noop['n_ok'],
+                      'api_error': cell.get('api_error', 0), 'noop_api_error': noop.get('api_error', 0),
+                      'items': QF['denominator'],
                       'diff_pt': round(d_pt, 3), 'boundary': abs(d_pt - THR) < 1e-9, 'pass': d_pt > THR})
 qpass = {(l, c): all(r['pass'] for r in qrows if not r['missing'] and (r['layer'], r['coef']) == (l, c))
          and len([r for r in qrows if not r['missing'] and (r['layer'], r['coef']) == (l, c)]) == len(QF_ARMS) for (l, c) in CANDS}
@@ -112,6 +125,10 @@ for (l, c) in CANDS:
         both_high = (pv is not None and pr is not None and pv > CEN['high'] and pr > CEN['high'])
         row['censored'] = bool(both_low or both_high)
         row['censor_side'] = '床' if both_low else ('天井' if both_high else None)
+        # **帯の境目に一致した値は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P327）
+        row['censor_boundary'] = [name for name, val, thr in
+                                  (('床', pv, CEN['low']), ('床', pr, CEN['low']), ('天井', pv, CEN['high']), ('天井', pr, CEN['high']))
+                                  if val is not None and abs(val - thr) < 1e-12]
     row['eligible'] = bool(row.get('quality_pass') and not row.get('missing') and not row.get('dilution_fail') and not row.get('censored'))
     rows.append(row)
 
@@ -152,7 +169,9 @@ if gate1_open and elig:
     half = 1.96 * float(np.std(spread)) / math.sqrt(a.reps)
     band = {'q95_pt': round(q95, 3), 'reps': a.reps, 'mc_half_pt': round(half, 4), 'null_rate': round(p0, 5),
             'rule': '帰無（全候補が同じ）で、候補横断の最大と最小の差が %g 分位に収まる幅。最大の候補との差がこの幅の内側の候補を同値として一覧に出す（決め方には使わない）' % 0.95}
-    tied = [{'layer': r['layer'], 'coef': r['coef'], 'eff_pt': r['eff_pt']} for r in elig if (best - r['eff_pt']) <= q95]
+    # **帯の境目に一致した候補は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P327）
+    tied = [{'layer': r['layer'], 'coef': r['coef'], 'eff_pt': r['eff_pt'],
+             'boundary': abs((best - r['eff_pt']) - q95) < 1e-9} for r in elig if (best - r['eff_pt']) <= q95]
 
 PS = T['print_strings']
 lines = []
@@ -200,13 +219,16 @@ for r in rows:
              % (r['layer'], r['coef'], '合格' if r.get('quality_pass') else '不合格',
                 r.get('ff_diff_pt'), r.get('refuse_diff_pt'), r.get('censor_side') or '—',
                 r.get('eff_pt'), '○' if r['eligible'] else '×（%s）' % ('・'.join(r.get('dilution_fail') or []) or ('床・天井' if r.get('censored') else ('品質床' if not r.get('quality_pass') else '記録が無い')))))
-L += ['', '## 品質床（選定の段）', '', '| 土台 | 腕 | 層 | 係数 | 正答 | 無操作 | 差 pt | 判定 |', '|---|---|---|---|---|---|---|---|']
+L += ['', '## 品質床（選定の段・分母は使えた試行・裁定 D104）', '',
+      '| 土台 | 腕 | 層 | 係数 | 正答/使えた試行 | 無操作 | api_error | 差 pt | 判定 |', '|---|---|---|---|---|---|---|---|---|']
 for r in qrows:
     if r.get('missing'):
-        L.append('| %s | %s | %s | %s | — | — | — | 記録が無い |' % (r['base'], r['arm'], r['layer'], r['coef']))
+        L.append('| %s | %s | %s | %s | — | — | — | — | %s |' % (r['base'], r['arm'], r['layer'], r['coef'], r.get('note') or '記録が無い'))
     else:
-        L.append('| %s | %s | %s | %s | %d | %d | %.2f | %s |' % (r['base'], r['arm'], r['layer'], r['coef'], r['correct'], r['noop_correct'], r['diff_pt'],
-                                                                  ('合格' if r['pass'] else '不合格') + ('（境目に一致）' if r['boundary'] else '')))
+        L.append('| %s | %s | %s | %s | %d/%d | %d/%d | %d／%d | %.3f | %s |'
+                 % (r['base'], r['arm'], r['layer'], r['coef'], r['correct'], r['n_ok'], r['noop_correct'], r['noop_n_ok'],
+                    r['api_error'], r['noop_api_error'], r['diff_pt'],
+                    ('合格' if r['pass'] else '不合格') + ('（境目に一致）' if r['boundary'] else '')))
 L += ['', '## 印字（正本 print_strings）', ''] + ['- ' + s for s in lines]
 if band:
     L += ['', '- 同値の帯（候補横断の最大統計量・帰無の模擬 %s 回・%s 区間の半幅 ±%.4f pt）: 幅 %.2f pt・同値の候補 %d 組。'

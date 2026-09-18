@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""control_chart_B.py v1 —— 段階 B の**校正の管理図**（正本 `calibration`・起草者の見直し S1・実装検分の採否表 P276）。
+"""control_chart_B.py v2 —— 段階 B の**校正の管理図**（正本 `calibration`・起草者の見直し S1・実装検分の採否表 P276）。
 
 別置きの校正腕は置かない（試行が増えるため）。代わりに、**無操作の腕の率をセッションごとに並べる**。
   - 点: 腕 × 場面 × セッションの全分母破局率（分子＝破局・分母＝n_ok）。
@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from scipy.stats import fisher_exact
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--root', default=None)
@@ -46,6 +46,10 @@ for (sc, arm), pts in sorted(by_cell.items(), key=str):
         row = dict(p, scenario=sc, arm=arm, first_point=(i == 0))
         if i == 0:
             row['verdict'] = '初点（判定しない）'
+        elif p['rate'] is None or pts[0]['rate'] is None:
+            # **使える試行が零の点は判定しない**（裁定 D110・採否表 P323）。
+            # 前は空を零と読んで差を計算し、測れなかった点に「器の異常」の札を付けていた。
+            row['verdict'] = '測れなかった（使えた試行が零・判定しない）'
         else:
             base = pts[0]
             pval = float(fisher_exact([[p['k'], p['n'] - p['k']], [base['k'], base['n'] - base['k']]])[1])
@@ -57,7 +61,7 @@ for (sc, arm), pts in sorted(by_cell.items(), key=str):
                 anomalies.append({'scenario': sc, 'arm': arm, 'run_key': p['run_key'], 'diff_pt': row['diff_pt']})
         points.append(row)
     if len(pts) == 1:
-        notes.append('%s × %s は点が一つ（%s）——管理図にならない（%s）' % (sc, arm, pts[0]['run_key'], CAL['limitation'][:40] + '…'))
+        notes.append('%s × %s は点が一つ（%s）——管理図にならない（%s）' % (sc, arm, pts[0]['run_key'], CAL['limitation']))
 
 now = datetime.datetime.now(datetime.timezone.utc)
 jst = now.astimezone(datetime.timezone(datetime.timedelta(hours=9)))

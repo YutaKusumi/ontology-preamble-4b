@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-"""integrity_B.py v2 —— 段階 B の走行の**整合検査**（率盲検・許可表方式）。
+"""integrity_B.py v3 —— 段階 B の走行の**整合検査**（率盲検・許可表方式）。
 
 **判定欄（catastrophe・choice・correct・style_a・style_b・mention）は読まない。** 許可した欄だけを取り出し、manifest と正本の登録に突き合わせる。
 当てる相（採否表 P230・**本走行の後だけでなく、調整走行と品質床にも当てる**）:
   同一性選別 `idB`／調整走行 `tuneB`／品質床 `stageB-quality`／本走行 `stageB`
 検査:
   行数と目標（腕 × n）・n_ok と api_error・書式外の件数（率ではない）・trial_id の重複と trial_index の欠落・腕ごとの n の揃い・
-  runner_sha と arms_spec と preamble_sha（正本 `arms.sha16`）・model と seed の登録との一致・生成の設定（`runner.generation`／品質床は `quality_floor.generation`）・
-  層と係数が候補の格子にあるか・方向の id の登録・**バッチの大きさの凍結**（`runner.fixed_across_runs`）・**詰めの向き**（`runner.padding`）・
+  preamble_sha（正本 `arms.sha16`・manifest の runner_sha と model は走行を跨いだ同一性で見る）・**seed が正本の式で組み直した値と一致するか**（`seeds.derivation_formula`）・
+  生成の設定（`runner.generation`／品質床は `quality_floor.generation`）・
+  層と係数が候補の格子にあるか・**バッチの大きさの凍結**（`runner.fixed_across_runs`）・**詰めの向き**（`runner.padding`）・
   走行キーとセッション記録の対応（`sessions.missing_rule`）・dry-run の印。
 出力: records/B/integrity-<tag>-<日付>.{md,json}（--force が無ければ上書きしない）。不整合があれば非零で終わる。
 用法: python tools/integrity_B.py --tag stageB [--root results/_synth/all --allow-dry] [--force]
@@ -17,7 +18,7 @@ import os, sys, json, argparse, datetime, collections
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 # 許可表は**正本から**作る（裁定 D97・器の中に手書きしない）
 _T0 = runs_B.load_T()
@@ -89,14 +90,30 @@ def check_cell(rec):
                 problems.append('%s × %s: preamble_sha が一つでない' % (rk, arm))
             elif want_sha and next(iter(shas)) != want_sha:
                 problems.append('%s × %s: **preamble_sha が正本 arms.sha16 と違う**（%s 対 %s）' % (rk, arm, next(iter(shas)), want_sha))
-        if PHASE == 'quality':
-            bad_ff = sum(1 for r in rs if r.get('format_fail') and r.get('correct') is True)
-            if bad_ff:
-                problems.append('%s × %s: 書式外なのに正答と記録された行が %d 件（正本 quality_floor.format_fail_rule）' % (rk, arm, bad_ff))
+        # 「書式外なのに正答」の検査は**ここには置けない**（裁定 D113・採否表 P314）。
+        # 正答の欄は率盲検の欄なので、許可表で読む行では恒に空になり、この検査は決して発火しなかった。
+        # 規約は採点器（steer_B.score_quality）が保証し、読み口が数えた件数を門と集計器が読んで止める。
+        # **正本の式で組み直した値と突き合わせる**（正本 seeds.derivation_formula・裁定 D107・採否表 P310）。
+        # 前は走行の種と直に比べていたので、実機が正本に従えば必ず落ちる状態だった。
+        run_seed = next(iter(seeds_exp)) if len(seeds_exp) == 1 else m.get('seed')
+        if run_seed is not None:
+            if PHASE == 'quality':
+                ckey = (m.get('stage') or ('post' if '__post__' in rk else 'selection'), arm, m.get('layer'), m.get('coef'))
+            elif PHASE == 'tune':
+                ckey = (m.get('scenario'), arm, m.get('layer'), m.get('coef'))
+            else:
+                ckey = (m.get('scenario'), arm)
+            try:
+                cs = runs_B.cell_seed(T, run_seed, PHASE, ckey)
+            except SystemExit:
+                cs = None
+            if cs is not None:
+                bad_seed = [r for r in rs if r.get('seed') != runs_B.trial_seed(cs, r.get('trial_index'))]
+                if bad_seed:
+                    problems.append('%s × %s: seed が正本の式で組み直した値と違う行が %d 件（先頭 trial_index %s・記録 %s・式 %s）'
+                                    % (rk, arm, len(bad_seed), bad_seed[0].get('trial_index'), bad_seed[0].get('seed'),
+                                       runs_B.trial_seed(cs, bad_seed[0].get('trial_index'))))
         for r in rs:
-            if r.get('seed') not in seeds_exp:
-                problems.append('%s × %s: seed %s が登録（%s）と違う' % (rk, arm, r.get('seed'), sorted(seeds_exp)))
-                break
             if r.get('sampling') and {k: r['sampling'].get(k) for k in ('temperature', 'top_p')} != {k: gen_exp.get(k) for k in ('temperature', 'top_p')}:
                 problems.append('%s × %s: 生成の設定が登録と違う（%s）' % (rk, arm, r.get('sampling')))
                 break

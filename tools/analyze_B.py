@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""analyze_B.py v2 —— 段階 B の本走行の集計と札（確証の族・門・記述の族・印字）。
+"""analyze_B.py v4 —— 段階 B の本走行の集計と札（確証の族・門・記述の族・印字）。
 
 正本 `design/contrasts-B.json` に従う。**札は一つだけ**付け、ほかに当たった門は注に出す（`gate_order`）。
 門の順（`gate_order.order`）:
@@ -18,7 +18,7 @@ import numpy as np
 from scipy.stats import fisher_exact, binom
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v4'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--gate', default=None, help='tools/gate_B.py の json（選定の記録）')
@@ -30,6 +30,10 @@ ap.add_argument('--out', default=None)
 ap.add_argument('--force', action='store_true')
 ap.add_argument('--allow-dry', action='store_true')
 ap.add_argument('--allow-partial-seal', action='store_true', help='検査用の口（封印が全対比を持たなくても進む）')
+ap.add_argument('--allow-not-open', action='store_true', help='検査用の口（門1 が open でなくても集計する・裁定 D109）')
+ap.add_argument('--allow-unbound', action='store_true', help='検査用の口（門の選んだ層 × 係数と違っても集計する・裁定 D105）')
+ap.add_argument('--allow-no-sessions', action='store_true', help='検査用の口（セッション記録が無くても集計する・裁定 D108）')
+ap.add_argument('--chart', default=None, help='tools/control_chart_B.py の json（管理図・裁定 D110）')
 a = ap.parse_args()
 T = runs_B.load_T(a.contrasts)
 CEN, DG, RG, SG, QF, GO = T['censor'], T['dilution_gate'], T['refuse_gate'], T['style_gate'], T['quality_floor'], T['gate_order']
@@ -48,12 +52,56 @@ if SEAL is not None:
     if SEAL_MISSING and not a.allow_partial_seal:
         sys.exit('封印の記録が確証の全対比を持っていない（裁定 D79・seal_format.scope）: 欠け %d 件。検査用は --allow-partial-seal' % len(SEAL_MISSING))
 
+# ---- 門の判定（裁定 D109・採否表 P315）: open でなければ既定で止まる ----
+if G is not None and G.get('verdict') != 'open' and not a.allow_not_open:
+    sys.exit('門1 の判定が open でない（%s）。集計しない（正本 gate_order.gate_stop・裁定 D109）。検査用は --allow-not-open'
+             % G.get('verdict'))
+
 C, idx = runs_B.counts_main(T, root=a.root, allow_dry=a.allow_dry)
 POOL_IDS = {r.get('direction_id') for recs in idx.values() for rec in recs
             for r in runs_B.iter_jsonl(rec['trials_path'], ('direction_id',))}
 STR = runs_B.counts_main_strata(T, root=a.root, allow_dry=a.allow_dry)
 CQ, idx_q = runs_B.counts_quality(T, root=a.root, allow_dry=a.allow_dry)
 DRY = sorted({m for recs in list(idx.values()) + list(idx_q.values()) for r in recs for m in r['dry_marks']})
+
+# ---- 選定した層 × 係数との束縛（裁定 D105・採否表 P304） ----
+PICK = (G or {}).get('selection', {}).get('pick') or {}
+BIND = []
+if PICK.get('layer') is not None:
+    for recs in list(idx.values()) + list(idx_q.values()):
+        for rec in recs:
+            m = rec['manifest']
+            if m.get('stage') == 'selection':
+                continue        # **選定の段は全候補で走るのが正しい**（束縛の対象は本走行と選定後の品質床だけ）
+            if m.get('layer') is None:
+                continue        # 無操作の相手と、層を持たない走行は対象外
+            if (m.get('layer'), m.get('coef')) != (PICK['layer'], PICK['coef']):
+                BIND.append('%s: 層 %s・係数 %s（門が選んだのは 層 %s・係数 %s）'
+                            % (rec['run_key'], m.get('layer'), m.get('coef'), PICK['layer'], PICK['coef']))
+    if BIND and not a.allow_unbound:
+        sys.exit('本走行・選定後の品質床が、門の選んだ層 × 係数と違う（正本 selection.binding・裁定 D105）:\n  '
+                 + '\n  '.join(BIND[:8]) + ('\n  ほか %d 件' % (len(BIND) - 8) if len(BIND) > 8 else ''))
+
+# ---- セッション記録（裁定 D108・正本 sessions.missing_rule・採否表 P313） ----
+SESS_MISSING = []
+_sess = runs_B.sessions_by_run_key(runs_B.load_sessions(a.root))
+for recs in list(idx.values()) + list(idx_q.values()):
+    for rec in recs:
+        if rec['run_key'] not in _sess:
+            SESS_MISSING.append(rec['run_key'])
+if SESS_MISSING and not a.allow_no_sessions:
+    sys.exit('走行キーのセッション記録が無い（正本 sessions.missing_rule・裁定 D108）: %s%s'
+             % ('・'.join(sorted(SESS_MISSING)[:6]), ' ほか' if len(SESS_MISSING) > 6 else ''))
+
+# ---- ランダム方向の三本の率（正本 random_control.pooling・裁定 D110・採否表 P311） ----
+BYDIR = runs_B.counts_main_by_direction(T, root=a.root, allow_dry=a.allow_dry)
+
+# ---- 管理図（正本 calibration.consequence・裁定 D110・採否表 P312・P322） ----
+CHART = runs_B.read_json(a.chart) if a.chart else None
+CHART_BAD = (CHART or {}).get('anomalies') or []
+CHART_RUNS = {x.get('run_key') for x in CHART_BAD}
+CHART_SC = {x.get('scenario') for x in CHART_BAD}
+CHART_NOTE = T['calibration']['consequence']
 
 # ---- 選定後の品質床（裁定 D77）: 落ちた腕 ----
 INTERV = sorted(a for a in T['arms']['main'] if '+v' in a or '-v' in a)
@@ -66,6 +114,12 @@ for arm in INTERV:                                  # **介入の腕の一覧か
         QF_ROWS.append({'arm': arm, 'missing': True, 'note': '選定後の品質床の走行が無い（合格扱いにしない・裁定 D77）'})
         QF_FAIL.add(arm)
         continue
+    if len(cells) > 1:                                # **門と同じ番人**（裁定 D106・採否表 P308）
+        QF_MISSING.append(arm)
+        QF_ROWS.append({'arm': arm, 'missing': True,
+                        'note': '選定後の品質床の走行が %d 本ある（古い走行を黙って採らない・裁定 D106）' % len(cells)})
+        QF_FAIL.add(arm)
+        continue
     k0 = sorted(cells)[0]
     cell, l, c, session = cells[k0], k0[2], k0[3], k0[4] if len(k0) > 4 else None
     base = arm.split('+v')[0].split('-v')[0]
@@ -75,12 +129,23 @@ for arm in INTERV:                                  # **介入の腕の一覧か
         QF_ROWS.append({'arm': arm, 'missing': True, 'note': '同じセッションの無操作の相手が無い（裁定 D92）'})
         QF_FAIL.add(arm)
         continue
-    d_pt = 100.0 * (cell['correct'] - noop['correct']) / QF['denominator']
-    ok = d_pt > QF['threshold_pt']
-    QF_ROWS.append({'arm': arm, 'layer': l, 'coef': c, 'correct': cell['correct'], 'noop_correct': noop['correct'],
-                    'diff_pt': round(d_pt, 3), 'pass': ok, 'boundary': abs(d_pt - QF['threshold_pt']) < 1e-9})
-    if not ok:
+    gap = cell.get('scoring_gap', 0) + noop.get('scoring_gap', 0)
+    if gap or not cell['n_ok'] or not noop['n_ok']:   # 採点欠落・使えた試行が零（裁定 D103・D110）
+        QF_MISSING.append(arm)
+        QF_ROWS.append({'arm': arm, 'missing': True, 'scoring_gap': gap,
+                        'note': ('判定欄が空の試行が %d 件ある（裁定 D103）' % gap) if gap else '使えた試行が零（測れなかった）'})
         QF_FAIL.add(arm)
+        continue
+    else:
+        # **分母は使えた試行**（裁定 D104・採否表 P305）
+        d_pt = 100.0 * (cell['correct'] / cell['n_ok'] - noop['correct'] / noop['n_ok'])
+        ok = d_pt > QF['threshold_pt']
+        QF_ROWS.append({'arm': arm, 'layer': l, 'coef': c, 'correct': cell['correct'], 'noop_correct': noop['correct'],
+                        'n_ok': cell['n_ok'], 'noop_n_ok': noop['n_ok'],
+                        'api_error': cell.get('api_error', 0), 'noop_api_error': noop.get('api_error', 0),
+                        'diff_pt': round(d_pt, 3), 'pass': ok, 'boundary': abs(d_pt - QF['threshold_pt']) < 1e-9})
+        if not ok:
+            QF_FAIL.add(arm)
 
 
 def cell(sc, arm):
@@ -177,6 +242,10 @@ def apply_style_gate(row):
     d = row.get('style_diff_pt')
     if d is None:
         return
+    # **帯の境目に一致した値は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P327）
+    for name, thr in (('様式門の保留', SG['hold_pt']), ('様式門の注', SG['note_pt'])):
+        if abs(d - thr) < 1e-9:
+            row['notes'].append('境目に一致（%s・%g pt）' % (name, thr))
     if d > SG['hold_pt']:
         row['label'] = '判定保留（様式転位）'
         row['fired'] = row.get('fired', []) + ['判定保留（様式転位）']
@@ -208,6 +277,8 @@ for famkey, F in T['families'].items():
             apply_style_gate(r)
         if len(r.get('fired') or []) > 1:
             r['notes'].append('当たった門: ' + '・'.join(r['fired']))
+        if r['scenario'] in CHART_SC:      # **管理図の異常を確証札の注に伝える**（正本 calibration.consequence・裁定 D110）
+            r['notes'].append('管理図: この場面の無操作の腕が帯を外れた走行がある（%s）' % CHART_NOTE[:24])
         if r.get('label') == '確証' and SEAL:
             want = (SEAL.get('signs') or {}).get(r['id'])
             r['sealed_sign'] = want
@@ -329,7 +400,8 @@ first = PS['first_finding'].format(confirmed=counts['確証'], undecidable=count
 REC = {'kind': 'analyze_B', 'version': VERSION, 'generated_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
        'contrasts_sha16': runs_B.sha16_file(a.contrasts or runs_B.CPATH), 'gate': (G or {}).get('verdict'),
        'selection': (G or {}).get('selection', {}).get('pick'), 'counts': counts, 'confirm': FAMROWS, 'descriptive': DESC,
-       's4': s4, 'stratified': STRAT, 'mention': MENTION, 'direction_ids': sorted(str(x) for x in POOL_IDS if x is not None), 'quality_post': QF_ROWS, 'orphan_arms': orphans, 'missing_cells': missing,
+       's4': s4, 'stratified': STRAT, 'mention': MENTION, 'by_direction': [dict(scenario=k_[0], arm=k_[1], direction_id=k_[2], **c_) for k_, c_ in sorted(BYDIR.items(), key=str)], 'chart_anomalies': CHART_BAD, 'binding': BIND,
+       'sessions_checked': len(_sess), 'direction_ids': sorted(str(x) for x in POOL_IDS if x is not None), 'quality_post': QF_ROWS, 'orphan_arms': orphans, 'missing_cells': missing,
        'sign_agreement': {'agree': agree, 'checked': n_conf, 'unchecked': unchecked, 'seal_missing': SEAL_MISSING, 'sealed': bool(SEAL)}, 'dry_marks': DRY}
 json.dump(REC, open(out_json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
@@ -361,6 +433,7 @@ for r in FAMROWS:
 L += ['', '## 記述の族（p を印字しない）', '']
 for famkey, rows in DESC.items():
     if not rows:
+        L.append('- `%s`: **この巡では出さない**（登録された対比が無い）' % famkey)   # 黙って飛ばさない（採否表 P326）
         continue
     L += ['### %s' % famkey, '', '| 対比 | 破局率 A | 破局率 B | pt 差 | 区間 | 書式外 A/B | refuse A/B |', '|---|---|---|---|---|---|---|']
     for r in rows:
@@ -377,6 +450,13 @@ for m_ in MENTION:
 L += ['', '## ランダム方向の三本の率（合併の前・正本 random_control.pooling）', '',
       '- 試行の記録にある方向の id: %s。id が一つしか無い走行では、三本の率を分けて出せない（その旨を記す）。'
       % (sorted(str(x) for x in POOL_IDS if x is not None) or '記録に無い'), '',
+      '| 場面 | 腕 | 方向 | 破局/n_ok | 率 | 書式外 |', '|---|---|---|---|---|---|']
+L += ['| %s | %s | %s | %d/%d | %s | %d |'
+      % (k_[0], k_[1], k_[2], c_['cat'], c_['n_ok'], (None if not c_['n_ok'] else round(c_['cat'] / c_['n_ok'], 4)), c_['ff'])
+      for k_, c_ in sorted(BYDIR.items(), key=str) if str(k_[2]).startswith('rand')]
+if CHART_BAD:
+    L += ['', '## 管理図の異常（正本 calibration.consequence・裁定 D110）', ''] +          ['- %s' % json.dumps(x, ensure_ascii=False) for x in CHART_BAD]
+L += ['',
       '## S4 の反証（三分岐・裁定 D81・D95）', '', '- 判定: **%s**' % s4.get('verdict')]
 if 'partner_rate' in s4:
     L.append('- pt 差 %s・区間 %s・相手の腕の率 %.4f・%d pt の検出力 %s（線は %g）'

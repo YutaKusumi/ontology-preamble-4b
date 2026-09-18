@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""synth_B.py v2 —— 段階 B の**合成データ**の生成器（器材の検査用・実データを作らない）。
+"""synth_B.py v3 —— 段階 B の**合成データ**の生成器（器材の検査用・実データを作らない）。
 
 札の全経路を一度ずつ以上発火させるための走行の記録を作る（器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表）。
 作るもの（既定の置き場は results/_synth/<場合>/）:
@@ -14,7 +14,7 @@ import os, sys, json, shutil, argparse, datetime, hashlib
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 SC = T['scenarios']
@@ -41,9 +41,13 @@ def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style
     ff = bool(ff)
     if status != 'ok' or ff:
         cat_v, choice, corr = None, None, None
+    elif refuse:
+        # **凍結パーサ `is_catastrophic` は refuse に破局の判定を返さない**（裁定 D103・採否表 P307）。
+        # 前はここで偽を書いていたため、実機の規約との食い違いが合成データで一度も現れなかった。
+        cat_v, choice, corr = None, 'refuse', (None if correct is None else bool(correct))
     else:
         cat_v = bool(cat)
-        choice = 'refuse' if refuse else 'A'
+        choice = 'A'
         corr = (None if correct is None else bool(correct))
     return {'trial_id': '%s__%s__%04d' % (run_key, arm, i), 'trial_index': i, 'arm': arm, 'scenario': scenario, 'tag': tag,
             'status': status, 'catastrophe': cat_v, 'choice': choice, 'refuse_class': None,
@@ -63,10 +67,23 @@ def cell_trials(n, spec, start=0, **kw):
     n_err = int(spec.get('api_error', 0))
     n_ff, n_loop, n_trunc = int(spec.get('ff', 0)), int(spec.get('loop', 0)), int(spec.get('trunc', 0))
     cat_target, ref_target = int(spec.get('cat', 0)), int(spec.get('refuse', 0))
+    # **種を正本の式で降ろす**（裁定 D107・採否表 P310）。前は走行の種をそのまま各行に書いていたので、
+    # 実機が正本に従えば整合検査が必ず落ちる状態だった。
+    _phase = {T['tags']['main']: 'main', T['tags']['tune']: 'tune', T['tags']['quality']: 'quality',
+              T['tags']['identity']: 'identity'}.get(kw.get('tag'), 'main')
+    _l, _c = kw.get('layer'), kw.get('coef')
+    if _phase == 'quality':
+        _key = ('post' if '__post__' in str(kw.get('run_key')) else 'selection', kw['arm'], _l, _c)
+    elif _phase == 'tune':
+        _key = (kw['scenario'], kw['arm'], _l, _c)
+    else:
+        _key = (kw['scenario'], kw['arm'])
+    _cs = runs_B.cell_seed(T, kw['seed'], _phase, _key)
     for k in range(n):
         i = start + k
         if i < n_err:
             out.append(_trial(i, cat=0, refuse=0, ff=0, style_a=0, style_b=0, mention=0, status='error', **kw))
+            out[-1]['seed'] = runs_B.trial_seed(_cs, i)
             continue
         j = i - n_err
         ff = j < n_ff
@@ -76,8 +93,14 @@ def cell_trials(n, spec, start=0, **kw):
                           mention=j < spec.get('mention', 0), loop=(n_ff <= j < n_ff + n_loop),
                           trunc=(n_ff + n_loop <= j < n_ff + n_loop + n_trunc),
                           correct=(None if 'correct' not in spec else (j < spec['correct'])), **kw))
+        out[-1]['seed'] = runs_B.trial_seed(_cs, i)
         if spec.get('scoring_gap') and (n_ff + cat_target + ref_target) <= j < (n_ff + cat_target + ref_target + int(spec['scoring_gap'])):
-            out[-1]['catastrophe'] = None      # 採点欠落（status は ok のまま・裁定 D96）
+            # 採点欠落（status は ok のまま・裁定 D96・D103）——**相ごとの欄**で作る
+            if 'correct' in spec:
+                out[-1]['correct'] = None      # 品質床は正答の欄
+            else:
+                out[-1]['choice'] = None       # 本走行は選択の欄
+                out[-1]['catastrophe'] = None
             out[-1]['choice'] = None
     return out
 
@@ -201,10 +224,18 @@ def case_s4_floor():
 
 
 def case_dilution_causal():
-    """**希釈が効く場面**——書式外が増えたぶんだけ破局の分子が減り、見かけの低下が出る（採否表 P301）。"""
+    """**希釈が効く場面**——書式外が増えたぶんだけ破局の分子が減り、見かけの低下が出る（裁定 D111・採否表 P309）。
+
+    前の版は両腕とも破局を 138 と決め打っており、**見かけの破局率の差が零**だった。
+    つまり正本 `dilution_gate.why` の因果は一度も作られていなかったのに、経路の表は発火したと書いていた。
+    いまは「答えられた試行のうちの破局の率を同じにし、書式外だけを増やす」——
+    すると全分母の破局率は書式外の多い腕で下がる（＝希釈）。"""
     m = base_main_spec()
-    m[('N1', 'Onull+v')] = {'cat': 138, 'refuse': 10, 'ff': 60, 'style_a': 40, 'style_b': 120, 'mention': 8}
-    m[('N1', 'Onull+vrand')] = {'cat': 138, 'refuse': 10, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    ff_hi, ff_lo, p_cat = 60, 4, 0.72        # 答えられた試行のうちの破局の率は同じ
+    m[('N1', 'Onull+v')] = {'cat': int(round((200 - ff_hi) * p_cat)), 'refuse': 10, 'ff': ff_hi,
+                            'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('N1', 'Onull+vrand')] = {'cat': int(round((200 - ff_lo) * p_cat)), 'refuse': 10, 'ff': ff_lo,
+                                'style_a': 40, 'style_b': 120, 'mention': 8}
     return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
 
 
@@ -317,6 +348,20 @@ def build(case, out_root):
                        'run_keys': [rk], 'dry_run': True},
                       open(os.path.join(sd, '%s__%s__s%d.json' % (T['tags']['main'], sc, sess)), 'w', encoding='utf-8'),
                       ensure_ascii=False, indent=1)
+    # **すべての走行キーにセッション記録を書く**（正本 sessions.missing_rule・裁定 D108・採否表 P313）。
+    # 前は本走行の分しか書いておらず、品質床と調整走行と同一性選別の走行キーには記録が無かった。
+    for tg in (T['tags']['tune'], T['tags']['quality'], T['tags']['identity']):
+        d = os.path.join(out_root, tg)
+        if not os.path.isdir(d):
+            continue
+        for rk in sorted(os.listdir(d)):
+            if not os.path.isdir(os.path.join(d, rk)):
+                continue
+            mf = [f for f in os.listdir(os.path.join(d, rk)) if f.startswith('manifest')]
+            sess = json.load(open(os.path.join(d, rk, mf[0]), encoding='utf-8')).get('session', 1) if mf else 1
+            json.dump({'tag': tg, 'session': sess, 'gpu': 'synth', 'batch': T['runner']['batch'],
+                       'run_keys': [rk], 'dry_run': True},
+                      open(os.path.join(sd, '%s.json' % rk), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     # ---- 封印（任意） ----
     if spec.get('seal'):
         json.dump({'kind': 'seal_B', 'signs': spec['seal'], 's4': 'synth', 'dry_run': True},

@@ -38,16 +38,17 @@
 - いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 
 ## 段階 B（機構層・設計中・2026-09-18 再開・O の枠組みに対応する方向の加減で破局率は動くか）
-- **いまどこか**: 設計の途中である（凍結していない・**データは一つも無い**）。設計の検分は二段（エージェント二体・系統内外の四票）を終え、**器材の実装検分は差し戻し**——介入そのものが登録どおりでない三件を含む所見を全件再現し、器材を直した（裁定 D90〜D100）。次は**直した器材を同じ二体に見せ**、そのあと系統外へ。
+- **いまどこか**: 設計の途中である（凍結していない・**データは一つも無い**）。設計の検分は二段（エージェント二体・系統内外の四票）を終え、**器材の検分は二度とも差し戻し**——一度目は介入そのものが登録どおりでない三件、二度目は**介入の帯の起点が直っていなかったこと**と、**起草者の直しが新しく入れた誤り十一件**（裁定 D101〜D116）。所見は二巡とも全件再現し、器材を直した。次は**系統の外**（claude.ai と Gemini）へ出す（裁定 D116——同系列の巡を重ねても票は増えないため）。
 - **再開の記録（ここから読む）**: [`records/B/stageB-restart-2026-09-18.md`](records/B/stageB-restart-2026-09-18.md)——時系列・登録者裁定 D57〜D61 の逐語・正本と器の改訂・次の段取り・未決・不利な材料。
-- 正本 JSON `design/contrasts-B.json`（draft10-2026-09-18・SHA16 403D896F40B39305・生成器 `tools/make_contrasts_B.py` v6）／転記行 `records/B/design-facts-B.md`（SHA16 7C3058E32BAA59D5・生成器 `tools/design_facts_B.py` v5）。
-- **設計草案10B（いまの版）**: [`design/design-stageB-draft10.md`](design/design-stageB-draft10.md)（SHA16 1035B0529F7909C4・**器材の実装検分**〔差し戻し〕の採否 P257〜P303 と裁定 D90〜D100 を反映・検査の記録 [`records/B/numbers-lint-draft10B.md`](records/B/numbers-lint-draft10B.md)・違反 零）。前の版は `design/design-stageB-draft9.md`・`draft8.md`。
+- 正本 JSON `design/contrasts-B.json`（draft11-2026-09-18・SHA16 7223039C83FDC123・生成器 `tools/make_contrasts_B.py` v7）／転記行 `records/B/design-facts-B.md`（SHA16 84577370A4682139・生成器 `tools/design_facts_B.py` v5）。
+- **設計草案11B（いまの版）**: [`design/design-stageB-draft11.md`](design/design-stageB-draft11.md)（SHA16 2D51C541763BBC3D・**器材の直しの確認**〔二度目の差し戻し〕の採否 P304〜P336 と裁定 D101〜D116 を反映・検査の記録 [`records/B/numbers-lint-draft11B.md`](records/B/numbers-lint-draft11B.md)・違反 零）。前の版は `design/design-stageB-draft10.md`・`draft9.md`・`draft8.md`。
 - **設計の検分・一段目（系統内の新規個体二体・2026-09-18）**: [`records/reviews/B/design-round1/`](records/reviews/B/design-round1/)——票（逐語）・再現の事前登録・再現の記録（K1〜K22）・採否表（SHA16 ABE92488CDF958BA）。**起草者自身の誤り二件を含む**。
 - **設計の検分・二段目（系統外 Gemini 二名・系統内 claude.ai 二名・2026-09-18）**: [`records/reviews/B/design-round2/`](records/reviews/B/design-round2/)——票（逐語・出所 `provenance.md`）・依頼文と資料の束・起草者の見直し（S1〜S12）・再現の事前登録と記録（K23〜K50・**再現しなかった所見は無い**）・採否表（P212〜P256・SHA16 E90E5C3F03BADA26）・反映の事前登録と確かめ。判定は差し戻し 一・条件つき 三で、登録者裁定 D86 は条件つき（甲）。**起草者に由来する誤り四件**と、**系統外の一名だけが挙げた二件**も採否表に記録した。
 - 設計: Qwen3-4B-Instruct-2507（bf16・transformers・Colab）・場面 N1・S1・SK・S4・確証の族は 16 対比（減算・加算・交差。いずれも「方向 v 対 ノルム一致ランダム方向」）・n=200／腕。規模は合計 23,680 試行の見込み。
 - 段階 A との関係: 段階 A の結果は方向の抽出にも効果の根拠にも使わない（反映メモ A・再開の記録 §1 の D57・D58）。段階 A は初版の重み、段階 B は 2507 の重みである。
-- **器材（段階 B・凍結前）**: 計画 [`records/B/tooling-plan-B-2026-09-18.md`](records/B/tooling-plan-B-2026-09-18.md)（器材を書く前に登録）→ 記録 [`records/B/tooling-record-B-2026-09-18.md`](records/B/tooling-record-B-2026-09-18.md)（**実装検分の差し戻しの後に作り直した**・十三の器の SHA16・直した中身）→ 合成データによる検査 [`records/B/dry-run-B-2026-09-18.md`](records/B/dry-run-B-2026-09-18.md)（札の全経路が発火・整合検査は四つの相すべてで不整合 零）。
-- **器材の実装検分（エージェント二体・2026-09-18・差し戻し）**: [`records/reviews/B/impl-round/`](records/reviews/B/impl-round/)——依頼文と束・票（逐語）・事前登録（票を読む前の枠と追い問い K51〜K96）・再現（**全件再現**）・採否表（P257〜P303・SHA16 3D17EA6FD996A811）。**起草者に由来する誤りが大半**である。
+- **器材（段階 B・凍結前）**: 計画 [`records/B/tooling-plan-B-2026-09-18.md`](records/B/tooling-plan-B-2026-09-18.md)（器材を書く前に登録）→ 記録 [`records/B/tooling-record-B-2026-09-18.md`](records/B/tooling-record-B-2026-09-18.md)（**二度目の差し戻しの後に作り直した**・十七の器の SHA16・直した中身）→ 合成データによる検査 [`records/B/dry-run-B-2026-09-18.md`](records/B/dry-run-B-2026-09-18.md)（札の全経路が発火・整合検査は四つの相すべてで不整合 零）。
+- **器材の実装検分（エージェント二体・2026-09-18・差し戻し）**: [`records/reviews/B/impl-round/`](records/reviews/B/impl-round/)——依頼文と束・票（逐語）・事前登録・再現（**全件再現**）・採否表（P257〜P303）。**起草者に由来する誤りが大半**である。
+- **器材の直しの確認（同じ票を持たせた新規個体二体・2026-09-18・二度目の差し戻し）**: [`records/reviews/B/impl-round-2/`](records/reviews/B/impl-round-2/)——依頼文と束・票（逐語）・事前登録（票を読む前の枠と追い問い K97〜K129）・再現（**三十三件すべて再現**・SHA16 FD383674D5D39687）・採否表（P304〜P336）・裁定（D101〜D116）・**直しが効いたかの記録**（`verification-fixes-B-recheck.md`）。
 - 検分の予定（裁定 D59・D86）: 設計の検分（**二段とも済**）→ 器材の実装検分（**次の外の目はここ**）→ 凍結前の最終検分。各段に系統外を二名以上（claude.ai の票は起草者と同一系列として一票）。
 - 旧い草案（読むときは再開の記録と併せて）: `design/design-stageB-draft4.md` ほか。草案4 の主抽出位置は成り立たない。
 

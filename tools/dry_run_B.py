@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""dry_run_B.py v2 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+"""dry_run_B.py v3 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
 
 器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表の経路を、合成データ（`synth_B.py`）で作り、
 `gate_B.py`（門1 と選定）と `analyze_B.py`（本走行の集計と札）を走らせて、**どの経路が発火したか**を数える。
@@ -15,7 +15,7 @@ import runs_B
 
 T = runs_B.load_T()
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 PY = sys.executable
 ap = argparse.ArgumentParser()
@@ -33,7 +33,8 @@ PATHS = ['確証', '確証（登録された向きと逆）', '封印した符�
          '判定保留（書式外転位）', '判定保留（refuse 転位・差）', '判定保留（refuse 転位）', '判定保留（様式転位）', '注（様式）',
          '判定不能（品質床）', '非有意', '門1 を閉じる', '記録の不在（incomplete）', '全候補が非正', '同点の割り方',
          '床・天井で選定から外す', 'S4: 下がった（外れ）', 'S4: 下がらなかった（当たり）', 'S4: 当否を言わない', 'S4: 余地の条項',
-         '希釈が効く場面（書式外が分子を食う）', '中断と再開', '同一性選別の走行', '未測定（ループ・打ち切り）', '封印の欠けで止まる']
+         '希釈が効く場面（書式外が分子を食う）', '採点の規約（書式外と refuse に判定を付けない）', '門が開いていないと集計器が止まる', '束縛の食い違いで集計器が止まる',
+         '中断と再開', '同一性選別の走行', '未測定（ループ・打ち切り）', '封印の欠けで止まる']
 fired = {k: [] for k in PATHS}
 rows = []
 
@@ -72,6 +73,19 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             if rc_stop != 0:
                 fired['封印の欠けで止まる'].append(case)
             cmd += ['--seal', seal, '--allow-partial-seal']
+        # **門が開いていなければ止まることを先に確かめる**（裁定 D109・採否表 P315）
+        if G.get('verdict') != 'open':
+            rc_stop2, _ = run(cmd)
+            if rc_stop2 != 0:
+                fired['門が開いていないと集計器が止まる'].append(case)
+            cmd += ['--allow-not-open']
+        # **束縛の食い違いで止まることを確かめる**（裁定 D105・採否表 P304）。
+        # 合成データの走行は場合ごとの「best」で作るが、門が実際に選ぶ組はそれと違うことがある
+        # （候補が希釈や床・天井で外れる場合）。そのとき集計器は止まるのが正しい。
+        rc_b, out_b = run(cmd)
+        if rc_b != 0 and '門の選んだ層 × 係数と違う' in out_b:
+            fired['束縛の食い違いで集計器が止まる'].append(case)
+            cmd += ['--allow-unbound']
         rc_a, out_a = run(cmd)
         assert rc_a == 0, out_a
         A = json.load(open(os.path.join(REPO, root, 'analysis-B.json'), encoding='utf-8'))
@@ -111,8 +125,18 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
                         unmeas += 1
         if unmeas:
             fired['未測定（ループ・打ち切り）'].append(case)
-        if ff_cat == 0 and case == 'dilution_causal':
-            fired['希釈が効く場面（書式外が分子を食う）'].append(case)
+        if case == 'dilution_causal':
+            # **恒真にしない**（裁定 D111・採否表 P309）。書式外の差・見かけの破局率の差・札の三つがそろって初めて発火。
+            cc = runs_B.counts_main(T, root=root, allow_dry=True)[0]
+            v, r = cc.get(('N1', 'Onull+v')), cc.get(('N1', 'Onull+vrand'))
+            if v and r:
+                ff_d = abs(100.0 * v['ff'] / v['n_ok'] - 100.0 * r['ff'] / r['n_ok'])
+                cat_d = 100.0 * r['cat'] / r['n_ok'] - 100.0 * v['cat'] / v['n_ok']
+                lab = [x.get('label') for x in (A.get('confirm') or []) if 'Onull+v~Onull+vrand' in str(x.get('id'))]
+                if ff_d >= T['dilution_gate']['threshold_pt'] and cat_d > 0 and any('書式外転位' in str(x) for x in lab):
+                    fired['希釈が効く場面（書式外が分子を食う）'].append(case)
+        if ff_cat == 0:
+            fired['採点の規約（書式外と refuse に判定を付けない）'].append(case)
     if os.path.isdir(os.path.join(REPO, root, T['tags']['identity'])):
         fired['同一性選別の走行'].append(case)
     rows.append(rec)

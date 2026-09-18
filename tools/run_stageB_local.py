@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""run_stageB_local.py v2 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+"""run_stageB_local.py v3 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
 
 段階 A の走行器（`run_preamble_local.py` v2.7・vLLM の OpenAI 互換サーバ）は凍結物なので触らない。
 B は hook を掛けるため transformers を直に使うが、**プロンプトの組み立てと採点の経路は凍結物に合わせる**:
@@ -20,7 +20,7 @@ import numpy as np
 import runs_B
 import steer_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FROZEN_RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
@@ -117,6 +117,9 @@ def make_hook(vec, coef, sign, starts):
         hs = output[0] if isinstance(output, tuple) else output
         v = torch.as_tensor(vec, dtype=hs.dtype, device=hs.device)
         add = sign * coef * v
+        if len(starts) != hs.shape[0]:
+            raise SystemExit('hook: 起点の数（%d）とバッチの行数（%d）が違う——一つのバッチは一つの腕にそろえる'
+                             '（正本 runner.one_arm_per_batch・裁定 D114）' % (len(starts), hs.shape[0]))
         if hs.shape[1] == 1:                       # 復号の段（KV キャッシュ）: 位置は必ず帯の内側
             hs[:, 0, :] = hs[:, 0, :] + add
         else:                                       # prefill: 行ごとの起点から後ろに掛ける

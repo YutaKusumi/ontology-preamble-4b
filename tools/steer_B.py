@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-"""steer_B.py v2 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床・強制デコード）。
+"""steer_B.py v3 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床・強制デコード）。
 
 正本 `design/contrasts-B.json` の `selection.apply`・`random_control`・`quality_floor`・`runner` に従う。
 規則（この器が守るもの）:
   - 加減は `h ← h ± α·v̂`（場面本文の開始位置から EOS まで・`register_forward_hook`・`selection.apply`）。α は**その層の v̂ のノルムに対する比**。
   - すべての方向（v̂・Nk・td・(6b)・ランダム方向）を**係数を掛ける前の ‖v̂〔static〕‖** に合わせ、**係数は加減のときに一度だけ**掛ける（裁定 D75・D90）。
-    自己検査は「v 腕とランダム腕の加わる量のノルムが全係数・全層で一致する」ことを確かめる（実装検分の採否表 P257——係数が二度掛かる誤りをここで捕まえる）。
+    自己検査は「**全方向 × 全係数 × 全層**で加わる量のノルムが一致する」ことを確かめる（裁定 D102——前は v 腕とランダム腕の対しか回さず、交差族に同じ穴が残った）。
+  - 介入の帯の起点は、**chat template を当てた列の中で場面の本文が始まる位置**（裁定 D101）。自己検査は起点のトークンを復号して場面本文の先頭と照合する
+    （`OP4B_TOKENIZER_DIR` に実トークナイザの置き場を渡したときに走る）。
   - ランダム方向は**調整走行と本走行で引き直す**（裁定 D84・種は `seeds.random_dirs` の tune と main）。
   - 一腕の試行は方向の登録順に等分し、端数は登録順に一つずつ配る（`random_control.allocation`・調整走行にも当てる）。
   - 品質床は**貪欲**（`quality_floor.generation`）。書式外は不正解に数え、api_error は一度だけ引き直す（`quality_floor.format_fail_rule`）。
@@ -19,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 RC = T['random_control']
@@ -76,20 +78,39 @@ def apply_vector(h, v_hat, coef, sign):
     return h + sign * coef * np.asarray(v_hat)
 
 
-def scenario_start_index(tokenizer, arm_text, pad_len=0):
-    """介入の帯の**起点**（正本 `selection.apply`・`runner.prompt_assembly`）。
-
-    組み立ては「前置き ＋ 空行 ＋ 場面の本文 ＋ 指示」なので、起点は「前置き ＋ 空行」のトークン数。
-    左詰めのバッチでは行ごとに詰めの長さ pad_len だけずれるので、**行ごとに**求める（採否表 P258）。
-    前置きを持たない腕（N）は起点が零（＋詰め）。"""
-    head = (arm_text + '\n\n') if arm_text else ''
-    n_head = len(tokenizer(head, add_special_tokens=False)['input_ids']) if head else 0
-    return pad_len + n_head
+def apply_chat(tokenizer, user_message):
+    """**段階 B は chat template を当てる**（正本 `runner.chat_template`・裁定 D101）。組み立て済みのトークン列を返す。"""
+    return list(tokenizer.apply_chat_template([{'role': 'user', 'content': user_message}],
+                                              add_generation_prompt=True, tokenize=True))
 
 
-def band_starts(tokenizer, arm_texts, pad_lens):
+def scenario_start_index(tokenizer, arm_text, scen_text, instruction, pad_len=0, probe=8):
+    """介入の帯の**起点**（正本 `selection.apply`・`runner.chat_template`・裁定 D101）。
+
+    **組み立て済みのトークン列の中で場面の本文が始まる位置**を引く（前置きの長さを別に数えない）。
+    前は「前置き ＋ 空行」のトークン数だけを数えており、chat template の頭のぶん（登録機種では三トークン）だけ
+    帯が手前から始まっていた——前置きを持たない腕では役割トークンそのものに掛かっていた（採否表 P305）。
+    左詰めのバッチでは行ごとに詰めの長さ pad_len だけずれるので、**行ごとに**求める（採否表 P258）。"""
+    body = (scen_text or '') + (instruction or '')
+    ids = apply_chat(tokenizer, _user_message(arm_text, scen_text, instruction))
+    want = tokenizer(body, add_special_tokens=False)['input_ids'][:probe]
+    if not want:
+        raise SystemExit('場面の本文が空で起点を引けない')
+    for i in range(len(ids) - len(want) + 1):
+        if ids[i:i + len(want)] == want:
+            return pad_len + i
+    raise SystemExit('組み立て済みの列の中に場面の本文の先頭が見つからない（腕の本文か指示の出所を確かめる）')
+
+
+def _user_message(arm_text, scen_text, instruction):
+    """凍結走行器 `user_message` と同じ式（正本 `runner.prompt_assembly`）。"""
+    t = arm_text or ''
+    return (t + '\n\n' + scen_text + instruction) if t else (scen_text + instruction)
+
+
+def band_starts(tokenizer, arm_texts, scen_text, instruction, pad_lens):
     """バッチの行ごとの起点（`make_hook` に渡す）。"""
-    return [scenario_start_index(tokenizer, t, p) for t, p in zip(arm_texts, pad_lens)]
+    return [scenario_start_index(tokenizer, t, scen_text, instruction, p) for t, p in zip(arm_texts, pad_lens)]
 
 
 def _to_hf(g, greedy):
@@ -106,6 +127,9 @@ def quality_generation():
     """品質床の生成の設定（**貪欲**・正本 quality_floor.generation・裁定 D78）。"""
     g = T['quality_floor']['generation']
     assert g['temperature'] == 0, '品質床は貪欲（temperature 零）でなければならない（裁定 D78）'
+    if g.get('max_tokens') is None:      # **黙って落とさない**（裁定 D103・採否表 P325）
+        raise SystemExit('品質床の最大トークン数が未定（裁定 D66 と採否表 P216 で決める）。'
+                         'このまま実機に渡すと transformers の既定で走り、例外も警告も出ない')
     return _to_hf(g, greedy=True)
 
 
@@ -131,16 +155,25 @@ def _selftest():
         assert len(rs) == N_RAND
         for r in rs:
             assert abs(float(np.linalg.norm(r)) - nv) < 1e-9, 'ランダム方向のノルムが ‖v̂‖ に合っていない（裁定 D90）'
-    # (2) **合成の検査**（実装検分の採否表 P257）: 加わる量のノルムが v 腕とランダム腕で全係数・全層で一致する
+    # (2) **合成の検査**（裁定 D102・採否表 P306・P310）: 加わる量のノルムが
+    #     **全方向（v̂・Nk・td・(6b)・ランダム方向） × 全係数 × 全層**で一致する。
+    #     前は v 腕とランダム腕の対しか回さなかったため、交差族と S4 の反証に同じ穴が残った。
+    raw = {'Nk': rng.normal(size=32) * 7.0, 'td': rng.normal(size=32) * 0.2, 'loaded': rng.normal(size=32) * 3.5}
+    others = {k: match_to_static(w, v) for k, w in raw.items()}      # 方向を作る器が合わせたものを模す
+    n_checked = 0
     for coef in T['selection']['candidates']['coefficients']:
         for ratio in T['selection']['candidates']['layers']:
-            r = random_directions(v, 'main', ratio)[0]
             a_v = np.linalg.norm(apply_vector(np.zeros(32), v, coef, +1))
-            a_r = np.linalg.norm(apply_vector(np.zeros(32), r, coef, +1))
-            assert abs(a_v - a_r) < 1e-9, ('加わる量が v 腕とランダム腕で違う（係数が二度掛かっていないか）', coef, ratio, a_v, a_r)
-    # (3) ほかの方向（Nk・td・(6b)）も ‖v̂‖ に合わせてから係数を掛ける
-    w = rng.normal(size=32) * 7.0
-    assert abs(float(np.linalg.norm(match_to_static(w, v))) - nv) < 1e-9
+            cand = dict(others)
+            for i, r in enumerate(random_directions(v, 'main', ratio)):
+                cand['rand:%d' % i] = r
+            for name, w in cand.items():
+                a_w = np.linalg.norm(apply_vector(np.zeros(32), w, coef, +1))
+                assert abs(a_v - a_w) < 1e-9, ('加わる量が v 腕と %s で違う（係数が二度掛かっていないか）' % name, coef, ratio, a_v, a_w)
+                n_checked += 1
+    assert n_checked == len(T['selection']['candidates']['coefficients']) * len(T['selection']['candidates']['layers']) * (len(raw) + N_RAND)
+    # (3) 合わせる器そのもの
+    assert abs(float(np.linalg.norm(match_to_static(rng.normal(size=32) * 7.0, v))) - nv) < 1e-9
     # (4) 引き直し（裁定 D84）と層ごとの子ストリーム（係数は入れない・採否表 P285）
     a1 = random_directions(v, 'tune', 0.5)[0]
     a2 = random_directions(v, 'main', 0.5)[0]
@@ -161,11 +194,45 @@ def _selftest():
     assert np.allclose(apply_vector(h, v, 0.5, -1) - h, -0.5 * v)
     # (7) 品質床の採点と生成（transformers の引数名で出す・採否表 P286）
     assert score_quality('A', 'a', False) and not score_quality('A', 'B', False) and not score_quality('A', 'A', True)
-    qg, mg = quality_generation(), main_generation()
-    assert qg['do_sample'] is False and 'temperature' not in qg, '品質床が貪欲でない'
+    try:
+        qg = quality_generation()
+    except SystemExit as e:
+        qg = None
+        assert '最大トークン数' in str(e), '品質床の生成の設定が、別の理由で止まっている: %s' % e
+    mg = main_generation()
+    if qg is not None:
+        assert qg['do_sample'] is False and 'temperature' not in qg, '品質床が貪欲でない'
+        assert 'max_new_tokens' in qg, '品質床の最大トークン数が黙って落ちている（裁定 D103）'
     assert set(mg) <= {'do_sample', 'temperature', 'top_p', 'max_new_tokens'}, '生成の設定に transformers が知らない鍵が混ざる'
     assert mg['max_new_tokens'] == T['runner']['generation']['max_tokens'] and mg['temperature'] == T['runner']['generation']['temperature']
-    print('[steer_B selftest] ノルム合わせ（合成の検査つき）・引き直し・層の子ストリーム・割り当てと再開・加減の向き・生成の設定: すべて通った')
+        # (8) **帯の起点**（裁定 D101・採否表 P305）: 実トークナイザがあれば、起点のトークンを復号して場面本文の先頭に一致することを確かめる
+    band = _selftest_band()
+    print('[steer_B selftest] 全方向 × 全係数 × 全層の合成 %d 通り・引き直し・層の子ストリーム・割り当てと再開・加減の向き・生成の設定・%s: すべて通った'
+          % (n_checked, band))
+
+
+def _selftest_band(model_dir=None):
+    """帯の起点の自己検査（正本 `runner.chat_template`・裁定 D101）。
+
+    **前置きを持つ腕と持たない腕の両方**で、起点のトークンを復号して場面本文の先頭に一致することを確かめる。
+    トークナイザが手元に無ければ、その旨を返して飛ばす（実機の段では必ず走らせる）。"""
+    try:
+        from transformers import AutoTokenizer
+    except Exception:
+        return '帯の起点（トークナイザが無いので飛ばした）'
+    src = model_dir or os.environ.get('OP4B_TOKENIZER_DIR')
+    if not src:
+        return '帯の起点（OP4B_TOKENIZER_DIR が無いので飛ばした）'
+    tok = AutoTokenizer.from_pretrained(src)
+    scen, inst = '場面の本文がここから始まる。', '\n\n指示。'
+    body_first = tok(scen + inst, add_special_tokens=False)['input_ids'][0]
+    n_ok = 0
+    for arm_text in ('前置きがここにある。', ''):            # 前置きを持つ腕と持たない腕
+        st = scenario_start_index(tok, arm_text, scen, inst, 0)
+        ids = apply_chat(tok, _user_message(arm_text, scen, inst))
+        assert ids[st] == body_first, ('起点のトークンが場面本文の先頭でない', arm_text[:8], st, tok.decode([ids[st]]))
+        n_ok += 1
+    return '帯の起点（実トークナイザで %d 通り・起点のトークンを復号して照合）' % n_ok
 
 
 if __name__ == '__main__':

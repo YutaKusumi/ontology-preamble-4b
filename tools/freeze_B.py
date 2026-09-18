@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v2 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v3 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
 
 凍結するもの（正本 `publication.record_first`・草案8B §2.11）:
   凍結本文（草案）・正本 `design/contrasts-B.json`・腕と方向の定義・器材・報告の雛形・**封印予想**。
@@ -18,7 +18,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -85,38 +85,46 @@ else:
         blockers.append('封印の無い確証の対比: %s' % '・'.join(missing_seal))
     if not SEAL.get('s4'):
         blockers.append('**S4 の反証の封印が無い**（正本 seal_format.scope は確証の族と S4 の両方を対象にする）')
-    for f in T['seal_format']['fields']:
-        pass
-    for need in ('information_state', 'timing', 'who'):
+    # **正本の鍵の登録から見る**（手書きの並びを置かない・裁定 D115・採否表 P328）
+    for need, label in sorted(T['seal_format']['record_keys'].items()):
+        if need in ('signs', 's4'):
+            continue                      # 上で別に見ている
         if not SEAL.get(need):
-            blockers.append('封印の記録に欄が無い: %s（seal_format.fields）' % need)
+            blockers.append('封印の記録に欄が無い: %s（%s・seal_format.record_keys）' % (need, label))
+# 整備の記録に載る SHA16 が現物と一致するかを見る（実装検分の採否表 P299——古い記録のまま凍結しない）。
+# **止める門の前に置く**（裁定 D112・採否表 P321）。前は門の後ろにあったので、古い記録だけのときに
+# 記録が書かれ、しかも「点検であり凍結ではない」と事実でないことを書いていた。
+import re as _re
+rec_path = os.path.join(REPO, 'records', 'B', 'tooling-record-B-2026-09-18.md')
+stale, unlisted = [], []
+if os.path.exists(rec_path):
+    _txt = open(rec_path, encoding='utf-8').read()
+    _listed = dict(_re.findall(r'`tools/([\w.]+)` \| [^|]*\| ([0-9A-F]{16})', _txt))
+    for _name, _sha in _listed.items():
+        _p = os.path.join(REPO, 'tools', _name)
+        if os.path.exists(_p) and runs_B.sha16_file(_p) != _sha:
+            stale.append(_name)
+    unlisted = [t for t in TOOLS if t not in _listed]
+if stale:
+    blockers.append('器材の整備の記録の SHA16 が現物と違う（記録を作り直してから凍結する）: %s' % '・'.join(stale))
+if unlisted:
+    blockers.append('器材の整備の記録に載っていない器材がある（記録に足す）: %s' % '・'.join(unlisted))
+
 if blockers and not a.allow_missing:
     print('[freeze_B] 凍結できない（--allow-missing は点検用）:')
     for b in blockers:
         print('  - ' + b)
     sys.exit(1)
 
-# 整備の記録に載る SHA16 が現物と一致するかを見る（実装検分の採否表 P299——古い記録のまま凍結しない）
-import re as _re
-rec_path = os.path.join(REPO, 'records', 'B', 'tooling-record-B-2026-09-18.md')
-stale = []
-if os.path.exists(rec_path):
-    _txt = open(rec_path, encoding='utf-8').read()
-    for _name, _sha in _re.findall(r'`tools/([\w.]+)` \| [^|]*\| ([0-9A-F]{16})', _txt):
-        _p = os.path.join(REPO, 'tools', _name)
-        if os.path.exists(_p) and runs_B.sha16_file(_p) != _sha:
-            stale.append(_name)
-if stale:
-    blockers.append('器材の整備の記録の SHA16 が現物と違う（記録を作り直してから凍結する）: %s' % '・'.join(stale))
-
 REC = {'kind': 'freeze_B', 'version': VERSION, 'frozen_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'), 'frozen_jst': jst.strftime('%Y-%m-%d %H:%M'),
        'frozen': frozen, 'values': VALUES, 'seal': SEAL, 'seal_sha256': (None if not a.seal else __import__('hashlib').sha256(open(a.seal, 'rb').read()).hexdigest().upper()),
-       'stale_record_hashes': stale, 'blockers': blockers, 'deviations': [],
+       'stale_record_hashes': stale, 'unlisted_tools': unlisted, 'blockers': blockers, 'deviations': [],
        'deviation_rule': T['deviation']['rule'], 'record_first': T['publication']['record_first']}
 json.dump(REC, open(out_json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 L = ['# 段階 B 凍結記録（機械生成・`tools/freeze_B.py` %s）' % VERSION, '',
      '- 凍結の時刻: %s UTC（日本時間 %s）。%s' % (now.strftime('%Y-%m-%d %H:%M'), jst.strftime('%Y-%m-%d %H:%M'),
-                                            '**点検（--allow-missing）であり凍結ではない**' if blockers else '凍結した。'), '',
+                                            ('**点検（--allow-missing）であり凍結ではない**' if a.allow_missing else
+                                             ('**止めているものがある——凍結していない**' if blockers else '凍結した。'))), '',
      '## 凍結物', '', '| 物 | 置き場 | SHA16 |', '|---|---|---|']
 for k in ('canon', 'draft', 'facts', 'report_template'):
     L.append('| %s | `%s` | %s |' % (k, frozen[k]['path'], frozen[k]['sha16']))

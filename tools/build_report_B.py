@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build_report_B.py v2 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
+"""build_report_B.py v3 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
 
 雛形の〔結果 X〕を、機械の区画で置き換える:
   A 要約／B 走行の記録（整合検査・抽出検査・セッション）／C 門1 と選定／D 確証の族の表／E 封印した符号との照合／
@@ -14,7 +14,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--analysis', required=True)
@@ -26,6 +26,7 @@ ap.add_argument('--force-problems', action='store_true', help='整合検査に�
 ap.add_argument('--template', default=os.path.join(REPO, 'records', 'B', 'results-report-template-B.md'))
 ap.add_argument('--out', default=None)
 ap.add_argument('--force', action='store_true')
+ap.add_argument('--lint', action='store_true', help='組み立ての後に報告の走査器（tools/report_lint.py）を走らせる（裁定 D112・採否表 P320）')
 a = ap.parse_args()
 T = runs_B.load_T()
 A = runs_B.read_json(a.analysis)
@@ -82,6 +83,23 @@ C_gate = block(['```',
                 (G['selection'].get('tie_note') or ''), (G['selection'].get('nonpositive_stop') or ''),
                 '```'])
 fmt_p = lambda x: ('—' if x is None else ('%.3g' % x if x >= 1e-5 else '<1e-5'))
+fmt_n = lambda x: ('—' if x is None else ('%g' % round(float(x), 4)))      # 丸めない浮動小数を報告に出さない（採否表 P328）
+
+# **雛形の数を正本から組み直して突き合わせる**（裁定 D112・採否表 P319）。
+_src = os.path.splitext(a.template)[0] + '.src.md'
+if os.path.exists(_src):
+    import subprocess, tempfile as _tf, shutil as _sh
+    _d = _tf.mkdtemp(prefix='tplchk_')
+    try:
+        _o, _l = os.path.join(_d, 't.md'), os.path.join(_d, 'l.md')
+        _rc = subprocess.run([sys.executable, os.path.join(REPO, 'tools', 'build_draftB.py'), '--kind', 'template',
+                              '--src', _src, '--out', _o, '--label', '報告雛形', '--lint-report', _l],
+                             capture_output=True, text=True, encoding='utf-8').returncode
+        if _rc == 0 and runs_B.sha16_file(_o) != runs_B.sha16_file(a.template):
+            sys.exit('雛形が正本から組み直した版と違う（正本が動いた後に雛形を組み直していない・裁定 D112）: '
+                     '現物 %s / 組み直し %s' % (runs_B.sha16_file(a.template), runs_B.sha16_file(_o)))
+    finally:
+        _sh.rmtree(_d, ignore_errors=True)
 rows = ['| 対比 | 場面 | 破局 A/n | 破局 B/n | 書式外 A／B | refuse A／B | pt 差 | 区間 | p | 様式の差 | 札 | 注 |',
         '|---|---|---|---|---|---|---|---|---|---|---|---|']
 for r in A['confirm']:
@@ -90,7 +108,7 @@ for r in A['confirm']:
         continue
     rows.append('| %s | %s | %d/%d | %d/%d | %s／%s | %s／%s | %s | %s | %s | %s | %s | %s |'
                 % (r['id'], r['scenario'], r['k_A'], r['n_ok_A'], r['k_B'], r['n_ok_B'],
-                   r.get('ff_pt_A'), r.get('ff_pt_B'), r.get('refuse_pt_A'), r.get('refuse_pt_B'),
+                   fmt_n(r.get('ff_pt_A')), fmt_n(r.get('ff_pt_B')), fmt_n(r.get('refuse_pt_A')), fmt_n(r.get('refuse_pt_B')),
                    r['diff_pt'], r['ci'], fmt_p(r.get('p')), r.get('style_diff_pt'), r['label'],
                    '・'.join(r.get('notes') or [])))
 D_conf = block(rows)
@@ -132,4 +150,18 @@ tpl += '\n\n## 11. 組み立ての記録（機械）\n\n- 器 `tools/build_repor
     os.path.relpath(a.analysis, REPO).replace('\\', '/'), runs_B.sha16_file(a.analysis),
     os.path.relpath(a.gate, REPO).replace('\\', '/'), runs_B.sha16_file(a.gate))
 open(out_md, 'w', encoding='utf-8', newline='\n').write(tpl)
+if a.lint:
+    # **報告の走査器を走らせる**（裁定 D112・採否表 P320）。前は口上が持つと書いて argparse に口が無かった。
+    import subprocess
+    lint = os.path.join(REPO, 'tools', 'report_lint.py')
+    if not os.path.exists(lint):
+        sys.exit('報告の走査器が無い: tools/report_lint.py')
+    side = os.path.splitext(out_md)[0] + '-machine.json'
+    cmd = [sys.executable, lint, out_md, '--contrasts', runs_B.CPATH, '--template', a.template]
+    if os.path.exists(side):
+        cmd += ['--sidecar', side]
+    rcl = subprocess.run(cmd).returncode
+    if rcl != 0:
+        sys.exit('報告の走査器が違反を出した（終了コード %d）' % rcl)
+
 print('[build_report_B] %s' % out_md)
