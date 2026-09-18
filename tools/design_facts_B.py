@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""design_facts_B.py v5 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+"""design_facts_B.py v6 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
 v3 からの変更（検分の二段目・四票の採否 P212〜P256・裁定 D75〜D86）: 転記行 C に**選定 × 確証の合成検出力**（採否表 P229）と、抽出場面を二層に分けない前提の但し書き（P245）、
 同点の割り方を正本の登録（無作為・selection.tie_break）に合わせた模擬を置く（P228）。転記行 D に **S4 の反証の検出力**と三分岐の線（裁定 D81）を足す。
 転記行 E に二標本で比べる旨と相手の共有の注（P256）、転記行 I に「全腕」の意味と内訳（P256）と決定性の検査で二度保存する容量（P235）を足す。費用の停止の倍率は正本 `cost` から引く（P251）。
@@ -15,6 +15,7 @@ import numpy as np
 from scipy.stats import fisher_exact, binom
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vprime_power import make_power
+import runs_B                      # 同値の帯は門と同じ関数を呼ぶ（裁定 D119）
 
 
 def make_power_cached(n):
@@ -132,8 +133,13 @@ base_tune = sum(bx[sc]['Onull']['k'] for sc in EX) / sum(bx[sc]['Onull']['n'] fo
 se_single = 100 * math.sqrt(2 * base_tune * (1 - base_tune) / tune_n)        # 一つの候補の低下幅の標準誤差
 se_diff = 100 * math.sqrt(4 * base_tune * (1 - base_tune) / tune_n)          # 候補どうしの差の標準誤差（採否表 P191）
 z = 1.96
-band_pt = z * se_diff
 REPS = 20000
+# **帯は門と同じ模擬で出す**（裁定 D119・2026-09-18）。前は素の区間の式（z × 候補どうしの差の標準誤差）で
+# ±13.8 pt を印字し、しかも**正本の鍵の名を出典に付けていた**。正本の当該の条はその式を「採らない」と明記しており、
+# 門の模擬は 21.5 pt を出す（系統外の検分で捕まった・採否表 P339）。
+_band = runs_B.equivalence_band(tune_n, tune_n, base_tune, T['selection']['candidates']['count'],
+                                reps=REPS, seed=[T['seeds']['tiebreak'] + 1, 0])
+band_pt = _band['q95_pt']
 CANDS = T['selection']['candidates']['count']
 D_PICK = 10.0                                                               # 模擬に置く真の低下幅（設計の値ではない）
 
@@ -156,8 +162,10 @@ positions = (0, CANDS // 2, CANDS - 1)
 picks = {pos: pick_prob(pos) for pos in positions}
 p_mid, half_mid = picks[CANDS // 2]
 p_flat = 1.0 / CANDS
-F['C'] = {'text': '選定の雑音と同値の帯（層 × 係数の %d 候補・調整走行は腕あたり n=%d〔n=%d × 抽出場面 %d〕・基底は抽出場面の Onull の既測 %.3f）: 一つの候補の低下幅の標準誤差 %.1f pt・**候補どうしの差の標準誤差 %.1f pt**・同値の帯（%g%%）は差 ±%.1f pt（正本 selection.equivalence_band の量）。裁定 D68 の決め方（点推定が最大の候補を採る）で、真の低下幅が %.0f pt の候補が格子の中ほどにあるとき、それを選べる割合は %.3f（モンテカルロ %s 回・%g%% 区間 ±%.3f）。格子の位置による差は %s。全候補が同じ（帰無）なら %.3f（＝候補数の逆数）。**選定の低下幅は効果量ではない**（本走行の確証族だけが効果を言う・正本 selection.no_effect_size）。'
-          % (CANDS, tune_n, nt, len(T['selection']['tune']['scenarios']), base_tune, se_single, se_diff, 100 * T['selection']['equivalence_ci'], band_pt,
+F['C'] = {'text': '選定の雑音と同値の帯（層 × 係数の %d 候補・調整走行は腕あたり n=%d〔n=%d × 抽出場面 %d〕・基底は抽出場面の Onull の既測 %.3f）: 一つの候補の低下幅の標準誤差 %.1f pt・**候補どうしの差の標準誤差 %.1f pt**・**同値の帯（%g%%）は %.1f pt**（正本 `selection.equivalence_band` のとおり候補横断の最大統計量・門と同じ模擬・モンテカルロ %s 回・%g%% 区間 ±%.4f pt）。**素の区間の式なら ±%.1f pt** だが、正本はその式を「候補が九つある多重性を見ないので採らない」と明記している（裁定 D98・D119）。裁定 D68 の決め方（点推定が最大の候補を採る）で、真の低下幅が %.0f pt の候補が格子の中ほどにあるとき、それを選べる割合は %.3f（モンテカルロ %s 回・%g%% 区間 ±%.3f）。格子の位置による差は %s。全候補が同じ（帰無）なら %.3f（＝候補数の逆数）。**選定の低下幅は効果量ではない**（本走行の確証族だけが効果を言う・正本 selection.no_effect_size）。'
+          % (CANDS, tune_n, nt, len(T['selection']['tune']['scenarios']), base_tune, se_single, se_diff,
+             100 * T['selection']['equivalence_ci'], band_pt, format(REPS, ','), 100 * T['selection']['equivalence_ci'],
+             _band['mc_half_pt'], z * se_diff,
              D_PICK, p_mid, fmt(REPS), 100 * T['selection']['equivalence_ci'], half_mid,
              '・'.join('位置 %d で %.3f' % (pos, picks[pos][0]) for pos in positions), p_flat) +
           '同点は無作為に割る（正本 selection.tie_break）。**この行の雑音は抽出場面をまとめた一つの率で出しており、場面の二層（N1・S1）の違いを無視している**（採否表 P245）。'

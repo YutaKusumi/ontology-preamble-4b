@@ -30,6 +30,8 @@ ap.add_argument('--out', default=None)
 ap.add_argument('--force', action='store_true')
 ap.add_argument('--reps', type=int, default=20000)
 ap.add_argument('--allow-dry', action='store_true', help='検査用の口（dry-run の走行を読む・印を出力に残す）')
+ap.add_argument('--allow-no-sessions', action='store_true', help='検査用の口（セッション記録が無くても走る・裁定 D126）')
+ap.add_argument('--allow-missing-cells', action='store_true', help='検査用の口（登録された升目が欠けていても走る・裁定 D126）')
 a = ap.parse_args()
 T = runs_B.load_T(a.contrasts)
 SEL, QF, DG, CEN = T['selection'], T['quality_floor'], T['dilution_gate'], T['censor']
@@ -46,6 +48,21 @@ rate = runs_B.rate
 CT, idx_tune = runs_B.counts_tune(T, root=a.root, allow_dry=a.allow_dry)
 CQ, idx_q = runs_B.counts_quality(T, root=a.root, allow_dry=a.allow_dry)
 DRY = sorted({m for recs in list(idx_tune.values()) + list(idx_q.values()) for r in recs for m in r['dry_marks']})
+
+# ---- セッション記録（正本 sessions.enforced_by・裁定 D126・2026-09-18） ----
+# 正本は「門・集計器・整合検査の**三つ**が確かめる」と書いているのに、門は一度も読んでいなかった
+# （系統外の検分で、記録を丸ごと消しても判定 open・終了コード 0 で通ることが示された・採否表 P352）。
+_SESS = runs_B.sessions_by_run_key(runs_B.load_sessions(a.root))
+_miss = sorted({rec['run_key'] for recs in list(idx_tune.values()) + list(idx_q.values())
+                for rec in recs if rec['run_key'] not in _SESS})
+if _miss and not a.allow_no_sessions:
+    sys.exit('走行キーのセッション記録が無い（正本 sessions.missing_rule・裁定 D126）: %s%s。検査用は --allow-no-sessions'
+             % ('・'.join(_miss[:6]), ' ほか %d 件' % (len(_miss) - 6) if len(_miss) > 6 else ''))
+
+# ---- 登録された升目の欠け（裁定 D126・採否表 P362） ----
+# 調整走行の升目が欠けると候補は黙って選定から外れるが、判定は open のままだった。
+_want_tune = {(sc, l, c, arm) for sc in EX for (l, c) in CANDS for arm in (V_ARM, R_ARM)}
+_gap_tune = sorted(_want_tune - set(CT), key=str)
 
 
 def tune_pooled(layer, coef, arm):
@@ -79,6 +96,14 @@ for base in QF_ARMS:
         cell = next(iter(cells.values()), None)
         session = next(iter(cells), (None,) * 5)[4] if cells else None
         noop = partner('selection', base, session)
+        # **相手のセルに走行が二本以上あれば止める**（正本 sessions.partner_duplicate_rule・裁定 D126）。
+        # 鍵の種類は数えても鍵の中の本数は数えていなかったので、同じ番号の二本が黙って合算され、
+        # 分母が倍になって門1 が誤って閉じる形が残っていた（採否表 P361）。
+        if noop is not None and noop.get('n', 0) > QF['items']:
+            qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
+                          'note': '無操作の相手の試行が %d 件あり、登録の %d 件を超える（走行が二本以上ある・裁定 D126）'
+                                  % (noop.get('n', 0), QF['items'])})
+            continue
         if cell is None or noop is None:
             qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
                           'note': '走行の記録が無い（%s）' % ('セル' if cell is None else '同じセッションの相手')})
@@ -161,14 +186,10 @@ if gate1_open and elig:
     n_r = int(np.mean([r['n_ok_r'] for r in elig]))
     p0 = float(np.mean([(r['cat_v'] + r['cat_r']) / max(r['n_ok_v'] + r['n_ok_r'], 1) for r in elig]))
     k = len(elig)
-    sim_v = rng_band.binomial(n_v, p0, size=(a.reps, k)) / max(n_v, 1)
-    sim_r = rng_band.binomial(n_r, p0, size=(a.reps, k)) / max(n_r, 1)
-    eff = 100.0 * (sim_r - sim_v)
-    spread = eff.max(axis=1) - eff.min(axis=1)
-    q95 = float(np.quantile(spread, 0.95))
-    half = 1.96 * float(np.std(spread)) / math.sqrt(a.reps)
-    band = {'q95_pt': round(q95, 3), 'reps': a.reps, 'mc_half_pt': round(half, 4), 'null_rate': round(p0, 5),
-            'rule': '帰無（全候補が同じ）で、候補横断の最大と最小の差が %g 分位に収まる幅。最大の候補との差がこの幅の内側の候補を同値として一覧に出す（決め方には使わない）' % 0.95}
+    # **共有の関数を呼ぶ**（裁定 D119・2026-09-18）——転記行も同じ関数を呼ぶので、二つの値が食い違わない。
+    band = runs_B.equivalence_band(n_v, n_r, p0, k, reps=a.reps,
+                                   seed=[T['seeds']['tiebreak'] + 1, _tie_mix])
+    q95 = band['q95_pt']
     # **帯の境目に一致した候補は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P327）
     tied = [{'layer': r['layer'], 'coef': r['coef'], 'eff_pt': r['eff_pt'],
              'boundary': abs((best - r['eff_pt']) - q95) < 1e-9} for r in elig if (best - r['eff_pt']) <= q95]
@@ -189,8 +210,15 @@ lines.append(PS['selection_direction'])
 if stop:
     lines.append(PS['nonpositive'].format(eff=max((r['eff_pt'] for r in elig), default=None)))
 
+# **登録された升目の欠けも incomplete に倒す**（裁定 D126・採否表 P362）。
+# 前は調整走行の升目が欠けても判定は open のままで、最良の候補の置き場が欠けても選定が黙って変わった。
+if _gap_tune and not a.allow_missing_cells:
+    incomplete = True
 verdict = ('incomplete' if incomplete else ('closed' if not gate1_open else ('escalate' if (stop or not elig) else 'open')))
-if incomplete:
+if _gap_tune:
+    lines.insert(0, '調整走行の登録された升目が %d 件欠けている（場面 × 層 × 係数 × 腕）。'
+                    '**欠けた升目は候補を黙って選定から外す**ので、揃えてから判定する（裁定 D126）。' % len(_gap_tune))
+if incomplete and n_missing:
     lines.insert(0, '品質床の走行の記録が %d 候補ぶん欠けている。**記録の不在は「操作不能」ではない**——揃えてから門1 を判定する（採否表 P272）。' % n_missing)
 now = datetime.datetime.now(datetime.timezone.utc)
 jst = now.astimezone(datetime.timezone(datetime.timedelta(hours=9)))

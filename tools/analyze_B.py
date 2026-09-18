@@ -45,9 +45,18 @@ G = runs_B.read_json(a.gate) if a.gate else None
 if G and G.get('kind') != 'gate_B':
     sys.exit('門の記録の種類が違う: %s' % a.gate)
 SEAL = runs_B.read_json(a.seal) if a.seal else None
+SIGN_MAP = T['seal_format']['sign_map']          # 正本の語彙 → 集計器の記号（裁定 D121）
+SIGN_VALUES = set(T['seal_format']['sign_values'])
 SEAL_MISSING = []
 if SEAL is not None:
     _conf_ids = [c['id'] for F in T['families'].values() for c in F['contrasts']]
+    # **列挙として検べる**（裁定 D121）——正本に無い語で封印されていたら止まる
+    _bad = sorted({v for v in (SEAL.get('signs') or {}).values() if v not in SIGN_VALUES})
+    if _bad:
+        sys.exit('封印の予想符号が正本の一覧に無い（正本 seal_format.sign_values・裁定 D121）: %s（使える語: %s）'
+                 % ('・'.join(map(str, _bad)), '・'.join(sorted(SIGN_VALUES))))
+    if SEAL.get('s4') is not None and SEAL['s4'] not in SIGN_VALUES and not a.allow_partial_seal:
+        sys.exit('S4 の反証の封印が正本の一覧に無い（裁定 D121）: %s' % SEAL['s4'])
     SEAL_MISSING = [i for i in _conf_ids if i not in (SEAL.get('signs') or {})]
     if SEAL_MISSING and not a.allow_partial_seal:
         sys.exit('封印の記録が確証の全対比を持っていない（裁定 D79・seal_format.scope）: 欠け %d 件。検査用は --allow-partial-seal' % len(SEAL_MISSING))
@@ -256,11 +265,12 @@ def apply_style_gate(row):
 RES, FAMROWS = {}, []
 for famkey, F in T['families'].items():
     rows = [analyse_contrast(famkey, c, 0.05) for c in F['contrasts']]
-    # Holm（族ごと・m は減らさない・降格した対比も順位に含める）
-    # **降格した対比は順位に含めない**（裁定 D93）。m は登録値のまま減らさない。
-    # 降格した対比は順位に含めない（裁定 D93）。ただし**様式門の保留は確証の札にのみ作用する**ので、順位からは外さない（裁定 D94）。
+    # Holm（族ごと・m は減らさない）。**降格・保留になった対比は順位に含めない**（裁定 D93）。
+    # **様式門の保留も外す**（裁定 D125・2026-09-18）——前は「様式門は確証の札にのみ作用する」（裁定 D94）を
+    # 理由に順位に残していたが、残すと次の対比の閾値が α/m から α/(m−1) に**緩む**（確証が出やすい側）。
+    # 標準の Holm としては FWER が保たれるので、これは FWER のための規則ではなく**保守の選択**である。
     _hard = lambda r: [g for g in (r.get('fired') or []) if g != '判定保留（様式転位）']
-    ordered = sorted([r for r in rows if r.get('p') is not None and not _hard(r)], key=lambda r: r['p'])
+    ordered = sorted([r for r in rows if r.get('p') is not None and not (r.get('fired') or [])], key=lambda r: r['p'])
     m = F['m']
     passed = True
     for i, r in enumerate(ordered):
@@ -269,18 +279,26 @@ for famkey, F in T['families'].items():
         r['holm_pass'] = passed and (r['p'] < step)
         passed = r['holm_pass']
     for r in rows:
-        if r.get('label') == '確証' and not r.get('holm_pass'):
-            r['label'] = '非有意'
-        if r.get('label') == '確証' and r.get('style_hold'):
+        if r.get('style_hold') and not _hard(r):
+            # 順位から外したので Holm の判定を持たない。**札は様式転位**（非有意に落とさない・裁定 D125）。
             r['label'] = '判定保留（様式転位）'
-        elif r.get('label') == '確証':
-            apply_style_gate(r)
+        else:
+            if r.get('label') == '確証' and not r.get('holm_pass'):
+                r['label'] = '非有意'
+            if r.get('label') == '確証':
+                apply_style_gate(r)
         if len(r.get('fired') or []) > 1:
             r['notes'].append('当たった門: ' + '・'.join(r['fired']))
-        if r['scenario'] in CHART_SC:      # **管理図の異常を確証札の注に伝える**（正本 calibration.consequence・裁定 D110）
+        # **異常のあった走行を含む対比だけに注を付ける**（裁定 D130・採否表 P381）。
+        # 前は場面が一致するだけで全対比に付いていた。
+        _bad_arms = {x.get('arm') for x in CHART_BAD if x.get('scenario') == r['scenario']}
+        if _bad_arms & {r['A'].split('+v')[0].split('-v')[0], r['B'].split('+v')[0].split('-v')[0]}:
             r['notes'].append('管理図: この場面の無操作の腕が帯を外れた走行がある（%s）' % CHART_NOTE[:24])
         if r.get('label') == '確証' and SEAL:
-            want = (SEAL.get('signs') or {}).get(r['id'])
+            # **封印の符号は正本の語彙で書かれる**（裁定 D121・2026-09-18）。集計器が内部で使う記号へは
+            # 正本の対応表（`seal_format.sign_map`）で写す。前は語彙が二通りあり、正本どおりに封印すると
+            # **確証がすべて「登録された向きと逆」になった**（実際に通して確かめた・採否表 P342）。
+            want = SIGN_MAP.get((SEAL.get('signs') or {}).get(r['id']))
             r['sealed_sign'] = want
             if want and want != r['sign']:
                 r['label'] = '確証（登録された向きと逆）'

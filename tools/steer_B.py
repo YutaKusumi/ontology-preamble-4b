@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""steer_B.py v3 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床・強制デコード）。
+"""steer_B.py v4 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床・強制デコード）。
 
 正本 `design/contrasts-B.json` の `selection.apply`・`random_control`・`quality_floor`・`runner` に従う。
 規則（この器が守るもの）:
@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v3'
+VERSION = 'v4'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 RC = T['random_control']
@@ -84,22 +84,17 @@ def apply_chat(tokenizer, user_message):
                                               add_generation_prompt=True, tokenize=True))
 
 
-def scenario_start_index(tokenizer, arm_text, scen_text, instruction, pad_len=0, probe=8):
-    """介入の帯の**起点**（正本 `selection.apply`・`runner.chat_template`・裁定 D101）。
+def scenario_start_index(tokenizer, arm_text, scen_text, instruction, pad_len=0):
+    """介入の帯の**起点**＝**主位置（プロンプトの最終トークン）**（正本 `selection.apply`・裁定 D124・2026-09-18）。
 
-    **組み立て済みのトークン列の中で場面の本文が始まる位置**を引く（前置きの長さを別に数えない）。
-    前は「前置き ＋ 空行」のトークン数だけを数えており、chat template の頭のぶん（登録機種では三トークン）だけ
-    帯が手前から始まっていた——前置きを持たない腕では役割トークンそのものに掛かっていた（採否表 P305）。
-    左詰めのバッチでは行ごとに詰めの長さ pad_len だけずれるので、**行ごとに**求める（採否表 P258）。"""
-    body = (scen_text or '') + (instruction or '')
+    裁定 D124 で帯を「場面本文の開始から」ではなく「主位置から EOS まで」に狭めた。
+    抽出した場所と加える場所を一致させるためであり、**狭めて落ちるのは prefill の場面本文の位置だけ**
+    （選択が作られる復号の段はすべて掛かる）。
+    左詰めのバッチでは、詰めの長さに関わらず**最終トークンは列の最後の位置**にある。
+    pad_len は左詰めの詰めの長さ（この式では結果に効かないが、呼び手の意図を明示するために受ける）。
+    """
     ids = apply_chat(tokenizer, _user_message(arm_text, scen_text, instruction))
-    want = tokenizer(body, add_special_tokens=False)['input_ids'][:probe]
-    if not want:
-        raise SystemExit('場面の本文が空で起点を引けない')
-    for i in range(len(ids) - len(want) + 1):
-        if ids[i:i + len(want)] == want:
-            return pad_len + i
-    raise SystemExit('組み立て済みの列の中に場面の本文の先頭が見つからない（腕の本文か指示の出所を確かめる）')
+    return pad_len + len(ids) - 1
 
 
 def _user_message(arm_text, scen_text, instruction):
@@ -109,8 +104,23 @@ def _user_message(arm_text, scen_text, instruction):
 
 
 def band_starts(tokenizer, arm_texts, scen_text, instruction, pad_lens):
-    """バッチの行ごとの起点（`make_hook` に渡す）。"""
+    """バッチの行ごとの起点（`make_hook` に渡す）。
+
+    正本 `selection.batch_composition` により**一つのバッチは一つの場面 × 一つの腕**なので、
+    詰めは起きず、全行が同じ起点になる。式は一般のまま置き、器が取り決めを守っているかを
+    `assert_batch_uniform` で確かめる。
+    """
     return [scenario_start_index(tokenizer, t, scen_text, instruction, p) for t, p in zip(arm_texts, pad_lens)]
+
+
+def assert_batch_uniform(arm_texts, scenarios=None):
+    """**一つのバッチは一つの場面 × 一つの腕**（正本 `selection.batch_composition`・裁定 D124）。"""
+    if len(set(arm_texts)) > 1:
+        raise SystemExit('バッチに複数の腕が混ざっている（正本 selection.batch_composition・裁定 D124）: %d 種'
+                         % len(set(arm_texts)))
+    if scenarios is not None and len(set(scenarios)) > 1:
+        raise SystemExit('バッチに複数の場面が混ざっている（正本 selection.batch_composition・裁定 D124）: %d 種'
+                         % len(set(scenarios)))
 
 
 def _to_hf(g, greedy):
@@ -212,27 +222,42 @@ def _selftest():
 
 
 def _selftest_band(model_dir=None):
-    """帯の起点の自己検査（正本 `runner.chat_template`・裁定 D101）。
+    """帯の起点の自己検査（正本 `runner.chat_template`・`selection.apply`・裁定 D122）。
 
-    **前置きを持つ腕と持たない腕の両方**で、起点のトークンを復号して場面本文の先頭に一致することを確かめる。
-    トークナイザが手元に無ければ、その旨を返して飛ばす（実機の段では必ず走らせる）。"""
+    **独立の正解と照らす**（裁定 D122）——起点を求めるのに使った経路とは別に、
+    組み立て済みの列を自分で作って最後の位置を取り、二つが一致することを確かめる。
+    さらに、その位置のトークンを**復号して**、組み立て済みの列の最終トークンと文字列で一致することを見る。
+    左詰めのバッチでも、詰めを入れた列の中で同じ位置が最終トークンを指すことを確かめる。
+    前の版は、起点を探すのに使ったトークンでそのまま照合していたので**恒真**だった。
+    """
     try:
         from transformers import AutoTokenizer
     except Exception:
-        return '帯の起点（トークナイザが無いので飛ばした）'
+        return '帯の起点（**飛ばした**——transformers が無い）'
     src = model_dir or os.environ.get('OP4B_TOKENIZER_DIR')
     if not src:
-        return '帯の起点（OP4B_TOKENIZER_DIR が無いので飛ばした）'
+        return '帯の起点（**飛ばした**——OP4B_TOKENIZER_DIR が無い）'
     tok = AutoTokenizer.from_pretrained(src)
     scen, inst = '場面の本文がここから始まる。', '\n\n指示。'
-    body_first = tok(scen + inst, add_special_tokens=False)['input_ids'][0]
     n_ok = 0
-    for arm_text in ('前置きがここにある。', ''):            # 前置きを持つ腕と持たない腕
-        st = scenario_start_index(tok, arm_text, scen, inst, 0)
+    for arm_text in ('前置きがここにある。', ''):
         ids = apply_chat(tok, _user_message(arm_text, scen, inst))
-        assert ids[st] == body_first, ('起点のトークンが場面本文の先頭でない', arm_text[:8], st, tok.decode([ids[st]]))
+        want = len(ids) - 1                                   # **独立の正解**（器を通さずに作る）
+        got = scenario_start_index(tok, arm_text, scen, inst, 0)
+        assert got == want, ('起点が独立の正解と違う', arm_text[:8], got, want)
+        assert tok.decode([ids[got]]) == tok.decode([ids[-1]]), '起点のトークンが最終トークンでない'
+        for pad in (0, 5, 37):                                # 左詰めの詰めを入れても最終トークンを指すか
+            padded = [tok.pad_token_id or 0] * pad + ids
+            st = scenario_start_index(tok, arm_text, scen, inst, pad)
+            assert padded[st] == ids[-1], ('詰めを入れると起点がずれる', pad, st)
         n_ok += 1
-    return '帯の起点（実トークナイザで %d 通り・起点のトークンを復号して照合）' % n_ok
+    assert_batch_uniform(['a', 'a', 'a'])
+    try:
+        assert_batch_uniform(['a', 'b'])
+        raise AssertionError('腕が混ざったバッチを止めていない（裁定 D124）')
+    except SystemExit:
+        pass
+    return '帯の起点（実トークナイザ・独立の正解と照合・詰め三通り・腕の混在を止めることも確かめた）'
 
 
 if __name__ == '__main__':
@@ -243,4 +268,4 @@ if __name__ == '__main__':
         _selftest()
         sys.exit(0)
     sys.exit('この器は GPU の上の走行器から import して使う（手元の検査は --selftest）。'
-             '走行の組み立て（場面の本文・hook の登録・バッチ）は `boot_stageB.py` の側にある。')
+             '走行の組み立て（場面の本文・hook の登録・バッチ）は走行器 `tools/run_stageB_local.py` の側にある。')

@@ -135,8 +135,15 @@ def check_cell(rec):
         problems.append('%s: バッチ %s が設計定数（%s）と違う' % (rk, m['batch'], T['runner']['batch']))
     if m.get('padding') and m['padding'] not in ('left',):
         problems.append('%s: 詰めの向きが左でない（正本 runner.padding）: %s' % (rk, m['padding']))
-    if PHASE == 'main' and rk not in sessions:
-        problems.append('%s: セッション記録が無い（sessions.missing_rule）' % rk)
+    # **全相で確かめる**（裁定 D126・2026-09-18）。前は本走行の相にしか掛かっておらず、
+    # 調整走行・品質床・同一性選別では記録を丸ごと消しても零件だった（系統外の検分で走らせて捕まった・採否表 P352）。
+    if rk not in sessions:
+        problems.append('%s: セッション記録が無い（正本 sessions.missing_rule・裁定 D126）' % rk)
+    else:
+        _s = sessions[rk][0] if isinstance(sessions[rk], list) else sessions[rk]
+        if m.get('session') is not None and _s.get('session') is not None and m['session'] != _s['session']:
+            problems.append('%s: manifest のセッション番号（%s）が記録（%s）と違う（裁定 D126）'
+                            % (rk, m['session'], _s['session']))
     if rec['dry_marks']:
         notes.append('%s: dry-run の印（%s）' % (rk, '・'.join(rec['dry_marks'])))
 
@@ -184,13 +191,19 @@ if set(ALLOW) & set(BLIND):
     problems.append('許可表に判定欄が混ざっている: %s' % '・'.join(sorted(set(ALLOW) & set(BLIND))))
 
 # ---- 走行を跨いだ同一性（runner.fixed_across_runs・採否表 P274） ----
-FIX_KEYS = {'重みの rev': 'model_rev', 'tokenizer の版': 'tokenizer_rev', 'transformers の版': 'versions', 'バッチの大きさと並べ方': 'batch'}
+# **manifest に実在する欄で見る**（裁定 D126・2026-09-18）。`versions` はセッション記録の欄であって
+# manifest には無いので、この検査は**常に飛んでいた**（系統外の検分で捕まった・採否表 P363）。
+# あわせて、値が空のときも黙って飛ばさず不整合に数える。
+FIX_KEYS = {'重みの rev': 'model_rev', 'tokenizer の版': 'tokenizer_rev', 'バッチの大きさ': 'batch',
+            '詰めの向き': 'padding', '走行器の SHA': 'runner_sha', '環境の SHA': 'pip_freeze_sha16'}
 seen = {}
 for k, recs in idx.items():
     for rec in recs:
         for name, mk in FIX_KEYS.items():
             v = rec['manifest'].get(mk)
             if v is None:
+                problems.append('%s: 走行を跨いで同一であるべき欄が manifest に無い（%s・正本 runner.fixed_across_runs・裁定 D126）'
+                                % (rec['run_key'], mk))
                 continue
             seen.setdefault(name, {}).setdefault(json.dumps(v, ensure_ascii=False, sort_keys=True), []).append(rec['run_key'])
 for name, vals in seen.items():

@@ -32,9 +32,13 @@ if os.path.exists(out_md) and not a.force:
 PATHS = ['確証', '確証（登録された向きと逆）', '封印した符号と一致', '判定不能（検閲）', '判定不能（採点欠落）', '判定不能（測れなかった）',
          '判定保留（書式外転位）', '判定保留（refuse 転位・差）', '判定保留（refuse 転位）', '判定保留（様式転位）', '注（様式）',
          '判定不能（品質床）', '非有意', '門1 を閉じる', '記録の不在（incomplete）', '全候補が非正', '同点の割り方',
-         '床・天井で選定から外す', 'S4: 下がった（外れ）', 'S4: 下がらなかった（当たり）', 'S4: 当否を言わない', 'S4: 余地の条項',
+         '床・天井で選定から外す', 'S4: 下がった（外れ）', 'S4: 上がった（当たり）', 'S4: 下がらなかった（当たり）', 'S4: 当否を言わない', 'S4: 余地の条項',
          '希釈が効く場面（書式外が分子を食う）', '採点の規約（書式外と refuse に判定を付けない）', '門が開いていないと集計器が止まる', '束縛の食い違いで集計器が止まる',
          '中断と再開', '同一性選別の走行', '未測定（ループ・打ち切り）', '封印の欠けで止まる']
+_s4_labels = T['descriptive_families']['B_desc_S4']['three_way']['labels']
+_s4_paths = [p for p in PATHS if p.startswith('S4: ')]
+assert len(_s4_paths) == len(_s4_labels) + 1, (
+    '経路の表の S4 の枝が正本の札と合わない（余地の条項の一つを足した数になるはず）', _s4_paths, _s4_labels)
 fired = {k: [] for k in PATHS}
 rows = []
 
@@ -44,7 +48,7 @@ def run(cmd):
     return r.returncode, (r.stdout or '') + (r.stderr or '')
 
 
-for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', 'scoring_gap', 's4_branches', 's4_floor', 'dilution_causal', 'incomplete'):
+for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', 'scoring_gap', 's4_branches', 's4_up', 's4_floor', 'dilution_causal', 'incomplete'):
     root = os.path.join('results', '_synth', case)
     rc, out = run(['tools/synth_B.py', '--case', case, '--out-root', root])
     assert rc == 0, out
@@ -97,7 +101,8 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             if any('注（様式' in n for n in (r.get('notes') or [])):
                 fired['注（様式）'].append(case)
         v4 = A['s4'].get('verdict') or ''
-        for nm, key in (('S4: 下がった（外れ）', '下がった'), ('S4: 下がらなかった（当たり）', '下がらなかった'),
+        for nm, key in (('S4: 下がった（外れ）', '下がった'), ('S4: 上がった（当たり）', '上がった'),
+                        ('S4: 下がらなかった（当たり）', '下がらなかった'),
                         ('S4: 当否を言わない', '当否を言わない'), ('S4: 余地の条項', '余地の条項')):
             if key in v4:
                 fired[nm].append('%s（%s）' % (case, v4))

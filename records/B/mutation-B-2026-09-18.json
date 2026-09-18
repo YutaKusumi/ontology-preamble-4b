@@ -1,0 +1,144 @@
+{
+ "kind": "mutation_B",
+ "version": "v1",
+ "generated_utc": "2026-09-18T11:41:09Z",
+ "rows": [
+  {
+   "name": "全方向のノルム合わせ",
+   "ruling": "D102",
+   "target": "direction_B.py",
+   "applied": true,
+   "what": "方向を作る器が td にしか合わせない誤り（交差族と S4 の反証に「加わる量が腕と統制で違う」構図が残る）。**守るのは方向を作る器である**——介入の器（steer_B）は自分で合わせた模造ベクトルしか見られないので、ここは守れない。走行器が npz を読むときにノルムを確かめる検査は、**本体を書くときに足す**（裁定 D117）",
+   "caught": [
+    "direction_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "direction_B.py": "AssertionError: ('方向のノルムが ‖v̂〕に合っていない（裁定 D102）', 'Nk', 0.25, 3.96749597674409, 2.694059469466182)"
+   }
+  },
+  {
+   "name": "帯の起点（主位置）",
+   "ruling": "D124",
+   "target": "steer_B.py",
+   "applied": true,
+   "what": "起点が列の先頭になる誤り（帯が役割トークンから掛かる）",
+   "caught": [
+    "steer_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "steer_B.py": "AssertionError: ('起点が独立の正解と違う', '前置きがここにあ', 0, 25)"
+   }
+  },
+  {
+   "name": "係数の掛け方",
+   "ruling": "D90",
+   "target": "steer_B.py",
+   "applied": true,
+   "what": "ランダム方向のノルムが v̂ と違う誤り（加わる量が腕と統制で違う）",
+   "caught": [
+    "steer_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "steer_B.py": "AssertionError: ランダム方向のノルムが ‖v̂‖ に合っていない（裁定 D90）"
+   }
+  },
+  {
+   "name": "バッチの腕の同質性",
+   "ruling": "D124",
+   "target": "steer_B.py",
+   "applied": true,
+   "what": "バッチに複数の腕が混ざっても止めない誤り",
+   "caught": [
+    "steer_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "steer_B.py": "AssertionError: 腕が混ざったバッチを止めていない（裁定 D124）"
+   }
+  },
+  {
+   "name": "層番号の四捨五入",
+   "ruling": "D4",
+   "target": "direction_B.py",
+   "applied": true,
+   "what": "層の添字が一つずれる誤り",
+   "caught": [
+    "direction_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "direction_B.py": "AssertionError: ('層番号が期待値と違う', 0.25, 34, 7, 8)"
+   }
+  },
+  {
+   "name": "様式門を Holm の順位に戻す",
+   "ruling": "D125",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "様式門の保留が順位を消費し、次の対比の閾値が α/m から α/(m−1) に緩む",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "（健全な入力）",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667, 0.025], 'confirm': 3, 'reverse': 1,",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.008333, 0.0125, 0.0125, 0.016667, 0.016667, 0.025], 'confirm': 3, 're"
+  },
+  {
+   "name": "封印の語彙の写しを外す",
+   "ruling": "D121",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "正本の語彙で封印すると確証がすべて「登録された向きと逆」になる",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "（健全な入力）",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667, 0.025], 'confirm': 3, 'reverse': 1,",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667, 0.025], 'confirm': 3, 'reverse': 2,"
+  },
+  {
+   "name": "セッション記録の検査を本走行だけに戻す",
+   "ruling": "D126",
+   "target": "integrity_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "調整走行・品質床・同一性選別で記録が無くても素通りする",
+   "kind": "integrity",
+   "changed": true,
+   "broken": "drop_sessions",
+   "base": "(1, {'stageB': {'rc': 1, 'problems': 5}, 'tuneB': {'rc': 1, 'problems': 36}, 'stageB-quality': {'rc': 1, 'prob",
+   "mutated": "(1, {'stageB': {'rc': 1, 'problems': 5}, 'tuneB': {'rc': 1, 'problems': None}, 'stageB-quality': {'rc': 1, 'pr"
+  },
+  {
+   "name": "門のセッション検査を外す",
+   "ruling": "D126",
+   "target": "gate_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "門が記録の不在を素通りする",
+   "kind": "gate",
+   "changed": true,
+   "broken": "drop_sessions",
+   "base": "(1, None)",
+   "mutated": "(0, 'open')"
+  },
+  {
+   "name": "升目の欠けを incomplete に倒さない",
+   "ruling": "D126",
+   "target": "gate_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "調整走行の升目が欠けても判定が open のまま",
+   "kind": "gate",
+   "changed": true,
+   "broken": "drop_tune_cell",
+   "base": "(2, 'incomplete')",
+   "mutated": "(0, 'open')"
+  }
+ ],
+ "missed": 0,
+ "total": 10
+}

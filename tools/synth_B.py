@@ -101,7 +101,6 @@ def cell_trials(n, spec, start=0, **kw):
             else:
                 out[-1]['choice'] = None       # 本走行は選択の欄
                 out[-1]['catastrophe'] = None
-            out[-1]['choice'] = None
     return out
 
 
@@ -173,8 +172,10 @@ def case_all():
     tune = {'best': (LAYERS[1], COEFS[1]), 'eff': 12, 'tie': False, 'nonpositive': False, 'ff_fail': (LAYERS[0], COEFS[0]), 'censor_all': False}
     qual = {'fail_selection': [], 'fail_post': ['Onull+vNk']}
     # 封印は**一致する対比と逆向きの対比の両方**を持たせる（採否表 P297）
-    seal = {'sub:N1:O-Ncold-v~O-Ncold-vrand': '上',          # データは「下」——逆向きの枝
-            'add:N1:Onull+v~Onull+vrand': '下'}              # データも「下」——一致の枝
+    # **正本の語彙で書く**（裁定 D121・2026-09-18）。前は集計器の内部の記号で書いていたので、
+    # 「正本どおりに封印すると確証がすべて逆向きになる」食い違いが合成データでは一度も発火しなかった。
+    seal = {'sub:N1:O-Ncold-v~O-Ncold-vrand': '上昇',          # データは低下——逆向きの枝
+            'add:N1:Onull+v~Onull+vrand': '低下'}              # データも低下——一致の枝
     return {'main': m, 'tune': tune, 'quality': qual, 'seal': seal,
             'resume': {'scenario': 'N1', 'arm': 'Onull+vtd'}}   # 中断と再開（採否表 P302）
 
@@ -216,6 +217,18 @@ def case_s4_branches():
     return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
 
 
+def case_s4_up():
+    """S4 の「**上がった（封印は当たり）**」の枝（裁定 D130・採否表 P371）。
+
+    (6b) の腕のほうが破局率が高く、区間が零を外す場合。正本 `three_way.labels` の四つのうち
+    この一つだけが合成データで一度も発火しておらず、経路の表は「零件」と印字していた
+    （系統内の検分で捕まった）。"""
+    m = base_main_spec()
+    m[('S4', 'Osec-Ncold+v6b')] = {'cat': 90, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('S4', 'Osec-Ncold+vrand')] = {'cat': 34, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
+
+
 def case_s4_floor():
     m = base_main_spec()
     m[('S4', 'Osec-Ncold+v6b')] = {'cat': 1, 'refuse': 2, 'ff': 2, 'style_a': 40, 'style_b': 120, 'mention': 8}
@@ -248,7 +261,7 @@ def case_incomplete():
 
 CASES = {'incomplete': case_incomplete, 'all': case_all, 'gate1_closed': case_gate1_closed, 'nonpositive': case_nonpositive, 'tie': case_tie,
          'censor_candidates': case_censor_candidates, 'scoring_gap': case_scoring_gap, 's4_branches': case_s4_branches,
-         's4_floor': case_s4_floor, 'dilution_causal': case_dilution_causal}
+         's4_floor': case_s4_floor, 's4_up': case_s4_up, 'dilution_causal': case_dilution_causal}
 
 
 def build(case, out_root):
@@ -364,7 +377,7 @@ def build(case, out_root):
                       open(os.path.join(sd, '%s.json' % rk), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     # ---- 封印（任意） ----
     if spec.get('seal'):
-        json.dump({'kind': 'seal_B', 'signs': spec['seal'], 's4': 'synth', 'dry_run': True},
+        json.dump({'kind': 'seal_B', 'signs': spec['seal'], 's4': 'どちらでもない', 'dry_run': True},
                   open(os.path.join(out_root, 'seal-B.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     return out_root
 

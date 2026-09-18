@@ -146,9 +146,17 @@ def _selftest():
             for ratio in LAYER_RATIOS:
                 H[(arm, sc, ratio)] = rng.normal(size=d)
     dirs, stats = build_directions(H)
-    v = dirs[('static', LAYER_RATIOS[0])]
-    td = dirs[('td', LAYER_RATIOS[0])]
-    assert abs(np.linalg.norm(td) - np.linalg.norm(v)) < 1e-9, 'td のノルムが v̂ に合っていない'
+    # **`build_directions` の出力そのものを読んで、全方向 × 全層を照合する**（裁定 D122・D102）。
+    # 前は td 一本だけを見ていたので、td だけ合わせる誤りに戻しても検査が通った（系統外の検分で捕まった）。
+    n_norm = 0
+    for ratio in LAYER_RATIOS:
+        nv = float(np.linalg.norm(dirs[('static', ratio)]))
+        for name in ('Nk', 'td', 'loaded'):
+            nw = float(np.linalg.norm(dirs[(name, ratio)]))
+            assert abs(nw - nv) < 1e-9, ('方向のノルムが ‖v̂〕に合っていない（裁定 D102）', name, ratio, nw, nv)
+            n_norm += 1
+    assert n_norm == 3 * len(LAYER_RATIOS), 'ノルムの照合の回数が足りない'
+    assert 'raw_norm_ratio' in stats[LAYER_RATIOS[0]], '合わせる前の比が記帳されていない（採否表 P284）'
     assert set(stats[LAYER_RATIOS[0]]['stability']) == {'static', 'loaded', 'Nk', 'td'}
     # 決定性 (i) 同じ並べ方 → 完全一致
     ok, bad = determinism_same_order(H, dict(H))
