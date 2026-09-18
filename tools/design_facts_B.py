@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""design_facts_B.py v3 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（草案5B の正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+"""design_facts_B.py v4 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+v3 からの変更（検分の二段目・四票の採否 P212〜P256・裁定 D75〜D86）: 転記行 C に**選定 × 確証の合成検出力**（採否表 P229）と、抽出場面を二層に分けない前提の但し書き（P245）、
+同点の割り方を正本の登録（無作為・selection.tie_break）に合わせた模擬を置く（P228）。転記行 D に **S4 の反証の検出力**と三分岐の線（裁定 D81）を足す。
+転記行 E に二標本で比べる旨と相手の共有の注（P256）、転記行 I に「全腕」の意味と内訳（P256）と決定性の検査で二度保存する容量（P235）を足す。費用の停止の倍率は正本 `cost` から引く（P251）。
 v1（草案4）からの変更: 保留 AUC の置換帯と門1 の誤判率（転記行 C）を廃し、**選定の雑音**（層 × 係数の 9 候補を調整走行 n=100 × 抽出場面で選ぶときの取り違え）に置き換えた。
 検出力（D）は族ごとの m（4・4・8）で印字する。品質床（E）は同じ腕の無操作との二標本・18 セルで数える。費用（F）はバッチ 16 の記録値から出し直す。
 A 規模／B 対比／C 選定の雑音と同値の帯／D v 対 v_random の検出力／E 品質床／F 費用と時間／G 凍結射程と器材の対応表／H seed・tag／I 活性保存の容量。
@@ -100,18 +103,20 @@ nd = sum(len(v.get('contrasts', [])) for v in T['descriptive_families'].values()
 base_line = lambda a: '・'.join('%s %d/%d' % (sc, T['bases_4B2507_api_stageVp'][sc][a]['k'], T['bases_4B2507_api_stageVp'][sc][a]['n']) for sc in SC)
 b_vals = {'confirmed': sum(x['m'] for x in fam.values()), 'sub': fam['B_sub']['m'], 'add': fam['B_add']['m'], 'cross': fam['B_cross']['m'],
           'desc': nd, 'vs_noop': len(T['descriptive_families']['B_desc_vs_noop']['contrasts']),
+          'rand_vs_noop': len(T['descriptive_families']['B_desc_rand_vs_noop']['contrasts']),
           'O_sub': len(T['descriptive_families']['B_desc_O_sub']['contrasts']),
           'textdiff': len(T['descriptive_families']['B_desc_textdiff']['contrasts']),
           'S4': len(T['descriptive_families']['B_desc_S4']['contrasts']),
           'random': T['random_control']['count'],
           'dup': len(ids_all) - len(set(ids_all))}
-F['B'] = {'text': '対比: 確証 %d（減算 %d・加算 %d・交差 %d・v 対 v_random・両側 Fisher・全分母・Holm は族ごと〔m=%s〕・上界 %.2f）・記述 %d（無操作との差 %d・O 減算 %d・実在する腕対の差方向 %d・S4 の反証 %d）・ランダム方向 %d 本（層ごとにノルム一致・合併して一腕）・id 重複 %d。土台の 4B-2507 既測（V′・全分母）: O-Ncold %s／Onull %s／Osec-Ncold（S4） %d/%d。'
+F['B'] = {'text': '対比: 確証 %d（減算 %d・加算 %d・交差 %d・v 対 v_random・両側 Fisher・全分母・Holm は族ごと〔m=%s〕・上界 %.2f〔和・族は相手の腕を共有するので独立でない〕）・記述 %d（無操作との差 %d・ランダム方向 対 無操作 %d・O 減算 %d・実在する腕対の差方向 %d〔td 対 ランダム方向と v̂ 対 td〕・S4 の反証 %d）・ランダム方向 %d 本（層ごとに v̂ のノルムに合わせる・合併して一腕）・id 重複 %d。土台の 4B-2507 既測（V′・全分母）: O-Ncold %s／Onull %s／Osec-Ncold（S4） %d/%d。'
           % (b_vals['confirmed'], b_vals['sub'], b_vals['add'], b_vals['cross'], '・'.join(str(fam[k]['m']) for k in ('B_sub', 'B_add', 'B_cross')), T['alpha_upper'],
-             b_vals['desc'], b_vals['vs_noop'], b_vals['O_sub'], b_vals['textdiff'], b_vals['S4'], b_vals['random'], b_vals['dup'],
+             b_vals['desc'], b_vals['vs_noop'], b_vals['rand_vs_noop'], b_vals['O_sub'], b_vals['textdiff'], b_vals['S4'], b_vals['random'], b_vals['dup'],
              base_line('O-Ncold'), base_line('Onull'), T['descriptive_families']['B_desc_S4']['base_4B2507'], T['descriptive_families']['B_desc_S4']['base_n']),
           'data': b_vals}
 # 自己検査（採否表 P190）: 印字した転記行 B の数を、正本から数え直した値と突き合わせる
 _checks = [('確証 (\d+)（', b_vals['confirmed']), ('・記述 (\d+)（', b_vals['desc']), ('無操作との差 (\d+)', b_vals['vs_noop']),
+           ('ランダム方向 対 無操作 (\d+)', b_vals['rand_vs_noop']),
            ('O 減算 (\d+)', b_vals['O_sub']), ('実在する腕対の差方向 (\d+)', b_vals['textdiff']), ('S4 の反証 (\d+)', b_vals['S4']),
            ('ランダム方向 (\d+) 本', b_vals['random']), ('id 重複 (\d+)', b_vals['dup'])]
 for _pat, _want in _checks:
@@ -131,13 +136,16 @@ CANDS = T['selection']['candidates']['count']
 D_PICK = 10.0                                                               # 模擬に置く真の低下幅（設計の値ではない）
 
 
-def pick_prob(pos, reps=REPS):
-    """裁定 D68 の決め方（点推定が最大の候補を採る）で、真に効く候補を選べる割合。pos は格子の位置。"""
+def pick_prob(pos, reps=REPS, delta=None):
+    """裁定 D68 の決め方（点推定が最大の候補を採る・同点は正本 selection.tie_break の登録どおり無作為に割る）で、
+    真に効く候補を選べる割合。pos は格子の位置。delta は真の低下幅（pt・既定は D_PICK）。"""
     eff = np.zeros(CANDS)
-    eff[pos] = D_PICK / 100.0
+    eff[pos] = (D_PICK if delta is None else delta) / 100.0
     kv = rng.binomial(tune_n, np.clip(base_tune - eff, 0.001, 0.999)[None, :], size=(reps, CANDS))
     kr = rng.binomial(tune_n, base_tune, size=(reps, CANDS))
-    hit = (np.argmax((kr - kv) / tune_n, axis=1) == pos).mean()
+    d = (kr - kv).astype(float)
+    d += (d == d.max(axis=1, keepdims=True)) * rng.random(d.shape) * 1e-6      # 同点は無作為に割る（selection.tie_break）
+    hit = (np.argmax(d, axis=1) == pos).mean()
     half = z * math.sqrt(hit * (1 - hit) / reps)
     return float(hit), float(half)
 
@@ -149,7 +157,9 @@ p_flat = 1.0 / CANDS
 F['C'] = {'text': '選定の雑音と同値の帯（層 × 係数の %d 候補・調整走行は腕あたり n=%d〔n=%d × 抽出場面 %d〕・基底は抽出場面の Onull の既測 %.3f）: 一つの候補の低下幅の標準誤差 %.1f pt・**候補どうしの差の標準誤差 %.1f pt**・同値の帯（%g%%）は差 ±%.1f pt（正本 selection.equivalence_band の量）。裁定 D68 の決め方（点推定が最大の候補を採る）で、真の低下幅が %.0f pt の候補が格子の中ほどにあるとき、それを選べる割合は %.3f（モンテカルロ %s 回・%g%% 区間 ±%.3f）。格子の位置による差は %s。全候補が同じ（帰無）なら %.3f（＝候補数の逆数）。**選定の低下幅は効果量ではない**（本走行の確証族だけが効果を言う・正本 selection.no_effect_size）。'
           % (CANDS, tune_n, nt, len(T['selection']['tune']['scenarios']), base_tune, se_single, se_diff, 100 * T['selection']['equivalence_ci'], band_pt,
              D_PICK, p_mid, fmt(REPS), 100 * T['selection']['equivalence_ci'], half_mid,
-             '・'.join('位置 %d で %.3f' % (pos, picks[pos][0]) for pos in positions), p_flat),
+             '・'.join('位置 %d で %.3f' % (pos, picks[pos][0]) for pos in positions), p_flat) +
+          '同点は無作為に割る（正本 selection.tie_break）。**この行の雑音は抽出場面をまとめた一つの率で出しており、場面の二層（N1・S1）の違いを無視している**（採否表 P245）。'
+          '合成の検出力（選定 × 確証）は転記行 D。',
           'data': {'tune_n_per_arm': tune_n, 'base': round(base_tune, 4), 'se_single_pt': round(se_single, 2), 'se_diff_pt': round(se_diff, 2),
                    'band_pt': round(band_pt, 2), 'reps': REPS, 'pick_by_position': {str(k): [round(v[0], 4), round(v[1], 4)] for k, v in picks.items()},
                    'pick_null': p_flat, 'candidates': CANDS, 'delta_pt': D_PICK}}
@@ -189,17 +199,52 @@ def two_side(f, a, sc, d):
 D_MAIN, D_SMALL = 15, 10
 lo_sc = lambda a: min(SC, key=lambda sc: bs(a, sc))
 hi_sc = lambda a: max(SC, key=lambda sc: bs(a, sc))
+
+
+def ci_excl_zero(p_a, p_b, nn=None, zz=1.96):
+    """二標本の pt 差の 95% Wald 区間が零を外す（下がる側）確率。二項の畳み込みで厳密（正本 B_desc_S4.adjudication の量）。"""
+    nn = nn or n
+    k = np.arange(nn + 1)
+    pa, pb = binom.pmf(k, nn, p_a), binom.pmf(k, nn, p_b)
+    ra = k / nn
+    diff = ra[:, None] - ra[None, :]
+    se = np.sqrt(ra[:, None] * (1 - ra[:, None]) / nn + ra[None, :] * (1 - ra[None, :]) / nn)
+    se = np.where(se == 0, np.inf, se)
+    w = pa[:, None] * pb[None, :]
+    return float(w[(diff + zz * se) < 0].sum())
+
+
+S4F = T['descriptive_families']['B_desc_S4']
+s4_base = S4F['base_4B2507'] / S4F['base_n']
+S4_PT, S4_POWER_MIN = S4F['three_way']['effect_pt'], S4F['three_way']['power_min']
+s4_pow = {d: round(ci_excl_zero(max(s4_base - d / 100, 0.001), s4_base), 3) for d in (S4_PT, D_MAIN)}
+# 合成の検出力（選定 × 確証・採否表 P229）
+# 選定の側は調整走行の基底（抽出場面をまとめた Onull）、確証の側は**族の登録された検定**（両側 Fisher・Holm の初段）を
+# 加算族の各場面の基底で出す（場面によって基底が違うので幅で示す）。
+combined, combined_by_sc = {}, {}
+for d in (5, D_SMALL, D_MAIN):
+    p_pick = pick_prob(CANDS // 2, delta=d)[0]
+    by_sc = {sc: pw(bs('Onull', sc), max(bs('Onull', sc) - d / 100, 0.001), 0.05 / fam['B_add']['m']) for sc in SC}
+    combined_by_sc[d] = {sc: round(p_pick * v, 3) for sc, v in by_sc.items()}
+    combined[d] = (round(p_pick * min(by_sc.values()), 3), round(p_pick * max(by_sc.values()), 3), round(p_pick, 3))
 F['D'] = {'text': 'v 対 v_random の検出力（両側 Fisher・n=%d 対 %d・全数列挙・名目／Holm の初段〔族ごとの m〕・上がる側と下がる側の両方）: '
           '**減算族**（土台 O-Ncold・m=%d）は基底が %s %.3f 〜 %s %.3f。%s の ±%d pt は %s、%s の ±%d pt は %s。'
           '**加算族**（土台 Onull・m=%d）は基底が %s %.3f 〜 %s %.3f。%s の ±%d pt は %s、%s の ±%d pt は %s。'
           '**交差族**（m=%d）は初段の水準が下がる（%s の O-Ncold・±%d pt は %s）。'
           '±%d pt は中間の基底でも初段に届かない（%s の Onull・%s）。床に近い基底では下がる側が率の外に出て測れない（読み条項の余地の条項）。'
+          '**S4 の反証**（記述・(6b) の腕 対 ランダム方向・基底 %.4f・裁定 D81 の三分岐）: 真の低下 %d pt を %g%% 区間で捕まえる確率は %.3f、%d pt では %.3f。'
+          '区間が零を含んだとき、%d pt の検出力が %g 以上なら「下がらなかった（封印は当たり）」、下回れば「当否を言わない」。'
+          '**合成の検出力**（選定で正しい組を選ぶ割合 × 加算族の初段〔両側 Fisher・場面ごとの基底で最小〜最大〕・採否表 P229）: 真の低下 %s。選定の側は調整走行の基底で出した割合である。'
           % (n, n, fam['B_sub']['m'], lo_sc('O-Ncold'), bs('O-Ncold', lo_sc('O-Ncold')), hi_sc('O-Ncold'), bs('O-Ncold', hi_sc('O-Ncold')),
              lo_sc('O-Ncold'), D_MAIN, two_side('B_sub', 'O-Ncold', lo_sc('O-Ncold'), D_MAIN), hi_sc('O-Ncold'), D_MAIN, two_side('B_sub', 'O-Ncold', hi_sc('O-Ncold'), D_MAIN),
              fam['B_add']['m'], lo_sc('Onull'), bs('Onull', lo_sc('Onull')), hi_sc('Onull'), bs('Onull', hi_sc('Onull')),
              lo_sc('Onull'), D_MAIN, two_side('B_add', 'Onull', lo_sc('Onull'), D_MAIN), hi_sc('Onull'), D_MAIN, two_side('B_add', 'Onull', hi_sc('Onull'), D_MAIN),
-             fam['B_cross']['m'], EX[0], D_MAIN, two_side('B_cross', 'O-Ncold', EX[0], D_MAIN), D_SMALL, EX[1], two_side('B_add', 'Onull', EX[1], D_SMALL)),
-          'data': rows}
+             fam['B_cross']['m'], EX[0], D_MAIN, two_side('B_cross', 'O-Ncold', EX[0], D_MAIN), D_SMALL, EX[1], two_side('B_add', 'Onull', EX[1], D_SMALL),
+             s4_base, S4_PT, 100 * 0.95, s4_pow[S4_PT], D_MAIN, s4_pow[D_MAIN], S4_PT, S4_POWER_MIN,
+             '・'.join('%d pt で %.3f〜%.3f（選定の割合 %.3f）' % (d, v[0], v[1], v[2]) for d, v in sorted(combined.items()))),
+          'data': dict(rows=rows, s4_power={str(k): v for k, v in s4_pow.items()}, s4_base=round(s4_base, 4),
+                       combined_power={str(k): list(v) for k, v in combined.items()},
+                       combined_power_by_scenario={str(k): v for k, v in combined_by_sc.items()})}
 
 # ---- E: 品質床（同じ腕の無操作との二標本・厳密値・裁定 D69 の射程） ----
 q, thr = q_items, -T['quality_floor']['threshold_pt'] / 100
@@ -224,7 +269,8 @@ pow_q = {p: q_power_exact(p, D_PICK * 1.5 / 100) for p in (0.7, 0.9)}
 acc_line = lambda d: '・'.join('%g で %.4f' % (k, v) for k, v in d.items())
 pow_line = lambda d: '・'.join('%g で %.3f' % (k, v) for k, v in d.items())
 F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・境目はちょうどの値を不合格とする）: 射程は選定の %d セル（土台 × 層 × 係数）に加え、選ばれた組での残りの介入 %d セルと相手の無操作 %d セル（裁定 D69）。帰無発火率（同じ真の正答率で閾値以下になる確率・二項の畳み込みで厳密）は正答率 %s。真の低下 %.0f pt を捕まえる確率は %s。帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（裁定 D66・候補は器材の整備の段）。'
-          % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, len(noop_bases), acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells),
+          '**同じ問いを使うが二標本で比べる**ので、この行の帰無発火率と検出力は対にして読むより保守側である（採否表 P256）。無操作の相手は土台ごとに一つで多くのセルが共有するため、帰無での不合格は相関して塊で出る。課題は**無操作の正答率が %g 以上**のものを選ぶ（裁定 D85）。'
+          % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, len(noop_bases), acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells, T['quality_floor']['base_min']),
           'data': {'null_exact': {str(k): v for k, v in null_q.items()}, 'power_exact': {str(k): v for k, v in pow_q.items()},
                    'cells': q_cells, 'cells_selection': q_cells_sel, 'cells_post': q_cells_post, 'cells_noop': len(noop_bases)}}
 
@@ -234,7 +280,7 @@ rec = one('バッチ %d なら (\d+) ユニット・%d で (\d+)・%d で (\d+)�
 rec_trials = int(one(r'草案4 の (\d[\d,]*) 試行でバッチ', ADC).group(1).replace(',', ''))
 b16, b1 = int(rec.group(1 + BATCHES.index(T['runner']['batch']))), int(rec.group(1 + BATCHES.index(1)))
 u16, u1 = t_all * b16 / rec_trials, t_all * b1 / rec_trials
-STOP_RATIO = 1.25
+STOP_RATIO = T['cost']['stop_rule']['multiplier']
 F['F'] = {'text': '費用と時間（草案4 の巡の追い問いの記録: %s 試行でバッチ %d なら %d ユニット・同時 %d 本なら %d ユニット。本草案の %s 試行に比例で当てた見込み ◐）: バッチ %d で **≈%s ユニット**・同時 %d 本なら ≈%s ユニット。品質床の %s 問は出力が短く、場面の試行より軽い（比例は上振れの側）。実測は調整走行の最初のセッションで取り、転記行を置き換える。費用の停止規則は段階 A と同じ型（見込みの %g 倍で登録者の再裁定）。'
           % (fmt(rec_trials), T['runner']['batch'], b16, 1, b1, fmt(t_all), T['runner']['batch'], fmt(round(u16)), 1, fmt(round(u1)), fmt(t_q), STOP_RATIO),
           'data': {'trials': t_all, 'units_batch': round(u16, 1), 'units_single': round(u1, 1), 'batch': T['runner']['batch'],
@@ -253,15 +299,18 @@ n_layers_saved = len(T['selection']['candidates']['layers'])
 prompt_vecs = len(T['arms']['panel']) * len(SC) * n_layers_saved
 resp_gib = (t_tune + t_main) * n_layers_saved * hid * 2 / 2**30
 F['I'] = {'text': '活性保存（4B-2507・hidden %d・bf16・凍結 %d 層）: 主位置（プロンプトの最終トークン）は腕 × 場面 × 層ごとに一度だけ保存する——%d 本 × %.1f KB ＝ %.1f MB（試行に依らないため試行ごとに保存しない・草案4 からの変更）。副位置（応答トークン平均）は試行ごとに保存する——%s 試行 × %d 層 ≈ %.2f GiB（Drive）。重み %.2f GiB＋バッチ %d の生成の活性が L4 の %g%% の内側かは、調整走行の最初のセッションで実測する ◐。'
-          % (hid, n_layers_saved, prompt_vecs, kb, prompt_vecs * kb / 1024, fmt(t_tune + t_main), n_layers_saved, resp_gib, m4['safetensors_gib'], T['runner']['batch'], 90),
-          'data': {'prompt_vectors': prompt_vecs, 'response_gib': round(resp_gib, 3)}}
+          '**内訳と「全腕」の意味**（採否表 P256）: 副位置の %s 試行は調整走行 %s ＋ 本走行 %s で、同一性選別の %s は含まない。主位置の %d 本は**前置きの腕 %d 本 × 場面 %d × 層 %d**（介入の腕は含まない）。'
+          '決定性の検査は主位置を**二度**保存して突き合わせるので、主位置の容量は %.1f MB になる（裁定 D77 の前段・採否表 P235）。'
+          % (hid, n_layers_saved, prompt_vecs, kb, prompt_vecs * kb / 1024, fmt(t_tune + t_main), n_layers_saved, resp_gib, m4['safetensors_gib'], T['runner']['batch'], 90,
+             fmt(t_tune + t_main), fmt(t_tune), fmt(t_main), fmt(t_id), prompt_vecs, len(T['arms']['panel']), len(SC), n_layers_saved, 2 * prompt_vecs * kb / 1024),
+          'data': {'prompt_vectors': prompt_vecs, 'response_gib': round(resp_gib, 3), 'prompt_mb_twice': round(2 * prompt_vecs * kb / 1024, 2)}}
 
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
 os.makedirs(os.path.join(REPO, 'records', 'B'), exist_ok=True)
 csha = sha(rd('design', 'contrasts-B.json'))
-json.dump({'generated_utc': now, 'tool': 'tools/design_facts_B.py v2', 'contrasts_sha16': csha, 'facts': F},
+json.dump({'generated_utc': now, 'tool': 'tools/design_facts_B.py v4', 'contrasts_sha16': csha, 'facts': F},
           open(os.path.join(REPO, 'records', 'B', 'design-facts-B.json'), 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
-L = ['# 段階 B 設計事実（機械生成・`tools/design_facts_B.py` v2・%s UTC・正本 contrasts-B.json SHA16 %s）' % (now, csha), '']
+L = ['# 段階 B 設計事実（機械生成・`tools/design_facts_B.py` v4・%s UTC・正本 contrasts-B.json SHA16 %s）' % (now, csha), '']
 for k in 'ABCDEFGHI':
     L.append('- **転記行 %s** — %s' % (k, F[k]['text']))
     L.append('')

@@ -38,15 +38,15 @@
 - いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 
 ## 段階 B（機構層・設計中・2026-09-18 再開・O の枠組みに対応する方向の加減で破局率は動くか）
-- **いまどこか**: 設計の途中である（凍結していない・データは無い）。草案4（2026-09-13）の主抽出位置が成り立たないことが検分の追い問いで判明し、登録者裁定で再設計した。次は草案5B と設計の検分。
+- **いまどこか**: 設計の途中である（凍結していない・データは無い）。草案4（2026-09-13）の主抽出位置が成り立たないことが検分の追い問いで判明し、登録者裁定で再設計した。**設計の検分は二段（エージェント二体・系統内外の四票）を終え、裁定 D75〜D86 を草案8B に反映した。次は器材の整備と実装検分。**
 - **再開の記録（ここから読む）**: [`records/B/stageB-restart-2026-09-18.md`](records/B/stageB-restart-2026-09-18.md)——時系列・登録者裁定 D57〜D61 の逐語・正本と器の改訂・次の段取り・未決・不利な材料。
-- 正本 JSON `design/contrasts-B.json`（draft5-2026-09-18・SHA16 19277DD2CC7AE36B・生成器 `tools/make_contrasts_B.py` v2）／転記行 `records/B/design-facts-B.md`（SHA16 8ACD8C5E18C82360・生成器 `tools/design_facts_B.py` v2）。
-- **設計草案7B（いまの版）**: [`design/design-stageB-draft7.md`](design/design-stageB-draft7.md)（SHA16 C7C99F0E550C6289・設計の検分の一段目〔エージェント二体〕の採否 P190〜P211 と登録者裁定 D62〜D74 を反映・原稿からの機械組み立て・本文の数は正本からの束縛のみ・検査の記録 [`records/B/numbers-lint-draft7B.md`](records/B/numbers-lint-draft7B.md)・違反 零）。前の版は `design/design-stageB-draft5.md`・`draft6.md`。
+- 正本 JSON `design/contrasts-B.json`（draft8-2026-09-18・SHA16 DC4A5AEE0AC42E23・生成器 `tools/make_contrasts_B.py` v4）／転記行 `records/B/design-facts-B.md`（SHA16 6BE2A009D508DE5D・生成器 `tools/design_facts_B.py` v4）。
+- **設計草案8B（いまの版）**: [`design/design-stageB-draft8.md`](design/design-stageB-draft8.md)（SHA16 A8772E5C453ED909・設計の検分の**二段目**〔系統外 Gemini 二名・系統内 claude.ai 二名〕の採否 P212〜P256 と登録者裁定 D75〜D86 を反映・原稿からの機械組み立て・本文の数は正本からの束縛のみ・検査の記録 [`records/B/numbers-lint-draft8B.md`](records/B/numbers-lint-draft8B.md)・違反 零）。前の版は `design/design-stageB-draft7.md`・`draft6.md`・`draft5.md`。
 - **設計の検分・一段目（系統内の新規個体二体・2026-09-18）**: [`records/reviews/B/design-round1/`](records/reviews/B/design-round1/)——票（逐語）・再現の事前登録・再現の記録（K1〜K22）・採否表（SHA16 ABE92488CDF958BA）。**起草者自身の誤り二件を含む**。
-- **次: 設計の検分・二段目（系統内外）**: 依頼文 [`records/reviews/B/design-round2/review-request-B-design-ext.md`](records/reviews/B/design-round2/review-request-B-design-ext.md)（SHA16 3C43D49A59FD96B7）と資料の束（`bundle-B-design-index.md`・part1〜part3）。claude.ai の Claude と Gemini に回す。
-- 設計: Qwen3-4B-Instruct-2507（bf16・transformers・Colab）・場面 N1・S1・SK・S4・確証の族は 16 対比（減算・加算・交差。いずれも「方向 v 対 ノルム一致ランダム方向」）・n=200／腕。規模は合計 20,680 試行の見込み。
+- **設計の検分・二段目（系統外 Gemini 二名・系統内 claude.ai 二名・2026-09-18）**: [`records/reviews/B/design-round2/`](records/reviews/B/design-round2/)——票（逐語・出所 `provenance.md`）・依頼文と資料の束・起草者の見直し（S1〜S12）・再現の事前登録と記録（K23〜K50・**再現しなかった所見は無い**）・採否表（P212〜P256・SHA16 E90E5C3F03BADA26）・反映の事前登録と確かめ。判定は差し戻し 一・条件つき 三で、登録者裁定 D86 は条件つき（甲）。**起草者に由来する誤り四件**と、**系統外の一名だけが挙げた二件**も採否表に記録した。
+- 設計: Qwen3-4B-Instruct-2507（bf16・transformers・Colab）・場面 N1・S1・SK・S4・確証の族は 16 対比（減算・加算・交差。いずれも「方向 v 対 ノルム一致ランダム方向」）・n=200／腕。規模は合計 23,280 試行の見込み。
 - 段階 A との関係: 段階 A の結果は方向の抽出にも効果の根拠にも使わない（反映メモ A・再開の記録 §1 の D57・D58）。段階 A は初版の重み、段階 B は 2507 の重みである。
-- 検分の予定（裁定 D59）: 設計の検分 → 器材の実装検分 → 凍結前の最終検分。各段に系統外を二名以上（claude.ai の票は起草者と同一系列として一票）。
+- 検分の予定（裁定 D59・D86）: 設計の検分（**二段とも済**）→ 器材の実装検分（**次の外の目はここ**）→ 凍結前の最終検分。各段に系統外を二名以上（claude.ai の票は起草者と同一系列として一票）。
 - 旧い草案（読むときは再開の記録と併せて）: `design/design-stageB-draft4.md` ほか。草案4 の主抽出位置は成り立たない。
 
 ## 次段の準備（段階 A／B・門0 費用パイロット・2026-09-12〜）
