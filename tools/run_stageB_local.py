@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""run_stageB_local.py v1 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+"""run_stageB_local.py v2 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
 
 段階 A の走行器（`run_preamble_local.py` v2.7・vLLM の OpenAI 互換サーバ）は凍結物なので触らない。
 B は hook を掛けるため transformers を直に使うが、**プロンプトの組み立てと採点の経路は凍結物に合わせる**:
@@ -20,7 +20,7 @@ import numpy as np
 import runs_B
 import steer_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FROZEN_RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
@@ -30,13 +30,22 @@ ASSEMBLY_EXPR = "(t + '\\n\\n' + SCEN_TEXT + INST) if t else (SCEN_TEXT + INST)"
 
 
 def check_assembly_matches_frozen():
-    """組み立ての式が凍結走行器と同じであり、正本にも登録されていることを確かめる（裁定 D87・食い違えば止まる）。"""
-    src = open(FROZEN_RUNNER, encoding='utf-8').read()
-    if ASSEMBLY_EXPR not in src:
+    """組み立てが凍結走行器と同じであることを確かめる（裁定 D87・採否表 P288）。
+
+    (i) 凍結走行器のソースに同じ式があること、(ii) 正本に登録があること、(iii) **B 自身の `user_message` が式どおりに振る舞うこと**。
+    """
+    src_txt = open(FROZEN_RUNNER, encoding='utf-8').read()
+    if ASSEMBLY_EXPR not in src_txt:
         raise SystemExit('凍結走行器の組み立ての式と違う（凍結物が変わったか、この器が古い）: %s' % FROZEN_RUNNER)
     reg = (T['runner'].get('prompt_assembly') or '')
     if '前置き' not in reg or '場面の本文' not in reg or '指示' not in reg:
         raise SystemExit('正本 runner.prompt_assembly に組み立ての式が無い（裁定 D87）')
+    # (iii) 凍結走行器の式をそのまま評価して、B の実装と突き合わせる
+    for t, SCEN_TEXT, INST in (('前置き', '場面', '指示'), ('', '場面', '指示')):
+        want = (t + '\n\n' + SCEN_TEXT + INST) if t else (SCEN_TEXT + INST)
+        got = user_message(t, SCEN_TEXT, INST)
+        if want != got:
+            raise SystemExit('B の user_message が凍結走行器の式と違う: %r 対 %r' % (want, got))
     return runs_B.sha16_file(FROZEN_RUNNER)
 
 
@@ -62,12 +71,16 @@ def arm_texts():
     return found
 
 
-def scenario_text(scenario):
+def scenario_and_instruction(scenario):
+    """場面の本文と**指示**を凍結の素材から引く（凍結走行器 `run_preamble_local.py` と同じ出所・採否表 P287）。"""
     d = json.load(open(SCEN_PATH, encoding='utf-8'))
     s = {x['question_id']: x for x in d['scenarios']}.get(scenario)
     if s is None:
         raise SystemExit('場面が凍結の素材に無い: %s' % scenario)
-    return s
+    inst = (d.get('json_instruction') or {}).get(s.get('family'))
+    if inst is None:
+        raise SystemExit('指示（json_instruction）が凍結の素材から引けない: 場面 %s' % scenario)
+    return s, inst
 
 
 def user_message(arm_text, scen_text, instruction):
@@ -92,16 +105,35 @@ def arm_plan(arm):
     return {'sign': sign, 'kind': kind, 'base': base_arm_of(arm)}
 
 
-def make_hook(vec, coef, sign, start_idx):
-    """`h ← h ± α·v̂` を、場面本文の開始位置から後ろ全部に掛ける hook（register_forward_hook）。"""
+def make_hook(vec, coef, sign, starts):
+    """`h ← h ± α·v̂` を場面本文の開始位置から EOS まで掛ける hook（register_forward_hook）。
+
+    starts は**行ごとの起点**（左詰めの詰めの長さを含む・`steer_B.band_starts`・採否表 P258）。
+    復号の段は隠れ状態の長さが一なので、**その一トークン全体に掛ける**（掛けないと生成に介入が入らない・採否表 P259）。
+    """
     import torch
 
     def hook(module, inputs, output):
         hs = output[0] if isinstance(output, tuple) else output
         v = torch.as_tensor(vec, dtype=hs.dtype, device=hs.device)
-        hs[:, start_idx:, :] = hs[:, start_idx:, :] + sign * coef * v
+        add = sign * coef * v
+        if hs.shape[1] == 1:                       # 復号の段（KV キャッシュ）: 位置は必ず帯の内側
+            hs[:, 0, :] = hs[:, 0, :] + add
+        else:                                       # prefill: 行ごとの起点から後ろに掛ける
+            for i, st in enumerate(starts):
+                hs[i, int(st):, :] = hs[i, int(st):, :] + add
         return (hs,) + tuple(output[1:]) if isinstance(output, tuple) else hs
     return hook
+
+
+def scoring():
+    """採点は**凍結パーサ**の関数を使う（正本 §2.9・採否表 P289）。"""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('app_parser_rev2', FROZEN_PARSER)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return {'parse_app_v2': mod.parse_app_v2, 'is_catastrophic': mod.is_catastrophic,
+            'parser_sha16': runs_B.sha16_file(FROZEN_PARSER)}
 
 
 def trial_record(**kw):
@@ -133,15 +165,33 @@ def _selftest():
     assert plans['O-Ncold-vtd']['kind'] == 'td' and plans['O-Ncold-vtd']['base'] == 'O-Ncold'
     # 方向の規則は steer_B 側で確かめる（ここでは繋がりだけ）
     v = np.ones(8)
-    rs = steer_B.random_directions(v, 1.0, 'main', 0.5)
+    rs = steer_B.random_directions(v, 'main', 0.5)
     assert len(rs) == T['random_control']['count']
-    rec = trial_record(**{f: None for f in ('trial_id', 'trial_index', 'arm', 'scenario', 'tag', 'status', 'catastrophe', 'choice',
-                                            'refuse_class', 'format_fail', 'style_a', 'style_b', 'mention', 'loop_flag', 'truncated',
-                                            'correct', 'logprobs', 'resp_mean_path', 'layer', 'coef', 'direction_id', 'seed',
-                                            'batch_pos', 'run_key', 'proc_uuid', 'runner_sha', 'arms_spec', 'preamble_sha',
-                                            'model', 'sampling', 'dry_run')})
-    assert len(rec) == 31
-    print('[run_stageB_local selftest] 組み立ての式（凍結走行器 SHA16 %s）・腕の素材・腕の名から方向・試行の記録の欄: すべて通った' % sha)
+    # 指示は凍結の素材から引ける（採否表 P287）
+    sc, inst = scenario_and_instruction(T['scenarios'][0])
+    assert isinstance(inst, str) and inst, '指示（json_instruction）が引けない'
+    # 採点は凍結パーサの関数（採否表 P289）
+    sco = scoring()
+    assert callable(sco['parse_app_v2']) and callable(sco['is_catastrophic'])
+    # 試行の記録の欄は正本の登録（裁定 D97）から作る
+    fields = T['trial_record_fields']['fields']
+    rec = trial_record(**{f: None for f in fields})
+    assert len(rec) == len(fields)
+    # hook は復号の段でも掛かる（採否表 P259）——小さな模擬で形だけ確かめる
+    try:
+        import torch
+        starts = [2, 0]
+        h_pre = torch.zeros((2, 5, 3))
+        h_dec = torch.zeros((2, 1, 3))
+        hk = make_hook(np.ones(3), 2.0, +1, starts)
+        hk(None, None, h_pre)
+        hk(None, None, h_dec)
+        assert float(h_pre[0, 0].sum()) == 0 and float(h_pre[0, 2].sum()) == 6, 'prefill の帯の起点が違う'
+        assert float(h_dec[0, 0].sum()) == 6 and float(h_dec[1, 0].sum()) == 6, '復号の段で加算が起きていない'
+    except ImportError:
+        pass
+    print('[run_stageB_local selftest] 組み立て（凍結走行器 SHA16 %s・振る舞いの照合つき）・腕の素材・腕の名から方向・指示・凍結パーサ（%s）・'
+          '試行の記録の欄 %d・hook の帯と復号の段: すべて通った' % (sha, sco['parser_sha16'], len(fields)))
 
 
 if __name__ == '__main__':

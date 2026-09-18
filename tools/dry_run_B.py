@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""dry_run_B.py v1 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+"""dry_run_B.py v2 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
 
 器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表の経路を、合成データ（`synth_B.py`）で作り、
 `gate_B.py`（門1 と選定）と `analyze_B.py`（本走行の集計と札）を走らせて、**どの経路が発火したか**を数える。
@@ -13,7 +13,9 @@ import os, sys, json, shutil, argparse, datetime, subprocess
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v1'
+T = runs_B.load_T()
+
+VERSION = 'v2'
 REPO = runs_B.REPO
 PY = sys.executable
 ap = argparse.ArgumentParser()
@@ -27,9 +29,11 @@ out_md = a.out or os.path.join(REPO, 'records', 'B', 'dry-run-B-%s.md' % jst.str
 if os.path.exists(out_md) and not a.force:
     sys.exit('既にある（--force で上書き）: %s' % out_md)
 
-PATHS = ['確証', '確証（登録された向きと逆）', '判定不能（検閲）', '判定保留（書式外転位）', '判定保留（refuse 転位・差）',
-         '判定保留（refuse 転位）', '判定保留（様式転位）', '注（様式）', '判定不能（品質床）', '非有意',
-         '門1 を閉じる', '全候補が非正', '同点の割り方', '床・天井で選定から外す', 'S4 の三分岐']
+PATHS = ['確証', '確証（登録された向きと逆）', '封印した符号と一致', '判定不能（検閲）', '判定不能（採点欠落）', '判定不能（測れなかった）',
+         '判定保留（書式外転位）', '判定保留（refuse 転位・差）', '判定保留（refuse 転位）', '判定保留（様式転位）', '注（様式）',
+         '判定不能（品質床）', '非有意', '門1 を閉じる', '記録の不在（incomplete）', '全候補が非正', '同点の割り方',
+         '床・天井で選定から外す', 'S4: 下がった（外れ）', 'S4: 下がらなかった（当たり）', 'S4: 当否を言わない', 'S4: 余地の条項',
+         '希釈が効く場面（書式外が分子を食う）', '中断と再開', '同一性選別の走行', '未測定（ループ・打ち切り）', '封印の欠けで止まる']
 fired = {k: [] for k in PATHS}
 rows = []
 
@@ -39,12 +43,15 @@ def run(cmd):
     return r.returncode, (r.stdout or '') + (r.stderr or '')
 
 
-for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates'):
+for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', 'scoring_gap', 's4_branches', 's4_floor', 'dilution_causal', 'incomplete'):
     root = os.path.join('results', '_synth', case)
     rc, out = run(['tools/synth_B.py', '--case', case, '--out-root', root])
     assert rc == 0, out
     rc_g, out_g = run(['tools/gate_B.py', '--root', root, '--allow-dry', '--out', os.path.join(root, 'gate-B.md'), '--force'])
+    assert rc_g in (0, 2), ('門の器が思わぬ終了コードで落ちた', rc_g, out_g[-400:])   # 採否表 P296
     G = json.load(open(os.path.join(REPO, root, 'gate-B.json'), encoding='utf-8'))
+    if G['verdict'] == 'incomplete':
+        fired['記録の不在（incomplete）'].append(case)
     sel = G['selection']
     if not G['gate1']['open']:
         fired['門1 を閉じる'].append(case)
@@ -60,7 +67,11 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates'):
         cmd = ['tools/analyze_B.py', '--gate', os.path.join(root, 'gate-B.json'), '--root', root, '--allow-dry',
                '--out', os.path.join(root, 'analysis-B.md'), '--force']
         if os.path.exists(os.path.join(REPO, seal)):
-            cmd += ['--seal', seal]
+            # 合成の封印は全対比ぶんではないので、**まず止まることを確かめてから**検査用の口で進む（裁定 D79・採否表 P277）
+            rc_stop, _ = run(cmd + ['--seal', seal])
+            if rc_stop != 0:
+                fired['封印の欠けで止まる'].append(case)
+            cmd += ['--seal', seal, '--allow-partial-seal']
         rc_a, out_a = run(cmd)
         assert rc_a == 0, out_a
         A = json.load(open(os.path.join(REPO, root, 'analysis-B.json'), encoding='utf-8'))
@@ -71,10 +82,39 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates'):
             rec['labels'][lab] = rec['labels'].get(lab, 0) + 1
             if any('注（様式' in n for n in (r.get('notes') or [])):
                 fired['注（様式）'].append(case)
-        if A['s4'].get('verdict'):
-            fired['S4 の三分岐'].append('%s（%s）' % (case, A['s4']['verdict']))
+        v4 = A['s4'].get('verdict') or ''
+        for nm, key in (('S4: 下がった（外れ）', '下がった'), ('S4: 下がらなかった（当たり）', '下がらなかった'),
+                        ('S4: 当否を言わない', '当否を言わない'), ('S4: 余地の条項', '余地の条項')):
+            if key in v4:
+                fired[nm].append('%s（%s）' % (case, v4))
+        if (A['sign_agreement'].get('agree') or 0) > 0:
+            fired['封印した符号と一致'].append(case)
         rec['s4'] = A['s4'].get('verdict')
         rec['sign_agreement'] = A['sign_agreement']
+    # 合成データの中身から確かめる経路（採否表 P300〜P302）
+    import glob as _g
+    mainroot = os.path.join(REPO, root, T['tags']['main'])
+    if os.path.isdir(mainroot):
+        sess = {json.load(open(os.path.join(d, 'manifest.json'), encoding='utf-8')).get('session') for d in _g.glob(os.path.join(mainroot, '*'))}
+        if len(sess) > 1:
+            fired['中断と再開'].append(case)
+        ff_cat = unmeas = 0
+        for d in _g.glob(os.path.join(mainroot, '*')):
+            for f in _g.glob(os.path.join(d, 'trials-*.jsonl')):
+                for line in open(f, encoding='utf-8'):
+                    if not line.strip():
+                        continue
+                    r = json.loads(line)
+                    if r.get('format_fail') and r.get('catastrophe'):
+                        ff_cat += 1
+                    if r.get('loop_flag') or r.get('truncated'):
+                        unmeas += 1
+        if unmeas:
+            fired['未測定（ループ・打ち切り）'].append(case)
+        if ff_cat == 0 and case == 'dilution_causal':
+            fired['希釈が効く場面（書式外が分子を食う）'].append(case)
+    if os.path.isdir(os.path.join(REPO, root, T['tags']['identity'])):
+        fired['同一性選別の走行'].append(case)
     rows.append(rec)
 
 missing = [k for k, v in fired.items() if not v]

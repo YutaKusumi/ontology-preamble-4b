@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""sample_inspection_B.py v1 —— 段階 B の**抽出検査**（腕と場面を伏せた標本・目視の記録・対応表の封印）。段階 A の型。
+"""sample_inspection_B.py v2 —— 段階 B の**抽出検査**（腕と場面を伏せた標本・目視の記録・対応表の封印）。段階 A の型。
 
 何をするか:
   (1) 走行の記録から、セル（場面 × 腕）ごとに `--per-cell` 件を無作為に抜き、**腕と場面を伏せた標識**で並べた標本を書く（生本文の先頭 `--chars` 字）。
@@ -16,11 +16,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--tag', default=None)
-ap.add_argument('--keydir', required=True, help='対応表の置き場（**公開の置き場の外**）')
+ap.add_argument('--selftest', action='store_true')
+ap.add_argument('--keydir', default=None, help='対応表の置き場（**公開の置き場の外**）')
 ap.add_argument('--per-cell', type=int, default=1)
 ap.add_argument('--fraction', type=float, default=0.25)
 ap.add_argument('--chars', type=int, default=600)
@@ -33,11 +34,23 @@ ap.add_argument('--allow-dry', action='store_true')
 ap.add_argument('--agree', default=None, help='目視の記録（json）を対応表と突き合わせる')
 a = ap.parse_args()
 T = runs_B.load_T(a.contrasts)
+if not a.selftest and not a.keydir:
+    sys.exit('--keydir（公開の置き場の外）が要る')
 tag = a.tag or T['tags']['main']
-if os.path.abspath(a.keydir).startswith(os.path.abspath(REPO)):
+def _inside_repo(kd):
+    """置き場が公開の置き場の中かを、**大文字小文字と接合点を畳んで**見る（実装検分の採否表 P281）。"""
+    k, r = os.path.normcase(os.path.realpath(kd)), os.path.normcase(os.path.realpath(REPO))
+    try:
+        return k == r or os.path.commonpath([k, r]) == r
+    except ValueError:
+        return False
+
+
+if not a.selftest and _inside_repo(a.keydir):
     sys.exit('対応表の置き場が公開の置き場の中にある（外に置く・段階 A の key_rule と同じ縛り）: %s' % a.keydir)
-os.makedirs(a.keydir, exist_ok=True)
-key_path = os.path.join(a.keydir, 'sampling-key-B-%s.json' % tag)
+if a.keydir:
+    os.makedirs(a.keydir, exist_ok=True)
+key_path = os.path.join(a.keydir, 'sampling-key-B-%s.json' % tag) if a.keydir else None
 out_txt = a.out or os.path.join(REPO, 'records', 'B', 'sampling-inspection-B-%s-sample.txt' % tag)
 seal_path = os.path.splitext(out_txt)[0].replace('-sample', '') + '-seal.json'
 sha256 = lambda p: hashlib.sha256(open(p, 'rb').read()).hexdigest().upper()
@@ -66,13 +79,24 @@ if a.agree:
     print('[sample_inspection_B] 一致 %d/%d → %s' % (agree, len(rows), out))
     sys.exit(0)
 
+if a.selftest:
+    # 置き場の判定（大文字小文字・接合点）と、標識の並べ替えの確かめ
+    assert _inside_repo(os.path.join(REPO, 'keys')), '公開の置き場の中を外と判定した'
+    assert _inside_repo(os.path.join(REPO, 'keys').lower()), '小文字の置き場を外と判定した（採否表 P281）'
+    assert not _inside_repo(REPO + '-keys'), '外の兄弟を中と判定した'
+    r_ = np.random.default_rng(T['seeds']['sample_inspection'])
+    perm = r_.permutation(20).tolist()
+    assert perm != sorted(perm), '並べ替えが恒等になっている'
+    print('[sample_inspection_B selftest] 置き場の判定（大文字小文字・兄弟）・標識の並べ替え: すべて通った')
+    sys.exit(0)
+
 # ---- 標本を作る ----
 if not a.force:
     for p in (out_txt, seal_path, key_path):
         if os.path.exists(p):
             sys.exit('既にある（--force で上書き）: %s' % p)
 idx = runs_B.index_runs(T, tag, a.root, allow_dry=a.allow_dry)
-rng = np.random.default_rng(a.seed if a.seed is not None else T['seeds']['dryrun'])
+rng = np.random.default_rng(a.seed if a.seed is not None else T['seeds']['sample_inspection'])
 cells = []
 for k, recs in sorted(idx.items(), key=lambda kv: str(kv[0])):
     for rec in recs:
@@ -88,22 +112,28 @@ for k, recs in sorted(idx.items(), key=lambda kv: str(kv[0])):
             cells.append({'scenario': rs[0].get('scenario') or rec['manifest'].get('scenario'), 'arm': arm, 'rows': rs, 'raw': raw})
 take = max(1, int(round(len(cells) * a.fraction)))
 pick_cells = [cells[i] for i in sorted(rng.choice(len(cells), size=min(take, len(cells)), replace=False).tolist())]
-items, sample_lines = [], []
-for ci, c in enumerate(pick_cells):
+picked = []
+for c in pick_cells:
     rs = c['rows']
     for j in rng.choice(len(rs), size=min(a.per_cell, len(rs)), replace=False).tolist():
         r = rs[j]
-        label = 'X%03d' % (len(items) + 1)
-        text = (c['raw'].get(r['trial_id']) or '')[:a.chars]
-        items.append({'label': label, 'trial_id': r['trial_id'], 'scenario': c['scenario'], 'arm': c['arm'],
-                      'machine_style': runs_B.stratum_of(r)})
-        sample_lines += ['【%s】' % label, text, '']
+        picked.append({'trial_id': r['trial_id'], 'scenario': c['scenario'], 'arm': c['arm'],
+                       'machine_style': runs_B.stratum_of(r), 'text': (c['raw'].get(r['trial_id']) or '')[:a.chars]})
+# **並べ替えてから**標識を振る（整列順のままだと腕と場面が読める・段階 A の登録者裁定 D25・実装検分の採否表 P280）
+order = rng.permutation(len(picked)).tolist()
+items, sample_lines = [], []
+for n_, i_ in enumerate(order, 1):
+    x = picked[i_]
+    label = 'X%03d' % n_
+    items.append({'label': label, 'trial_id': x['trial_id'], 'scenario': x['scenario'], 'arm': x['arm'],
+                  'machine_style': x['machine_style']})
+    sample_lines += ['【%s】' % label, x['text'], '']
 json.dump({'kind': 'sampling_key_B', 'tag': tag, 'items': items}, open(key_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 now = datetime.datetime.now(datetime.timezone.utc)
 json.dump({'kind': 'sample_inspection_B_seal', 'tag': tag, 'generated_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
            'key_path_note': '対応表は公開の置き場の外に置いた（この記録には置き場の名を書かない）', 'key_sha256': sha256(key_path),
            'n_items': len(items), 'per_cell': a.per_cell, 'fraction': a.fraction, 'chars': a.chars,
-           'seed': a.seed if a.seed is not None else T['seeds']['dryrun']},
+           'seed': a.seed if a.seed is not None else T['seeds']['sample_inspection'], 'shuffled': True},
           open(seal_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 head = ['# 段階 B 抽出検査の標本（腕と場面は伏せてある・機械の分類も伏せてある）',
         '# tag %s・%d 件・セルあたり %d 件・セルの割合 %g・先頭 %d 字' % (tag, len(items), a.per_cell, a.fraction, a.chars),

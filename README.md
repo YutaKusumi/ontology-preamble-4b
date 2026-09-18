@@ -38,15 +38,16 @@
 - いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 
 ## 段階 B（機構層・設計中・2026-09-18 再開・O の枠組みに対応する方向の加減で破局率は動くか）
-- **いまどこか**: 設計の途中である（凍結していない・**データは一つも無い**）。設計の検分は二段（エージェント二体・系統内外の四票）を終え、裁定 D75〜D86 を反映した。**器材の整備も一通り終え**（十二の器・合成データで札の全経路が発火）、その段で見つかった正本の不足に裁定 D87〜D89 を得た。次は**器材の実装検分**（次の外の目）。
+- **いまどこか**: 設計の途中である（凍結していない・**データは一つも無い**）。設計の検分は二段（エージェント二体・系統内外の四票）を終え、**器材の実装検分は差し戻し**——介入そのものが登録どおりでない三件を含む所見を全件再現し、器材を直した（裁定 D90〜D100）。次は**直した器材を同じ二体に見せ**、そのあと系統外へ。
 - **再開の記録（ここから読む）**: [`records/B/stageB-restart-2026-09-18.md`](records/B/stageB-restart-2026-09-18.md)——時系列・登録者裁定 D57〜D61 の逐語・正本と器の改訂・次の段取り・未決・不利な材料。
-- 正本 JSON `design/contrasts-B.json`（draft9-2026-09-18・SHA16 3EC6E04F17DBD485・生成器 `tools/make_contrasts_B.py` v5）／転記行 `records/B/design-facts-B.md`（SHA16 D1C0620E87086456・生成器 `tools/design_facts_B.py` v5）。
-- **設計草案9B（いまの版）**: [`design/design-stageB-draft9.md`](design/design-stageB-draft9.md)（SHA16 3C2070041C5084EF・**器材の整備の段で見つかった正本の不足**への裁定 D87〜D89 を反映・設計の検分の二段分と裁定 D62〜D86 は草案8B から引き継ぐ・検査の記録 [`records/B/numbers-lint-draft9B.md`](records/B/numbers-lint-draft9B.md)・違反 零）。前の版は `design/design-stageB-draft8.md`・`draft7.md`。
+- 正本 JSON `design/contrasts-B.json`（draft10-2026-09-18・SHA16 403D896F40B39305・生成器 `tools/make_contrasts_B.py` v6）／転記行 `records/B/design-facts-B.md`（SHA16 7C3058E32BAA59D5・生成器 `tools/design_facts_B.py` v5）。
+- **設計草案10B（いまの版）**: [`design/design-stageB-draft10.md`](design/design-stageB-draft10.md)（SHA16 1035B0529F7909C4・**器材の実装検分**〔差し戻し〕の採否 P257〜P303 と裁定 D90〜D100 を反映・検査の記録 [`records/B/numbers-lint-draft10B.md`](records/B/numbers-lint-draft10B.md)・違反 零）。前の版は `design/design-stageB-draft9.md`・`draft8.md`。
 - **設計の検分・一段目（系統内の新規個体二体・2026-09-18）**: [`records/reviews/B/design-round1/`](records/reviews/B/design-round1/)——票（逐語）・再現の事前登録・再現の記録（K1〜K22）・採否表（SHA16 ABE92488CDF958BA）。**起草者自身の誤り二件を含む**。
 - **設計の検分・二段目（系統外 Gemini 二名・系統内 claude.ai 二名・2026-09-18）**: [`records/reviews/B/design-round2/`](records/reviews/B/design-round2/)——票（逐語・出所 `provenance.md`）・依頼文と資料の束・起草者の見直し（S1〜S12）・再現の事前登録と記録（K23〜K50・**再現しなかった所見は無い**）・採否表（P212〜P256・SHA16 E90E5C3F03BADA26）・反映の事前登録と確かめ。判定は差し戻し 一・条件つき 三で、登録者裁定 D86 は条件つき（甲）。**起草者に由来する誤り四件**と、**系統外の一名だけが挙げた二件**も採否表に記録した。
 - 設計: Qwen3-4B-Instruct-2507（bf16・transformers・Colab）・場面 N1・S1・SK・S4・確証の族は 16 対比（減算・加算・交差。いずれも「方向 v 対 ノルム一致ランダム方向」）・n=200／腕。規模は合計 23,680 試行の見込み。
 - 段階 A との関係: 段階 A の結果は方向の抽出にも効果の根拠にも使わない（反映メモ A・再開の記録 §1 の D57・D58）。段階 A は初版の重み、段階 B は 2507 の重みである。
-- **器材（段階 B・整備済み・凍結前）**: 計画 [`records/B/tooling-plan-B-2026-09-18.md`](records/B/tooling-plan-B-2026-09-18.md)（器材を書く前に登録）→ 記録 [`records/B/tooling-record-B-2026-09-18.md`](records/B/tooling-record-B-2026-09-18.md)（器材の SHA16・**見つかった正本の不足三件**・**起草者の誤り三件**）→ 合成データによる検査 [`records/B/dry-run-B-2026-09-18.md`](records/B/dry-run-B-2026-09-18.md)（札の全経路が発火）。報告の雛形は結果の前に置いた（`records/B/results-report-template-B.md`）。
+- **器材（段階 B・凍結前）**: 計画 [`records/B/tooling-plan-B-2026-09-18.md`](records/B/tooling-plan-B-2026-09-18.md)（器材を書く前に登録）→ 記録 [`records/B/tooling-record-B-2026-09-18.md`](records/B/tooling-record-B-2026-09-18.md)（**実装検分の差し戻しの後に作り直した**・十三の器の SHA16・直した中身）→ 合成データによる検査 [`records/B/dry-run-B-2026-09-18.md`](records/B/dry-run-B-2026-09-18.md)（札の全経路が発火・整合検査は四つの相すべてで不整合 零）。
+- **器材の実装検分（エージェント二体・2026-09-18・差し戻し）**: [`records/reviews/B/impl-round/`](records/reviews/B/impl-round/)——依頼文と束・票（逐語）・事前登録（票を読む前の枠と追い問い K51〜K96）・再現（**全件再現**）・採否表（P257〜P303・SHA16 3D17EA6FD996A811）。**起草者に由来する誤りが大半**である。
 - 検分の予定（裁定 D59・D86）: 設計の検分（**二段とも済**）→ 器材の実装検分（**次の外の目はここ**）→ 凍結前の最終検分。各段に系統外を二名以上（claude.ai の票は起草者と同一系列として一票）。
 - 旧い草案（読むときは再開の記録と併せて）: `design/design-stageB-draft4.md` ほか。草案4 の主抽出位置は成り立たない。
 

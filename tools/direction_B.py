@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""direction_B.py v1 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
+"""direction_B.py v2 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
 
 正本 `design/contrasts-B.json` の `selection.position`・`selection.candidates`・`directions`・`activation_storage`・`runner` に従う。
 何をするか:
   (1) 腕 × 場面のプロンプトを組み、**プロンプトの最終トークン**（詰めでない最後の位置・`runner.padding`）の隠れ状態を、登録した層で取り出す。
-  (2) 同じ活性を**二度**（バッチの並べ方を変えて）取り、**完全一致**を確かめる（`activation_storage.determinism`）。一致しなければ止まる。
+  (2) 決定性の検査は二条（裁定 D91）: **同じ並べ方**で二度取って完全一致（外れたら走行を止める）／**並べ方を変えて**一度取り、許容差の内側かを見る（外れたら記帳して登録者に上げる）。
   (3) 方向を作る: (6a) 静的 h_O − h_Osec／(6b) 負荷下 h_{O-Ncold} − h_{Osec-Ncold}／Nk 方向 h_Nk − h_N／腕対の差方向 h_Onull − h_N。
       いずれも**抽出場面の平均**。td は v̂ のノルムに合わせる（`directions.td`）。
   (4) 要約統計: 層ごとのノルム・方向どうしのコサイン・**平均を取る前の場面ごとの差ベクトルどうしのコサイン**（抽出場面の間の安定性・採否表 P237）。
@@ -15,12 +15,12 @@
       python tools/direction_B.py --selftest
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, sys, json, hashlib, argparse, datetime
+import os, sys, json, math, hashlib, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 PANEL = T['arms']['panel']
@@ -30,8 +30,27 @@ DIRS = T['directions']
 
 
 def layer_index(ratio, n_layers):
-    """層の割合 → 層の添字（正本 selection.candidates.layer_index_rule・零始まり）。"""
-    return int(round(ratio * n_layers)) - 1
+    """層の割合 → 層の添字（正本 `selection.candidates.layer_index_rule`・零始まり）。
+
+    **四捨五入**（Python の `round` は偶数丸めなので使わない・実装検分の採否表 P283）。"""
+    idx = int(math.floor(ratio * n_layers + 0.5)) - 1
+    assert 0 <= idx < n_layers, ('層の添字が範囲の外', ratio, n_layers, idx)
+    return idx
+
+
+def hidden_states_index(layer_idx):
+    """`hidden_states` の添字（埋め込みの分だけ一つずれる・正本の「層の添字」とは別物）。"""
+    return layer_idx + 1
+
+
+def write_layer_record(out_dir, n_layers):
+    """総層数と層の添字を**記帳**する（正本 `layer_index_rule` が求める・採否表 P283）。"""
+    rec = {'num_hidden_layers': n_layers, 'ratios': LAYER_RATIOS,
+           'layer_indices': {str(r): layer_index(r, n_layers) for r in LAYER_RATIOS},
+           'hidden_states_indices': {str(r): hidden_states_index(layer_index(r, n_layers)) for r in LAYER_RATIOS}}
+    os.makedirs(out_dir, exist_ok=True)
+    json.dump(rec, open(os.path.join(out_dir, 'layers.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    return rec
 
 
 def unit(v):
@@ -78,17 +97,43 @@ def build_directions(H):
     return out, stats
 
 
-def determinism_ok(h1, h2):
-    """主位置の活性を二度取って**完全一致**（bitwise）を見る（activation_storage.determinism）。"""
-    bad = [k for k in h1 if not np.array_equal(h1[k], h2.get(k))]
+def determinism_same_order(h1, h2):
+    """**同じ並べ方**で二度取った活性の完全一致（bitwise）を見る（裁定 D91 の (i)）。一致しなければ走行を止める。"""
+    if set(h1) != set(h2):
+        return False, ['鍵の集合が違う: %s' % sorted(set(h1) ^ set(h2))[:4]]
+    bad = []
+    for k in h1:
+        a, b = np.asarray(h1[k]), np.asarray(h2[k])
+        if np.isnan(a).any() or np.isnan(b).any():
+            bad.append('%s: NaN を含む' % (k,))
+        elif not np.array_equal(a, b):
+            bad.append('%s: 一致しない' % (k,))
     return (not bad), bad
+
+
+def determinism_cross_order(h1, h2, tol=None):
+    """**並べ方を変えて**取った活性が許容差の内側かを見る（裁定 D91 の (ii)）。外れたら記帳して登録者に上げる（止めない）。"""
+    tol = tol or T['activation_storage']['determinism']['cross_order_tolerance']
+    rows = []
+    for k in sorted(set(h1) & set(h2), key=str):
+        a, b = np.asarray(h1[k], dtype=float), np.asarray(h2[k], dtype=float)
+        na, nb = float(np.linalg.norm(a)), float(np.linalg.norm(b))
+        cos = float(np.dot(a, b) / (na * nb)) if na and nb else None
+        rel = float(np.max(np.abs(a - b)) / na) if na else None
+        ok = (cos is not None and cos >= tol['cos_min']) and (rel is not None and rel <= tol['max_abs_over_norm'])
+        rows.append({'key': str(k), 'cos': cos, 'max_abs_over_norm': rel, 'ok': ok})
+    return all(r['ok'] for r in rows), rows
 
 
 def _selftest():
     rng = np.random.default_rng(7)
-    d, n_layers = 16, 36
-    assert layer_index(0.25, n_layers) == int(round(0.25 * n_layers)) - 1
-    assert layer_index(0.5, n_layers) == 17 and layer_index(0.75, n_layers) == 26
+    d = 16
+    # 層番号は**手で書いた期待値の表**と突き合わせる（実装式で確かめない・採否表 P283）
+    want = {(0.25, 36): 8, (0.5, 36): 17, (0.75, 36): 26, (0.25, 34): 8, (0.5, 34): 16, (0.75, 34): 25,
+            (0.25, 42): 10, (0.5, 42): 20, (0.75, 42): 31}
+    for (ratio, n), idx in want.items():
+        assert layer_index(ratio, n) == idx, ('層番号が期待値と違う', ratio, n, layer_index(ratio, n), idx)
+    assert hidden_states_index(layer_index(0.5, 36)) == 18, 'hidden_states の添字の変換が違う'
     H = {}
     for arm in PANEL:
         for sc in EX:
@@ -99,14 +144,33 @@ def _selftest():
     td = dirs[('td', LAYER_RATIOS[0])]
     assert abs(np.linalg.norm(td) - np.linalg.norm(v)) < 1e-9, 'td のノルムが v̂ に合っていない'
     assert set(stats[LAYER_RATIOS[0]]['stability']) == {'static', 'loaded', 'Nk', 'td'}
-    ok, bad = determinism_ok(H, dict(H))
+    # 決定性 (i) 同じ並べ方 → 完全一致
+    ok, bad = determinism_same_order(H, dict(H))
     assert ok and not bad
     H2 = dict(H)
     k0 = next(iter(H2))
     H2[k0] = H2[k0] + 1e-9
-    ok2, bad2 = determinism_ok(H, H2)
-    assert not ok2 and bad2 == [k0], '決定性の検査が差を見落とす'
-    print('[direction_B selftest] 層番号の規則・ノルム合わせ・安定性・決定性の検査: すべて通った')
+    ok2, bad2 = determinism_same_order(H, H2)
+    assert not ok2 and len(bad2) == 1, '決定性の検査が差を見落とす'
+    H3 = dict(H)
+    H3.pop(k0)
+    ok3, bad3 = determinism_same_order(H, H3)
+    assert not ok3 and '鍵の集合' in bad3[0], '鍵の欠けを見落とす'
+    H4 = dict(H)
+    H4[k0] = H4[k0] * np.nan
+    ok4, bad4 = determinism_same_order(H, H4)
+    assert not ok4 and 'NaN' in bad4[0], 'NaN を別の名で報告していない'
+    # 決定性 (ii) 並べ方を変えた → 許容差
+    tol = T['activation_storage']['determinism']['cross_order_tolerance']
+    Hs = {k: vv + rng.normal(size=d) * 1e-6 for k, vv in H.items()}
+    ok5, rows5 = determinism_cross_order(H, Hs)
+    assert ok5, ('わずかな差が許容差を外れた', rows5[:1])
+    Hb = {k: vv + rng.normal(size=d) * 1.0 for k, vv in H.items()}
+    ok6, rows6 = determinism_cross_order(H, Hb)
+    assert not ok6, '大きな差を許容差の内側と判定した'
+    print('[direction_B selftest] 層番号（期待値の表・%d 通り）・hidden_states の添字・ノルム合わせ・安定性・'
+          '決定性の二条（同じ並べ方は完全一致／並べ方を変えたら cos %g・相対差 %g）: すべて通った'
+          % (len(want), tol['cos_min'], tol['max_abs_over_norm']))
 
 
 if __name__ == '__main__':

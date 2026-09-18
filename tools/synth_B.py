@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""synth_B.py v1 —— 段階 B の**合成データ**の生成器（器材の検査用・実データを作らない）。
+"""synth_B.py v2 —— 段階 B の**合成データ**の生成器（器材の検査用・実データを作らない）。
 
 札の全経路を一度ずつ以上発火させるための走行の記録を作る（器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表）。
 作るもの（既定の置き場は results/_synth/<場合>/）:
@@ -14,7 +14,7 @@ import os, sys, json, shutil, argparse, datetime, hashlib
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 SC = T['scenarios']
@@ -29,28 +29,56 @@ INTERV = sorted(a for a in T['arms']['main'] if '+v' in a or '-v' in a)
 NOOP_BASE = {a: a.split('+v')[0].split('-v')[0] for a in INTERV}
 
 
-def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style_b, mention, correct=None, layer=None, coef=None, status='ok', sampling=None):
+def _arm_sha(arm):
+    base = arm.split('+v')[0].split('-v')[0]
+    return T['arms']['sha16'].get(base) or 'SYNTH'
+
+
+def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style_b, mention, correct=None,
+           layer=None, coef=None, status='ok', sampling=None, loop=False, trunc=False, direction_id=None):
+    """一試行の記録。**実機の採点の規約に合わせる**（実装検分の採否表 P301）——
+    書式外の試行は答えを読み取れないので `catastrophe`・`choice`・`correct` は None にする。"""
+    ff = bool(ff)
+    if status != 'ok' or ff:
+        cat_v, choice, corr = None, None, None
+    else:
+        cat_v = bool(cat)
+        choice = 'refuse' if refuse else 'A'
+        corr = (None if correct is None else bool(correct))
     return {'trial_id': '%s__%s__%04d' % (run_key, arm, i), 'trial_index': i, 'arm': arm, 'scenario': scenario, 'tag': tag,
-            'status': status, 'catastrophe': (None if status != 'ok' else bool(cat)), 'choice': ('refuse' if refuse else 'A'),
-            'format_fail': bool(ff), 'style_a': bool(style_a), 'style_b': bool(style_b), 'mention': bool(mention),
-            'loop_flag': False, 'truncated': False, 'correct': (None if correct is None else bool(correct)),
-            'seed': seed, 'run_key': run_key, 'runner_sha': 'SYNTH', 'arms_spec': arm, 'preamble_sha': 'SYNTH',
+            'status': status, 'catastrophe': cat_v, 'choice': choice, 'refuse_class': None,
+            'format_fail': ff, 'style_a': bool(style_a), 'style_b': bool(style_b), 'mention': bool(mention),
+            'loop_flag': bool(loop), 'truncated': bool(trunc), 'correct': corr, 'logprobs': None, 'resp_mean_path': None,
+            'seed': seed, 'run_key': run_key, 'runner_sha': 'SYNTH', 'arms_spec': arm, 'preamble_sha': _arm_sha(arm),
             'model': 'stub/dry-run', 'sampling': dict(sampling or T['runner']['generation']), 'layer': layer, 'coef': coef,
-            'direction_id': 'synth', 'batch_pos': i % T['runner']['batch'], 'proc_uuid': 'synth', 'dry_run': True}
+            'direction_id': direction_id or ('rand:%d' % (i % T['random_control']['count']) if 'vrand' in arm else 'fixed'),
+            'batch_pos': i % T['runner']['batch'], 'proc_uuid': 'synth', 'dry_run': True}
 
 
-def cell_trials(n, spec, **kw):
-    """spec: 件数の割り当て（cat・refuse・ff・style_a・style_b・mention・correct・api_error）。残りは無印の試行。"""
+def cell_trials(n, spec, start=0, **kw):
+    """spec: 件数の割り当て（cat・refuse・ff・style_a・style_b・mention・correct・api_error・loop・trunc）。
+
+    **書式外は破局の分子を食う**（実機と同じ・希釈の因果を作る・採否表 P301）。start は中断と再開のための試行の番号の起点。"""
     out = []
     n_err = int(spec.get('api_error', 0))
-    for i in range(n):
+    n_ff, n_loop, n_trunc = int(spec.get('ff', 0)), int(spec.get('loop', 0)), int(spec.get('trunc', 0))
+    cat_target, ref_target = int(spec.get('cat', 0)), int(spec.get('refuse', 0))
+    for k in range(n):
+        i = start + k
         if i < n_err:
-            out.append(_trial(i, status='error', cat=0, refuse=0, ff=0, style_a=0, style_b=0, mention=0, **kw))
+            out.append(_trial(i, cat=0, refuse=0, ff=0, style_a=0, style_b=0, mention=0, status='error', **kw))
             continue
         j = i - n_err
-        out.append(_trial(i, cat=j < spec.get('cat', 0), refuse=spec.get('cat', 0) <= j < spec.get('cat', 0) + spec.get('refuse', 0),
-                          ff=j < spec.get('ff', 0), style_a=j < spec.get('style_a', 0), style_b=j < spec.get('style_b', 0),
-                          mention=j < spec.get('mention', 0), correct=(None if 'correct' not in spec else j < spec['correct']), **kw))
+        ff = j < n_ff
+        cat = (not ff) and (n_ff <= j < n_ff + cat_target)
+        refuse = (not ff) and (n_ff + cat_target <= j < n_ff + cat_target + ref_target)
+        out.append(_trial(i, cat=cat, refuse=refuse, ff=ff, style_a=j < spec.get('style_a', 0), style_b=j < spec.get('style_b', 0),
+                          mention=j < spec.get('mention', 0), loop=(n_ff <= j < n_ff + n_loop),
+                          trunc=(n_ff + n_loop <= j < n_ff + n_loop + n_trunc),
+                          correct=(None if 'correct' not in spec else (j < spec['correct'])), **kw))
+        if spec.get('scoring_gap') and (n_ff + cat_target + ref_target) <= j < (n_ff + cat_target + ref_target + int(spec['scoring_gap'])):
+            out[-1]['catastrophe'] = None      # 採点欠落（status は ok のまま・裁定 D96）
+            out[-1]['choice'] = None
     return out
 
 
@@ -117,9 +145,15 @@ def case_all():
     # S4 の反証（下がった＝封印は外れ）
     m[('S4', 'Osec-Ncold+v6b')] = {'cat': 10, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
     m[('S4', 'Osec-Ncold+vrand')] = {'cat': 60, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    # api_error と未測定（ループ・打ち切り）を無操作の腕に入れる（採否表 P300・P302）
+    m[('N1', 'O')] = {'cat': 60, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 120, 'mention': 8, 'api_error': 12, 'loop': 3, 'trunc': 2}
     tune = {'best': (LAYERS[1], COEFS[1]), 'eff': 12, 'tie': False, 'nonpositive': False, 'ff_fail': (LAYERS[0], COEFS[0]), 'censor_all': False}
     qual = {'fail_selection': [], 'fail_post': ['Onull+vNk']}
-    return {'main': m, 'tune': tune, 'quality': qual, 'seal': {'sub:N1:O-Ncold-v~O-Ncold-vrand': '上'}}
+    # 封印は**一致する対比と逆向きの対比の両方**を持たせる（採否表 P297）
+    seal = {'sub:N1:O-Ncold-v~O-Ncold-vrand': '上',          # データは「下」——逆向きの枝
+            'add:N1:Onull+v~Onull+vrand': '下'}              # データも「下」——一致の枝
+    return {'main': m, 'tune': tune, 'quality': qual, 'seal': seal,
+            'resume': {'scenario': 'N1', 'arm': 'Onull+vtd'}}   # 中断と再開（採否表 P302）
 
 
 def case_gate1_closed():
@@ -142,7 +176,48 @@ def case_censor_candidates():
     return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12, 'censor_all': True}, 'quality': {'fail_selection': [], 'fail_post': []}}
 
 
-CASES = {'all': case_all, 'gate1_closed': case_gate1_closed, 'nonpositive': case_nonpositive, 'tie': case_tie, 'censor_candidates': case_censor_candidates}
+def case_scoring_gap():
+    """採点欠落（判定欄が空）と n_ok が零のセル（裁定 D96・採否表 P300）。"""
+    m = base_main_spec()
+    m[('S1', 'O-Ncold-v')] = {'cat': 20, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 120, 'mention': 8, 'scoring_gap': 7}
+    m[('SK', 'O-Ncold-v')] = {'cat': 0, 'refuse': 0, 'ff': 0, 'style_a': 0, 'style_b': 0, 'mention': 0, 'api_error': N_MAIN}
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
+
+
+def case_s4_branches():
+    """S4 の残りの枝——「下がらなかった（封印は当たり）」と「余地の条項で測れない（床）」（裁定 D81・D95）。"""
+    m = base_main_spec()
+    # 相手の率を**既測の基底の近く**（低い側）に置く——10 pt の検出力が線を越えるのはこの領域だけ（転記行 D）
+    m[('S4', 'Osec-Ncold+v6b')] = {'cat': 33, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('S4', 'Osec-Ncold+vrand')] = {'cat': 34, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
+
+
+def case_s4_floor():
+    m = base_main_spec()
+    m[('S4', 'Osec-Ncold+v6b')] = {'cat': 1, 'refuse': 2, 'ff': 2, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('S4', 'Osec-Ncold+vrand')] = {'cat': 8, 'refuse': 2, 'ff': 2, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
+
+
+def case_dilution_causal():
+    """**希釈が効く場面**——書式外が増えたぶんだけ破局の分子が減り、見かけの低下が出る（採否表 P301）。"""
+    m = base_main_spec()
+    m[('N1', 'Onull+v')] = {'cat': 138, 'refuse': 10, 'ff': 60, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('N1', 'Onull+vrand')] = {'cat': 138, 'refuse': 10, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
+
+
+def case_incomplete():
+    """品質床の走行の記録が欠けた場合（**記録の不在は「操作不能」ではない**・採否表 P272）。"""
+    m = base_main_spec()
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12},
+            'quality': {'fail_selection': [], 'fail_post': [], 'drop_selection': [(LAYERS[0], COEFS[0])]}}
+
+
+CASES = {'incomplete': case_incomplete, 'all': case_all, 'gate1_closed': case_gate1_closed, 'nonpositive': case_nonpositive, 'tie': case_tie,
+         'censor_candidates': case_censor_candidates, 'scoring_gap': case_scoring_gap, 's4_branches': case_s4_branches,
+         's4_floor': case_s4_floor, 'dilution_causal': case_dilution_causal}
 
 
 def build(case, out_root):
@@ -151,16 +226,37 @@ def build(case, out_root):
         shutil.rmtree(out_root)
     os.makedirs(out_root, exist_ok=True)
     # ---- 本走行 ----
+    resume = spec.get('resume')                     # {'scenario': 'N1', 'arm': 'Onull+vtd'} なら、その腕を二つのセッションに分ける
     for sc in SC:
-        trials = []
-        for arm in T['arms']['by_scenario'][sc]:
-            s = spec['main'][(sc, arm)]
-            trials += cell_trials(N_MAIN, s, arm=arm, scenario=sc, tag=T['tags']['main'], seed=T['seeds']['main'][sc],
-                                  run_key='%s__%s__s1' % (T['tags']['main'], sc))
         _pick = spec['tune'].get('best') or (LAYERS[1], COEFS[1])
-        write_run(out_root, T['tags']['main'], '%s__s1' % sc, {'scenario': sc, 'session': 1, 'n': N_MAIN, 'seed': T['seeds']['main'][sc],
-                                                               'arms': T['arms']['by_scenario'][sc], 'batch': T['runner']['batch'],
-                                                               'layer': _pick[0], 'coef': _pick[1]}, trials)
+        man = {'scenario': sc, 'session': 1, 'n': N_MAIN, 'seed': T['seeds']['main'][sc],
+               'arms': T['arms']['by_scenario'][sc], 'batch': T['runner']['batch'], 'layer': _pick[0], 'coef': _pick[1]}
+        trials, tail = [], []
+        for arm in T['arms']['by_scenario'][sc]:
+            s_ = spec['main'][(sc, arm)]
+            rk = '%s__%s__s1' % (T['tags']['main'], sc)
+            if resume and resume.get('scenario') == sc and resume.get('arm') == arm:
+                half = N_MAIN // 2
+                trials += cell_trials(half, s_, start=0, arm=arm, scenario=sc, tag=T['tags']['main'], seed=T['seeds']['main'][sc], run_key=rk)
+                tail += cell_trials(N_MAIN - half, s_, start=half, arm=arm, scenario=sc, tag=T['tags']['main'],
+                                    seed=T['seeds']['main'][sc], run_key='%s__%s__s2' % (T['tags']['main'], sc))
+            else:
+                trials += cell_trials(N_MAIN, s_, arm=arm, scenario=sc, tag=T['tags']['main'], seed=T['seeds']['main'][sc], run_key=rk)
+        write_run(out_root, T['tags']['main'], '%s__s1' % sc, man, trials)
+        if tail:
+            write_run(out_root, T['tags']['main'], '%s__s2' % sc, dict(man, session=2, arms=[resume['arm']]), tail)
+
+    # ---- 同一性選別（三スタック・採否表 P302）----
+    idt = T['tags']['identity']
+    for stack in T['identity_screen']['stacks']:
+        for arm in T['identity_screen']['arms_run']:
+            trials = cell_trials(T['identity_screen']['n'], {'cat': 40, 'refuse': 6, 'ff': 4, 'style_a': 20, 'style_b': 90, 'mention': 5},
+                                 arm=arm, scenario=T['identity_screen']['scenario'], tag=idt, seed=T['seeds']['identity_transformers'],
+                                 run_key='%s__%s__%s' % (idt, stack, arm))
+            write_run(out_root, idt, '%s__%s' % (stack, arm), {'stack': stack, 'scenario': T['identity_screen']['scenario'],
+                                                               'n': T['identity_screen']['n'], 'seed': T['seeds']['identity_transformers'],
+                                                               'arms': [arm], 'session': 1}, trials)
+
     # ---- 調整走行 ----
     tu = spec['tune']
     base_cat = 100                       # n_ok=200（抽出場面をまとめて）→ 一腕あたり 100 ずつ
@@ -190,6 +286,8 @@ def build(case, out_root):
     for base in QF_ARMS:
         arm = base + QF_OPS[base]
         for (l, c) in CANDS:
+            if (l, c) in (q.get('drop_selection') or []):
+                continue                      # 走行の記録を作らない（記録の不在）
             bad = (q['fail_selection'] == 'all') or (arm in (q['fail_selection'] or []))
             trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2}, arm=arm, scenario='quality', tag=tag_q, sampling=T['quality_floor']['generation'],
                                  seed=T['seeds']['quality'], layer=l, coef=c, run_key='%s__%s__L%sC%s' % (tag_q, arm, l, c))
@@ -211,9 +309,14 @@ def build(case, out_root):
     sd = os.path.join(out_root, 'sessions-B')
     os.makedirs(sd, exist_ok=True)
     for sc in SC:
-        json.dump({'tag': T['tags']['main'], 'session': 1, 'scenario': sc, 'gpu': 'synth', 'batch': T['runner']['batch'],
-                   'run_keys': ['%s__%s__s1__dryrun' % (T['tags']['main'], sc)], 'dry_run': True},
-                  open(os.path.join(sd, '%s__%s__s1.json' % (T['tags']['main'], sc)), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+        for sess in (1, 2):
+            rk = '%s__%s__s%d__dryrun' % (T['tags']['main'], sc, sess)
+            if not os.path.isdir(os.path.join(out_root, T['tags']['main'], rk)):
+                continue
+            json.dump({'tag': T['tags']['main'], 'session': sess, 'scenario': sc, 'gpu': 'synth', 'batch': T['runner']['batch'],
+                       'run_keys': [rk], 'dry_run': True},
+                      open(os.path.join(sd, '%s__%s__s%d.json' % (T['tags']['main'], sc, sess)), 'w', encoding='utf-8'),
+                      ensure_ascii=False, indent=1)
     # ---- 封印（任意） ----
     if spec.get('seal'):
         json.dump({'kind': 'seal_B', 'signs': spec['seal'], 's4': 'synth', 'dry_run': True},

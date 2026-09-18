@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""gate_B.py v1 —— 段階 B の**門1 と選定**（品質床の判定・希釈の門・床と天井・操作有効性・同値の帯・同点の割り方・非正の停止）。
+"""gate_B.py v2 —— 段階 B の**門1 と選定**（品質床の判定・希釈の門・床と天井・操作有効性・同値の帯・同点の割り方・非正の停止）。
 
 正本 `design/contrasts-B.json` の `quality_floor`・`dilution_gate`・`selection`・`gate1`・`censor`・`print_strings` に従う。
 入力: 調整走行（tag `tuneB`）と品質床の**選定の段**（tag `stageB-quality`・stage=selection）の走行の記録。
@@ -16,12 +16,12 @@
 用法: python tools/gate_B.py [--root <results の代わり>] [--out <md>] [--force] [--reps 20000]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, sys, json, math, argparse, datetime
+import os, sys, json, math, hashlib, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--root', default=None)
@@ -63,13 +63,25 @@ def tune_pooled(layer, coef, arm):
 # ---- (1) 品質床（選定の段） ----
 THR = QF['threshold_pt']
 qrows = []
+def partner(stage, base, session):
+    """無操作の相手を**同じセッション**から引く（裁定 D92・合算しない・採否表 P261）。"""
+    return CQ.get((stage, base, None, None, session))
+
+
 for base in QF_ARMS:
-    noop = CQ.get(('selection', base, None, None)) or CQ.get(('selection', base, 'null', 'null'))
     for (l, c) in CANDS:
         arm = base + QF_OPS[base]
-        cell = CQ.get(('selection', arm, l, c))
+        cells = {k: v for k, v in CQ.items() if k[0] == 'selection' and k[1] == arm and k[2] == l and k[3] == c}
+        if len(cells) > 1:
+            qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
+                          'note': '同じセルの走行が %d セッションに分かれている（相手も分ける・裁定 D92）' % len(cells)})
+            continue
+        cell = next(iter(cells.values()), None)
+        session = next(iter(cells), (None,) * 5)[4] if cells else None
+        noop = partner('selection', base, session)
         if cell is None or noop is None:
-            qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True})
+            qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
+                          'note': '走行の記録が無い（%s）' % ('セル' if cell is None else '同じセッションの相手')})
             continue
         n = QF['denominator']
         d_pt = 100.0 * (cell['correct'] - noop['correct']) / n
@@ -105,10 +117,16 @@ for (l, c) in CANDS:
 
 # ---- (2) 門1 ----
 n_qpass = sum(1 for (l, c) in CANDS if qpass[(l, c)])
+n_missing = len({(r['layer'], r['coef']) for r in qrows if r.get('missing')})
 gate1_open = n_qpass > 0
+incomplete = n_missing > 0          # 記録の不在は「操作不能」と区別する（採否表 P272）
 
 # ---- (5)(6)(7) 選定 ----
-rng = np.random.default_rng(T['seeds']['tiebreak'])
+# 同点の割り方の種に**データ由来の値**を混ぜる（固定の種だけだと「添字の小さい方」に偏る・実装検分の軽微1）
+_tie_mix = int(hashlib.sha256(json.dumps([[r.get('layer'), r.get('coef'), r.get('cat_v'), r.get('cat_r')] for r in rows],
+                                          ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:8], 16)
+rng = np.random.default_rng([T['seeds']['tiebreak'], _tie_mix])
+rng_band = np.random.default_rng([T['seeds']['tiebreak'] + 1, _tie_mix])   # 帯の模擬は別の流れ（軽微2）
 elig = [r for r in rows if r['eligible'] and r.get('eff_pt') is not None]
 pick, tie_note, band, tied, stop = None, None, None, [], None
 if gate1_open and elig:
@@ -126,8 +144,8 @@ if gate1_open and elig:
     n_r = int(np.mean([r['n_ok_r'] for r in elig]))
     p0 = float(np.mean([(r['cat_v'] + r['cat_r']) / max(r['n_ok_v'] + r['n_ok_r'], 1) for r in elig]))
     k = len(elig)
-    sim_v = rng.binomial(n_v, p0, size=(a.reps, k)) / max(n_v, 1)
-    sim_r = rng.binomial(n_r, p0, size=(a.reps, k)) / max(n_r, 1)
+    sim_v = rng_band.binomial(n_v, p0, size=(a.reps, k)) / max(n_v, 1)
+    sim_r = rng_band.binomial(n_r, p0, size=(a.reps, k)) / max(n_r, 1)
     eff = 100.0 * (sim_r - sim_v)
     spread = eff.max(axis=1) - eff.min(axis=1)
     q95 = float(np.quantile(spread, 0.95))
@@ -141,14 +159,20 @@ lines = []
 if not gate1_open:
     lines.append(PS['gate1_closed'])
 else:
-    lines.append(PS['gate1_open'].format(k=n_qpass, layer=(pick or {}).get('layer'), coef=(pick or {}).get('coef'),
-                                         eff=(pick or {}).get('eff_pt'), tied=len(tied)))
+    if pick is None:
+        lines.append('門1: 品質床に合格する層 × 係数は %d 組あるが、**選定の対象が残らなかった**（希釈の門・床と天井で全候補が外れた）。'
+                     '正本 selection.censor により、非正の停止と同じ扱いにして登録者に上げる。' % n_qpass)
+    else:
+        lines.append(PS['gate1_open'].format(k=n_qpass, layer=pick.get('layer'), coef=pick.get('coef'),
+                                             eff=pick.get('eff_pt'), tied=len(tied)))
 lines.append(PS['selection_coi'])
 lines.append(PS['selection_direction'])
 if stop:
     lines.append(PS['nonpositive'].format(eff=max((r['eff_pt'] for r in elig), default=None)))
 
-verdict = 'closed' if not gate1_open else ('escalate' if (stop or not elig) else 'open')
+verdict = ('incomplete' if incomplete else ('closed' if not gate1_open else ('escalate' if (stop or not elig) else 'open')))
+if incomplete:
+    lines.insert(0, '品質床の走行の記録が %d 候補ぶん欠けている。**記録の不在は「操作不能」ではない**——揃えてから門1 を判定する（採否表 P272）。' % n_missing)
 now = datetime.datetime.now(datetime.timezone.utc)
 jst = now.astimezone(datetime.timezone(datetime.timedelta(hours=9)))
 out_md = a.out or os.path.join(REPO, 'records', 'B', 'gate-B-%s.md' % jst.strftime('%Y-%m-%d'))

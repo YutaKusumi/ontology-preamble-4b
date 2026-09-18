@@ -271,6 +271,7 @@ pow_q = {p: q_power_exact(p, D_PICK * 1.5 / 100) for p in (0.7, 0.9)}
 acc_line = lambda d: '・'.join('%g で %.4f' % (k, v) for k, v in d.items())
 pow_line = lambda d: '・'.join('%g で %.3f' % (k, v) for k, v in d.items())
 F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・境目はちょうどの値を不合格とする）: 射程は選定の %d セル（土台 × 層 × 係数）に加え、選ばれた組での残りの介入 %d セルと、相手の無操作 %d セル（選定の段）＋%d セル（選定後の段・裁定 D88）。帰無発火率（同じ真の正答率で閾値以下になる確率・二項の畳み込みで厳密）は正答率 %s。真の低下 %.0f pt を捕まえる確率は %s。帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（裁定 D66・候補は器材の整備の段）。'
+          '**相手の無操作は段 × 土台 × セッションごとに一つ**で、ここではセッションが段に一つの見込みで数えている（裁定 D92・走行が分かれれば相手のセルはその数だけ増える）。'
           '**同じ問いを使うが二標本で比べる**ので、この行の帰無発火率と検出力は対にして読むより保守側である（採否表 P256）。無操作の相手は土台ごとに一つで多くのセルが共有するため、帰無での不合格は相関して塊で出る。課題は**無操作の正答率が %g 以上**のものを選ぶ（裁定 D85）。'
           % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, q_noop_sel, q_noop_post, acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells, T['quality_floor']['base_min']),
           'data': {'null_exact': {str(k): v for k, v in null_q.items()}, 'power_exact': {str(k): v for k, v in pow_q.items()},

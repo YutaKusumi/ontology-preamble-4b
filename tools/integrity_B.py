@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""integrity_B.py v1 —— 段階 B の走行の**整合検査**（率盲検・許可表方式）。
+"""integrity_B.py v2 —— 段階 B の走行の**整合検査**（率盲検・許可表方式）。
 
 **判定欄（catastrophe・choice・correct・style_a・style_b・mention）は読まない。** 許可した欄だけを取り出し、manifest と正本の登録に突き合わせる。
 当てる相（採否表 P230・**本走行の後だけでなく、調整走行と品質床にも当てる**）:
@@ -17,10 +17,12 @@ import os, sys, json, argparse, datetime, collections
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
-ALLOW = ('status', 'trial_id', 'trial_index', 'arm', 'scenario', 'tag', 'run_key', 'runner_sha', 'arms_spec', 'preamble_sha',
-         'format_fail', 'seed', 'model', 'sampling', 'layer', 'coef', 'direction_id', 'batch_pos', 'dry_run', 'loop_flag', 'truncated')
+# 許可表は**正本から**作る（裁定 D97・器の中に手書きしない）
+_T0 = runs_B.load_T()
+ALLOW = tuple(runs_B.field_registry(_T0)['integrity_allow'])
+BLIND = tuple(runs_B.field_registry(_T0)['blind'])
 ap = argparse.ArgumentParser()
 ap.add_argument('--tag', required=True)
 ap.add_argument('--root', default=None)
@@ -74,15 +76,23 @@ def check_cell(rec):
              'format_fail': sum(1 for r in rs if r.get('format_fail')), 'loop': sum(1 for r in rs if r.get('loop_flag')),
              'truncated': sum(1 for r in rs if r.get('truncated'))}
         cells.append(c)
-        if len(rs) != n_exp:
-            problems.append('%s × %s: 行数 %d（目標 %d）' % (rk, arm, len(rs), n_exp))
+        # 行数・番号・重複は**セル単位**で見る（中断と再開で走行が分かれるため・採否表 P264）。ここでは走行の中の重複だけを見る。
         if len(set(ids)) != len(ids):
-            problems.append('%s × %s: trial_id が重複（%d 件）' % (rk, arm, len(ids) - len(set(ids))))
-        if idx != list(range(len(rs))):
-            problems.append('%s × %s: trial_index の欠落または重複' % (rk, arm))
-        bad_sha = {r.get('preamble_sha') for r in rs}
-        if PHASE in ('main', 'identity') and ARM_SHA.get(arm.split('+v')[0].split('-v')[0]) and len(bad_sha) != 1:
-            problems.append('%s × %s: preamble_sha が一つでない' % (rk, arm))
+            problems.append('%s × %s: 走行の中で trial_id が重複（%d 件）' % (rk, arm, len(ids) - len(set(ids))))
+        if len(rs) > n_exp:
+            problems.append('%s × %s: 行数 %d が目標 %d を超える' % (rk, arm, len(rs), n_exp))
+        shas = {r.get('preamble_sha') for r in rs}
+        base_arm = arm.split('+v')[0].split('-v')[0]
+        want_sha = ARM_SHA.get(base_arm)
+        if PHASE in ('main', 'identity', 'tune'):
+            if len(shas) != 1:
+                problems.append('%s × %s: preamble_sha が一つでない' % (rk, arm))
+            elif want_sha and next(iter(shas)) != want_sha:
+                problems.append('%s × %s: **preamble_sha が正本 arms.sha16 と違う**（%s 対 %s）' % (rk, arm, next(iter(shas)), want_sha))
+        if PHASE == 'quality':
+            bad_ff = sum(1 for r in rs if r.get('format_fail') and r.get('correct') is True)
+            if bad_ff:
+                problems.append('%s × %s: 書式外なのに正答と記録された行が %d 件（正本 quality_floor.format_fail_rule）' % (rk, arm, bad_ff))
         for r in rs:
             if r.get('seed') not in seeds_exp:
                 problems.append('%s × %s: seed %s が登録（%s）と違う' % (rk, arm, r.get('seed'), sorted(seeds_exp)))
@@ -120,6 +130,55 @@ for k, recs in sorted(idx.items(), key=lambda kv: str(kv[0])):
         check_cell(rec)
 if not idx:
     problems.append('走行の記録が一つも無い（tag %s）' % a.tag)
+
+# ---- セル単位の検査（中断と再開・採否表 P264）: 走行を跨いで trial_id の重複と欠落を見る ----
+cells_by_key = {}
+for k, recs in idx.items():
+    for rec in recs:
+        m = rec['manifest']
+        for r in runs_B.iter_jsonl(rec['trials_path'], ALLOW):
+            # セルの単位は相ごとに違う（本走行は 場面 × 腕・調整走行は 場面 × 層 × 係数 × 腕・品質床は 段 × 腕 × 層 × 係数 × セッション・選別は スタック × 腕）
+            if PHASE == 'main':
+                key = (r.get('scenario') or m.get('scenario'), r['arm'])
+            elif PHASE == 'tune':
+                key = (m.get('scenario'), m.get('layer'), m.get('coef'), r['arm'])
+            elif PHASE == 'quality':
+                key = (m.get('stage'), r['arm'], m.get('layer'), m.get('coef'), m.get('session'))
+            else:
+                key = (m.get('stack'), m.get('scenario'), r['arm'])
+            c = cells_by_key.setdefault(key, {'ids': [], 'idx': [], 'runs': set(), 'n_ok': 0, 'gap': 0, 'cff': 0})
+            c['ids'].append(r['trial_id'])
+            c['idx'].append(r['trial_index'])
+            c['runs'].add(rec['run_key'])
+            if r['status'] == 'ok':
+                c['n_ok'] += 1
+n_exp_cell = expect_n(PHASE, {})
+for key, c in sorted(cells_by_key.items(), key=str):
+    if len(set(c['ids'])) != len(c['ids']):
+        problems.append('%s × %s: **走行を跨いで trial_id が重複**（%d 件・再開の重複を見落とさない）' % (key[0], key[1], len(c['ids']) - len(set(c['ids']))))
+    if sorted(c['idx']) != list(range(n_exp_cell)):
+        problems.append('%s × %s: セルの試行の番号が %d 件で連番でない（目標 %d・走行 %s）'
+                        % (key[0], key[1], len(c['idx']), n_exp_cell, '・'.join(sorted(c['runs']))))
+    if c['n_ok'] == 0:
+        problems.append('%s × %s: **n_ok が零**（測れなかったセル・裁定 D96）' % (key[0], key[1]))
+
+# ---- 判定欄を読まないことの自己検査（率盲検・裁定 D97） ----
+if set(ALLOW) & set(BLIND):
+    problems.append('許可表に判定欄が混ざっている: %s' % '・'.join(sorted(set(ALLOW) & set(BLIND))))
+
+# ---- 走行を跨いだ同一性（runner.fixed_across_runs・採否表 P274） ----
+FIX_KEYS = {'重みの rev': 'model_rev', 'tokenizer の版': 'tokenizer_rev', 'transformers の版': 'versions', 'バッチの大きさと並べ方': 'batch'}
+seen = {}
+for k, recs in idx.items():
+    for rec in recs:
+        for name, mk in FIX_KEYS.items():
+            v = rec['manifest'].get(mk)
+            if v is None:
+                continue
+            seen.setdefault(name, {}).setdefault(json.dumps(v, ensure_ascii=False, sort_keys=True), []).append(rec['run_key'])
+for name, vals in seen.items():
+    if len(vals) > 1:
+        problems.append('**走行を跨いで %s が同じでない**（%s・正本 runner.fixed_rule）' % (name, '／'.join('%s: %d 走行' % (v[:24], len(rs)) for v, rs in vals.items())))
 
 now = datetime.datetime.now(datetime.timezone.utc)
 jst = now.astimezone(datetime.timezone(datetime.timedelta(hours=9)))
