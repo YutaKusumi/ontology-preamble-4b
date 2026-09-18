@@ -40,9 +40,10 @@
 ## 段階 B（機構層・設計中・2026-09-18 再開・O の枠組みに対応する方向の加減で破局率は動くか）
 - **いまどこか**: 設計の途中である（凍結していない・データは無い）。草案4（2026-09-13）の主抽出位置が成り立たないことが検分の追い問いで判明し、登録者裁定で再設計した。次は草案5B と設計の検分。
 - **再開の記録（ここから読む）**: [`records/B/stageB-restart-2026-09-18.md`](records/B/stageB-restart-2026-09-18.md)——時系列・登録者裁定 D57〜D61 の逐語・正本と器の改訂・次の段取り・未決・不利な材料。
-- 正本 JSON `design/contrasts-B.json`（draft5-2026-09-18・SHA16 272BA678ADE12CA1・生成器 `tools/make_contrasts_B.py` v2）／転記行 `records/B/design-facts-B.md`（SHA16 A49907A9D4B88E75・生成器 `tools/design_facts_B.py` v2）。
-- **設計草案6B（いまの版）**: [`design/design-stageB-draft6.md`](design/design-stageB-draft6.md)（SHA16 710775A95E2B5095・登録者裁定 D62〜D67 を反映・原稿からの機械組み立て `tools/build_draftB.py`・本文の数は正本からの束縛のみ・検査の記録 [`records/B/numbers-lint-draft6B.md`](records/B/numbers-lint-draft6B.md)・違反 零）。一つ前は `design/design-stageB-draft5.md`。
-- 次: 設計の検分（裁定 D59 の一段目）。まずエージェント（系統内の新規個体）、その後に系統内外（claude.ai の Claude・Gemini）。
+- 正本 JSON `design/contrasts-B.json`（draft5-2026-09-18・SHA16 19277DD2CC7AE36B・生成器 `tools/make_contrasts_B.py` v2）／転記行 `records/B/design-facts-B.md`（SHA16 8ACD8C5E18C82360・生成器 `tools/design_facts_B.py` v2）。
+- **設計草案7B（いまの版）**: [`design/design-stageB-draft7.md`](design/design-stageB-draft7.md)（SHA16 C7C99F0E550C6289・設計の検分の一段目〔エージェント二体〕の採否 P190〜P211 と登録者裁定 D62〜D74 を反映・原稿からの機械組み立て・本文の数は正本からの束縛のみ・検査の記録 [`records/B/numbers-lint-draft7B.md`](records/B/numbers-lint-draft7B.md)・違反 零）。前の版は `design/design-stageB-draft5.md`・`draft6.md`。
+- **設計の検分・一段目（系統内の新規個体二体・2026-09-18）**: [`records/reviews/B/design-round1/`](records/reviews/B/design-round1/)——票（逐語）・再現の事前登録・再現の記録（K1〜K22）・採否表（SHA16 ABE92488CDF958BA）。**起草者自身の誤り二件を含む**。
+- **次: 設計の検分・二段目（系統内外）**: 依頼文 [`records/reviews/B/design-round2/review-request-B-design-ext.md`](records/reviews/B/design-round2/review-request-B-design-ext.md)（SHA16 3C43D49A59FD96B7）と資料の束（`bundle-B-design-index.md`・part1〜part3）。claude.ai の Claude と Gemini に回す。
 - 設計: Qwen3-4B-Instruct-2507（bf16・transformers・Colab）・場面 N1・S1・SK・S4・確証の族は 16 対比（減算・加算・交差。いずれも「方向 v 対 ノルム一致ランダム方向」）・n=200／腕。規模は合計 20,680 試行の見込み。
 - 段階 A との関係: 段階 A の結果は方向の抽出にも効果の根拠にも使わない（反映メモ A・再開の記録 §1 の D57・D58）。段階 A は初版の重み、段階 B は 2507 の重みである。
 - 検分の予定（裁定 D59）: 設計の検分 → 器材の実装検分 → 凍結前の最終検分。各段に系統外を二名以上（claude.ai の票は起草者と同一系列として一票）。

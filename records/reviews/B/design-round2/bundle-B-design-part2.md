@@ -1,3 +1,11 @@
+# 段階 B 設計草案7B の検分——資料の束 part2（正本 JSON の逐語）
+
+- 生成: 2026-09-18 00:19 UTC（日本時間 2026-09-18 09:19）・器 `tools/bundle_B_design.py`
+- 収めたもの（逐語・SHA16 は器が計算）: design/contrasts-B.json（SHA16 19277DD2CC7AE36B）
+
+本文と正本が食い違う場合は正本が勝ちます。以下は逐語です。
+
+```json
 {
  "id": "contrasts-B",
  "version": "draft7-2026-09-18",
@@ -1305,3 +1313,4 @@
  "alpha_upper": 0.15,
  "fwer_note": "3 族・各 α=0.05・Holm を族ごと（m は族ごとに 4・4・8）・上界 0.15。記述の族は p を印字しない。"
 }
+```
