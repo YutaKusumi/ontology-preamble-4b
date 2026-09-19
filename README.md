@@ -52,7 +52,7 @@
 - **器材の実装検分（エージェント二体・2026-09-18・差し戻し）**: [`records/reviews/B/impl-round/`](records/reviews/B/impl-round/)——依頼文と束・票（逐語）・事前登録・再現（**全件再現**）・採否表（P257〜P303）。**起草者に由来する誤りが大半**である。
 - **器材の直しの確認（同じ票を持たせた新規個体二体・2026-09-18・二度目の差し戻し）**: [`records/reviews/B/impl-round-2/`](records/reviews/B/impl-round-2/)——依頼文と束・票（逐語）・事前登録（票を読む前の枠と追い問い K97〜K129）・再現（**三十三件すべて再現**・SHA16 FD383674D5D39687）・採否表（P304〜P336）・裁定（D101〜D116）・**直しが効いたかの記録**（`verification-fixes-B-recheck.md`）。
 - **系統の外への検分（claude.ai 二名・Gemini 二名・2026-09-18・四票とも差し戻し）**: [`records/reviews/B/external-round/`](records/reviews/B/external-round/)——依頼文と束・票（逐語）・事前登録（票を受け取る前の枠と追い問い K130〜K176）・再現（**四十七件のうち四十六件**・SHA16 3BA48A6777C1A166）・採否表（P337〜P383）・裁定（D117〜D131）・**四つの設計の問いの検討**（`design-questions-D118-D129.md`——起草者が自分の案を二件取り下げた）。**系統外の二票だけが独立の目である。**
-- **最後の系統外への検分（裁定 D131・束は組んだ・票はまだ無い）**: [`records/reviews/B/final-round/`](records/reviews/B/final-round/)——依頼文 `final-request-B.md`・索引 `bundle-index.md`・資料の部（必読と参照）・票を受け取る前の枠 `preregistration-final-B.md`。
+- **最後の系統外への検分（裁定 D131・Gemini 二名・claude.ai 二名・四票とも条件つき可）**: [`records/reviews/B/final-round/`](records/reviews/B/final-round/)——依頼文と束・票を受け取る前の枠・票（逐語・出所 `provenance.md`）・追い問いの事前登録（再現の前）・再現の記録 `verification-B-final.md`・採否表と登録者裁定の案 `adoption-table-B-final.md`（**裁定待ち**）。**この巡の後の直しは、独立の目を通らない**。
 - 検分の予定（裁定 D59・D86・D131）: 設計の検分（**二段とも済**）→ 器材の実装検分（**済・二度とも差し戻し**）→ 系統の外への検分（**済・四票とも差し戻し**）→ **最後の系統外の巡**（裁定 D131・束は組んだ）→ 登録者の裁定と凍結。各段に系統外を二名以上（claude.ai の票は起草者と同一系列として一票）。
 - 旧い草案（読むときは再開の記録と併せて）: `design/design-stageB-draft4.md` ほか。草案4 の主抽出位置は成り立たない。
 
