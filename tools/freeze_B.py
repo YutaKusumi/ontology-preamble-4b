@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v9 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v11 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+v11（2026-09-20・方向の抽出の後・独立の目を通っていない）: **Colab の起動器に、データを作る相（正本 `tags` の相）がすべて書かれているか**を構文木から見て、欠けていたら止める。前は、残りの相（同一性選別・調整走行・品質床・本走行）を書いていなくても凍結の点検が「止めるもの 0 件」になった——凍結はデータを作る器を凍らせる手続きなので、書いていない相があるうちは凍らせない。
+v10（2026-09-20・方向の抽出の後・独立の目を通っていない）: 凍結する器に、凍結の値を組み立てる器 `freeze_values_B.py` を足した（値は手で打たず、走行の記録と正本から機械で写す）。
 v9（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: 凍結する器に **Colab の起動器 `colab/boot_stageB.py`** を足した（データを作る相を走らせる器——前は器材の整備の記録にだけ載り、凍結の一覧に無かった）。整備の記録の照らしで、置き場に「/」を含む器（`tools/colab/…`）も読めるようにした（前の読み方は「/」を含む名を拾えず、足すと「記録に載っていない」で止まった）。
 v8（2026-09-19 の夜・封印の後・独立の目を通っていない）: **登録者とコーディネータの予想の JSON の SHA-256 を記帳する**（正本 `predictions.order`「凍結の記録に両方の SHA を記帳」）。
   照合は `seal_B.check_predictions`（一つずつあること・書式の欄と選択肢・予想者・様式の名・起草者の封印がコーディネータの予想から作ったままか・
@@ -30,7 +32,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v9'
+VERSION = 'v11'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -47,7 +49,8 @@ TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 
          'qf_task_B.py', 'qf_select_B.py',       # 品質床の課題の器と選定の判定の器（v7・裁定 D146・D147——凍結の後の品質床の走行が課題の器を使う）
          'make_predictions_form_B.py',           # 予想の書式の器（v7・裁定 D148）
          'seal_B.py', 'compare_predictions_B.py',   # 封印の器と照合の器（v8・裁定 D148——照合の器は結果の前に書き、凍結の対象にする）
-         'colab/boot_stageB.py']                    # Colab の起動器（v9・データを作る相を走らせる器）
+         'colab/boot_stageB.py',                    # Colab の起動器（v9・データを作る相を走らせる器）
+         'freeze_values_B.py']                      # 凍結の値を組み立てる器（v10・2026-09-20）
 NEED_VALUES = ['model_rev', 'tokenizer_rev', 'num_hidden_layers', 'layer_indices', 'arm_token_lengths',
                'quality_task', 'quality_base_accuracy', 'v_hat_sha256', 'direction_stats', 'h_norm_ratio',
                'top_k_stageA_effective', 'quality_input_mode', 'quality_base_min_applied']   # 裁定 D142・D138・D137（v6）
@@ -146,6 +149,20 @@ if stale:
     blockers.append('器材の整備の記録の SHA16 が現物と違う（記録を作り直してから凍結する）: %s' % '・'.join(stale))
 if unlisted:
     blockers.append('器材の整備の記録に載っていない器材がある（記録に足す）: %s' % '・'.join(unlisted))
+# **Colab の起動器に、データを作る相がすべて書かれているか**（v11）——書いていない相があるうちは凍らせない
+_boot = os.path.join(REPO, 'tools', 'colab', 'boot_stageB.py')
+if os.path.exists(_boot):
+    import ast as _ast
+    _phases = set()
+    for _n in _ast.parse(open(_boot, encoding='utf-8').read()).body:
+        if isinstance(_n, _ast.Assign) and any(getattr(t_, 'id', None) == 'PHASES' for t_ in _n.targets):
+            _phases = set(_ast.literal_eval(_n.value))
+    _need_ph = {k for k in T['tags'] if k != 'dryrun'}          # 正本の置き場の相（合成データの相を除く）
+    _missing_ph = sorted(_need_ph - _phases)
+    if _missing_ph:
+        blockers.append('Colab の起動器に書かれていない相がある（データを作る器が揃うまで凍らせない・`tools/colab/boot_stageB.py` の PHASES）: %s' % '・'.join(_missing_ph))
+else:
+    blockers.append('Colab の起動器が無い: tools/colab/boot_stageB.py')
 # **採否表の引用の照合**（v5）: 手で打った引用が別の行を指していないか（裁定の番号と出所の札で照らせる範囲）
 import citations_B
 _cv, _ct = citations_B.check_all(REPO)

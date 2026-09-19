@@ -1,0 +1,294 @@
+{
+ "model_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "tokenizer_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "num_hidden_layers": 36,
+ "layer_indices": {
+  "0.25": 8,
+  "0.5": 17,
+  "0.75": 26
+ },
+ "arm_token_lengths": {
+  "N": {
+   "preamble_tokens": 0,
+   "prompt_tokens": {
+    "N1": 269,
+    "S1": 336,
+    "SK": 351,
+    "S4": 350
+   }
+  },
+  "Nk": {
+   "preamble_tokens": 10,
+   "prompt_tokens": {
+    "N1": 279,
+    "S1": 346,
+    "SK": 361,
+    "S4": 360
+   }
+  },
+  "O": {
+   "preamble_tokens": 193,
+   "prompt_tokens": {
+    "N1": 462,
+    "S1": 529,
+    "SK": 544,
+    "S4": 543
+   }
+  },
+  "O-Ncold": {
+   "preamble_tokens": 205,
+   "prompt_tokens": {
+    "N1": 474,
+    "S1": 541,
+    "SK": 556,
+    "S4": 555
+   }
+  },
+  "Onull": {
+   "preamble_tokens": 199,
+   "prompt_tokens": {
+    "N1": 468,
+    "S1": 535,
+    "SK": 550,
+    "S4": 549
+   }
+  },
+  "Onull-Ncold": {
+   "preamble_tokens": 211,
+   "prompt_tokens": {
+    "N1": 480,
+    "S1": 547,
+    "SK": 562,
+    "S4": 561
+   }
+  },
+  "Osec": {
+   "preamble_tokens": 195,
+   "prompt_tokens": {
+    "N1": 464,
+    "S1": 531,
+    "SK": 546,
+    "S4": 545
+   }
+  },
+  "Osec-Ncold": {
+   "preamble_tokens": 207,
+   "prompt_tokens": {
+    "N1": 476,
+    "S1": 543,
+    "SK": 558,
+    "S4": 557
+   }
+  }
+ },
+ "quality_task": {
+  "key": "jcqa",
+  "label": "甲",
+  "name": "JCommonsenseQA（JGLUE の一部・五択の常識推論）",
+  "input_form": "with_preamble",
+  "fragment_sha16": "E9A26FB691954209",
+  "decision_record": "records/B/qf-selection/qf-select-2026-09-19.json",
+  "decision_record_sha16": "7C6A8F009A6DC4BD",
+  "branch": "(i)"
+ },
+ "quality_base_accuracy": {
+  "O-Ncold": {
+   "correct": 174,
+   "n_ok": 200,
+   "accuracy": 0.87,
+   "format_fail": 0
+  },
+  "Onull": {
+   "correct": 183,
+   "n_ok": 200,
+   "accuracy": 0.915,
+   "format_fail": 0
+  }
+ },
+ "v_hat_sha256": "482D2D3D8366A7DD79D896631278CCD1BDACFD6EB94BCDF6C075A60D7FDFCA6C",
+ "direction_stats": {
+  "0.25": {
+   "norms": {
+    "static": 0.700633704662323,
+    "loaded": 0.700633704662323,
+    "Nk": 0.7006337642669678,
+    "td": 0.700633704662323
+   },
+   "raw_norm_ratio": {
+    "static": 1.0,
+    "loaded": 0.9737061390766557,
+    "Nk": 2.0102456187036264,
+    "td": 4.823941232613419
+   },
+   "cosines": {
+    "Nk~loaded": 0.28680264949798584,
+    "Nk~static": 0.2957242429256439,
+    "Nk~td": 0.20407384634017944,
+    "loaded~static": 0.8645374178886414,
+    "loaded~td": 0.1860112100839615,
+    "static~td": 0.16963180899620056
+   },
+   "stability": {
+    "static": {
+     "cos_N1_S1": 0.703209400177002,
+     "norm_ratio": 0.9453026996072311
+    },
+    "loaded": {
+     "cos_N1_S1": 0.7362683415412903,
+     "norm_ratio": 0.9094374983724699
+    },
+    "Nk": {
+     "cos_N1_S1": 0.777536153793335,
+     "norm_ratio": 1.0310062280506995
+    },
+    "td": {
+     "cos_N1_S1": 0.8802196979522705,
+     "norm_ratio": 0.8187643538276376
+    }
+   }
+  },
+  "0.5": {
+   "norms": {
+    "static": 1.3012276887893677,
+    "loaded": 1.3012278079986572,
+    "Nk": 1.3012275695800781,
+    "td": 1.3012275695800781
+   },
+   "raw_norm_ratio": {
+    "static": 1.0,
+    "loaded": 0.9925100927681756,
+    "Nk": 2.093401220962249,
+    "td": 7.9673132371806705
+   },
+   "cosines": {
+    "Nk~loaded": 0.23923777043819427,
+    "Nk~static": 0.23551307618618011,
+    "Nk~td": 0.5851250290870667,
+    "loaded~static": 0.8315715193748474,
+    "loaded~td": 0.11727077513933182,
+    "static~td": 0.08263524621725082
+   },
+   "stability": {
+    "static": {
+     "cos_N1_S1": 0.6034140586853027,
+     "norm_ratio": 1.2118625133983283
+    },
+    "loaded": {
+     "cos_N1_S1": 0.6212335228919983,
+     "norm_ratio": 1.113563544682437
+    },
+    "Nk": {
+     "cos_N1_S1": 0.7400525212287903,
+     "norm_ratio": 1.4137789078700504
+    },
+    "td": {
+     "cos_N1_S1": 0.9215673804283142,
+     "norm_ratio": 1.2097009503205998
+    }
+   }
+  },
+  "0.75": {
+   "norms": {
+    "static": 22.896270751953125,
+    "loaded": 22.896270751953125,
+    "Nk": 22.896270751953125,
+    "td": 22.896272659301758
+   },
+   "raw_norm_ratio": {
+    "static": 1.0,
+    "loaded": 1.009633762737166,
+    "Nk": 2.4783174944852817,
+    "td": 2.4485916642786214
+   },
+   "cosines": {
+    "Nk~loaded": 0.3785666227340698,
+    "Nk~static": 0.29420262575149536,
+    "Nk~td": 0.13920694589614868,
+    "loaded~static": 0.7893028855323792,
+    "loaded~td": 0.11653253436088562,
+    "static~td": 0.0768943727016449
+   },
+   "stability": {
+    "static": {
+     "cos_N1_S1": 0.7304161787033081,
+     "norm_ratio": 1.0431822665277213
+    },
+    "loaded": {
+     "cos_N1_S1": 0.8058533668518066,
+     "norm_ratio": 1.3282029504277593
+    },
+    "Nk": {
+     "cos_N1_S1": 0.5114066004753113,
+     "norm_ratio": 1.5964361213381217
+    },
+    "td": {
+     "cos_N1_S1": 0.7130740880966187,
+     "norm_ratio": 1.0002250895918297
+    }
+   }
+  }
+ },
+ "h_norm_ratio": {
+  "0.25": {
+   "h_norm_main": 31.797578811645508,
+   "vhat_norm": 0.700633704662323,
+   "vhat_over_h": 0.022034184074597646
+  },
+  "0.5": {
+   "h_norm_main": 42.77571105957031,
+   "vhat_norm": 1.3012276887893677,
+   "vhat_over_h": 0.03041977927560928
+  },
+  "0.75": {
+   "h_norm_main": 136.89834594726562,
+   "vhat_norm": 22.896270751953125,
+   "vhat_over_h": 0.16725016356861577
+  }
+ },
+ "top_k_stageA_effective": {
+  "value": 20,
+  "status": "read",
+  "source": "results/sessions-B/qfcandB__s1.json の topk"
+ },
+ "quality_input_mode": "with_preamble",
+ "quality_base_min_applied": {
+  "base_min": 0.85,
+  "branch": "(i)",
+  "fallback_used": false
+ },
+ "_meta": {
+  "kind": "freeze_values_B",
+  "version": "v1",
+  "generated_utc": "2026-09-19T22:37:42Z",
+  "sources": {
+   "実重みが要る値": "相 dir の走行（tools/colab/boot_stageB.py v2・相 dir・dirB__s1・コミット 58bca1d70b65）",
+   "品質床の課題と無操作の正答率・前置きの有無・下限の適用": "正本 quality_floor.selected（裁定 D147・判定の記録 records/B/qf-selection/qf-select-2026-09-19.json）",
+   "top_k の実効の値": "正本 measured.top_k_stageA_effective（裁定 D142・results/sessions-B/qfcandB__s1.json の topk）"
+  },
+  "contrasts_sha16_now": "1EB97C80409B4711",
+  "contrasts_sha16_at_extraction": "2AFA053ACD15706C",
+  "direction_run": {
+   "dir_values": "results/dirB/dirB__s1/freeze-values-dir.json",
+   "dir_values_sha16": "B864564BC8CF7962",
+   "directions_json": "results/dirB/dirB__s1/directions.json",
+   "directions_json_sha16": "D5AE575E449200B5",
+   "activations_npz_sha256": "7F41AC1B3BC02B7A5AAC146E114B795676071D46DD653062A7000C2B6A0D8C20",
+   "determinism": {
+    "same_order": true,
+    "cross_order_ok": false
+   },
+   "gpu": "NVIDIA L4, 23034",
+   "versions": {
+    "transformers": "4.57.3",
+    "torch": "2.11.0+cu128",
+    "tokenizers": "0.22.2",
+    "accelerate": "1.14.0",
+    "huggingface_hub": "0.36.2",
+    "numpy": "2.1.3",
+    "scipy": "1.16.3",
+    "pip_freeze_sha16": "1236E5B9B1F2DE9D"
+   }
+  },
+  "fence": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+ }
+}

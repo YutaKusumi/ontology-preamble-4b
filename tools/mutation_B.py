@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v8 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v9 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v9（2026-09-20・方向の抽出の後・独立の目を通っていない）: 凍結の値の器の型を一つ足した（DRY〔乱数の模型〕の値を凍結の値に通す）。
 v8（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: 方向の抽出器 v7 の二つの型を足した（決定性 (i) の不一致で止めない・腕ごとのトークン長で場面を落とす）。
 v7（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: 予想の照合の器（`compare_predictions_B`）の写し方と照らしを外す型を五つ足した（非有意の写し方・逆向きの確証の向き・帯の境目・集計と門の記録の照合・予想しないの数え方）。
 v6（2026-09-19 の夜・封印の後・独立の目を通っていない）: 封印した予想の照合（`seal_B.check_predictions`）の五つの検査を外す型を足した（出所の SHA・向き・封印の経緯の記録の SHA・予想者・様式の名）。
@@ -17,7 +18,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v8'
+VERSION = 'v9'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -54,6 +55,10 @@ MUTATIONS = [
      ("for sc in scenarios}}", "for sc in scenarios[:1]}}"),
      ['direction_B.py'],
      '凍結時に記帳するトークン長が一つの場面の分しか無い誤り（正本 position_length.record_at_freeze・主位置の位置は場面ごとに違う）'),
+    ('DRY の値を凍結の値に通す', 'D122', 'freeze_values_B.py',
+     ("    if dv.get('dry') or dv.get('model_rev') in (None, '', 'dry'):", '    if False:'),
+     ['freeze_values_B.py'],
+     '乱数の小さな模型（DRY）の値が、凍結時に記帳する値として通る誤り'),
     # ---- 直しの監査（2026-09-19）で器に入れた規則 ----
     ('S4 の片側上限を狭める', 'D118', 'rules_B.py',
      ('    one = newcombe(kB, nB, kA, nA, 0.90)', '    one = newcombe(kB, nB, kA, nA, 0.50)'),

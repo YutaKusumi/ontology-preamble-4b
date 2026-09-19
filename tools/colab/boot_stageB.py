@@ -118,9 +118,9 @@ if PHASE == 'qfcand':
     if T['quality_floor'].get('task_registered') is None:
         sys.exit('[boot] 正本に品質床の課題の登録が無い（quality_floor.task_registered・裁定 D146）')
 else:
-    TAG = T['tags'].get('direction')              # 相 dir の置き場（正本 tags.direction・v2）
+    TAG = T['tags'].get('dir')                    # 相 dir の置き場（正本 tags.dir・v2）
     if not TAG or not T['activation_storage'].get('pre_freeze_run'):
-        sys.exit('[boot] 正本に相 dir の登録が無い（tags.direction・activation_storage.pre_freeze_run）')
+        sys.exit('[boot] 正本に相 dir の登録が無い（tags.dir・activation_storage.pre_freeze_run）')
 mark('repo', head=HEAD[:12], commit_fixed=FIXED, persist=PERSIST, canon_version=T['version'])
 
 # ---- 2. GPU（正本 runner.environment）

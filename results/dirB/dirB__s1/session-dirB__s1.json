@@ -1,0 +1,142 @@
+{
+ "tag": "dirB",
+ "session": 1,
+ "run_keys": [
+  "dirB__s1"
+ ],
+ "batch": 16,
+ "phase": "dir",
+ "gpu": "NVIDIA L4, 23034",
+ "memory_class_gb": 24,
+ "versions": {
+  "transformers": "4.57.3",
+  "torch": "2.11.0+cu128",
+  "tokenizers": "0.22.2",
+  "accelerate": "1.14.0",
+  "huggingface_hub": "0.36.2",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "pip_freeze_sha16": "1236E5B9B1F2DE9D"
+ },
+ "repo_head": "58bca1d70b6529b23a9889fe38be76305f32d765",
+ "commit": "58bca1d70b6529b23a9889fe38be76305f32d765",
+ "commit_fixed": true,
+ "pip_freeze_sha16": "1236E5B9B1F2DE9D",
+ "started": "2026-09-19T21:57:54Z",
+ "boot": "v2",
+ "dry": false,
+ "clause": "本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。",
+ "counts": {
+  "dirB__s1": {
+   "arms": 8,
+   "extraction_scenarios": 2,
+   "layers": 3,
+   "determinism_cross_order_ok": false
+  }
+ },
+ "topk": null,
+ "model_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "model_rev_full": {
+  "id": "Qwen/Qwen3-4B-Instruct-2507",
+  "registered": "cdbee75f17c0",
+  "full": "cdbee75f17c01a7cc42f958dc650907174af0554",
+  "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554"
+ },
+ "tokenizer_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "selftests": {
+  "run_stageB_local.py": {
+   "rc": 0,
+   "tail": "[run_stageB_local selftest] 組み立て（凍結走行器 SHA16 9F849D2823132BA2・振る舞いの照合つき）・腕の素材・腕の名から方向・指示・凍結パーサ（12EAA8B845BC0A2F）・試行の記録の欄 31・層の割合と添字の対応・様式と言及と refuse の分類とループ（段階 "
+  },
+  "direction_B.py": {
+   "rc": 0,
+   "tail": "[direction_B selftest] 層番号（期待値の表・9 通り）・hidden_states の添字・ノルム合わせ・安定性・‖v̂‖ と ‖h‖ の比・決定性の二条（同じ並べ方は完全一致／バッチの組成を変えたら cos 0.999・相対差 0.01）・二条の当て方（(i) は止め (ii) は記帳）・腕ごと"
+  },
+  "steer_B.py": {
+   "rc": 0,
+   "tail": "[steer_B selftest] 全方向 × 全係数 × 全層の合成 54 通り・引き直し・層の子ストリーム・割り当て（交互）と再開・帯の起点の関数・加減の向き・生成の設定・帯の起点（実トークナイザ・独立の正解と照合・詰め三通り・腕の混在を止めることも確かめた）: すべて通った"
+  }
+ },
+ "runner_sha16": "19CF08D60957EB8E",
+ "assembly_frozen_sha16": "9F849D2823132BA2",
+ "updated": "2026-09-19T22:00:31Z",
+ "log": [
+  {
+   "step": "repo",
+   "t": 17.2,
+   "at": "2026-09-19T21:57:35Z",
+   "head": "58bca1d70b65",
+   "commit_fixed": true,
+   "persist": "/content/drive/MyDrive/op4b-stageB",
+   "canon_version": "draft13-2026-09-19"
+  },
+  {
+   "step": "gpu",
+   "t": 17.3,
+   "at": "2026-09-19T21:57:35Z",
+   "gpu": "NVIDIA L4, 23034",
+   "memory_class_gb": 24
+  },
+  {
+   "step": "pip",
+   "t": 36.3,
+   "at": "2026-09-19T21:57:54Z",
+   "versions": {
+    "transformers": "4.57.3",
+    "torch": "2.11.0+cu128",
+    "tokenizers": "0.22.2",
+    "accelerate": "1.14.0",
+    "huggingface_hub": "0.36.2",
+    "numpy": "2.1.3",
+    "scipy": "1.16.3",
+    "pip_freeze_sha16": "1236E5B9B1F2DE9D"
+   }
+  },
+  {
+   "step": "weights",
+   "t": 93.6,
+   "at": "2026-09-19T21:58:51Z",
+   "rev": "cdbee75f17c0",
+   "layers": 36
+  },
+  {
+   "step": "selftest",
+   "t": 98.2,
+   "at": "2026-09-19T21:58:56Z",
+   "tool": "run_stageB_local.py",
+   "rc": 0
+  },
+  {
+   "step": "selftest",
+   "t": 100.1,
+   "at": "2026-09-19T21:58:58Z",
+   "tool": "direction_B.py",
+   "rc": 0
+  },
+  {
+   "step": "selftest",
+   "t": 106.3,
+   "at": "2026-09-19T21:59:04Z",
+   "tool": "steer_B.py",
+   "rc": 0
+  },
+  {
+   "step": "extract",
+   "t": 192.8,
+   "at": "2026-09-19T22:00:31Z",
+   "run_key": "dirB__s1",
+   "seconds": 86.4,
+   "same_order": true,
+   "cross_order_ok": false
+  }
+ ],
+ "ended": "2026-09-19T22:00:31Z",
+ "files_sha16_lf": {
+  "dirB/dirB__s1/directions.json": "D5AE575E449200B5",
+  "dirB/dirB__s1/directions.npz": "66CFF4575C07EE6B",
+  "dirB/dirB__s1/freeze-values-dir.json": "B864564BC8CF7962",
+  "dirB/dirB__s1/layers.json": "9E40DB6D680AED0D",
+  "dirB/dirB__s1/main_position_activations.npz": "7F41AC1B3BC02B7A"
+ },
+ "wall_s": 192.8
+}

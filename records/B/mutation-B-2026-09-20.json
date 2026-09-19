@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
- "version": "v8",
- "generated_utc": "2026-09-19T21:21:36Z",
+ "version": "v9",
+ "generated_utc": "2026-09-19T22:13:29Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -102,6 +102,20 @@
    }
   },
   {
+   "name": "DRY の値を凍結の値に通す",
+   "ruling": "D122",
+   "target": "freeze_values_B.py",
+   "applied": true,
+   "what": "乱数の小さな模型（DRY）の値が、凍結時に記帳する値として通る誤り",
+   "caught": [
+    "freeze_values_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "freeze_values_B.py": "AssertionError: 止まらなかった: DRY の値"
+   }
+  },
+  {
    "name": "S4 の片側上限を狭める",
    "ruling": "D118",
    "target": "rules_B.py",
@@ -112,7 +126,7 @@
    ],
    "missed": [],
    "lines": {
-    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '当否を言わない', 0.7070567376539129, np.float64(0.3335191915017552))"
+    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '10 pt 以上の低下は否定', 0.2450702712391273, np.float64(0.6186078173912847))"
    }
   },
   {
@@ -764,5 +778,5 @@
   }
  ],
  "missed": 0,
- "total": 55
+ "total": 56
 }
