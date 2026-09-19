@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
-"""boot_stageB.py v1 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
-相（OP4B_PHASE）: **qfcand だけ**（品質床の課題の選定の測定 → 同じランタイムで top_k の確かめ）。同一性選別・調整走行・品質床・本走行の相は、まだ書いていない。
+"""boot_stageB.py v2 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
+v2（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: **相 dir** を足した——凍結の前に、前置きの腕 × 抽出場面 × 候補の層の**主位置の活性だけ**を実重みで取り、
+  方向（v̂ ほか）・要約統計・‖v̂‖／‖h‖・層の添字・腕ごとのトークン長を書く（`direction_B.extract`・**生成しない・率は一つも作らない**・正本 `activation_storage.pre_freeze_run`）。
+  止める条件は登録どおり（層の対応の崩れ・決定性 (i) の不一致・自己検査・重みの版・GPU）。決定性 (ii) の外れは止めずに記帳する。相 qfcand の流れは変えていない。
+相（OP4B_PHASE）: **qfcand**（品質床の課題の選定の測定 → 同じランタイムで top_k の確かめ）と **dir**（凍結の前の方向の抽出・v2）。同一性選別・調整走行・品質床・本走行の相は、まだ書いていない。
 運用: コーディネータが登録者の Chrome 越しに Colab を操作する——**ランタイムの選択と結果の zip のダウンロードもコーディネータ**（登録者の指示・2026-09-19）。
 登録者の手に残すのは Drive 接続の OAuth 同意と、プラン・支払い。資格情報は入力しない（HF_TOKEN のポップアップはキャンセル・公開の重み）。
 セルに打つのは一行だけ（先頭の下線は type が先頭十数字を落とす事故の緩衝・<commit> は 40 桁）:
@@ -14,13 +17,18 @@
   7. top_k の確かめ（裁定 D142）: 段階 A と同じ版の vLLM を入れ、段階 A と同じ起動の引数で立て、起動の記録から既定の標本化の値を読む。
      段階 A の起動の記録が Drive（op4b-stageA/logs）に残っていれば、それも読む（読むだけ）。読めなければ「読めなかった」と記帳する（正本の値のまま）。
   8. 終わり（ファイルの SHA16・生テキストの SHA16・zip）。**生テキストは公開の置き場に置かない**（正本 quality_floor.raw_publication）
+流れ（dir・v2）: 0〜4 は qfcand と同じ（永続先・リポジトリ・GPU・pip・重み）→ 5. 自己検査（走行器・抽出器・介入の器・実トークナイザ）と、腕の本文が凍結走行器の rd と一致すること
+  → 6. 抽出（`direction_B.extract`: 層の対応 → 活性を三度〔同じ並べ方で二度・走行器と同じバッチの組成で一度〕→ 決定性の二条 → 方向〔全方向を ‖v̂‖ に合わせる〕
+  → 要約統計・‖v̂‖／‖h‖・腕ごとのトークン長）→ 7. 凍結の値の候補（freeze-values-dir.json）とセッション記録 → 8. zip（置き場 dirB/dirB__s<n> だけ・前の相の記録は入れない）。
+  一行の相の値は OP4B_PHASE='dir'。**生成しないので率は一つも作らない。** 活性の npz は Drive と手元（リポジトリの外）に保全し、方向の npz と記録はリポジトリに置く（正本 activation_storage.pre_freeze_run）。
 DRY（手元の検査・OP4B_DRY=1）: 小さな乱数の模型（登録機種のトークナイザの設定から作る・実重みではない）で 6 まで通し、7 は起動の記録の読み方だけを見本の行で確かめる。
   OP4B_REPO_DIR・OP4B_PERSIST・OP4B_TOKENIZER_DIR が要る。OP4B_DRY_N で一セルの問いの数を減らす（既定 20——バッチの境目を跨ぐ）。
 柵: 本スクリプトの出力は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, sys, re, json, time, glob, shutil, signal, hashlib, datetime, subprocess, urllib.request
 
-VERSION = 'v1'
+VERSION = 'v2'
+PHASES = ('qfcand', 'dir')
 T0 = time.time(); LOG = []
 PHASE = os.environ.get('OP4B_PHASE', 'qfcand')
 SESSION = int(os.environ.get('OP4B_SESSION', '1'))
@@ -31,8 +39,8 @@ REPO_URL = 'https://github.com/YutaKusumi/ontology-preamble-4b.git'
 MODEL_KEY = '4B-2507'
 CLAUSE = '本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。'
 now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-if PHASE != 'qfcand':
-    sys.exit('[boot] 相 %s はまだ書いていない（この版は qfcand だけ）' % PHASE)
+if PHASE not in PHASES:
+    sys.exit('[boot] 相 %s はまだ書いていない（この版は %s）' % (PHASE, '・'.join(PHASES)))
 if SESSION < 1:
     sys.exit('[boot] OP4B_SESSION は一以上')
 if DRY:
@@ -102,12 +110,17 @@ import runs_B, runs_A
 T = runs_B.load_T()
 TA = runs_A.load_T(os.path.join(REPO, 'design', 'contrasts-A.json'))
 HF = runs_A.read_json(os.path.join(REPO, 'records', 'A', 'hf-models-A.json'))
-CS = T['quality_floor']['candidate_session']
-TAG = CS['tag']
-if T['tags'].get('qfcand') != TAG:
-    sys.exit('[boot] 正本 tags.qfcand（%s）が candidate_session.tag（%s）と違う' % (T['tags'].get('qfcand'), TAG))
-if T['quality_floor'].get('task_registered') is None:
-    sys.exit('[boot] 正本に品質床の課題の登録が無い（quality_floor.task_registered・裁定 D146）')
+if PHASE == 'qfcand':
+    CS = T['quality_floor']['candidate_session']
+    TAG = CS['tag']
+    if T['tags'].get('qfcand') != TAG:
+        sys.exit('[boot] 正本 tags.qfcand（%s）が candidate_session.tag（%s）と違う' % (T['tags'].get('qfcand'), TAG))
+    if T['quality_floor'].get('task_registered') is None:
+        sys.exit('[boot] 正本に品質床の課題の登録が無い（quality_floor.task_registered・裁定 D146）')
+else:
+    TAG = T['tags'].get('direction')              # 相 dir の置き場（正本 tags.direction・v2）
+    if not TAG or not T['activation_storage'].get('pre_freeze_run'):
+        sys.exit('[boot] 正本に相 dir の登録が無い（tags.direction・activation_storage.pre_freeze_run）')
 mark('repo', head=HEAD[:12], commit_fixed=FIXED, persist=PERSIST, canon_version=T['version'])
 
 # ---- 2. GPU（正本 runner.environment）
@@ -210,19 +223,23 @@ else:
 SREC.update(model_rev=REV.get('full') or REV.get('registered'), model_rev_full=REV, tokenizer_rev=REV.get('full') or 'dry')
 mark('weights', rev=(REV.get('full') or 'dry')[:12], layers=model.config.num_hidden_layers)
 
-# ---- 5. 候補のデータと断片（登録と照らす）→ 自己検査
-os.environ['OP4B_QF_CACHE'] = os.environ.get('OP4B_QF_CACHE') if DRY and os.environ.get('OP4B_QF_CACHE') else (
-    os.path.join(os.path.expanduser('~'), '.cache', 'op4b-qf') if DRY else '/content/op4b-qf-cache')
-import qf_task_B as QT
-FRAG = {}
-for cand in QT.candidates():
-    files = QT.fetch(cand, verify=True)
-    frag = QT.fragment(cand)
-    QT.verify_fragment(cand, frag)
-    FRAG[cand['key']] = frag
-    mark('fragment', task=cand['key'], files=len(files), fragment_sha16=QT.registered(cand['key'])['fragment_sha16'])
+# ---- 5. 候補のデータと断片（相 qfcand だけ・登録と照らす）→ 自己検査
+if PHASE == 'qfcand':
+    os.environ['OP4B_QF_CACHE'] = os.environ.get('OP4B_QF_CACHE') if DRY and os.environ.get('OP4B_QF_CACHE') else (
+        os.path.join(os.path.expanduser('~'), '.cache', 'op4b-qf') if DRY else '/content/op4b-qf-cache')
+    import qf_task_B as QT
+    FRAG = {}
+    for cand in QT.candidates():
+        files = QT.fetch(cand, verify=True)
+        frag = QT.fragment(cand)
+        QT.verify_fragment(cand, frag)
+        FRAG[cand['key']] = frag
+        mark('fragment', task=cand['key'], files=len(files), fragment_sha16=QT.registered(cand['key'])['fragment_sha16'])
+    SELFTESTS = ('run_stageB_local.py', 'qf_task_B.py', 'steer_B.py')
+else:
+    SELFTESTS = ('run_stageB_local.py', 'direction_B.py', 'steer_B.py')     # 相 dir: 抽出器の自己検査（層番号・ノルム合わせ・決定性の二条・トークン長）
 ENVX = dict(os.environ, OP4B_REQUIRE_FULL_SELFTEST='1', PYTHONIOENCODING='utf-8', OP4B_TOKENIZER_DIR=MPATH)   # 帯の起点の検査は実トークナイザで（飛ばすと失敗）
-for tool in ('run_stageB_local.py', 'qf_task_B.py', 'steer_B.py'):
+for tool in SELFTESTS:
     r = subprocess.run([sys.executable, os.path.join(REPO, 'tools', tool), '--selftest'], cwd=REPO, env=ENVX, capture_output=True, text=True, encoding='utf-8', errors='replace')
     tail = (r.stdout.strip().splitlines() or [''])[-1][:160]
     SREC.setdefault('selftests', {})[tool] = {'rc': r.returncode, 'tail': tail}
@@ -234,6 +251,52 @@ import run_stageB_local as RUN
 SREC['runner_sha16'] = RUN.RUNNER_SHA16
 SREC['assembly_frozen_sha16'] = RUN.check_assembly_matches_frozen()
 save_session()
+
+# ---- 相 dir（v2）: 凍結の前の方向の抽出・**活性だけ**（生成しない・率は一つも作らない・正本 activation_storage.pre_freeze_run）
+if PHASE == 'dir':
+    import direction_B
+    RUN_KEY = '%s__s%d' % (TAG, SESSION)
+    OUT = os.path.join(RES_P, TAG, RUN_KEY)
+    if RUN_KEY not in RUN_KEYS:
+        RUN_KEYS.append(RUN_KEY)              # 走行キーは走らせる前に記帳する
+    save_session()
+    if os.path.exists(os.path.join(OUT, 'directions.json')):
+        mark('skip', run_key=RUN_KEY)         # 再開: 書き終えた抽出は取り直さない
+        DREC = json.load(open(os.path.join(OUT, 'directions.json'), encoding='utf-8'))
+    else:
+        if os.path.isdir(OUT):
+            shutil.rmtree(OUT)                # directions.json の無い置き場は書きかけ（記録は最後に書く）
+        t1 = time.time()
+        try:
+            DREC = direction_B.extract(model, tok, OUT, model_label=REV['id'],
+                                       dtype_label=('float32（DRY の小さな乱数の模型）' if DRY else 'bfloat16'),
+                                       log=lambda m: print(m, flush=True))
+        except SystemExit as e:               # 層の対応の崩れ・決定性 (i) の不一致は止めて登録者に上げる（裁定 D91）
+            halt('[boot] 方向の抽出が止まった——登録者に上げる: %s' % e)
+        mark('extract', run_key=RUN_KEY, seconds=round(time.time() - t1, 1), same_order=DREC['determinism_same_order'],
+             cross_order_ok=DREC['determinism_cross_order']['ok'])
+    # 凍結時に記帳する値のうち、この相が取るもの（`tools/freeze_B.py` の NEED_VALUES の一部・残りは記録から読む）
+    FV = {'model_id': REV['id'], 'model_rev': REV.get('full') or 'dry', 'tokenizer_rev': REV.get('full') or 'dry',
+          'num_hidden_layers': DREC['num_hidden_layers'], 'layer_indices': DREC['layer_indices'], 'arm_token_lengths': DREC['arm_token_lengths'],
+          'v_hat_sha256': DREC['npz_sha256'], 'direction_stats': DREC['stats'], 'h_norm_ratio': DREC['h_norm'],
+          'determinism': {'same_order': DREC['determinism_same_order'], 'cross_order_ok': DREC['determinism_cross_order']['ok']},
+          'activations_npz_sha256': DREC['activations_npz_sha256'], 'versions': VER, 'gpu': gpu, 'dry': DRY,
+          'source': 'tools/colab/boot_stageB.py %s・相 dir・%s・コミット %s' % (VERSION, RUN_KEY, HEAD[:12])}
+    json.dump(FV, open(os.path.join(OUT, 'freeze-values-dir.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    _files = {os.path.relpath(f, RES_P).replace('\\', '/'): runs_B.sha16_file(f) for f in sorted(glob.glob(os.path.join(OUT, '*')))}
+    SREC['counts'][RUN_KEY] = {'arms': len(DREC['arms']), 'extraction_scenarios': len(DREC['extraction_scenarios']),
+                               'layers': len(DREC['layer_indices']), 'determinism_cross_order_ok': DREC['determinism_cross_order']['ok']}
+    SREC.update(ended=now(), files_sha16_lf=_files, wall_s=round(time.time() - T0, 1))
+    _spath = save_session()
+    shutil.copy2(_spath, os.path.join(OUT, 'session-%s.json' % RUN_KEY))      # zip に入れる（セッション記録の写し）
+    if not DRY:
+        zp = shutil.make_archive(os.path.join(PERSIST, 'stageB-dir-s%d-%s' % (SESSION, datetime.date.today().isoformat())), 'zip', RES_P,
+                                 base_dir=os.path.join(TAG, RUN_KEY))
+        print('[boot] zip → %s。コーディネータが Drive の Web UI からダウンロードし、SHA16 はセッション記録の files_sha16_lf と突合する。' % zp, flush=True)
+    print('[boot] 完了 phase=dir session=%d・層 %s・‖v̂‖／‖h‖ %s・決定性 (ii) %s・壁時計 %.0f 秒。%s'
+          % (SESSION, DREC['layer_indices'], {k_: (None if v_['vhat_over_h'] is None else round(v_['vhat_over_h'], 6)) for k_, v_ in DREC['h_norm'].items()},
+             DREC['determinism_cross_order']['ok'], time.time() - T0, CLAUSE), flush=True)
+    sys.exit(0)
 
 # ---- 6. 走行（候補 × 腕・走行キーは走らせる前に記帳する）
 PLAN = []

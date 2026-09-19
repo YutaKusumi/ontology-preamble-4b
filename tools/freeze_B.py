@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v8 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v9 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+v9（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: 凍結する器に **Colab の起動器 `colab/boot_stageB.py`** を足した（データを作る相を走らせる器——前は器材の整備の記録にだけ載り、凍結の一覧に無かった）。整備の記録の照らしで、置き場に「/」を含む器（`tools/colab/…`）も読めるようにした（前の読み方は「/」を含む名を拾えず、足すと「記録に載っていない」で止まった）。
 v8（2026-09-19 の夜・封印の後・独立の目を通っていない）: **登録者とコーディネータの予想の JSON の SHA-256 を記帳する**（正本 `predictions.order`「凍結の記録に両方の SHA を記帳」）。
   照合は `seal_B.check_predictions`（一つずつあること・書式の欄と選択肢・予想者・様式の名・起草者の封印がコーディネータの予想から作ったままか・
   封印の経緯の記録に三つの SHA-256 が載るか）で、外れたら止める。凍結する器に封印の器 `seal_B.py` と照合の器 `compare_predictions_B.py`（結果の前・凍結の前に書く）を足した。
@@ -29,7 +30,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v8'
+VERSION = 'v9'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -45,7 +46,8 @@ TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 
          'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py',
          'qf_task_B.py', 'qf_select_B.py',       # 品質床の課題の器と選定の判定の器（v7・裁定 D146・D147——凍結の後の品質床の走行が課題の器を使う）
          'make_predictions_form_B.py',           # 予想の書式の器（v7・裁定 D148）
-         'seal_B.py', 'compare_predictions_B.py']   # 封印の器と照合の器（v8・裁定 D148——照合の器は結果の前に書き、凍結の対象にする）
+         'seal_B.py', 'compare_predictions_B.py',   # 封印の器と照合の器（v8・裁定 D148——照合の器は結果の前に書き、凍結の対象にする）
+         'colab/boot_stageB.py']                    # Colab の起動器（v9・データを作る相を走らせる器）
 NEED_VALUES = ['model_rev', 'tokenizer_rev', 'num_hidden_layers', 'layer_indices', 'arm_token_lengths',
                'quality_task', 'quality_base_accuracy', 'v_hat_sha256', 'direction_stats', 'h_norm_ratio',
                'top_k_stageA_effective', 'quality_input_mode', 'quality_base_min_applied']   # 裁定 D142・D138・D137（v6）
@@ -134,7 +136,7 @@ rec_path = os.path.join(REPO, 'records', 'B', 'tooling-record-B-2026-09-18.md')
 stale, unlisted = [], []
 if os.path.exists(rec_path):
     _txt = open(rec_path, encoding='utf-8').read()
-    _listed = dict(_re.findall(r'`tools/([\w.]+)` \| [^|]*\| ([0-9A-F]{16})', _txt))
+    _listed = dict(_re.findall(r'`tools/([\w./]+)` \| [^|]*\| ([0-9A-F]{16})', _txt))      # 「/」を含む置き場も読む（v9）
     for _name, _sha in _listed.items():
         _p = os.path.join(REPO, 'tools', _name)
         if os.path.exists(_p) and runs_B.sha16_file(_p) != _sha:

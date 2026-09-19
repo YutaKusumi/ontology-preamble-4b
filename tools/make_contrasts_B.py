@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_B.py v15 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+"""make_contrasts_B.py v16 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+v15 からの変更（v16・2026-09-20・凍結の前の方向の抽出の準備）: 相 dir の置き場 `tags.direction` と、走らせ方の登録 `activation_storage.pre_freeze_run`（活性だけ・生成しない・手順の表との順の違い・記帳する値・止める条件・置き場・見せ方）を置いた。開示の Colab の項に相 dir を足した。**独立の目を通っていない**（裁定 D131）。
 v14 からの変更（v15・2026-09-19 の夜・結果の前）: 登録者裁定 D149——予想の照合の写し方の解釈（`predictions.compare_rules.interpretation` の六項）を確定した。解釈の状態の欄を「確定」に改め、裁定の台帳に D149 を足した。写し方そのものは変えていない。**独立の目を通っていない**（裁定 D131）。
 v13 からの変更（v14・2026-09-19 の夜・封印の後・結果の前）: 予想の照合の器 `tools/compare_predictions_B.py` を書いた。正本の照合の規則に無かった写し方——判定保留の扱い・逆向きの確証の向き・門1 が閉じた回と escalate の回・incomplete の回・照合の記録と集計の門の記録の照合——を`predictions.compare_rules.interpretation` に置いた（**起草者の解釈・登録者の確認を待つ**）。開示の「まだ書いていない器」から照合の器を外した。**独立の目を通っていない**（裁定 D131）。
 v12 からの変更（v13・2026-09-19 の夜・登録者裁定 D148）: **登録者とコーディネータの予想の条**（`predictions`）を戻した——段階 A の裁定 D47 の型。B の設計は起草者の予想符号の封印（裁定 D79・`seal_format`）だけを置き、V′・M・F・A で毎回あった登録者予想の書式・照合の器・独立の決まりを落としていた（起草者の見落とし・登録者の問いで気づいた）。予想の値は封印の値にそろえ、起草者の封印はコーディネータの予想から機械で作る。時機は B の活性も率も一つも見る前。書式に載せる用語と場面の説明も正本に置いた。**独立の目を通っていない**（裁定 D131）。
@@ -584,7 +585,20 @@ activation_storage = {'prompt_final': ('前置きの腕 × **抽出場面** × �
                                       'cross_order_tolerance': {'cos_min': 0.999, 'max_abs_over_norm': 0.01},
                                       'material': '主位置の活性を、腕 × 場面 × 層ごとに**二度**（同じ並べ方で一度・走行器と同じバッチの組成で一度）保存して突き合わせる（採否表 P235・P260・P396）',
                                       'batch_freeze': 'バッチの大きさと並べ方を走行のあいだ凍結する（runner.fixed_across_runs）',
-                                      'capacity': '二度保存しても主位置の容量は二倍にしかならない（転記行 I）'}}
+                                      'capacity': '二度保存しても主位置の容量は二倍にしかならない（転記行 I）'},
+                      'pre_freeze_run': {
+                          'what': ('凍結の前に、前置きの腕 × 抽出場面 × 候補の層の**主位置の活性だけ**を実重みで取る（相 dir・起動器 `tools/colab/boot_stageB.py`・抽出の本体 `direction_B.extract`）。'
+                                   '**生成しない——率は一つも作らない**。予想の封印の後に走らせる（封印の時機は「B の活性も率も一つも見る前」・`predictions.timing`）'),
+                          'order_note': ('手順の表（`procedure`）では同一性選別が方向の抽出の前にあるが、方向の抽出は**凍結の前**に走らせる（凍結の記録に v̂ の SHA と要約統計を記帳するため・`predictions.order`）。'
+                                         '同一性選別は凍結の後のデータ生成の段に残る。二つは互いの結果を使わない'),
+                          'records': ('凍結時に記帳する値のうち実重みが要るもの——重みの rev・tokenizer の版・総層数と層の添字・腕ごとのトークン長・v̂ の SHA・方向の要約統計・‖v̂‖／‖h‖——を'
+                                      '`freeze-values-dir.json` に書く。決定性の二条の結果と、主位置の活性の npz の SHA も書く'),
+                          'stops': ('止めて登録者に上げる: 重みの版が解けない・snapshot の名が違う／GPU が登録の環境に無い／自己検査が落ちる／腕の本文が凍結走行器の読み方と違う／'
+                                    '層の対応が崩れる／決定性 (i) の不一致。決定性 (ii) の外れは止めずに記帳して上げる（`determinism`）'),
+                          'placement': ('方向の npz・directions.json・layers.json・凍結の値の候補・セッション記録は**リポジトリに置く**（腕と方向の定義として記録先行公開の対象）。'
+                                        '主位置の活性の npz は Drive と手元（リポジトリの外）に保全し、SHA と所在を記録に置く（`place`）'),
+                          'showing': ('‖v̂‖／‖h‖ と要約統計は登録者に見せる。**見せるだけで、層と係数の格子は変えない**（裁定 D141）。'
+                                      '変えるなら凍結の前の設計の変更として記帳し、登録者の承認を得る')}}
 trial_record = ['生テキスト', '機械判定（三つ組）', '応答様式 (a)(b)', '検査認識の言及',
                 '副位置の活性（応答トークン平均・fp16）', '操作の有無と層・係数', '方向の id', 'seed', 'バッチ位置', '走行キー', 'proc_uuid']
 trial_record_fields = {
@@ -685,7 +699,8 @@ seeds = {'identity_transformers': 70001, 'tune': {sc: 72000 + i for i, sc in enu
          'derivation': ('走行の種 → セルの種 → バッチの種の順に決定的に降ろす（採否表 P232・P243・裁定 D127）。子ストリームの作り方は `derivation_formula` に一つに決めた。'
                         '品質床も同じ規則で、セルの番号に段・腕・層・係数を使う（相の番号は `phase_index` の品質床）。'
                         '**課題の選定の測定**（相 `qfcand`・裁定 D146）も品質床の相の式を使い、段を「candidate:候補の鍵」とする（段の添字は selection・post の後に候補の登録順で並べる——前からある段の番号は変わらない）')}
-tags = {'identity': 'idB', 'tune': 'tuneB', 'main': 'stageB', 'quality': 'stageB-quality', 'dryrun': 'dryB', 'qfcand': 'qfcandB'}
+tags = {'identity': 'idB', 'tune': 'tuneB', 'main': 'stageB', 'quality': 'stageB-quality', 'dryrun': 'dryB', 'qfcand': 'qfcandB',
+        'direction': 'dirB'}          # 相 dir（凍結の前の方向の抽出・v16）
 procedure = ['同一性選別（三スタック・段階 A の門0.5 と共用・transformers 経路 %d 腕 × n=%d × N1）' % (13, n_id),
              '方向の抽出（プロンプトの最終トークンの活性・抽出場面の平均・層ごと・試行を要しない）',
              '調整走行（層 × 係数の %d 候補 × Onull+v・Onull+vrand × n=%d × 抽出場面・品質床・容量と時間の転記）' % (len(LAYERS) * len(COEFS), n_tune),
@@ -880,7 +895,8 @@ judge_validity = {'carry_over': '段階 A の判定器の妥当性の測定（4B
 DISCLOSURE_ITEMS = {
     'まだ書いていない器': [
         '**相をまたいだ走らせ方の順**（同一性選別 → 方向の抽出 → 調整走行 → 品質床 → 本走行）を束ねる器。一つのセルを走らせる口（`run_stageB_local.run_cell`・品質床は `run_quality_cell`）と、試行の記録・生テキスト・副位置の活性・セッション記録を置き場に書く口（`write_cell`・`write_session`）までは書いた。',
-        '**Colab での起動**のうち、同一性選別・調整走行・品質床（選定の段・選定後の段）・本走行の相。**書いたのは課題の選定の測定（相 qfcand）と top_k の確かめだけ**（`tools/colab/boot_stageB.py`・裁定 D146・2026-09-19 の夕刻）。',
+        '**Colab での起動**のうち、同一性選別・調整走行・品質床（選定の段・選定後の段）・本走行の相。**書いたのは課題の選定の測定（相 qfcand）と top_k の確かめ（裁定 D146・2026-09-19 の夕刻）、'
+        '凍結の前の方向の抽出（相 dir・活性だけ・2026-09-20）だけ**（`tools/colab/boot_stageB.py`）。',
         '品質床の**報告の行**——下限に届かず手当て（裁定 D137）の下で走らせたときに印字する、観測した無操作の正答率での一セルと選定後のセル数での帰無発火率（対の見方を主・二標本を上限・`quality_floor.base_min_fallback`）。'
         '対の見方は問いごとの正誤の入れ替わりから数えるので、走行の記録と一緒に書く。**品質床のセルそのものは書いた**（`run_stageB_local.run_quality_cell`・裁定 D146）。選定の記録の器（`tools/qf_select_B.py`）は、二標本の上限だけを印字する。'
         '採点の関数（`steer_B.score_quality`・記号の読み取りは `qf_task_B.extract_letter`）と門の判定（`gate_B`）はある。'],

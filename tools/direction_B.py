@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""direction_B.py v6 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
+"""direction_B.py v7 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
+v7（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: **本体を関数 `extract` に切り出した**——起動器（相 dir）と口（`__main__`）が同じものを呼ぶ。これまで口の本体は一度も走っておらず（端から端までの検査は部品の関数だけを呼んでいた）、起動器から実重みで呼ぶ前に小さな模型で通すため。決定性の二条の当て方を `check_determinism` に、**腕ごとのトークン長**（正本 `position_length.record_at_freeze`）を `token_lengths` に置き、自己検査で確かめる。口の使われていなかった引数（--arms-dir・--scenarios-dir——渡しても何も変わらなかった）を外した。
 v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 決定性 (ii) を**バッチの組成を変えた比較**にした——走行器と同じ組成（同じプロンプトを `runner.batch` 行）で取った主位置の活性と、一本流しの値を比べる（採否表 P396）。前は腕の並べ方を逆にした一本流しどうしを比べており、行列の形が変わらないので落ちようがなかった。主位置の活性を取る関数を本体の外（`main_position_activation`・`main_position_activation_batch`）に出し、端から端までの検査が同じ関数を呼べるようにした。
 
 正本 `design/contrasts-B.json` の `selection.position`・`selection.candidates`・`directions`・`activation_storage`・`runner` に従う。
@@ -21,7 +22,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v6'
+VERSION = 'v7'
 STRICT = os.environ.get('OP4B_REQUIRE_FULL_SELFTEST') == '1'     # 実機の段では飛ばしを失敗に倒す（裁定 D122・採否表 P344）
 REPO = runs_B.REPO
 T = runs_B.load_T()
@@ -260,6 +261,25 @@ def _selftest():
     Hb = {k: vv + rng.normal(size=d) * 1.0 for k, vv in H.items()}
     ok6, rows6 = determinism_cross_order(H, Hb)
     assert not ok6, '大きな差を許容差の内側と判定した'
+    # 決定性の二条の当て方（v7）: (i) の不一致は止まり、(ii) の外れは止まらずに記帳する
+    try:
+        check_determinism(H, H2, H)
+        raise AssertionError('決定性 (i) の不一致で止まらなかった')
+    except SystemExit:
+        pass
+    ok_s, ok_c, rows_c = check_determinism(H, dict(H), Hb)
+    assert ok_s and not ok_c and rows_c, '決定性 (ii) の外れを記帳していない（止まった・または外れを見落とした）'
+    # 腕ごとのトークン長（v7）: 前置きの本文だけの数（N は零）と、場面ごとの組み立て済みの列の長さ（手で数えた期待値と照らす）
+    class _Tok:
+        def __call__(self, t, add_special_tokens=False):
+            return {'input_ids': t.split()}
+    _AT = {'O': 'a b c', 'N': '', 'Osec': 'a b c d'}
+    _SC = ['N1', 'S1', 'SK', 'S4']
+    _pid = lambda arm, sc: list(range(len(_AT[arm].split()) + 10 + _SC.index(sc)))
+    tl = token_lengths(_Tok(), _AT, _SC, _pid)
+    assert tl['N']['preamble_tokens'] == 0 and tl['O']['preamble_tokens'] == 3 and tl['Osec']['preamble_tokens'] == 4, ('前置きのトークン数が違う', tl)
+    assert set(tl) == set(_AT) and all(set(v['prompt_tokens']) == set(_SC) for v in tl.values()), ('腕か場面が欠けた', tl)
+    assert tl['Osec']['prompt_tokens']['S4'] == 17 and tl['N']['prompt_tokens']['N1'] == 10, ('組み立て済みの列の長さが違う', tl)
     # ‖v̂‖ と ‖h‖ の比（採否表 P356）——器を通さずに一層だけ数え直して照らす
     hr = h_norm_record(H, dirs)
     r0 = LAYER_RATIOS[0]
@@ -272,42 +292,47 @@ def _selftest():
         except ImportError:
             raise SystemExit('torch が無い——実機の段では失敗に倒す（OP4B_REQUIRE_FULL_SELFTEST=1・裁定 D122）')
     print('[direction_B selftest] 層番号（期待値の表・%d 通り）・hidden_states の添字・ノルム合わせ・安定性・‖v̂‖ と ‖h‖ の比・'
-          '決定性の二条（同じ並べ方は完全一致／バッチの組成を変えたら cos %g・相対差 %g）: すべて通った'
+          '決定性の二条（同じ並べ方は完全一致／バッチの組成を変えたら cos %g・相対差 %g）・二条の当て方（(i) は止め (ii) は記帳）・腕ごとのトークン長: すべて通った'
           % (len(want), tol['cos_min'], tol['max_abs_over_norm']))
 
 
-if __name__ == '__main__':
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--selftest', action='store_true')
-    ap.add_argument('--model', default='Qwen/Qwen3-4B-Instruct-2507')
-    ap.add_argument('--dtype', default='bfloat16')
-    ap.add_argument('--out', default=None)
-    ap.add_argument('--arms-dir', default=os.path.join(REPO, 'arms'))
-    ap.add_argument('--scenarios-dir', default=None, help='場面の本文の置き場（凍結盤の素材）')
-    a = ap.parse_args()
-    if a.selftest:
-        _selftest()
-        sys.exit(0)
-    try:
-        import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer
-    except Exception as e:                                    # 手元では届かない（Colab の段で走らせる）
-        sys.exit('torch／transformers が無い: %s（この器は GPU の上で走らせる。手元の検査は --selftest）' % e)
-    out_dir = a.out or os.path.join(REPO, 'results', 'dirB')
-    os.makedirs(out_dir, exist_ok=True)
-    # 置き場を直に渡せるようにする（版を固定し、Hub への問い合わせを避ける・裁定 D115・採否表 P335〔二体目 G8〕）
-    tok = AutoTokenizer.from_pretrained(os.environ.get('OP4B_TOKENIZER_DIR') or a.model)
-    tok.padding_side = 'left'                                  # 正本 runner.padding
-    model = AutoModelForCausalLM.from_pretrained(a.model, torch_dtype=getattr(torch, a.dtype), device_map='auto')
-    model.eval()
-    n_layers = model.config.num_hidden_layers
-    idxs = {r: layer_index(r, n_layers) for r in LAYER_RATIOS}
+def check_determinism(H1, H2, H3):
+    """**決定性の二条**（裁定 D91・正本 `activation_storage.determinism`）を当てる。
 
-    # ---- 本体（裁定 D117・2026-09-18） ----
-    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    (i) 同じ並べ方で二度取った値（H1・H2）が完全一致でなければ**止める**（SystemExit・登録者に上げる）。
+    (ii) バッチの組成を変えた値（H3）は許容差を見て**記帳するだけ**（止めない）。戻り値: (ok_same, ok_cross, rows_cross)。"""
+    ok_same, bad_same = determinism_same_order(H1, H2)
+    if not ok_same:
+        raise SystemExit('決定性 (i)（同じ並べ方で完全一致）に落ちた——走行を止め、登録者に上げる（裁定 D91）: %s' % bad_same[:4])
+    ok_cross, rows_cross = determinism_cross_order(H1, H3)
+    return ok_same, ok_cross, rows_cross
+
+
+def token_lengths(tok, arm_text, scenarios, prompt_ids_fn):
+    """**腕ごとのトークン長**（正本 `position_length.record_at_freeze`・裁定 D82）。
+
+    前置きの本文だけのトークン数（特別なトークンを付けない・N は零）と、場面ごとの組み立て済みの列の長さ（主位置は列の最後）を返す。
+    arm_text: 腕 → 前置きの本文、scenarios: 場面の並び、prompt_ids_fn(arm, sc): 組み立て済みのトークン列。"""
+    out = {}
+    for arm in sorted(arm_text):
+        t = arm_text[arm] or ''
+        pre = len(tok(t, add_special_tokens=False)['input_ids']) if t else 0
+        out[arm] = {'preamble_tokens': int(pre), 'prompt_tokens': {sc: int(len(prompt_ids_fn(arm, sc))) for sc in scenarios}}
+    return out
+
+
+def extract(model, tok, out_dir, model_label=None, dtype_label=None, log=print):
+    """**方向の抽出の本体**（凍結の前・活性だけ・生成しない）。起動器（`tools/colab/boot_stageB.py` の相 dir）と、この器の口（`__main__`）が同じものを呼ぶ。
+
+    (1) 層の対応を実機で確かめる → (2) 活性を三度取る（同じ並べ方で二度・走行器と同じバッチの組成で一度）→ 決定性の二条 →
+    (3) 方向を作る（全方向を ‖v̂‖ に合わせる）→ (4) npz と記録を書く（方向・主位置の活性・層・‖v̂‖／‖h‖・腕ごとのトークン長）。
+    戻り値: 記録（`directions.json` と同じ中身）。決定性 (i) に落ちたら SystemExit。"""
+    import torch
     import steer_B
     import run_stageB_local as RUN
-
+    os.makedirs(out_dir, exist_ok=True)
+    n_layers = model.config.num_hidden_layers
+    idxs = {r: layer_index(r, n_layers) for r in LAYER_RATIOS}
     AT = {k: v['text'] for k, v in RUN.arm_texts().items()}          # 腕の素材は SHA16 で引き当てる
     PANEL_ARMS = list(T['arms']['panel'])
     EXTRACT = list(T['extraction_scenarios'])
@@ -333,17 +358,14 @@ if __name__ == '__main__':
     _ids = prompt_ids(PANEL_ARMS[0], EXTRACT[0])
     _t = torch.tensor([_ids], device=model.device)
     align = {str(r): assert_layer_alignment(model, _t, torch.ones_like(_t), idxs[r]) for r in LAYER_RATIOS}
-    print('[direction_B] 層の対応を確かめた（hidden_states[idx+1] と layers[idx] の最大差 %s）' % align)
+    log('[direction_B] 層の対応を確かめた（hidden_states[idx+1] と layers[idx] の最大差 %s）' % align)
 
-    # (2) 活性を二度取る（決定性の二条・裁定 D91）
+    # (2) 活性を三度取る（決定性の二条・裁定 D91）
     H1 = collect(PANEL_ARMS)
     H2 = collect(PANEL_ARMS)                       # 同じ並べ方
     H3 = collect(PANEL_ARMS, rows=T['runner']['batch'])   # **バッチの組成を変えた**（走行器と同じ組成・採否表 P396）
-    ok_same, bad_same = determinism_same_order(H1, H2)
-    ok_cross, rows_cross = determinism_cross_order(H1, H3)
-    if not ok_same:
-        raise SystemExit('決定性 (i)（同じ並べ方で完全一致）に落ちた: %s' % bad_same[:4])
-    print('[direction_B] 決定性 (i) 完全一致・(ii) バッチの組成（%d 行）を変えた値が許容差の内側 %s' % (T['runner']['batch'], ok_cross))
+    ok_same, ok_cross, rows_cross = check_determinism(H1, H2, H3)
+    log('[direction_B] 決定性 (i) 完全一致・(ii) バッチの組成（%d 行）を変えた値が許容差の内側 %s' % (T['runner']['batch'], ok_cross))
 
     # (3) 方向を作る（全方向を ‖v̂〕に合わせる・裁定 D102）
     dirs, stats = build_directions(H1)
@@ -353,29 +375,54 @@ if __name__ == '__main__':
             d = abs(float(np.linalg.norm(v)) - nv[r])
             assert d < 1e-6 * max(nv[r], 1.0), ('方向のノルムが ‖v̂〕に合っていない（裁定 D102）', name, r, d)
 
-    # (4) 書き出す（npz・要約統計・層の記帳）
+    # (4) 書き出す（npz・要約統計・層の記帳・トークン長）
     npz = os.path.join(out_dir, 'directions.npz')
     np.savez(npz, **{'%s__%s' % (name, r): v for (name, r), v in dirs.items()})
     sha = hashlib.sha256(open(npz, 'rb').read()).hexdigest().upper()
-    # **主位置の活性そのものを保存する**（正本 activation_storage.prompt_final・determinism.material・2026-09-19）。
-    # 前は方向（差を平均したもの）だけを保存しており、正本が「保存する」と書く活性も、決定性の検査の二度分も残らなかった。
+    # **主位置の活性そのものを保存する**（正本 activation_storage.prompt_final・determinism.material・2026-09-19）
     act = os.path.join(out_dir, 'main_position_activations.npz')
     np.savez(act, **{'same_order__%s__%s__%s' % (arm, sc, r): v for (arm, sc, r), v in H1.items()},
              **{'batch_rows__%s__%s__%s' % (arm, sc, r): v for (arm, sc, r), v in H3.items()})
     act_sha = hashlib.sha256(open(act, 'rb').read()).hexdigest().upper()
-    hrec = h_norm_record(H1, dirs)                     # 採否表 P356・調整走行の前に登録者に見せる
+    hrec = h_norm_record(H1, dirs)                     # 採否表 P356・調整走行の前に登録者に見せる（見せるだけ・裁定 D141）
     write_layer_record(out_dir, n_layers, hrec)
-    print('[direction_B] ‖v̂‖／‖h‖（主位置・層ごと）: %s——**調整走行の前に登録者に見せる**（正本 activation_storage.h_norm_record）'
-          % {r_: (None if v_['vhat_over_h'] is None else round(v_['vhat_over_h'], 6)) for r_, v_ in hrec.items()})
-    rec = {'kind': 'direction_B', 'version': VERSION, 'model': a.model, 'dtype': a.dtype, 'h_norm': hrec,
+    tl = token_lengths(tok, {a_: AT[a_] for a_ in PANEL_ARMS}, list(T['scenarios']), prompt_ids)
+    log('[direction_B] ‖v̂‖／‖h‖（主位置・層ごと）: %s——**調整走行の前に登録者に見せる・見せるだけで格子は変えない**（正本 activation_storage.h_norm_record・裁定 D141）'
+        % {r_: (None if v_['vhat_over_h'] is None else round(v_['vhat_over_h'], 6)) for r_, v_ in hrec.items()})
+    rec = {'kind': 'direction_B', 'version': VERSION, 'model': model_label, 'dtype': dtype_label, 'h_norm': hrec,
            'num_hidden_layers': n_layers, 'layer_indices': {str(r): idxs[r] for r in LAYER_RATIOS},
            'alignment_max_abs': align, 'determinism_same_order': bool(ok_same),
            'determinism_cross_order': {'ok': bool(ok_cross), 'rows': rows_cross, 'compared': '一本流し 対 走行器と同じバッチの組成（%d 行）' % T['runner']['batch']},
            'stats': {str(r): stats[r] for r in LAYER_RATIOS}, 'npz_sha256': sha, 'activations_npz_sha256': act_sha,
-           'arms': PANEL_ARMS, 'extraction_scenarios': EXTRACT,
+           'arm_token_lengths': tl, 'arms': PANEL_ARMS, 'extraction_scenarios': EXTRACT,
            'contrasts_sha16': runs_B.sha16_file(runs_B.CPATH)}
     json.dump(rec, open(os.path.join(out_dir, 'directions.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print('[direction_B] 方向を書いた: %s（SHA-256 %s…）' % (npz, sha[:16]))
-    print('[direction_B] 総層数 %d・層の添字 %s・合わせる前の比 %s'
-          % (n_layers, idxs, {str(r): stats[r].get('raw_norm_ratio') for r in LAYER_RATIOS}))
-    sys.exit(0 if ok_cross else 2)      # (ii) は止めない条だが、外れたら非零で知らせる（裁定 D91）
+    log('[direction_B] 方向を書いた: %s（SHA-256 %s…）' % (npz, sha[:16]))
+    log('[direction_B] 総層数 %d・層の添字 %s・合わせる前の比 %s'
+        % (n_layers, idxs, {str(r): stats[r].get('raw_norm_ratio') for r in LAYER_RATIOS}))
+    return rec
+
+
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--selftest', action='store_true')
+    ap.add_argument('--model', default='Qwen/Qwen3-4B-Instruct-2507')
+    ap.add_argument('--dtype', default='bfloat16')
+    ap.add_argument('--out', default=None)
+    a = ap.parse_args()
+    if a.selftest:
+        _selftest()
+        sys.exit(0)
+    try:
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+    except Exception as e:                                    # 手元では届かない（Colab の段で走らせる）
+        sys.exit('torch／transformers が無い: %s（この器は GPU の上で走らせる。手元の検査は --selftest）' % e)
+    out_dir = a.out or os.path.join(REPO, 'results', 'dirB')
+    # 置き場を直に渡せるようにする（版を固定し、Hub への問い合わせを避ける・裁定 D115・採否表 P335〔二体目 G8〕）
+    tok = AutoTokenizer.from_pretrained(os.environ.get('OP4B_TOKENIZER_DIR') or a.model)
+    tok.padding_side = 'left'                                  # 正本 runner.padding
+    model = AutoModelForCausalLM.from_pretrained(a.model, torch_dtype=getattr(torch, a.dtype), device_map='auto')
+    model.eval()
+    rec = extract(model, tok, out_dir, model_label=a.model, dtype_label=a.dtype)
+    sys.exit(0 if rec['determinism_cross_order']['ok'] else 2)      # (ii) は止めない条だが、外れたら非零で知らせる（裁定 D91）

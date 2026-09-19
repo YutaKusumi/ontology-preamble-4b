@@ -1,0 +1,768 @@
+{
+ "kind": "mutation_B",
+ "version": "v8",
+ "generated_utc": "2026-09-19T21:21:36Z",
+ "rows": [
+  {
+   "name": "全方向のノルム合わせ",
+   "ruling": "D102",
+   "target": "direction_B.py",
+   "applied": true,
+   "what": "方向を作る器が td にしか合わせない誤り（交差族と S4 の反証に「加わる量が腕と統制で違う」構図が残る）。**守るのは方向を作る器である**——介入の器（steer_B）は自分で合わせた模造ベクトルしか見られないので、ここは守れない。走行器が npz を読むときにノルムを確かめる検査は、**本体を書くときに足す**（裁定 D117）",
+   "caught": [
+    "direction_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "direction_B.py": "AssertionError: ('方向のノルムが ‖v̂〕に合っていない（裁定 D102）', 'Nk', 0.25, 3.96749597674409, 2.694059469466182)"
+   }
+  },
+  {
+   "name": "帯の起点（主位置）",
+   "ruling": "D124",
+   "target": "steer_B.py",
+   "applied": true,
+   "what": "起点が列の先頭になる誤り（帯が役割トークンから掛かる）。**起点の式は `main_position` 一つ**で、走行器もこれを呼ぶ（採否表 P404）",
+   "caught": [
+    "steer_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "steer_B.py": "AssertionError: ('起点が列の最後でない', [5, 6, 7], 0)"
+   }
+  },
+  {
+   "name": "係数の掛け方",
+   "ruling": "D90",
+   "target": "steer_B.py",
+   "applied": true,
+   "what": "ランダム方向のノルムが v̂ と違う誤り（加わる量が腕と統制で違う）",
+   "caught": [
+    "steer_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "steer_B.py": "AssertionError: ランダム方向のノルムが ‖v̂‖ に合っていない（裁定 D90）"
+   }
+  },
+  {
+   "name": "バッチの腕の同質性",
+   "ruling": "D124",
+   "target": "steer_B.py",
+   "applied": true,
+   "what": "バッチに複数の腕が混ざっても止めない誤り",
+   "caught": [
+    "steer_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "steer_B.py": "AssertionError: 腕が混ざったバッチを止めていない（裁定 D124）"
+   }
+  },
+  {
+   "name": "層番号の四捨五入",
+   "ruling": "D4",
+   "target": "direction_B.py",
+   "applied": true,
+   "what": "層の添字が一つずれる誤り",
+   "caught": [
+    "direction_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "direction_B.py": "AssertionError: ('層番号が期待値と違う', 0.25, 34, 7, 8)"
+   }
+  },
+  {
+   "name": "決定性 (i) の不一致で止めない",
+   "ruling": "D91",
+   "target": "direction_B.py",
+   "applied": true,
+   "what": "同じ並べ方で二度取った活性が一致しなくても、方向を作って凍結へ進む誤り（登録は止めて登録者に上げる）",
+   "caught": [
+    "direction_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "direction_B.py": "AssertionError: 決定性 (i) の不一致で止まらなかった"
+   }
+  },
+  {
+   "name": "腕ごとのトークン長で場面を落とす",
+   "ruling": "D82",
+   "target": "direction_B.py",
+   "applied": true,
+   "what": "凍結時に記帳するトークン長が一つの場面の分しか無い誤り（正本 position_length.record_at_freeze・主位置の位置は場面ごとに違う）",
+   "caught": [
+    "direction_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "direction_B.py": "AssertionError: ('腕か場面が欠けた', {'N': {'preamble_tokens': 0, 'prompt_tokens': {'N1': 10}}, 'O': {'preamble_tokens': 3, 'prompt_tokens': {'N1': 13}}, 'Osec': {'prea"
+   }
+  },
+  {
+   "name": "S4 の片側上限を狭める",
+   "ruling": "D118",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "「効き目以上の低下は否定」の札が出やすくなる誤り（反証が当たりやすい側・起草者の引力と同じ側）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '当否を言わない', 0.7070567376539129, np.float64(0.3335191915017552))"
+   }
+  },
+  {
+   "name": "区間を Wald に戻す",
+   "ruling": "D130",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "床の近くで被覆が崩れる区間に戻る誤り",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError: ('Newcombe の区間が文献値と違う', 0.05750489914903714, 0.333872654036906)"
+   }
+  },
+  {
+   "name": "等質性の境目を注に数える",
+   "ruling": "D127",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "境目ちょうどに注を付ける誤り（正本は「超えたら」）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError"
+   }
+  },
+  {
+   "name": "同方向の判定を大小の一致に戻す",
+   "ruling": "D130",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "差が零のとき、偽どうしで同方向と誤判定する誤り（系統外の検分で捕まった型）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError"
+   }
+  },
+  {
+   "name": "読めた分母から書式外を除かない",
+   "ruling": "D127",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "書式外による希釈が refuse 門をすり抜ける誤り",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError: ('読めた分母の門', {'hold': False, 'reasons': [], 'diff_all': -7.499999999999998, 'answered': {'n_A': 194, 'n_B': 194, 'p': 0.04085336223692694, 'diff_"
+   }
+  },
+  {
+   "name": "api_error の門を外す",
+   "ruling": "D127",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "差のある欠測を品質床の門で止めない誤り",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError"
+   }
+  },
+  {
+   "name": "行ごとの方向を一本にする",
+   "ruling": "D117",
+   "target": "run_stageB_local.py",
+   "applied": true,
+   "what": "ランダム方向の腕のすべての行に同じ方向が掛かる誤り",
+   "caught": [
+    "run_stageB_local.py"
+   ],
+   "missed": [],
+   "lines": {
+    "run_stageB_local.py": "AssertionError: 行ごとの方向が行に届いていない"
+   }
+  },
+  {
+   "name": "様式の欄を空で書く",
+   "ruling": "D117",
+   "target": "run_stageB_local.py",
+   "applied": true,
+   "what": "様式門が実データで黙って効かない誤り（走行器 v4 まで実際にこうだった）",
+   "caught": [
+    "run_stageB_local.py"
+   ],
+   "missed": [],
+   "lines": {
+    "run_stageB_local.py": "AssertionError: ('JSON 直答が読めない', {'parsed': {'choice': 'b', 'amount': None, 'escalation': 1, 'report_to_operator': None, 'reason_summary': 'x', '_nonintegrity':"
+   }
+  },
+  {
+   "name": "td の特異性の向きを見ない",
+   "ruling": "D133",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "td のほうが動いた組でも「書ける」になる誤り（前の規則の型・特異性を書ける側・起草者の引力と同じ側）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError: ('td の特異性の札', ['書ける', '書ける', '書かない', '書かない'])"
+   }
+  },
+  {
+   "name": "S4 の書式外の門を外す",
+   "ruling": "D134",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "書式外が片腕だけ増えても、S4 が三分岐に進む誤り（反証の結果が分母で逆になりうる）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError: ('S4 の書式外の門', [])"
+   }
+  },
+  {
+   "name": "S4 の封印の照合をしない",
+   "ruling": "D135",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "封印の値を読まずに照合を出す誤り（前は札の文言に当否を固定で入れていた）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError: ('S4 の封印の照合', '下がった', '低下', '言えない', '当たり')"
+   }
+  },
+  {
+   "name": "品質床の境目を合格に数える",
+   "ruling": "D137",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "閾値ちょうどの差を合格に数える誤り（正本は不合格・多重性の数が境目の規則と合わなくなる）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError: ('品質床の不合格の問い数が境目の規則と違う', 21, 20)"
+   }
+  },
+  {
+   "name": "様式門の札を保留に戻す",
+   "ruling": "P401",
+   "target": "rules_B.py",
+   "applied": true,
+   "what": "非有意の対比が様式門で保留に化ける誤り（起草者に有利な向き）",
+   "caught": [
+    "rules_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "rules_B.py": "AssertionError"
+   }
+  },
+  {
+   "name": "ランダム方向を塊に戻す",
+   "ruling": "D140",
+   "target": "steer_B.py",
+   "applied": true,
+   "what": "方向が登録順の連続した塊に割られ、バッチ・時刻・セッションと交絡する誤り",
+   "caught": [
+    "steer_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "steer_B.py": "AssertionError: ('割り当てが交互でない（裁定 D140）', [0, 0, 0, 0, 0, 0])"
+   }
+  },
+  {
+   "name": "層の添字の照合を外す",
+   "ruling": "P393",
+   "target": "run_stageB_local.py",
+   "applied": true,
+   "what": "層の割合と層の添字が食い違っても走行器が止まらない誤り（記録の層は割合なので、違う層に掛けても記録は正しく見える）",
+   "caught": [
+    "run_stageB_local.py"
+   ],
+   "missed": [],
+   "lines": {
+    "run_stageB_local.py": "AssertionError: ('一つずれた添字を通した', 0.5, 36, 17)"
+   }
+  },
+  {
+   "name": "腕の本文の末尾の改行を残す",
+   "ruling": "D144",
+   "target": "run_stageB_local.py",
+   "applied": true,
+   "what": "腕の本文を凍結走行器の rd で読まず、末尾の改行を残す誤り（走行器 v6 まで実際にこうだった——O・Osec・Onull で前置きと場面の本文の間の改行が一つ多く、段階 A と V′ の列と一字違った）",
+   "caught": [
+    "run_stageB_local.py"
+   ],
+   "missed": [],
+   "lines": {
+    "run_stageB_local.py": "腕の本文が凍結走行器の rd で読んだ本文と違う（末尾の改行など）: O・Onull・Osec"
+   }
+  },
+  {
+   "name": "記号の読み取りで隣のラテン文字を見ない",
+   "ruling": "D146",
+   "target": "qf_task_B.py",
+   "applied": true,
+   "what": "DNA の D や AI の A を答えに読む誤り（読めないはずの応答が正答や誤答に化ける）",
+   "caught": [
+    "qf_task_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "qf_task_B.py": "AssertionError: ('記号の読み取りが規則と違う', 'DNA の話ではなく B', 'ABCD', 'D', 'B')"
+   }
+  },
+  {
+   "name": "断片の提示の順を並べ直す",
+   "ruling": "D146",
+   "target": "qf_task_B.py",
+   "applied": true,
+   "what": "提示の順が登録（引いた順）と違う誤り（断片の SHA が登録と合わなくなる）",
+   "caught": [
+    "qf_task_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "qf_task_B.py": "AssertionError"
+   }
+  },
+  {
+   "name": "問いの本文の空行を落とす",
+   "ruling": "D146",
+   "target": "qf_task_B.py",
+   "applied": true,
+   "what": "課題の指示と問題文の間の空行が無くなり、登録した組み立て（presentation.layout）と違う誤り",
+   "caught": [
+    "qf_task_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "qf_task_B.py": "E. 戊"
+   }
+  },
+  {
+   "name": "品質床の記録の生成の設定を渡した鍵だけにする",
+   "ruling": "D146",
+   "target": "run_stageB_local.py",
+   "applied": true,
+   "what": "記録に温度と top_p が無く、本物の出力が整合検査で全件「生成の設定が登録と違う」に落ちる誤り（合成データは正本の値を書くので通る型）",
+   "caught": [
+    "run_stageB_local.py"
+   ],
+   "missed": [],
+   "lines": {
+    "run_stageB_local.py": "KeyError: 'temperature'"
+   }
+  },
+  {
+   "name": "判定の順を二つの土台の平均で見る",
+   "ruling": "D145",
+   "target": "qf_select_B.py",
+   "applied": true,
+   "what": "一方の土台が下限に届かなくても平均で (1) に入る誤り（起草者の引力と同じ側）",
+   "caught": [
+    "qf_select_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "qf_select_B.py": "AssertionError: {'bases': ['O-Ncold', 'Onull'], 'base_min': 0.85, 'base_min_floor': 0.7, 'ff_threshold_pt': 10, 'rows': {'jcqa': {'min_acc': 0.8975, 'max_ff_pt'"
+   }
+  },
+  {
+   "name": "手当ての下限に届かないとき付けない側に戻る",
+   "ruling": "D145",
+   "target": "qf_select_B.py",
+   "applied": true,
+   "what": "どの候補も手当ての下限に届かないとき、止まらずに付けない側へ戻って先へ進む誤り（裁定 D145 で止まる側に決めた・起草者の引力の側）",
+   "caught": [
+    "qf_select_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "qf_select_B.py": "AssertionError: {'bases': ['O-Ncold', 'Onull'], 'base_min': 0.85, 'base_min_floor': 0.7, 'ff_threshold_pt': 10, 'rows': {'jcqa': {'min_acc': 0.695, 'max_ff_pt':"
+   }
+  },
+  {
+   "name": "予想の書式の向きの欄の鍵から前置きを落とす",
+   "ruling": "D148",
+   "target": "make_predictions_form_B.py",
+   "applied": true,
+   "what": "予想の JSON の向きの鍵が正本の決まり（b.dir.）と違い、照合の器が対比を引けなくなる誤り",
+   "caught": [
+    "make_predictions_form_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "make_predictions_form_B.py": "AssertionError: 向きの欄が確証の対比と合わない"
+   }
+  },
+  {
+   "name": "予想の書式の封印の JS の置き換えを外す",
+   "ruling": "D148",
+   "target": "make_predictions_form_B.py",
+   "applied": true,
+   "what": "封印の JSON が V′ 様式の名と保存の名のまま出る誤り（どの段の予想か JSON から分からなくなる）",
+   "caught": [
+    "make_predictions_form_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "make_predictions_form_B.py": "AssertionError: JS の置き換えが無い"
+   }
+  },
+  {
+   "name": "封印の出所の SHA-256 を照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "封印の後にコーディネータの予想の JSON が書き換わっても、凍結の器が通す誤り",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 封印の出所の SHA-256 を替える"
+   }
+  },
+  {
+   "name": "封印の向きを予想の JSON と照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "起草者の封印の向きがコーディネータの予想の JSON と違っても通す誤り（封印を二重に書いた形・seal_format.from_predictions の違反）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 封印の向きを一つ替える"
+   }
+  },
+  {
+   "name": "封印の経緯の記録の SHA を照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "封印の経緯の記録に載る SHA-256 と現物が違っても通す誤り（封印の後に登録者の予想のファイルが替わっても分からない）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 封印の経緯の記録の登録者の SHA が違う"
+   }
+  },
+  {
+   "name": "予想者の欄を名の役と照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "登録者のファイルにコーディネータの予想が入っていても通す誤り（照合が二人の予想を取り違える）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 登録者のファイルの予想者がコーディネータ"
+   }
+  },
+  {
+   "name": "予想の様式の名を照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "別の段・別の版の書式で作った予想の JSON を通す誤り（正本 predictions.compare_rules.validation）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 登録者の予想の様式の名が違う"
+   }
+  },
+  {
+   "name": "非有意を照合不能に写す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "「どちらでもない」の予想が、非有意の結果でも照合不能に落ちる誤り（正本 compare_rules.direction の違反・当たりも外れも数えられなくなる）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('写し方が違う（得た・望んだ）', {'sub:S4:O-Ncold-v~O-Ncold-vrand': ('照合不能', '的中'), 'add:N1:Onull+v~Onull+vrand': ('照合不能', '外れ')})"
+   }
+  },
+  {
+   "name": "逆向きの確証を封印の向きで写す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "札の向き（集計の記号）を読まず、確証をすべて低下に写す誤り（逆向きに立った確証が、低下と予想した人の的中に化ける）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('写し方が違う（得た・望んだ）', {'sub:SK:O-Ncold-v~O-Ncold-vrand': ('外れ', '的中')})"
+   }
+  },
+  {
+   "name": "確証の本数の帯の境目を外す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "帯の上の端の本数（3・8・16 本）が帯に入らない誤り（照合不能に落ちる）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('帯の写し方', 0, None)"
+   }
+  },
+  {
+   "name": "照合で集計と門の記録の照合を外す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "別の門の記録から作った集計で照合できてしまう誤り",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: 止まらなかった: 門の記録の食い違い"
+   }
+  },
+  {
+   "name": "予想しないを照合に数える",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "「予想しない」の欄を外れに数える誤り（正本 compare_rules.not_predicted の違反）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('写し方が違う（得た・望んだ）', {'cross:N1:O-Ncold+vNk~O-Ncold+vrand': ('外れ', '予想しない')})"
+   }
+  },
+  {
+   "name": "書式外の境目を当たりに数える",
+   "ruling": "D145",
+   "target": "qf_select_B.py",
+   "applied": true,
+   "what": "書式外の率がちょうど閾値の候補を落とす誤り（登録は「超えたら当たる」）",
+   "caught": [
+    "qf_select_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "qf_select_B.py": "AssertionError: {'bases': ['O-Ncold', 'Onull'], 'base_min': 0.85, 'base_min_floor': 0.7, 'ff_threshold_pt': 10, 'rows': {'jcqa': {'min_acc': 0.85, 'max_ff_pt': "
+   }
+  },
+  {
+   "name": "引用の裁定の照合を外す",
+   "ruling": "—",
+   "target": "citations_B.py",
+   "applied": true,
+   "what": "引用の括弧の裁定と、引いた採否表の行の裁定が食い違っても止めない誤り（直す前の器材に実際に四十件余りあった型）",
+   "caught": [
+    "citations_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "citations_B.py": "AssertionError: 裁定の食い違いを止めない（札なし）"
+   }
+  },
+  {
+   "name": "出所の札の照合を外す",
+   "ruling": "—",
+   "target": "citations_B.py",
+   "applied": true,
+   "what": "系統内の検分が挙げた所見に「系統外の検分」の札を付けても止めない誤り（独立の票の記録が水増しされる側）",
+   "caught": [
+    "citations_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "citations_B.py": "AssertionError: 札の食い違いを止めない（裁定なし）"
+   }
+  },
+  {
+   "name": "様式門を Holm の順位に戻す",
+   "ruling": "D125",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "様式門の保留が順位を消費し、次の対比の閾値が α/m から α/(m−1) に緩む",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "（健全な入力）",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.008333, 0.0125, 0.0125, 0.016667, 0.016667, 0.025], 'confirm': 4, 're"
+  },
+  {
+   "name": "封印の語彙の写しを外す",
+   "ruling": "D121",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "正本の語彙で封印すると確証がすべて「登録された向きと逆」になる",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "（健全な入力）",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 2, 'style"
+  },
+  {
+   "name": "セッション記録の検査を本走行だけに戻す",
+   "ruling": "D126",
+   "target": "integrity_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "調整走行・品質床・同一性選別で記録が無くても素通りする",
+   "kind": "integrity",
+   "changed": true,
+   "broken": "drop_sessions",
+   "base": "(1, {'stageB': {'rc': 1, 'problems': 5}, 'tuneB': {'rc': 1, 'problems': 36}, 'stageB-quality': {'rc': 1, 'prob",
+   "mutated": "(1, {'stageB': {'rc': 1, 'problems': 5}, 'tuneB': {'rc': 1, 'problems': None}, 'stageB-quality': {'rc': 1, 'pr"
+  },
+  {
+   "name": "門のセッション検査を外す",
+   "ruling": "D126",
+   "target": "gate_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "門が記録の不在を素通りする",
+   "kind": "gate",
+   "changed": true,
+   "broken": "drop_sessions",
+   "base": "(1, None)",
+   "mutated": "(0, 'open')"
+  },
+  {
+   "name": "升目の欠けを incomplete に倒さない",
+   "ruling": "D126",
+   "target": "gate_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "調整走行の升目が欠けても判定が open のまま",
+   "kind": "gate",
+   "changed": true,
+   "broken": "drop_tune_cell",
+   "base": "(2, 'incomplete')",
+   "mutated": "(0, 'open')"
+  },
+  {
+   "name": "等質性の注を集計器が付けない",
+   "ruling": "D127",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "ランダム方向の三本が不均一でも注が付かない",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "（健全な入力）",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
+  },
+  {
+   "name": "td の特異性を集計器が数えない",
+   "ruling": "D133",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "td の特異性をどの場面でも書ける（起草者の引力と同じ側）",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "（健全な入力）",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
+  },
+  {
+   "name": "S4 の門を集計器が当てない",
+   "ruling": "D134",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "ランダム方向の腕だけ書式外が増えても、S4 が三分岐に進む（反証の結果が分母で逆になりうる）",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "s4_ff",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
+  },
+  {
+   "name": "様式門の札を集計器が使わない",
+   "ruling": "P401",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "様式門に当たった非有意の対比が保留に化ける（起草者に有利な向き）",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "（健全な入力）",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
+  },
+  {
+   "name": "選定後の相手の重複の番人を外す",
+   "ruling": "P403",
+   "target": "analyze_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "選定後の品質床の無操作の相手が二本あっても合算して読む（分母が倍になる）",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "dup_post_partner",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.016667], 'confirm': 3, 'reverse': 1, 'style_hold': 1, 'agree'",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
+  },
+  {
+   "name": "様式の欄の空を採点欠落に数えない",
+   "ruling": "D117",
+   "target": "runs_B.py",
+   "applied": true,
+   "pipeline": true,
+   "what": "走行器が様式を書かなくても、様式門が黙って素通りする（走行器 v4 まで実際にそうだった）",
+   "kind": "analyze",
+   "changed": true,
+   "broken": "null_style",
+   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style",
+   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
+  }
+ ],
+ "missed": 0,
+ "total": 55
+}

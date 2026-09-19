@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""endtoend_B.py v5 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+"""endtoend_B.py v6 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+v6（2026-09-20・凍結の前の方向の抽出の準備）: **(14) 方向の抽出の本体 `direction_B.extract`** を通す——起動器の相 dir と抽出器の口が呼ぶ本体で、これまで一度も走っていなかった（この検査は部品の関数だけを呼んでいた）。方向と主位置の活性の npz・層・‖v̂‖／‖h‖・決定性・腕ごとのトークン長を書くこと、書いた方向の SHA とノルム合わせ、トークン長を組み立て済みの列から数え直した値と照らす。
 v5（2026-09-19 の夕刻・裁定 D145・D146）: **品質床のセル** `run_quality_cell` を (13) で通す——問いの組み立て（前置きあり・なし）・係数 0 の hook と無操作の一致（左詰めのバッチ）・係数 ≠ 0 で出力が変わる・記号と書式外と正誤が生テキストから組み直せる・生成の設定の記録・例外の引き直しと api_error・本物の整合検査に通す（問いは合成）。
 v4（2026-09-19 の後刻）: 盤の全腕で、組み立て済みの列が凍結走行器の読み方（`rd`）と式で作った列と一致することを足した（走行器 v6 までの末尾の改行の欠陥の型）。
 v3（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 試行の記録のバッチの行数（採否表 P406）・走行の記録の加えた量（P394）・層の割合と添字の食い違いで走行器が止まること（P393）・決定性 (ii) のバッチの組成の比較（P396）・ランダム方向の交互の割り当て（裁定 D140）を足した。
@@ -28,7 +29,7 @@ v3（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, sys, json, argparse, datetime, tempfile, shutil
 
-VERSION = 'v5'
+VERSION = 'v6'
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 REPO = os.path.dirname(HERE)
@@ -530,6 +531,33 @@ _bad13 = [p_ for p_ in _ip if any(w_ in p_ for w_ in ('seed', '生成の設定',
 check('(13f) 品質床の記録が本物の整合検査の種・生成の設定・manifest の欄・走行を跨いだ同一性で落ちない', not _bad13,
       ('落ちた %s' % _bad13[:2]) if _bad13 else '整合検査の問題 %d 件はいずれも小さな検査に由来（問いの数・升目の欠け）' % len(_ip))
 
+# ---- (14) 方向の抽出の本体 `extract`（v6・2026-09-20・凍結の前の方向の抽出の準備） ----
+import hashlib as _hl14
+_o14 = os.path.join(tmp, 'dir14')
+_r14 = direction_B.extract(model, tok, _o14, model_label='E2E', dtype_label='float32', log=lambda m_: None)
+_files14 = sorted(os.listdir(_o14))
+_want14 = ['directions.json', 'directions.npz', 'layers.json', 'main_position_activations.npz']
+_sha14 = _hl14.sha256(open(os.path.join(_o14, 'directions.npz'), 'rb').read()).hexdigest().upper()
+_npz14 = np.load(os.path.join(_o14, 'directions.npz'))
+_L14 = T['selection']['candidates']['layers']
+_norm14 = all(abs(float(np.linalg.norm(_npz14['%s__%s' % (n_, r_)])) - float(np.linalg.norm(_npz14['static__%s' % r_])))
+              < 1e-5 * max(1.0, float(np.linalg.norm(_npz14['static__%s' % r_]))) for n_ in ('loaded', 'Nk', 'td') for r_ in _L14)
+_tl14 = _r14['arm_token_lengths']
+# 組み立て済みの列の長さを、抽出器を通さずに数え直す（腕 × 場面の取り違えを見る）
+_AT14 = {k_: v_['text'] for k_, v_ in RUN.arm_texts().items()}
+_re14 = {}
+for _a in T['arms']['panel']:
+    for _sc in T['scenarios']:
+        _s14, _i14 = RUN.scenario_and_instruction(_sc)
+        _re14[(_a, _sc)] = len(steer_B.apply_chat(tok, RUN.user_message(_AT14[_a], _s14['text'], _i14)))
+_tl_ok = (set(_tl14) == set(T['arms']['panel']) and _tl14['N']['preamble_tokens'] == 0
+          and all(_tl14[_a]['prompt_tokens'][_sc] == _re14[(_a, _sc)] for _a in T['arms']['panel'] for _sc in T['scenarios']))
+_ok14 = (_files14 == _want14 and _sha14 == _r14['npz_sha256'] and _norm14 and _tl_ok and _r14['determinism_same_order'] is True
+         and _r14['num_hidden_layers'] == n_layers and set(_r14['h_norm']) == {str(r_) for r_ in _L14})
+check('(14) 方向の抽出の本体 extract が小さな模型で通り、方向と主位置の活性の npz・層・‖v̂‖／‖h‖・決定性・腕ごとのトークン長を書く（2026-09-20）', _ok14,
+      'ファイル %s・SHA 一致 %s・ノルム合わせ %s・トークン長の数え直し %s・決定性 (ii) %s'
+      % (_files14, _sha14 == _r14['npz_sha256'], _norm14, _tl_ok, _r14['determinism_cross_order']['ok']))
+
 shutil.rmtree(tmp, ignore_errors=True)
 
 json.dump({'kind': 'endtoend_B', 'version': VERSION, 'generated_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -550,7 +578,7 @@ L += ['', '## この検査が確認していないこと', '',
       '- バッチ 16・実重み・実際のメモリでの挙動（OOM・KV キャッシュ・速度）は確かめていない。',
       '- 品質床のセルは**合成の問い**で通した（13）。候補の課題（JCommonsenseQA・JMMLU）の問いは、ここでは使わない（課題の器の自己検査が断片の登録と照らす）。',
       '- **相をまたいだ走らせ方の順**（同一性選別 → 調整走行 → 品質床 → 本走行）と、Colab での起動は、'
-      '  まだ書いていない（一つのセルを走らせて書く口と、セッション記録を書く口までは書いた）。',
+      '  まだ書いていない（一つのセルを走らせて書く口と、セッション記録を書く口までは書いた）。凍結の前の方向の抽出（相 dir）は起動器に書き、(14) で本体を通した。',
       '- 様式と言及の照らし合わせ（9d）は、走行器と同じ段階 A の関数で採点し直したもので、**関数そのものの正しさ**は段階 A の検分と走行器の自己検査（見本の文）に拠る。',
       '- 乱数の模型の出力はほぼすべて書式外になるので、**答えの読める試行（破局・refuse の判定）の経路は、ここでは走らない**（走行器の自己検査の見本の文で確かめた）。', '',
       '本記録のいかなる数値も、AI に意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。', '']

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v7 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v8 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v8（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: 方向の抽出器 v7 の二つの型を足した（決定性 (i) の不一致で止めない・腕ごとのトークン長で場面を落とす）。
 v7（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: 予想の照合の器（`compare_predictions_B`）の写し方と照らしを外す型を五つ足した（非有意の写し方・逆向きの確証の向き・帯の境目・集計と門の記録の照合・予想しないの数え方）。
 v6（2026-09-19 の夜・封印の後・独立の目を通っていない）: 封印した予想の照合（`seal_B.check_predictions`）の五つの検査を外す型を足した（出所の SHA・向き・封印の経緯の記録の SHA・予想者・様式の名）。
 v5（2026-09-19 の後刻）: 腕の本文の末尾の改行を残して読む誤り（走行器 v6 まで実際にこうだった・O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった）を足した。
@@ -16,7 +17,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v7'
+VERSION = 'v8'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -44,6 +45,15 @@ MUTATIONS = [
      ('int(math.floor(ratio * n_layers + 0.5)) - 1', 'int(math.floor(ratio * n_layers)) - 1'),
      ['direction_B.py'],
      '層の添字が一つずれる誤り'),
+    # ---- 方向の抽出器 v7（2026-09-20・凍結の前の方向の抽出の準備） ----
+    ('決定性 (i) の不一致で止めない', 'D91', 'direction_B.py',
+     ('    if not ok_same:', '    if False:'),
+     ['direction_B.py'],
+     '同じ並べ方で二度取った活性が一致しなくても、方向を作って凍結へ進む誤り（登録は止めて登録者に上げる）'),
+    ('腕ごとのトークン長で場面を落とす', 'D82', 'direction_B.py',
+     ("for sc in scenarios}}", "for sc in scenarios[:1]}}"),
+     ['direction_B.py'],
+     '凍結時に記帳するトークン長が一つの場面の分しか無い誤り（正本 position_length.record_at_freeze・主位置の位置は場面ごとに違う）'),
     # ---- 直しの監査（2026-09-19）で器に入れた規則 ----
     ('S4 の片側上限を狭める', 'D118', 'rules_B.py',
      ('    one = newcombe(kB, nB, kA, nA, 0.90)', '    one = newcombe(kB, nB, kA, nA, 0.50)'),
