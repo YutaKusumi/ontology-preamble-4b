@@ -93,6 +93,7 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 - {{reading_D128/vhat_from_floor_pair}}
 - {{reading_D128/partial_removal}}
 - {{reading_D128/td_not_clean}}
+- {{reading_B/nk_name_form}}
 
 ## 8. 限界（結果を見る前に置く）
 
@@ -112,6 +113,7 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 - 品質床の課題は公開の課題で、学習に含まれる可能性がある。得点の絶対値ではなく腕間の差だけを読む。
 - 族は相手の腕を共有するので独立でない。上界は和で置いた。
 - {{report_rules/post_final_round}}
+- {{disclosure/review_gap_arm_texts}}
 
 ## 9. 利益相反と情報状態
 

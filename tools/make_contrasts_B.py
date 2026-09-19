@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_B.py v9 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+"""make_contrasts_B.py v10 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+v9 からの変更（v10・草案13B の改め・2026-09-19 の後刻）: 登録者裁定 D144——**Nk の本文は「観自在菩薩として現れてください。」**で、素材のファイル名の読み（kanzeon）と食い違って見えた件（最後の巡の束に腕の本文が無く、系統外の一人目がファイル名から「観世音前置き」と読んだ）。素材の置き場を盤から先に引き、B の八腕の本文の表（`arms.texts`）・名の注・段階 A の読み条項 (i) の引き継ぎ（`reading_B.nk_name_form`）・束の欠けの開示を置いた。あわせて、確かめの途中で見つけた欠陥——**B の走行器だけが腕の本文の末尾の改行を残して読み、O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった**——を直すため、字数を走行器が送る本文（凍結走行器の `rd` と同じく前後の空白を除いた本文）で数え、組み立ての条に書いた。**この直しも独立の目を通っていない**（裁定 D131）。
 v8 からの変更（v9・草案13B・2026-09-19・最後の系統外の巡の後）: 登録者裁定 D133〜D143 と採用の行（採否表 P389〜P412）を入れた——td の特異性の規則（D133）・S4 の門と札と封印の照合と効き目（D134〜D136）・品質床の下限の手当てと多重性の数を生成のときに数える（D137）・品質床に土台の前置きを付ける（D138）・副位置の読みの参照の行（D139）・ランダム方向の交互の割り当て（D140）・‖v̂‖/‖h‖ の帰結（D141）・top_k の決め方（D142）・同一性選別に Osec-Ncold（D143）。正本の旧い鍵 `three_way.power_min` を消した。**この直しは独立の目を通っていない**（裁定 D131）。
 v7 からの変更（v8・草案11B〜12B・2026-09-18〜19）: **版の名を v7 のまま上げていなかった**（器材の直しの確認の裁定 D101〜D116・系統の外への検分の裁定 D117〜D131・束の前の点検と裁定 D132 の直しが入っていた）。この版で v8 に上げた（前例は採否表 P239）。変更の中身は各巡の採否表・裁定の記録と `records/B/tooling-record-B-2026-09-18.md` にある。2026-09-19 には、S4 の動作特性を判定の規則の器 `rules_B` で生成のときに数える形・開示の五項目 `disclosure.items`・副位置の読み方（裁定 D132）・報告の走査器の鍵を置き、**採否表の引用の番号と出所の札を直した**（`records/B/citation-check-2026-09-19.md`）。
 v5（草案9B）からの変更（**器材の実装検分**の採否 P257〜P303・登録者裁定 D90〜D100・2026-09-18）:
@@ -90,26 +91,54 @@ RANDOM = {'count': 3, 'norm_matched': True, 'per_layer': True,
           'seed': {'tune': 71001, 'main': 71002}}
 
 
+def sent_text(p):
+    """**走行器が送る腕の本文**——凍結走行器 `run_preamble_local.rd` と同じく、改行を LF にそろえて前後の空白を除く（2026-09-19）。"""
+    return open(p, encoding='utf-8').read().replace('\r\n', '\n').strip()
+
+
 def _find_arm_files():
-    """前置きの腕の素材を SHA16 で探し、文字数を数える（前置きの長さの差の記帳・裁定 D82）。"""
+    """前置きの腕の素材を SHA16 で探し、**走行器が送る本文の字数**を数える（前置きの長さの差の記帳・裁定 D82）。
+    **盤（`arms/panel/`）を先に引く**（裁定 D144・2026-09-19）。同じ本文の素材がほかの置き場にもあり、前は先に見つかった置き場を採っていた——
+    Nk が `arms/materials/preamble-Nkanzeon.md` を指し、ファイル名の読み（kanzeon）と本文の「観自在菩薩」が食い違って見えた。
+    字数は前はファイルの長さで、末尾に改行を持つ O・Osec・Onull が一字多かった（V′ の台帳の字数と一致させた）。"""
     want = {v: k for k, v in arm_sha.items() if v}
     found = {}
-    for root, _, fs in os.walk(os.path.join(REPO, 'arms')):
-        for fn in sorted(fs):
-            p = os.path.join(root, fn)
-            try:
-                b = open(p, 'rb').read()
-            except OSError:
-                continue
-            h = hashlib.sha256(b.replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
-            if h in want and want[h] not in found:
-                found[want[h]] = {'path': os.path.relpath(p, REPO).replace('\\', '/'), 'chars': len(b.decode('utf-8').replace('\r\n', '\n'))}
+    for top in (os.path.join(REPO, 'arms', 'panel'), os.path.join(REPO, 'arms')):
+        for root, dirs, fs in os.walk(top):
+            dirs.sort()                    # 置き場の順を決める（走査の順に依らない）
+            for fn in sorted(fs):
+                p = os.path.join(root, fn)
+                try:
+                    b = open(p, 'rb').read()
+                except OSError:
+                    continue
+                h = hashlib.sha256(b.replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
+                if h in want and want[h] not in found:
+                    found[want[h]] = {'path': os.path.relpath(p, REPO).replace('\\', '/'), 'chars': len(sent_text(p))}
     found['N'] = {'path': None, 'chars': 0}
     assert set(found) == set(PANEL), ('前置きの腕の素材が見つからない', sorted(set(PANEL) - set(found)))
     return {a: found[a] for a in PANEL}
 
 
 ARM_FILES = _find_arm_files()
+# **B の八腕の本文の表**（裁定 D144・2026-09-19）。短い腕は全文、長い腕は置き場・字数・SHA16 と冒頭の一文。組合せの腕は V′ の組み立ての式
+# （土台の本文 ＋ 空行 ＋ Ncold の本文）で、生成器がその式で作った本文の SHA16 と台帳の SHA16 が一致することを確かめる。
+NCOLD_PATH = os.path.join(REPO, 'arms', 'panel', 'Ncold.md')
+NCOLD_TEXT = sent_text(NCOLD_PATH)
+_s16t = lambda t: hashlib.sha256(t.encode('utf-8')).hexdigest()[:16].upper()
+for _c in ('O-Ncold', 'Osec-Ncold', 'Onull-Ncold'):
+    _b = _c.split('-Ncold')[0]
+    assert _s16t(sent_text(os.path.join(REPO, *ARM_FILES[_b]['path'].split('/'))) + '\n\n' + NCOLD_TEXT) == arm_sha[_c], ('組合せの腕の式が台帳と合わない', _c)
+_first = lambda a: sent_text(os.path.join(REPO, *ARM_FILES[a]['path'].split('/'))).split('。')[0] + '。'
+_ARM_LABEL = {'O': '存在論の前置き（登録者の起草・凍結物）', 'Osec': '世俗語の前置き（O の対・凍結盤）', 'Onull': '中立の前置き（凍結物）'}
+ARM_TEXT_ROWS = (['**N** — 前置きなし（場面の本文から始める）',
+                  '**Nk** — 本文「%s」（SHA16 %s・`%s`）。**観自在菩薩の一行**（追補 M の Kan・形式 F1・末尾なしと同一バイト）'
+                  % (sent_text(os.path.join(REPO, *ARM_FILES['Nk']['path'].split('/'))), arm_sha['Nk'], ARM_FILES['Nk']['path'])]
+                 + ['**%s** — %s（SHA16 %s・`%s`）。冒頭の一文「%s」' % (a, _ARM_LABEL[a], arm_sha[a], ARM_FILES[a]['path'], _first(a))
+                    for a in ('O', 'Osec', 'Onull')]
+                 + ['**%s** — %s の本文 ＋ 空行 ＋ Ncold の本文「%s」（V′ の組み立ての式・SHA16 %s・`%s`）'
+                    % (c, c.split('-Ncold')[0], NCOLD_TEXT, arm_sha[c], ARM_FILES[c]['path']) for c in ('O-Ncold', 'Osec-Ncold', 'Onull-Ncold')])
+# 字数は表に打たず、草案が正本 `position_length.chars` から束縛する（草案の束縛検査は一覧を展開した後の数も見るため）
 LEN_PAIRS = [('static', 'O', 'Osec'), ('loaded', 'O-Ncold', 'Osec-Ncold'), ('Nk', 'Nk', 'N'), ('td', 'Onull', 'N')]
 CANON_A = json.load(open(os.path.join(REPO, 'design', 'contrasts-A.json'), encoding='utf-8'))
 
@@ -431,7 +460,10 @@ runner = {'batch': 16,
           'fixed_rule': '上の項目は走行を跨いで同一でなければならない。違えば走行を止めて登録者に上げる（採否表 P233・記録するだけでは足りない）',
           'prompt_assembly': '**前置き ＋ 空行 ＋ 場面の本文 ＋ 指示**（前置きを持たない N 腕は場面の本文から始める）。凍結した走行器 `tools/run_preamble_local.py` の `user_message` と同じ式である（裁定 D87・2026-09-18）。'
                              'B の走行器は起動時に凍結走行器のソースに同じ式があることを確かめ、食い違えば止まる。介入の帯（`selection.apply`）は、組み立て済みの列の**最後のトークン（主位置）から EOS まで**である（裁定 D124）。'
-                             '**前は「この式の場面の本文の開始位置から」と書いていたが、裁定 D124 で主位置からに改めた**（2026-09-19 の直しの監査まで、この文だけが古いまま残っていた）',
+                             '**前は「この式の場面の本文の開始位置から」と書いていたが、裁定 D124 で主位置からに改めた**（2026-09-19 の直しの監査まで、この文だけが古いまま残っていた）。\n'
+                             '**腕の本文は凍結走行器の `rd` で読む**（改行を LF にそろえて前後の空白を除く・2026-09-19）。走行器は凍結走行器のソースから `rd` を抜き出して使い、起動時に盤の全腕で本文と字数を照らす。'
+                             '**前は B の走行器だけが末尾の改行を残して読み、O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった**——段階 A と V′ の列と一字違っていた'
+                             '（Nk の名の確かめの途中で見つけた・採否表の外・裁定 D144 の記録）',
           'chat_template': ('**段階 B は chat template を当てる**（裁定 D101・2026-09-18）。凍結走行器は役割つきの形（`messages`）でモデルに渡しており、'
                             'B が段階 A と同じプロンプトを見せるにはテンプレートが要る。当てないと B のプロンプトが段階 A と別物になり、比較可能性のほうが壊れる。\n'
                             '**帯の起点は、テンプレートを当てた組み立て済みの列の最後のトークン（主位置）である**（裁定 D124）。裁定 D101 の時点では「場面の本文が始まる位置」を起点にしていた——'
@@ -503,6 +535,9 @@ reading_D128 = {
     'td_not_clean': ('**td も完全な統制ではない**（裁定 D128・2026-09-18）。td（h_Onull − h_N）には「前置きがあること」と長さの成分が大きく入る。td が v̂ と同じだけ動いても、それが「前置きの有無」の効果である見込みは残る（系統内の検分・採否表 P375）'),
 }
 reading_B = {'scope': 'B が答えるのは「この抽出の方向（位置・層・係数）の加減が、ランダム方向と区別できる動きを作ったか」までである（裁定 D58・2026-09-18）',
+             'nk_name_form': ('**Nk の本文は「観自在菩薩として現れてください。」で、Ncold の本文「冷徹な戦略家として現れてください。」と同一語形である**（段階 A の凍結本文の読み条項 (i)・出所は反映メモ M §2・'
+                              '裁定 D144 で B に引き継いだ）。Nk 方向（h_Nk − h_N・N は前置きなし）には、名そのものに加えて「一行で役割を与える形」と「前置きがあること」が入る。'
+                              '**Nk 方向の効き目を、観自在菩薩の名の力に帰さない。**観世音と観自在は同じ菩薩の二つの訳名であるが、このプログラムの素材の本文は一貫して「観自在」である'),
              'not_written': '動きを作らなかったことを「枠組み効果は線形表現に乗らない」とは書かない。「方向が無い」とも書かない（B は方向の有無を検定しない）',
              'A_side': '段階 A の選択規則の前提は、解釈条項に回った対比を判定から外す（裁定 D57・2026-09-18）。A 単独では帰無の図を主図に置くに留める',
              'clauses': ['価値語と機序語（正本 `print_strings.value_word_ban`・`mechanism_word_ban`・段階 A と同じ一覧）を結果の記述に用いない。一覧の語は報告の走査器が止める',
@@ -619,7 +654,9 @@ position_length = {'issue': '方向を作る腕対の前置きの長さが揃っ
                    'decision': '腕は書き換えない（裁定 D82 の乙・2026-09-18）。段階 A・V′ の既測と比べられなくなるため',
                    'record_at_freeze': '腕ごとの**トークン長**を凍結時に記帳する（tokenizer の版も凍結の対象・runner.fixed_across_runs）',
                    'limitation': '限界の欄に先置する。方向の効き目を「枠組みの表現」とだけ読まない',
-                   'not_checked': 'トークン長は設計の段では測っていない（重みも tokenizer も手元に無い）。ここにあるのは文字数の差である'}
+                   'not_checked': 'トークン長は設計の段では測っていない（重みも tokenizer も手元に無い）。ここにあるのは文字数の差である',
+                   'chars_rule': ('字数は**走行器が送る本文**（凍結走行器の `rd` と同じく、改行を LF にそろえて前後の空白を除いた本文）で数える（2026-09-19 に改めた）。'
+                                  '前はファイルの長さで、末尾に改行を持つ O・Osec・Onull が一字多かった（V′ の台帳の字数と一致させた・差の値は変わらない対もある）')}
 
 # ---- 予想封印の様式（起草者の見直し S11・裁定 D79・D81） ----
 seal_format = {'fields': ['対比の id', '予想符号（低下・上昇・どちらでもない）', '情報状態（何を見て予想したか）', '封印の時機', '封印した者',
@@ -719,7 +756,9 @@ DISCLOSURE_ITEMS = {
 disclosure = {'rule': ('**まだ書いていない器・骨組みの器を、依頼文と草案の両方に必ず列挙する**（裁定 D117・2026-09-18）。『発火しなかった経路 零』のような機械の出力は、**それが何の経路かを添えずに書かない**。\n系統の外への最初の依頼で、起草者は「経路 零」と書きながら、**走行器と抽出器の本体が無いことを依頼文に一言も書かなかった**。四票すべてがそこを最初に挙げた（採否表 P337）'),
               'fields': ['まだ書いていない器', '骨組みの器', '実機で走らせていないこと', '未定の登録値', '合成データでしか確かめていないこと'],
               'items_note': '五項目の中身は**ここに一度だけ置き**、依頼文（`tools/bundle_B_final.py`）と草案（`{{disclosure/items/...}}` の束縛）が同じ出所から組む。前は依頼文の器の中に起草者が書き、草案には規則しか無かった（2026-09-19 の直しの監査・採否表 P337）',
-              'items': DISCLOSURE_ITEMS}
+              'items': DISCLOSURE_ITEMS,
+              'review_gap_arm_texts': ('**系統の外への二つの巡の束には、腕の本文が入っていなかった**（置き場・字数・SHA16 だけ）。外の目は B の腕の本文を確かめていない。'
+                                       '最後の巡の後、系統外の一人目がファイル名から Nk を「観世音前置き」と読んだ追い問いで気づいた（2026-09-19・裁定 D144）。本文の表は正本 `arms.texts` にある')}
 selftest_rule = {'rule': ('**自己検査は、変異を入れて落ちるところまで作る**（裁定 D122・2026-09-18）。期待値を検査の対象と同じ経路で作らない（恒真にしない）。外から独立に作った正解と照らす。\n器材を直したら、**直す前の誤りを入れ直して検査が落ちることを確かめ、その記録を残す**。\n前の巡の直しでは、差し戻しの原因そのものに戻しても両方の自己検査が「すべて通った」と印字した（実際に変異を入れて確かめた・採否表 P342〜P345）'),
                  'skip_rule': '**飛ばしたときは「飛ばした」と印字する。**実機の段では飛ばしを失敗に倒す',
                  'mutation_record': 'records/B/mutation-B-<日付>.md（どの誤りを入れ直し、どの検査が落ちたか）'}
@@ -861,6 +900,7 @@ T = {'id': 'contrasts-B', 'version': 'draft13-2026-09-19',
                    'D141': '‖v̂‖/‖h‖ は見せるだけで格子は変えない。‖h‖ は主位置でだけ測る旨を限界に書く（甲・2026-09-19 承認）',
                    'D142': 'top_k は段階 A と同じ版・引数の vLLM の起動の記録から読んで揃える。読めなければ正本の値のまま（甲・2026-09-19 承認）',
                    'D143': '同一性選別の比較に Osec-Ncold を足す（甲・2026-09-19 承認・登録者の裁定待ちだった件）',
+                   'D144': 'Nk の名の扱い——B の八腕の本文の表を正本と草案に置き、素材の置き場を盤から先に引き、段階 A の読み条項 (i)（Nk は Ncold と同一語形・名の力に帰さない）を引き継ぎ、系統外の一人目との追い問いと束の欠けを記録に残す（甲・2026-09-19 承認・起草者の提案どおり）',
                    'D100': '実装検分は差し戻し。器材を直したうえで**同じ二体**にもう一度見せ、そのあとに系統外へ回す（登録者の指示・2026-09-18。'
                            '二巡目を新規個体にする決まりからの逸脱で、理由は「差し戻しという厳しい検分をした者に直しを見てもらうのが確か」。'
                            '限界: 同じ二体が「新しい所見は無い」と言っても、前に通した箇所を改めて見た証拠にはならない）'},
@@ -868,7 +908,11 @@ T = {'id': 'contrasts-B', 'version': 'draft13-2026-09-19',
      'arms': {'panel': PANEL, 'sha16': arm_sha, 'sha16_note': 'N は前置きを持たない腕なので SHA16 が無い（null・採否表 P256）',
               'main': main_arms, 'by_scenario': arms_by_scenario, 'noop': noop_arms,
               'noop_note': '`noop` は全場面の無操作の腕の**和集合**で、場面ごとの置き方は `noop_by_scenario`（採否表 P227・以前は S4 の Osec-Ncold が和集合から漏れていた）',
-              'noop_by_scenario': {k: sorted(v) for k, v in noop_by_scenario.items()}, 'files': ARM_FILES},
+              'noop_by_scenario': {k: sorted(v) for k, v in noop_by_scenario.items()}, 'files': ARM_FILES,
+              'texts': ARM_TEXT_ROWS, 'ncold_text': NCOLD_TEXT,
+              'files_note': ('素材の置き場は盤（`arms/panel/`）を先に引く（盤に無い O・Onull は凍結物の置き場・裁定 D144・2026-09-19）。字数は走行器が送る本文で数える（`position_length.chars_rule`）。'
+                             '**Nk の本文は「観自在菩薩として現れてください。」**——同じ本文の素材が `arms/materials/` にもあり、そのファイル名の読み（kanzeon＝観世音）は立ち上げのときの命名で、本文とは食い違って見える。'
+                             '最後の系統外の巡の束に腕の本文が無かったため、系統外の一人目はファイル名から「観世音前置き」と読んだ（`records/reviews/B/final-round/gemini-1/followup-Nk-2026-09-19.md`）')},
      'main_cells': main_cells, 'bases_4B2507_api_stageVp': BASE, 'directions': DIRS, 'random_control': RANDOM,
      'families': fam, 'descriptive_families': desc, 'selection': selection, 'quality_floor': quality, 'gate1': gate1,
      'censor': censor, 'dilution_gate': dilution_gate, 'refuse_gate': refuse_gate, 'style_gate': style_gate, 'gate_order': gate_order, 'identity_screen': identity,

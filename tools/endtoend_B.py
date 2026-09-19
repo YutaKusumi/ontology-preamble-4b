@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""endtoend_B.py v3 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+"""endtoend_B.py v4 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+v4（2026-09-19 の後刻）: 盤の全腕で、組み立て済みの列が凍結走行器の読み方（`rd`）と式で作った列と一致することを足した（走行器 v6 までの末尾の改行の欠陥の型）。
 v3（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 試行の記録のバッチの行数（採否表 P406）・走行の記録の加えた量（P394）・層の割合と添字の食い違いで走行器が止まること（P393）・決定性 (ii) のバッチの組成の比較（P396）・ランダム方向の交互の割り当て（裁定 D140）を足した。
 
 系統の外への検分で、四票すべてが「**介入を掛けて走らせる器がまだ無い**」ことを最初に挙げた。
@@ -26,7 +27,7 @@ v3（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, sys, json, argparse, datetime, tempfile, shutil
 
-VERSION = 'v3'
+VERSION = 'v4'
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 REPO = os.path.dirname(HERE)
@@ -425,6 +426,21 @@ for _arm in ('O', 'Osec'):
 _ok11, _rows11 = direction_B.determinism_cross_order(_H1, _H3)
 check('(11) 決定性 (ii): 一本流しと走行器と同じバッチの組成の主位置の活性が許容差の内側（採否表 P396）', _ok11,
       'バッチ %d 行・%d 組・最小のコサイン %s' % (T['runner']['batch'], len(_rows11), min((r_['cos'] for r_ in _rows11 if r_.get('cos') is not None), default=None)))
+# (12) **盤の全腕で、組み立て済みの列が凍結走行器の読み方と式で作った列と一致する**（v4・2026-09-19）。
+#      走行器 v6 までは腕の本文の末尾の改行を残して読み、O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった。
+#      期待値は正本の置き場から凍結走行器の `rd` で読んだ本文と凍結走行器の式で作る（走行器の読み口 `arm_texts` を通さない）。
+_rd12 = RUN.frozen_rd()
+_bad12 = []
+for _arm in T['arms']['panel']:
+    _t12 = '' if _arm == 'N' else _rd12(os.path.join(REPO, *T['arms']['files'][_arm]['path'].split('/')))
+    for _sc12 in T['extraction_scenarios']:
+        _s12, _i12 = RUN.scenario_and_instruction(_sc12)
+        _want12 = (_t12 + '\n\n' + _s12['text'] + _i12) if _t12 else (_s12['text'] + _i12)
+        _got12 = RUN.user_message(AT[_arm], _s12['text'], _i12)
+        if _got12 != _want12 or steer_B.apply_chat(tok, _got12) != steer_B.apply_chat(tok, _want12):
+            _bad12.append('%s×%s' % (_arm, _sc12))
+check('(12) 盤の全腕で、組み立て済みの列が凍結走行器の読み方と式で作った列と一致する（2026-09-19）', not _bad12,
+      ('食い違い %s' % _bad12) if _bad12 else '腕 %d × 抽出場面 %d・一致' % (len(T['arms']['panel']), len(T['extraction_scenarios'])))
 
 shutil.rmtree(tmp, ignore_errors=True)
 

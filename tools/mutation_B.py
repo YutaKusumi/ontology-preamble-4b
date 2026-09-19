@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v4 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v5 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v5（2026-09-19 の後刻）: 腕の本文の末尾の改行を残して読む誤り（走行器 v6 まで実際にこうだった・O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった）を足した。
 v4（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 最後の巡の所見を入れ直した型を足した——td の特異性の向きを見ない（裁定 D133）・S4 の門を外す（D134）・S4 の封印の照合をしない（D135）・品質床の境目を合格に数える（D137）・ランダム方向を塊に戻す（D140）・様式門の札を保留に戻す（採否表 P401）・層の添字の照合を外す（P393）・相手の重複の番人を外す（P403）。帯の起点の変異は起点の関数（P404）に当て直した。
 
 系統の外への検分で、**差し戻しの原因そのものに戻しても両方の自己検査が「すべて通った」と印字する**ことが分かった。
@@ -13,7 +14,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v4'
+VERSION = 'v5'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -107,6 +108,10 @@ MUTATIONS = [
      ("    return int(layer_idx) == direction_B.layer_index(float(layer_ratio), int(n_layers))", "    return True"),
      ['run_stageB_local.py'],
      '層の割合と層の添字が食い違っても走行器が止まらない誤り（記録の層は割合なので、違う層に掛けても記録は正しく見える）'),
+    ('腕の本文の末尾の改行を残す', 'D144', 'run_stageB_local.py',
+     ("                                  'text': _RD(p)}", "                                  'text': b.decode('utf-8').replace('\\r\\n', '\\n')}"),
+     ['run_stageB_local.py'],
+     '腕の本文を凍結走行器の rd で読まず、末尾の改行を残す誤り（走行器 v6 まで実際にこうだった——O・Osec・Onull で前置きと場面の本文の間の改行が一つ多く、段階 A と V′ の列と一字違った）'),
     # ---- 採否表の引用の照合（2026-09-19・束の前の点検で手で打った引用の誤りが多数見つかった） ----
     ('引用の裁定の照合を外す', '—', 'citations_B.py',
      ('                if not (ds & rd):', '                if False:'),

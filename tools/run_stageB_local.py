@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""run_stageB_local.py v6 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+"""run_stageB_local.py v7 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+v7（2026-09-19 の後刻・独立の目を通っていない）: **腕の本文を凍結走行器の `rd` で読む**（改行を LF にそろえて前後の空白を除く）。v6 までは末尾の改行を残して読み、**O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった**——段階 A と V′ の列と一字違っていた（Nk の名の確かめ〔裁定 D144〕の途中で見つけた・採否表の外）。起動時の照合に、盤の全腕の本文が凍結走行器の `rd` と一致することを足した。
 v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: `run_cell` の頭で**層の割合と層の添字の対応**を確かめて止まる（`layer_binding_ok`・採否表 P393）／帯の起点を `steer_B.main_position` から出す（P404）／試行の記録に**バッチの実際の行数** `batch_rows`（P406）／セルの**加えた量** `added_norm` を返す（P394）／`generate` に渡す鍵を正本 `generation_explicit.passed_keys` に限る（裁定 D142 の条を足したため）／自己検査の締めの行が、飛ばした検査を「通った」に数えない（P397）。
 
 段階 A の走行器（`run_preamble_local.py` v2.7・vLLM の OpenAI 互換サーバ）は凍結物なので触らない。
@@ -30,7 +31,7 @@ import numpy as np
 import runs_B
 import steer_B
 
-VERSION = 'v6'
+VERSION = 'v7'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FROZEN_RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
@@ -44,10 +45,25 @@ STRICT = os.environ.get('OP4B_REQUIRE_FULL_SELFTEST') == '1'     # 実機の段�
 RESP_ROWS = 4       # 副位置を取る順伝播の小分けの行数（数の結果は変えない・メモリのための実装の値）
 
 
+def frozen_rd():
+    """凍結走行器 `run_preamble_local.py` の `rd`（腕の本文の読み方）を **ast で抜き出して**返す（再実装しない・2026-09-19）。
+    凍結走行器は腕の本文を `rd` で読み、改行を LF にそろえて前後の空白を除く。B の走行器はこれを使って読む。"""
+    import ast as _ast
+    src = open(FROZEN_RUNNER, encoding='utf-8').read().replace('\r\n', '\n')
+    got = [_ast.get_source_segment(src, n) for n in _ast.parse(src).body if isinstance(n, _ast.FunctionDef) and n.name == 'rd']
+    if len(got) != 1:
+        raise SystemExit('凍結走行器に腕の本文の読み方 `rd` が一つだけ無い: %d 件' % len(got))
+    ns = {}
+    exec(compile(got[0], FROZEN_RUNNER, 'exec'), ns)
+    return ns['rd']
+
+
 def check_assembly_matches_frozen():
     """組み立てが凍結走行器と同じであることを確かめる（裁定 D87・採否表 P288）。
 
-    (i) 凍結走行器のソースに同じ式があること、(ii) 正本に登録があること、(iii) **B 自身の `user_message` が式どおりに振る舞うこと**。
+    (i) 凍結走行器のソースに同じ式があること、(ii) 正本に登録があること、(iii) **B 自身の `user_message` が式どおりに振る舞うこと**、
+    (iv) **盤の全腕の本文が、凍結走行器の `rd` で読んだ本文と同じこと**（v7・2026-09-19——v6 までは末尾の改行を残して読み、
+    O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった）。
     """
     src_txt = open(FROZEN_RUNNER, encoding='utf-8').read()
     if ASSEMBLY_EXPR not in src_txt:
@@ -61,11 +77,23 @@ def check_assembly_matches_frozen():
         got = user_message(t, SCEN_TEXT, INST)
         if want != got:
             raise SystemExit('B の user_message が凍結走行器の式と違う: %r 対 %r' % (want, got))
+    # (iv) 腕の本文の読み方（v7）
+    rd_ = frozen_rd()
+    AT_ = arm_texts()
+    bad = [a for a, v in AT_.items() if v['path'] and v['text'] != rd_(os.path.join(REPO, *v['path'].split('/')))]
+    if bad:
+        raise SystemExit('腕の本文が凍結走行器の rd で読んだ本文と違う（末尾の改行など）: %s' % '・'.join(bad))
     return runs_B.sha16_file(FROZEN_RUNNER)
+
+
+_RD = None
 
 
 def arm_texts():
     """正本 `arms.sha16` の SHA16 で腕の素材を引き当てる（手で置き場を書かない）。N は前置きを持たない。"""
+    global _RD
+    if _RD is None:
+        _RD = frozen_rd()
     want = {v: k for k, v in T['arms']['sha16'].items() if v}
     found = {}
     for root, _, fs in os.walk(os.path.join(REPO, 'arms')):
@@ -77,8 +105,9 @@ def arm_texts():
                 continue
             h = hashlib.sha256(b.replace(b'\r\n', b'\n')).hexdigest()[:16].upper()
             if h in want and want[h] not in found:
+                # **本文は凍結走行器の rd で読む**（改行を LF にそろえて前後の空白を除く・v7）。v6 までは末尾の改行を残していた
                 found[want[h]] = {'path': os.path.relpath(p, REPO).replace('\\', '/'), 'sha16': h,
-                                  'text': b.decode('utf-8').replace('\r\n', '\n')}
+                                  'text': _RD(p)}
     found['N'] = {'path': None, 'sha16': None, 'text': ''}
     missing = [a for a in T['arms']['panel'] if a not in found]
     if missing:
@@ -227,6 +256,11 @@ def _selftest():
     msg = user_message(texts['O']['text'], '場面の本文', '\n指示')
     assert msg.startswith(texts['O']['text']) and msg.endswith('\n指示') and '\n\n場面の本文' in msg
     assert user_message('', '場面の本文', '\n指示') == '場面の本文\n指示', 'N 腕は前置きを付けない'
+    # **腕の本文の末尾に改行が残らない**（v7）——末尾に改行を持つ素材（O・Osec・Onull）でも、前置きと場面の本文の間は空行一つ
+    for a_ in ('O', 'Osec', 'Onull'):
+        m_ = user_message(texts[a_]['text'], '場面の本文', '\n\n指示')
+        assert not texts[a_]['text'].endswith('\n') and texts[a_]['text'] + '\n\n場面の本文' in m_ and '\n\n\n' not in m_, \
+            ('前置きと場面の本文の間の改行が凍結走行器と違う', a_)
     plans = {a: arm_plan(a) for a in T['arms']['main']}
     assert plans['Onull'] is None and plans['Onull+v']['kind'] == 'static' and plans['Onull+v']['sign'] == +1
     assert plans['O-Ncold-v']['sign'] == -1 and plans['O-Ncold+vNk']['kind'] == 'Nk'

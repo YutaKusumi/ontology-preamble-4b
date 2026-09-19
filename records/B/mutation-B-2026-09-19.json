@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
- "version": "v4",
- "generated_utc": "2026-09-19T05:17:09Z",
+ "version": "v5",
+ "generated_utc": "2026-09-19T06:40:20Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -284,6 +284,20 @@
    }
   },
   {
+   "name": "腕の本文の末尾の改行を残す",
+   "ruling": "D144",
+   "target": "run_stageB_local.py",
+   "applied": true,
+   "what": "腕の本文を凍結走行器の rd で読まず、末尾の改行を残す誤り（走行器 v6 まで実際にこうだった——O・Osec・Onull で前置きと場面の本文の間の改行が一つ多く、段階 A と V′ の列と一字違った）",
+   "caught": [
+    "run_stageB_local.py"
+   ],
+   "missed": [],
+   "lines": {
+    "run_stageB_local.py": "腕の本文が凍結走行器の rd で読んだ本文と違う（末尾の改行など）: O・Onull・Osec"
+   }
+  },
+  {
    "name": "引用の裁定の照合を外す",
    "ruling": "—",
    "target": "citations_B.py",
@@ -456,5 +470,5 @@
   }
  ],
  "missed": 0,
- "total": 33
+ "total": 34
 }
