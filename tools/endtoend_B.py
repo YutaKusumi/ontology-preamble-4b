@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""endtoend_B.py v4 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+"""endtoend_B.py v5 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+v5（2026-09-19 の夕刻・裁定 D145・D146）: **品質床のセル** `run_quality_cell` を (13) で通す——問いの組み立て（前置きあり・なし）・係数 0 の hook と無操作の一致（左詰めのバッチ）・係数 ≠ 0 で出力が変わる・記号と書式外と正誤が生テキストから組み直せる・生成の設定の記録・例外の引き直しと api_error・本物の整合検査に通す（問いは合成）。
 v4（2026-09-19 の後刻）: 盤の全腕で、組み立て済みの列が凍結走行器の読み方（`rd`）と式で作った列と一致することを足した（走行器 v6 までの末尾の改行の欠陥の型）。
 v3（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 試行の記録のバッチの行数（採否表 P406）・走行の記録の加えた量（P394）・層の割合と添字の食い違いで走行器が止まること（P393）・決定性 (ii) のバッチの組成の比較（P396）・ランダム方向の交互の割り当て（裁定 D140）を足した。
 
@@ -27,7 +28,7 @@ v3（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, sys, json, argparse, datetime, tempfile, shutil
 
-VERSION = 'v4'
+VERSION = 'v5'
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 REPO = os.path.dirname(HERE)
@@ -442,6 +443,93 @@ for _arm in T['arms']['panel']:
 check('(12) 盤の全腕で、組み立て済みの列が凍結走行器の読み方と式で作った列と一致する（2026-09-19）', not _bad12,
       ('食い違い %s' % _bad12) if _bad12 else '腕 %d × 抽出場面 %d・一致' % (len(T['arms']['panel']), len(T['extraction_scenarios'])))
 
+# (13) **品質床のセル**（v5・裁定 D145・D146・2026-09-19 の夕刻）。問いは合成（長さを変えて左詰めを起こす・候補のデータは使わない）。
+import qf_task_B
+import subprocess
+_Q = [{'id': str(k_), 'question': ('問い%d。' % k_) + ('長い文。' * (k_ % 7)), 'choices': ['甲%d' % k_, '乙', '丙', '丁'] + (['戊'] if k_ % 2 else []),
+       'answer': 'ABCD'[k_ % 4]} for k_ in range(20)]
+_qtag = T['tags']['quality']
+_cs = lambda arm_, l_, c_: runs_B.cell_seed(T, T['seeds']['quality'], 'quality', ('selection', arm_, l_, c_))
+_msgs = []
+_orig_apply = steer_B.apply_chat
+steer_B.apply_chat = lambda tok_, m_: (_msgs.append(m_), _orig_apply(tok_, m_))[1]
+try:
+    q0 = RUN.run_quality_cell(model, tok, items=_Q, arm='Onull', stage='selection', task='synth', cell_seed_value=_cs('Onull', None, None),
+                              tag=_qtag, run_key='e2e__q_noop')
+    _m_with = list(_msgs); _msgs.clear()
+    qN = RUN.run_quality_cell(model, tok, items=_Q[:3], arm='Onull', stage='selection', task='synth', cell_seed_value=1, tag=_qtag,
+                              run_key='e2e__q_nopre', input_form='without_preamble')
+    _m_without = list(_msgs)
+finally:
+    steer_B.apply_chat = _orig_apply
+_bk = [qf_task_B.block(q_) for q_ in _Q]
+check('(13a) 品質床の問いの組み立て: 前置きあり＝前置き＋空行＋問いの本文、なし＝問いの本文だけ（裁定 D138・D146）',
+      _m_with == [AT['Onull'] + '\n\n' + b_ for b_ in _bk] and _m_without == _bk[:3], '前置きあり %d 件・なし %d 件' % (len(_m_with), len(_m_without)))
+qc0 = RUN.run_quality_cell(model, tok, items=_Q, arm='Onull+v', stage='selection', task='synth', cell_seed_value=_cs('Onull+v', ratio, 0.0),
+                           tag=_qtag, run_key='e2e__q_c0', layer_ratio=ratio, coef=0.0, dirs=loaded, layer_idx=li)
+_same = [a_['text'] == b_['text'] for a_, b_ in zip(q0['raws'], qc0['raws'])]
+check('(13b) 品質床: 係数 0 の hook を掛けたセルが無操作と一致する（左詰めのバッチ・貪欲）', all(_same) and len(_same) == len(_Q), '%d/%d 行一致' % (sum(_same), len(_same)))
+qc4 = RUN.run_quality_cell(model, tok, items=_Q, arm='Onull+v', stage='selection', task='synth', cell_seed_value=_cs('Onull+v', ratio, 4.0),
+                           tag=_qtag, run_key='e2e__q_c4', layer_ratio=ratio, coef=4.0, dirs=loaded, layer_idx=li)
+_diff = sum(a_['text'] != b_['text'] for a_, b_ in zip(q0['raws'], qc4['raws']))
+check('(13c) 品質床: 係数 ≠ 0 の hook は出力を変える（介入が品質床の経路に掛かっている）', _diff > 0 and qc4['added_norm'] and qc4['added_norm'] > 0,
+      '%d/%d 行が違う・加えた量 %.3g' % (_diff, len(_Q), qc4['added_norm'] or 0))
+_bt = T['runner']['batch']
+_rows13 = [r_['batch_rows'] for r_ in q0['trials']]
+_cons = all(r_['choice'] == qf_task_B.extract_letter(w_['text'], qf_task_B.letters_of(q_)) and r_['format_fail'] == (r_['choice'] is None)
+            and r_['correct'] == (r_['choice'] == q_['answer']) and w_['item_id'] == q_['id']
+            for r_, w_, q_ in zip(q0['trials'], q0['raws'], _Q))
+_samp = q0['trials'][0]['sampling']
+check('(13d) 品質床の記録: バッチの行数・記号と書式外と正誤が生テキストから組み直せる・生成の設定に正本の温度と top_p・前置きの SHA',
+      _rows13 == [min(_bt, len(_Q))] * min(_bt, len(_Q)) + [len(_Q) - _bt] * (len(_Q) - _bt) and _cons
+      and _samp.get('temperature') == T['quality_floor']['generation']['temperature'] and _samp.get('top_p') == T['quality_floor']['generation']['top_p']
+      and q0['trials'][0]['preamble_sha'] == T['arms']['sha16']['Onull'] and qN['trials'][0]['preamble_sha'] is None,
+      'バッチの行数 %s・整合 %s・生成の設定 %s' % (sorted(set(_rows13)), _cons, {k_: _samp.get(k_) for k_ in ('temperature', 'top_p', 'do_sample', 'max_new_tokens')}))
+# 例外の引き直し: 一度目だけ落ちるバッチは引き直して ok、二度とも落ちるバッチは api_error（hook は外れている）
+_orig_gen = model.generate
+_calls = {'n': 0}
+
+
+def _flaky(*a_, **k_):
+    _calls['n'] += 1
+    if _calls['n'] == 1:
+        raise RuntimeError('擬似の例外（一度目）')
+    return _orig_gen(*a_, **k_)
+
+
+model.generate = _flaky
+try:
+    qr = RUN.run_quality_cell(model, tok, items=_Q[:4], arm='Onull+v', stage='selection', task='synth', cell_seed_value=1, tag=_qtag,
+                              run_key='e2e__q_retry', layer_ratio=ratio, coef=1.0, dirs=loaded, layer_idx=li)
+    model.generate = lambda *a_, **k_: (_ for _ in ()).throw(RuntimeError('擬似の例外（常に）'))
+    qe = RUN.run_quality_cell(model, tok, items=_Q[:4], arm='Onull+v', stage='selection', task='synth', cell_seed_value=1, tag=_qtag,
+                              run_key='e2e__q_err', layer_ratio=ratio, coef=1.0, dirs=loaded, layer_idx=li)
+finally:
+    model.generate = _orig_gen
+_nh = sum(len(getattr(L_, '_forward_hooks', {}) or {}) for L_ in direction_B.decoder_layers(model))
+check('(13e) 品質床: 一度だけ落ちたバッチは引き直して ok・二度とも落ちたバッチは api_error・hook は残らない',
+      all(r_['status'] == 'ok' for r_ in qr['trials']) and all(r_['status'] == 'api_error' and r_['correct'] is None for r_ in qe['trials'])
+      and all(w_['error'] for w_ in qe['raws']) and _nh == 0, '引き直し %d 行 ok・api_error %d 行・残った hook %d 本' % (
+          sum(r_['status'] == 'ok' for r_ in qr['trials']), sum(r_['status'] == 'api_error' for r_ in qe['trials']), _nh))
+# 本物の整合検査に通す（選定の段の二セル・種と生成の設定と manifest の欄と走行を跨いだ同一性で落ちないこと）
+_root13 = os.path.join(tmp, 'q13')
+_env13 = dict(RUN.manifest_env(model, tok), pip_freeze_sha16='E2E', gpu='cpu', started='x', ended='x', dry_run=False)
+_rk13 = []
+for _arm13, _out13, _l13, _c13 in (('Onull', q0, None, None), ('Onull+v', qc4, ratio, 4.0)):
+    _rk = 'e2e13__%s__L%sC%s' % (_arm13, _l13, _c13)
+    _tr = [dict(r_, run_key=_rk, trial_id=r_['trial_id'].replace(r_['run_key'], _rk)) for r_ in _out13['trials']]
+    RUN.write_cell(_root13, _qtag, _rk, dict(_env13, tag=_qtag, run_key=_rk, session=1, n=len(_tr), seed=T['seeds']['quality'], stage='selection',
+                                              arm=_arm13, layer=_l13, coef=_c13, task_source_sha16='E2E', added_norm=_out13['added_norm']), _tr, _out13['raws'])
+    _rk13.append(_rk)
+RUN.write_session(_root13, _qtag, 1, _rk13, extra={'gpu': 'cpu'})
+_ij = os.path.join(tmp, 'integrity13.md')
+subprocess.run([sys.executable, os.path.join(HERE, 'integrity_B.py'), '--tag', _qtag, '--root', _root13, '--out', _ij, '--force'],
+               capture_output=True, text=True, encoding='utf-8', errors='replace', env=dict(os.environ, PYTHONIOENCODING='utf-8'))
+_ip = json.load(open(os.path.splitext(_ij)[0] + '.json', encoding='utf-8'))['problems'] if os.path.exists(os.path.splitext(_ij)[0] + '.json') else ['整合検査の出力が無い']
+_bad13 = [p_ for p_ in _ip if any(w_ in p_ for w_ in ('seed', '生成の設定', 'manifest に欄が無い', 'セッション記録が無い', '同一であるべき', '同じでない', '出力が無い'))]
+check('(13f) 品質床の記録が本物の整合検査の種・生成の設定・manifest の欄・走行を跨いだ同一性で落ちない', not _bad13,
+      ('落ちた %s' % _bad13[:2]) if _bad13 else '整合検査の問題 %d 件はいずれも小さな検査に由来（問いの数・升目の欠け）' % len(_ip))
+
 shutil.rmtree(tmp, ignore_errors=True)
 
 json.dump({'kind': 'endtoend_B', 'version': VERSION, 'generated_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -460,7 +548,7 @@ L += ['', '## この検査が確認していないこと', '',
       '- **実重み（Qwen3-4B-Instruct-2507）では一行も走らせていない。**模型は乱数の初期化である。',
       '- したがって**破局率も活性のノルムも、この検査からは何も言えない**。',
       '- バッチ 16・実重み・実際のメモリでの挙動（OOM・KV キャッシュ・速度）は確かめていない。',
-      '- 品質床の走行は含まない（課題が未定・裁定 D66）。',
+      '- 品質床のセルは**合成の問い**で通した（13）。候補の課題（JCommonsenseQA・JMMLU）の問いは、ここでは使わない（課題の器の自己検査が断片の登録と照らす）。',
       '- **相をまたいだ走らせ方の順**（同一性選別 → 調整走行 → 品質床 → 本走行）と、Colab での起動は、'
       '  まだ書いていない（一つのセルを走らせて書く口と、セッション記録を書く口までは書いた）。',
       '- 様式と言及の照らし合わせ（9d）は、走行器と同じ段階 A の関数で採点し直したもので、**関数そのものの正しさ**は段階 A の検分と走行器の自己検査（見本の文）に拠る。',

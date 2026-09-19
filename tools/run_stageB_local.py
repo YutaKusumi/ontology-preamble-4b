@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""run_stageB_local.py v7 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+"""run_stageB_local.py v8 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+v8（2026-09-19 の夕刻・裁定 D145・D146・独立の目を通っていない）: **品質床のセル `run_quality_cell`** を書いた（前は「課題が未定のため」本体が無かった）。問いの本文は `qf_task_B.block`、前置きの付け方は `user_message`（凍結走行器と同じ式・指示の欄は空）、バッチは断片の順に左詰め、貪欲、記号の読み取りは `qf_task_B.extract_letter`、例外のバッチは一度だけ引き直す。試行の記録の生成の設定には正本の温度と top_p を添える（`quality_sampling_record`——渡した鍵だけを書くと本物の出力が整合検査で全件落ちる型）。
 v7（2026-09-19 の後刻・独立の目を通っていない）: **腕の本文を凍結走行器の `rd` で読む**（改行を LF にそろえて前後の空白を除く）。v6 までは末尾の改行を残して読み、**O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった**——段階 A と V′ の列と一字違っていた（Nk の名の確かめ〔裁定 D144〕の途中で見つけた・採否表の外）。起動時の照合に、盤の全腕の本文が凍結走行器の `rd` と一致することを足した。
 v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: `run_cell` の頭で**層の割合と層の添字の対応**を確かめて止まる（`layer_binding_ok`・採否表 P393）／帯の起点を `steer_B.main_position` から出す（P404）／試行の記録に**バッチの実際の行数** `batch_rows`（P406）／セルの**加えた量** `added_norm` を返す（P394）／`generate` に渡す鍵を正本 `generation_explicit.passed_keys` に限る（裁定 D142 の条を足したため）／自己検査の締めの行が、飛ばした検査を「通った」に数えない（P397）。
 
@@ -22,7 +23,7 @@ B は hook を掛けるため transformers を直に使うが、**プロンプ�
 詰めは左（`runner.padding`）・バッチは設計定数（`runner.batch`）・生成の設定は `runner.generation`（品質床は `quality_floor.generation`）。
 出力: results/<tag>/<run_key>/{manifest.json, trials-<run_key>.jsonl, raw-<run_key>.jsonl, resp-<run_key>.npz} と results/sessions-B/<tag>__s<番号>.json。
 用法: python tools/run_stageB_local.py --selftest
-      （一つのセルを走らせる口は `run_cell`・書く口は `write_cell`・`write_session`。相をまたいだ順は起動器が渡す——まだ書いていない）
+      （一つのセルを走らせる口は `run_cell`・品質床は `run_quality_cell`（v8）・書く口は `write_cell`・`write_session`。相をまたいだ順は起動器が渡す——品質床の課題の選定の測定は `tools/colab/boot_stageB.py`）
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, re, sys, json, uuid, hashlib, argparse, datetime
@@ -31,7 +32,7 @@ import numpy as np
 import runs_B
 import steer_B
 
-VERSION = 'v7'
+VERSION = 'v8'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FROZEN_RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
@@ -256,6 +257,13 @@ def _selftest():
     msg = user_message(texts['O']['text'], '場面の本文', '\n指示')
     assert msg.startswith(texts['O']['text']) and msg.endswith('\n指示') and '\n\n場面の本文' in msg
     assert user_message('', '場面の本文', '\n指示') == '場面の本文\n指示', 'N 腕は前置きを付けない'
+    # **品質床の問いの組み立て**（v8・裁定 D138・D146）: 前置き ＋ 空行 ＋ 問いの本文（指示の欄は空）・前置きなしは問いの本文だけ・記録の生成の設定は正本の温度と top_p
+    import qf_task_B
+    _it = {'id': '0', 'question': '問い', 'choices': ['一', '二', '三', '四'], 'answer': 'B'}
+    _bk = qf_task_B.block(_it)
+    assert user_message(texts['Onull']['text'], _bk, '') == texts['Onull']['text'] + '\n\n' + _bk and user_message('', _bk, '') == _bk, '品質床の問いの組み立てが式と違う'
+    _qs = quality_sampling_record(steer_B.quality_generation())
+    assert _qs['temperature'] == T['quality_floor']['generation']['temperature'] and _qs['top_p'] == T['quality_floor']['generation']['top_p'] and _qs.get('do_sample') is False, _qs
     # **腕の本文の末尾に改行が残らない**（v7）——末尾に改行を持つ素材（O・Osec・Onull）でも、前置きと場面の本文の間は空行一つ
     for a_ in ('O', 'Osec', 'Onull'):
         m_ = user_message(texts[a_]['text'], '場面の本文', '\n\n指示')
@@ -624,6 +632,130 @@ def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value
                          'mode': s_['mode'], 'loop_period': s_['loop_period'], 'retry': j in need})
         done += k
     return {'trials': trials, 'raws': raws, 'resp': resp, 'added_norm': added_norm}
+
+
+def quality_sampling_record(gen):
+    """品質床の試行の記録に書く生成の設定（v8）。`generate` に渡すのは貪欲の鍵（温度を渡さない）だが、記録には正本
+    `quality_floor.generation` の温度と top_p を添える——整合検査は記録の温度と top_p を正本の値と照らすので、
+    渡した鍵だけを書くと**本物の出力が全件「生成の設定が登録と違う」に落ちる**（合成データは正本の値を書くので通る型）。"""
+    g0 = T['quality_floor']['generation']
+    return dict(gen, temperature=g0['temperature'], top_p=g0['top_p'])
+
+
+def run_quality_cell(model, tok, *, items, arm, stage, task, cell_seed_value, tag, run_key, layer_ratio=None, coef=None,
+                     dirs=None, layer_idx=None, input_form='with_preamble', batch=None, start=0):
+    """品質床の一つのセル（段 × 腕 × 層 × 係数・一つの課題の断片）を走らせて、試行の記録と生テキストを返す（v8・裁定 D146・2026-09-19）。
+
+    items は `qf_task_B.fragment` の返り値（提示の順）。**バッチは断片の順に `runner.batch` 問ずつ前から詰め、左詰め**（`quality_floor.batching`）。
+    一つのバッチは一つの腕（裁定 D114）。帯の起点は行ごとの主位置（左詰めなので列の最後の位置・`steer_B.main_position`）。生成は貪欲（`quality_floor.generation`）。
+    input_form は 'with_preamble'（土台の前置き ＋ 空行 ＋ 問いの本文・裁定 D138）か 'without_preamble'（問いの本文だけ・判定の順の戻る枝・裁定 D145）。
+    例外で落ちたバッチは同じ組で一度だけ引き直し、なお落ちればその行を api_error にする（器の番人の SystemExit は止める）。
+    記録（`trial_record_scope`）: 答えの記号は `choice`、正誤は `correct`、書式外は `format_fail`。場面にだけ意味のある欄は空。
+    返り値: {'trials': [...], 'raws': [...], 'added_norm': 加えた量のノルム（無操作は None）}。
+    """
+    import torch
+    import qf_task_B
+    T_ = T
+    if input_form not in ('with_preamble', 'without_preamble'):
+        raise SystemExit('品質床の問いの出し方が登録に無い: %s' % input_form)
+    batch = batch or T_['runner']['batch']
+    gen = dict(steer_B.quality_generation())
+    _ge = T_['runner'].get('generation_explicit') or {}
+    _na = set(_ge.get('not_applicable') or [])
+    _keys = _ge.get('passed_keys')
+    if not _keys:
+        raise SystemExit('正本 runner.generation_explicit.passed_keys が無い（generate に渡す鍵の一覧・v6）')
+    gen.update({k: _ge[k] for k in _keys if k not in _na})
+    max_new = int(gen['max_new_tokens'])
+    plan = arm_plan(arm)
+    if plan is not None and (dirs is None or layer_idx is None):
+        raise SystemExit('介入の腕 %s には方向と層の添字が要る' % arm)
+    import direction_B
+    _nl = len(direction_B.decoder_layers(model))
+    if layer_idx is not None and layer_ratio is not None and not layer_binding_ok(layer_ratio, layer_idx, _nl):
+        raise SystemExit('層の割合 %s と層の添字 %s が対応しない（総層数 %d なら添字 %d・正本 layer_index_rule・採否表 P393）'
+                         % (layer_ratio, layer_idx, _nl, direction_B.layer_index(float(layer_ratio), _nl)))
+    added_norm = None if plan is None else float(coef) * float(np.linalg.norm(dirs[('static', layer_ratio)]))
+    AT = arm_texts()
+    base = base_arm_of(arm)
+    at = AT[base]['text'] if input_form == 'with_preamble' else ''
+    pad_id = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
+    if pad_id is None:
+        raise SystemExit('トークナイザに詰めのトークンが無い（左詰めにできない）')
+    eos = _eos_ids(model, tok)
+    model_name = getattr(getattr(model, 'config', None), '_name_or_path', None)
+    rec_sampling = quality_sampling_record(gen)
+    n = len(items)
+    trials, raws = [], []
+    done = 0
+    # **バッチの区切りは断片の頭（試行の番号 零）から数えた倍数**（場面の試行と同じ・再開しても同じ問いは同じバッチに入る）
+    while start + done < n:
+        i0 = start + done
+        bi = i0 // batch
+        k = min((bi + 1) * batch, n) - i0
+        tidx = list(range(i0, i0 + k))
+        its = [items[i] for i in tidx]
+        rows = [steer_B.apply_chat(tok, user_message(at, qf_task_B.block(it), '')) for it in its]
+        P = max(len(r_) for r_ in rows)
+        pads = [P - len(r_) for r_ in rows]
+        inp = torch.full((k, P), int(pad_id), dtype=torch.long, device=model.device)
+        am = torch.zeros_like(inp)
+        for r_, (row, pd) in enumerate(zip(rows, pads)):
+            inp[r_, pd:] = torch.tensor(row, dtype=torch.long, device=model.device)
+            am[r_, pd:] = 1
+        starts = [steer_B.main_position(row, pd) for row, pd in zip(rows, pads)]      # **主位置**（左詰めなので全行が列の最後・起点の式は一つ）
+        if any(s_ != P - 1 for s_ in starts):
+            raise SystemExit('左詰めの主位置が列の最後にない: %s（正本 runner.padding）' % starts)
+        V, dir_ids = row_vectors(plan, dirs, layer_ratio, tidx, n, 'main')            # 品質床は main の方向（§2.8 の相ごとの方向）
+        expected = None if plan is None else {'arm': arm, 'kind': plan['kind'], 'coef': float(coef), 'batch_index': bi}
+
+        def _gen():
+            h = None
+            try:
+                if plan is not None:
+                    h = register_hook(model, layer_idx, make_hook(V, coef, plan['sign'], starts,
+                                                                  meta={'arm': arm, 'kind': plan['kind'], 'batch_index': bi}))
+                assert_hooks_exactly(model, layer_idx if plan is not None else -1, expected)
+                torch.manual_seed(batch_seed(cell_seed_value, bi))
+                with torch.no_grad():
+                    return model.generate(input_ids=inp, attention_mask=am, pad_token_id=int(pad_id), **gen)
+            finally:
+                if h is not None:
+                    h.remove()
+                    assert_no_hooks(model, layer_idx)
+        g, err = None, None
+        for _attempt in (1, 2):                    # **一度だけ引き直す**（quality_floor.format_fail_rule・batching）
+            try:
+                g = _gen()
+                break
+            except Exception as e:                 # 器の番人（SystemExit）はここを通らずに止まる
+                err = '%s: %s' % (type(e).__name__, str(e)[:160])
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+        for j in range(k):
+            i, it = tidx[j], its[j]
+            if g is not None:
+                resp, fin = _response(g[j, P:], eos, max_new)
+                text = tok.decode(resp, skip_special_tokens=True)
+                letter = qf_task_B.extract_letter(text, qf_task_B.letters_of(it))
+                ff = letter is None
+                correct = steer_B.score_quality(letter, it['answer'], ff)
+                status = 'ok'
+            else:
+                text, fin, letter, ff, correct, status = None, None, None, None, None, 'api_error'
+            tid = '%s__%s__%04d' % (run_key, arm, i)
+            trials.append(trial_record(
+                trial_id=tid, trial_index=i, arm=arm, scenario=task, tag=tag, status=status,
+                catastrophe=None, choice=letter, refuse_class=None, format_fail=ff, style_a=None, style_b=None, mention=None,
+                loop_flag=None, truncated=(None if fin is None else fin == 'length'), correct=correct, resp_mean_path=None,
+                layer=layer_ratio, coef=coef, direction_id=dir_ids[j], seed=runs_B.recorded_seed(T_, cell_seed_value, i),
+                batch_pos=j, batch_rows=k, run_key=run_key, proc_uuid=PROC, runner_sha=RUNNER_SHA16, arms_spec=arm,
+                preamble_sha=(AT[base]['sha16'] if input_form == 'with_preamble' else None), model=model_name, sampling=rec_sampling,
+                dry_run=False))
+            raws.append({'trial_id': tid, 'item_id': it['id'], 'text': text, 'finish': fin, 'error': err if g is None else None,
+                         'stage': stage, 'input_form': input_form})
+        done += k
+    return {'trials': trials, 'raws': raws, 'added_norm': added_norm}
 
 
 def manifest_env(model, tok):

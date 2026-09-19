@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""runs_B.py v5 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
+"""runs_B.py v6 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
+v6（2026-09-19 の夕刻・裁定 D146）: 品質床の相のセルの番号の段に、課題の選定の測定の段「candidate:候補の鍵」を足した（selection・post の後に候補の登録順——前からある段の番号は変わらない）。
 v5（2026-09-19・最後の系統外の巡の後）: 層別の計数から、常に零を足す死んだ行を消した（採否表 P409）。
 
 段階 B の相（正本 `tags`）と置き場:
@@ -18,7 +19,7 @@ import os, re, sys, json, glob, hashlib
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CPATH = os.path.join(REPO, 'design', 'contrasts-B.json')
-VERSION = 'v5'
+VERSION = 'v6'
 COUNT_FIELDS = ('trial_id', 'arm', 'status', 'catastrophe', 'choice', 'format_fail', 'style_a', 'style_b', 'mention', 'loop_flag', 'truncated', 'correct')
 
 
@@ -243,7 +244,8 @@ def cell_index(T, phase, key):
         for x in src:
             if x not in ARMS:
                 ARMS.append(x)
-    STAGES = ['selection', 'post']
+    # 課題の選定の測定（相 qfcand・裁定 D146）の段は selection・post の後に候補の登録順で足す（前からある段の番号は変わらない）
+    STAGES = ['selection', 'post'] + ['candidate:%s' % c['key'] for c in (T['quality_floor'].get('task_candidates') or [])]
     ESC = int(T['seeds']['cell_index_escape'])     # 逃げ道の幅（正本に登録・採否表 P378・前は器の中に手書きしていた）
     def _ai(arm):
         if arm in ARMS:
