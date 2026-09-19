@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""citations_B.py v1 —— 「採否表 P…」の引用を採否表と照らす（2026-09-19・束の前の点検で、手で打った引用の誤りが多数見つかったため）。
+"""citations_B.py v2 —— 「採否表 P…」の引用を採否表と照らす（2026-09-19・束の前の点検で、手で打った引用の誤りが多数見つかったため）。
+v2（2026-09-19・最後の系統外の巡の後）: 最後の巡の採否表（`records/reviews/B/final-round/`）の出所の欄を読む（前は出所の欄を読まず、その行の札を照らせなかった）。既定で照らす草案を草案13B にした。
 
 照らすもの（正本 JSON の文字列・草案・報告雛形・器材のソースの注と文字列）:
   (1) 引いた P が採否表（`records/reviews/**/adoption-table-*.md` の行と、軽微の一覧の見出し）にあるか。
@@ -14,17 +15,17 @@
 import os, re, sys, json, glob, argparse
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-VERSION = 'v1'
+VERSION = 'v2'
 SELF = os.path.basename(__file__)
 TOOL_GLOBS = ('tools/*_B.py', 'tools/build_draftB.py')
-DOCS = ('design/design-stageB-draft12.md', 'records/B/results-report-template-B.md')
+DOCS = ('design/design-stageB-draft13.md', 'records/B/results-report-template-B.md')
 CANON = 'design/contrasts-B.json'
 
 
 def _lineage(table_dir, text):
     """出所の欄から検分者の集合を作る（G＝系統外・C＝系統内）。段階 B の採否表だけ。"""
     v = set()
-    if table_dir == 'external-round':
+    if table_dir in ('external-round', 'final-round'):
         if '四票' in text:
             v |= {'G1', 'G2', 'C1', 'C2'}
         for who, tag in (('Gemini', 'G'), (r'claude\.ai', 'C')):
@@ -64,7 +65,7 @@ def load_rows(repo=REPO):
             if not m:
                 continue
             cols = [c.strip() for c in ln.strip().strip('|').split('|')]
-            if tdir in ('external-round', 'impl-round-2'):
+            if tdir in ('external-round', 'final-round', 'impl-round-2'):
                 src = cols[2] if len(cols) > 2 else ''
             elif tdir == 'design-round2':
                 src = cols[3] if len(cols) > 3 and re.match(r'K\d+$', cols[1]) else (cols[2] if len(cols) > 2 else '')

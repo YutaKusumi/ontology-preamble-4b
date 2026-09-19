@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v5 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v6 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 下りた裁定 D143（同一性選別に Osec-Ncold）・D136（S4 の効き目）を記帳の値から外し、**top_k の実効の値**（裁定 D142）・**品質床の問いの前置きの有無**（裁定 D138）・**下限の適用**（裁定 D137）を足した。凍結の記録に「最後の系統外の巡の後の直しは、独立の目を通っていない」を置く（正本 `report_rules.post_final_round`・裁定 D131）。
 
 凍結するもの（正本 `publication.record_first`・草案8B §2.11）:
   凍結本文（草案）・正本 `design/contrasts-B.json`・腕と方向の定義・器材・報告の雛形・**封印予想**。
@@ -9,20 +10,21 @@
   - 品質床の課題の出所・版・ライセンス・断片の SHA（裁定 D66）と、**無操作の実測の正答率**（下限 `quality_floor.base_min` を凍結する根拠・裁定 D129）
     （入力・帯・採点・最大トークン数は裁定 D120 で正本に登録したので、ここでは求めない・v4）
   - **‖v̂‖ と主位置の ‖h‖ の比**（層ごと・`activation_storage.h_norm_record`・採否表 P356）
-  - **まだ下りていない登録者の裁定**: 同一性選別に Osec-Ncold を足すか（`identity_screen.b_panel_arms_compared`）・S4 の効き目を絶対値のままにするか（`effect_pt_caveat`）
+  - **top_k の実効の値**（裁定 D142・`runner.generation_explicit.top_k_rule`——段階 A と同じ版・引数の vLLM の起動の記録から読む。読めなければその旨）
+  - **品質床の問いの前置きの有無**（裁定 D138・`quality_floor.input`——付けて測るか、戻る条件に当たって付けない側に戻ったか）と、**下限の適用**（裁定 D137・`base_min` か手当ての `base_min_fallback` か）
   - v̂ の SHA（`selection.vector_fix`）と方向の要約統計（ノルム・コサイン・場面間の安定性）
 封印予想（`seal_format`）: 確証の各対比の符号と S4 の反証。**B のデータを一つも見る前**に書き、情報状態と時機を添える。
 凍結の後の変更はすべて**逸脱**とし、番号・日付・理由・登録者の承認を記帳する（`deviation.rule`）。
 **採否表の引用の照合**（v5・2026-09-19）: 正本・草案・報告雛形・器材の「採否表 P…」を `tools/citations_B.py` で照らし、違反があれば止める。
 出力: records/B/FREEZE-RECORD-B.md と同 .json（--force が無ければ上書きしない）。
-用法: python tools/freeze_B.py --draft design/design-stageB-draft12.md [--seal records/B/seal-B.json] [--values records/B/freeze-values-B.json] [--force]
+用法: python tools/freeze_B.py --draft design/design-stageB-draft13.md [--seal records/B/seal-B.json] [--values records/B/freeze-values-B.json] [--force]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v5'
+VERSION = 'v6'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -38,7 +40,7 @@ TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 
          'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py']
 NEED_VALUES = ['model_rev', 'tokenizer_rev', 'num_hidden_layers', 'layer_indices', 'arm_token_lengths',
                'quality_task', 'quality_base_accuracy', 'v_hat_sha256', 'direction_stats', 'h_norm_ratio',
-               'identity_osec_ncold_decision', 's4_effect_decision']
+               'top_k_stageA_effective', 'quality_input_mode', 'quality_base_min_applied']   # 裁定 D142・D138・D137（v6）
 ap = argparse.ArgumentParser()
 ap.add_argument('--draft', required=True)
 ap.add_argument('--seal', default=None)
@@ -141,7 +143,8 @@ if blockers and not a.allow_missing:
 REC = {'kind': 'freeze_B', 'version': VERSION, 'frozen_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'), 'frozen_jst': jst.strftime('%Y-%m-%d %H:%M'),
        'frozen': frozen, 'values': VALUES, 'seal': SEAL, 'seal_sha256': (None if not a.seal else __import__('hashlib').sha256(open(a.seal, 'rb').read()).hexdigest().upper()),
        'stale_record_hashes': stale, 'unlisted_tools': unlisted, 'citation_violations': len(_cv), 'blockers': blockers, 'deviations': [],
-       'deviation_rule': T['deviation']['rule'], 'record_first': T['publication']['record_first']}
+       'deviation_rule': T['deviation']['rule'], 'record_first': T['publication']['record_first'],
+       'limitations': [T['report_rules']['post_final_round'], T['runner']['generation_explicit']['top_k_limitation'], T['quality_floor']['input_limitation']]}
 json.dump(REC, open(out_json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 L = ['# 段階 B 凍結記録（機械生成・`tools/freeze_B.py` %s）' % VERSION, '',
      '- 凍結の時刻: %s UTC（日本時間 %s）。%s' % (now.strftime('%Y-%m-%d %H:%M'), jst.strftime('%Y-%m-%d %H:%M'),
@@ -168,6 +171,8 @@ else:
     L.append('- **まだ無い**（`seal_format` の様式で、データを一つも見る前に書く）')
 if blockers:
     L += ['', '## 凍結を止めているもの', ''] + ['- ' + b for b in blockers]
+L += ['', '## 限界（凍結の記録に置く）', '', '- %s' % T['report_rules']['post_final_round'],
+      '- %s' % T['runner']['generation_explicit']['top_k_limitation'], '- %s' % T['quality_floor']['input_limitation']]
 L += ['', '## 逸脱台帳', '', '- %s' % T['deviation']['rule'], '- %s' % T['deviation']['silent_fix'], '- （凍結の後に足す）', '',
       '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。', '']
 open(out_md, 'w', encoding='utf-8', newline='\n').write('\n'.join(L))

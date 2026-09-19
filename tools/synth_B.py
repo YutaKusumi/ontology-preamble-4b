@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""synth_B.py v3 —— 段階 B の**合成データ**の生成器（器材の検査用・実データを作らない）。
+"""synth_B.py v4 —— 段階 B の**合成データ**の生成器（器材の検査用・実データを作らない）。
+v4（2026-09-19・最後の系統外の巡の後）: ランダム方向の割り当てを交互にしたので、等質性の注の経路は「方向ごとに固める」置き方にした（裁定 D140）。S4 の門・封印の照合・td の特異性の三つの札の場合を足した（裁定 D133〜D135）。様式門に当たった非有意（採否表 P401）と、選定後の品質床の相手の重複（採否表 P403）の場合も足した。試行の記録にバッチの行数、走行の記録に加えた量の欄を書く（採否表 P406・P394）。合成の方向に要約統計（合わせる前の比）を添える（裁定 D133）。
 
 札の全経路を一度ずつ以上発火させるための走行の記録を作る（器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表）。
 作るもの（既定の置き場は results/_synth/<場合>/）:
@@ -15,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 import numpy as np
 
-VERSION = 'v3'
+VERSION = 'v4'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 SC = T['scenarios']
@@ -36,7 +37,7 @@ def _arm_sha(arm):
 
 
 def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style_b, mention, correct=None,
-           layer=None, coef=None, status='ok', sampling=None, loop=False, trunc=False, direction_id=None):
+           layer=None, coef=None, status='ok', sampling=None, loop=False, trunc=False, direction_id=None, batch_rows=None):
     """一試行の記録。**実機の採点の規約に合わせる**（実装検分の採否表 P301）——
     書式外の試行は答えを読み取れないので `catastrophe`・`choice`・`correct` は None にする。"""
     ff = bool(ff)
@@ -58,14 +59,25 @@ def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style
             'seed': seed, 'run_key': run_key, 'runner_sha': 'SYNTH', 'arms_spec': arm, 'preamble_sha': _arm_sha(arm),
             'model': 'stub/dry-run', 'sampling': dict(sampling or T['runner']['generation']), 'layer': layer, 'coef': coef,
             'direction_id': direction_id or 'fixed',
-            'batch_pos': i % T['runner']['batch'], 'proc_uuid': 'synth', 'dry_run': True}
+            'batch_pos': i % T['runner']['batch'], 'batch_rows': batch_rows, 'proc_uuid': 'synth', 'dry_run': True}
+
+
+def _by_direction(j, n_eff):
+    """番号 j を「方向ごとに固めた順位」に写す（方向 0 の試行が先・交互の割り当て〔裁定 D140〕の下で等質性の注の経路を作るため）。"""
+    import steer_B as _st
+    al = _st.allocate(n_eff)
+    d = _st.direction_of(j, n_eff)
+    return sum(al[:d]) + j // len(al)
 
 
 def _spread(j, n_eff, contiguous):
-    """結果の置き場所。既定は**行き渡らせる**（素数の歩幅で並べ替える）——ランダム方向の三本（登録順の等分）に均等に乗るように。
-    `contiguous` のセルだけ番号の順に固める（等質性の注の経路・2026-09-19）。"""
-    if contiguous or n_eff <= 1:
+    """結果の置き場所。既定は**行き渡らせる**（素数の歩幅で並べ替える）——ランダム方向の三本に均等に乗るように。
+    `contiguous` のセルだけ**方向ごとに固める**（等質性の注の経路・2026-09-19）。交互の割り当て（裁定 D140）の下では、
+    番号の順に固めても三方向に均等に乗ってしまうので、方向 0 の試行から順に結果を置く。"""
+    if n_eff <= 1:
         return j
+    if contiguous:
+        return _by_direction(j, n_eff)
     for stride in (7919, 7907, 7901, 7883):
         if n_eff % stride and __import__('math').gcd(stride, n_eff) == 1:
             return (j * stride) % n_eff
@@ -100,7 +112,8 @@ def cell_trials(n, spec, start=0, n_total=None, local=False, **kw):
     for k in range(n):
         i = start + k
         if i < n_err:
-            out.append(_trial(i, cat=0, refuse=0, ff=0, style_a=0, style_b=0, mention=0, status='error', **kw))
+            out.append(_trial(i, cat=0, refuse=0, ff=0, style_a=0, style_b=0, mention=0, status='error',
+                              batch_rows=min((i // T['runner']['batch'] + 1) * T['runner']['batch'], n_total) - (i // T['runner']['batch']) * T['runner']['batch'], **kw))
             out[-1]['seed'] = runs_B.recorded_seed(T, _cs, i)   # バッチの種（裁定 D127）
             continue
         j = _spread((k if local else i) - n_err, (n if local else n_total) - n_err, _contig)
@@ -108,12 +121,14 @@ def cell_trials(n, spec, start=0, n_total=None, local=False, **kw):
         cat = (not ff) and (n_ff <= j < n_ff + cat_target)
         refuse = (not ff) and (n_ff + cat_target <= j < n_ff + cat_target + ref_target)
         _sn = spec.get('style_none')
-        _did = ('rand:%d' % _st.direction_of(i, n_total)) if 'vrand' in kw.get('arm', '') else None   # 登録順の等分（random_control.allocation）
+        _did = ('rand:%d' % _st.direction_of(i, n_total)) if 'vrand' in kw.get('arm', '') else None   # 交互（random_control.allocation・裁定 D140）
+        _B = T['runner']['batch']
+        _brows = min((i // _B + 1) * _B, n_total) - (i // _B) * _B                                      # バッチの実際の行数（採否表 P406）
         out.append(_trial(i, cat=cat, refuse=refuse, ff=ff, style_a=None if _sn else j < spec.get('style_a', 0),
                           style_b=None if _sn else j < spec.get('style_b', 0),
                           mention=None if _sn else j < spec.get('mention', 0), loop=(n_ff <= j < n_ff + n_loop), direction_id=_did,
                           trunc=(n_ff + n_loop <= j < n_ff + n_loop + n_trunc),
-                          correct=(None if 'correct' not in spec else (j < spec['correct'])), **kw))
+                          correct=(None if 'correct' not in spec else (j < spec['correct'])), batch_rows=_brows, **kw))
         out[-1]['seed'] = runs_B.recorded_seed(T, _cs, i)   # バッチの種（裁定 D127）
         if spec.get('scoring_gap') and (n_ff + cat_target + ref_target) <= j < (n_ff + cat_target + ref_target + int(spec['scoring_gap'])):
             # 採点欠落（status は ok のまま・裁定 D96・D103）——**相ごとの欄**で作る
@@ -135,7 +150,7 @@ def write_run(root, tag, name, manifest, trials, resp=None):
               'model_rev': 'SYNTH', 'tokenizer_rev': 'SYNTH', 'runner_sha': 'SYNTH', 'pip_freeze_sha16': 'SYNTH',
               'gpu': 'synth', 'started': stamp, 'ended': stamp, 'dry_run': True,
               'dtype': T['runner']['dtype'], 'order': T['runner']['order_id'], 'transformers_version': 'SYNTH', 'refuse_rules_sha16': 'SYNTH'}
-    extra = {'direction_ids': ['synth'], 'arms': manifest.get('arms', []), 'task_source_sha16': 'SYNTH'}
+    extra = {'direction_ids': ['synth'], 'arms': manifest.get('arms', []), 'task_source_sha16': 'SYNTH', 'added_norm': 'SYNTH'}
     phase = next(k for k, v in T['tags'].items() if v == tag)
     need = list((T['runner'].get('manifest_fields') or {}).get(phase, []))
     manifest = dict({k: extra[k] for k in need if k in extra}, **dict(manifest, **common, generated=stamp))
@@ -155,21 +170,27 @@ def write_run(root, tag, name, manifest, trials, resp=None):
 SYN_H = 16
 
 
-def synth_directions():
-    """合成の方向（層ごと・静的に合わせたノルム）。(6b) の方向は層ごとに決まった単位ベクトルの一定倍。"""
+def synth_directions(with_stats=False):
+    """合成の方向（層ごと・静的に合わせたノルム）。(6b) の方向は層ごとに決まった単位ベクトルの一定倍。
+    with_stats なら、抽出器の要約統計と同じ形の「合わせる前の比」も返す（裁定 D133 で報告に並べる量の経路のため）。"""
     rng = np.random.default_rng(T['seeds']['dryrun'])
-    out = {}
+    out, stats = {}, {}
     for r in LAYERS:
         st = rng.normal(size=SYN_H)
+        stats[str(r)] = {'raw_norm_ratio': {}}
         for name in ('static', 'loaded', 'Nk', 'td'):
             v = rng.normal(size=SYN_H) if name != 'static' else st
+            stats[str(r)]['raw_norm_ratio'][name] = float(np.linalg.norm(v) / np.linalg.norm(st))
             out[(name, r)] = v * (np.linalg.norm(st) / np.linalg.norm(v))
-    return out
+    return (out, stats) if with_stats else out
 
 
 def write_synth_directions(d):
     os.makedirs(d, exist_ok=True)
-    np.savez(os.path.join(d, 'directions.npz'), **{'%s__%s' % (n_, r_): v for (n_, r_), v in synth_directions().items()})
+    dirs, stats = synth_directions(with_stats=True)
+    np.savez(os.path.join(d, 'directions.npz'), **{'%s__%s' % (n_, r_): v for (n_, r_), v in dirs.items()})
+    json.dump({'kind': 'direction_B', 'dry_run': True, 'stats': stats}, open(os.path.join(d, 'directions.json'), 'w', encoding='utf-8'),
+              ensure_ascii=False, indent=1)
 
 
 def synth_resp(is_A, i):
@@ -225,8 +246,15 @@ def case_all():
     m[('S4', 'Osec-Ncold+vrand')] = {'cat': 60, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
     # **td の特異性が「書ける」場面**（裁定 D123）: N1 の加算の土台で td の腕だけ高い——v 対 td の区間が零を外す
     m[('N1', 'Onull+vtd')] = {'cat': 90, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 120, 'mention': 8}
-    # **等質性の注**（裁定 D127）: N1 の減算のランダム方向の腕だけ、破局を番号の順に固める——登録順の等分で方向 0 に偏る
+    # **等質性の注**（裁定 D127）: N1 の減算のランダム方向の腕だけ、破局を**方向ごとに固める**——方向 0 に偏る（交互の割り当て・裁定 D140）
     m[('N1', 'O-Ncold-vrand')] = dict(m[('N1', 'O-Ncold-vrand')], contiguous=True)
+    # **td のほうが動いた**（裁定 D133）: S1 の減算で v はランダムより下がり（確証）、td は v よりさらに下がる——(v − td) の符号が (v − ランダム) と逆
+    m[('S1', 'O-Ncold-v')] = {'cat': 30, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('S1', 'O-Ncold-vrand')] = {'cat': 80, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('S1', 'O-Ncold-vtd')] = {'cat': 5, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    # **様式門に当たった非有意**（採否表 P401）: S4 の交差族 Onull で破局率は同じ・様式の差だけが門を超える——札は非有意のまま
+    m[('S4', 'Onull+vNk')] = {'cat': 60, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 10, 'mention': 8}
+    m[('S4', 'Onull+vrand')] = {'cat': 60, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 190, 'mention': 8}
     # api_error と未測定（ループ・打ち切り）を無操作の腕に入れる（採否表 P300・P302）
     m[('N1', 'O')] = {'cat': 60, 'refuse': 10, 'ff': 6, 'style_a': 40, 'style_b': 120, 'mention': 8, 'api_error': 12, 'loop': 3, 'trunc': 2}
     tune = {'best': (LAYERS[1], COEFS[1]), 'eff': 12, 'tie': False, 'nonpositive': False, 'ff_fail': (LAYERS[0], COEFS[0]), 'censor_all': False}
@@ -274,7 +302,9 @@ def case_s4_branches():
     # 相手の率を**既測の基底の近く**（低い側）に置く——10 pt の検出力が線を越えるのはこの領域だけ（転記行 D）
     m[('S4', 'Osec-Ncold+v6b')] = {'cat': 33, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
     m[('S4', 'Osec-Ncold+vrand')] = {'cat': 34, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
-    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
+    # 封印（S4 だけ・裁定 D135 の照合の経路）: 「どちらでもない」と封印して「10 pt 以上の低下は否定」が出る——当たり
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []},
+            'seal': {}, 's4_seal': 'どちらでもない'}
 
 
 def case_s4_up():
@@ -295,7 +325,26 @@ def case_s4_undecided():
     m = base_main_spec()
     m[('S4', 'Osec-Ncold+v6b')] = {'cat': 52, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
     m[('S4', 'Osec-Ncold+vrand')] = {'cat': 60, 'refuse': 6, 'ff': 4, 'style_a': 40, 'style_b': 120, 'mention': 8}
-    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}}
+    # 封印（S4 だけ）: 「当否を言わない」は照合も「言えない」（裁定 D135）
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []},
+            'seal': {}, 's4_seal': '低下'}
+
+
+def case_s4_gate():
+    """**S4 の三分岐の前の門**（裁定 D134）: ランダム方向の腕だけ書式外が門を超えて増える——全分母では破局率が下がって見える例（再現の記録 K178 の型）。
+    札は門の札（判定保留）で、三分岐に進まず、封印との照合は「言えない」。"""
+    m = base_main_spec()
+    m[('S4', 'Osec-Ncold+v6b')] = {'cat': 20, 'refuse': 0, 'ff': 0, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    m[('S4', 'Osec-Ncold+vrand')] = {'cat': 24, 'refuse': 0, 'ff': 80, 'style_a': 40, 'style_b': 120, 'mention': 8}
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []},
+            'seal': {}, 's4_seal': 'どちらでもない'}
+
+
+def case_post_partner_dup():
+    """**選定後の品質床の相手の重複**（採否表 P403）: 同じセッション番号の無操作の相手が二本ある——集計器は合算せず、その土台の腕を判定不能（品質床）に倒す。"""
+    m = base_main_spec()
+    return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []},
+            'dup_post_partner': 'Onull'}
 
 
 def case_s4_floor_rule():
@@ -373,7 +422,7 @@ def case_chart():
     return {'main': m, 'tune': {'best': (LAYERS[1], COEFS[1]), 'eff': 12}, 'quality': {'fail_selection': [], 'fail_post': []}, 'split': split}
 
 
-CASES = {'incomplete': case_incomplete, 'all': case_all, 's4_undecided': case_s4_undecided, 's4_floor_rule': case_s4_floor_rule, 'refuse_readable': case_refuse_readable, 'api_error_gate': case_api_error_gate,
+CASES = {'s4_gate': case_s4_gate, 'post_partner_dup': case_post_partner_dup, 'incomplete': case_incomplete, 'all': case_all, 's4_undecided': case_s4_undecided, 's4_floor_rule': case_s4_floor_rule, 'refuse_readable': case_refuse_readable, 'api_error_gate': case_api_error_gate,
          'style_gap': case_style_gap, 'chart': case_chart, 'gate1_closed': case_gate1_closed, 'nonpositive': case_nonpositive, 'tie': case_tie,
          'censor_candidates': case_censor_candidates, 'scoring_gap': case_scoring_gap, 's4_branches': case_s4_branches,
          's4_floor': case_s4_floor, 's4_up': case_s4_up, 'dilution_causal': case_dilution_causal}
@@ -484,6 +533,9 @@ def build(case, out_root):
                              run_key='%s__post__noop__%s' % (tag_q, base))
         write_run(out_root, tag_q, 'post__%s__noop' % base, {'stage': 'post', 'arm': base, 'layer': None, 'coef': None, 'n': N_Q,
                                                              'seed': T['seeds']['quality']}, trials)
+        if spec.get('dup_post_partner') == base:          # 相手の重複（同じセッション番号の二本目・採否表 P403）
+            write_run(out_root, tag_q, 'post__%s__noop__dup' % base, {'stage': 'post', 'arm': base, 'layer': None, 'coef': None, 'n': N_Q,
+                                                                      'seed': T['seeds']['quality']}, trials)
     # ---- セッション記録 ----
     sd = os.path.join(out_root, 'sessions-B')
     os.makedirs(sd, exist_ok=True)
@@ -513,8 +565,8 @@ def build(case, out_root):
     # ---- 方向（合成・副位置の読みの経路のため・裁定 D132） ----
     write_synth_directions(os.path.join(out_root, 'dirB'))
     # ---- 封印（任意） ----
-    if spec.get('seal'):
-        json.dump({'kind': 'seal_B', 'signs': spec['seal'], 's4': 'どちらでもない', 'dry_run': True,
+    if spec.get('seal') is not None:
+        json.dump({'kind': 'seal_B', 'signs': spec['seal'], 's4': spec.get('s4_seal', 'どちらでもない'), 'dry_run': True,
                    'information_state': '合成データ（検査用）', 'timing': '合成', 'who': '合成', 'vhat_floor_ack': '合成（検査用）'},
                   open(os.path.join(out_root, 'seal-B.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     return out_root

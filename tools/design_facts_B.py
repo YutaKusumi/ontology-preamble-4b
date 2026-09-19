@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""design_facts_B.py v7 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+"""design_facts_B.py v8 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+v8（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 転記行 D の S4 の文を**いまの規則**（門 → 三分岐・同等性・札は結果だけ・裁定 D118・D134〜D136）で組み、数は `rules_B.s4_oc` から出す（前は検出力の規則の文と Wald の区間の数が残り、正本の旧い鍵 `power_min` を読んでいた・採否表 P389）。転記行 E の帰無発火率・検出力・多重性を**正本の `measured.quality_floor_multiplicity` と同じ関数**（`rules_B.qf_null_rate`・`qf_power`・`qf_multiplicity`）から出し、下限 0.85 の値を足す（採否表 P390）。多重性の数は正本と同じ関数から出す（採否表 P391・裁定 D137）。「分母＝200」を「登録した問いの数」に改めた。注の古い数を消した（採否表 P405）。
 v6 からの変更（v7・2026-09-18〜19）: **版の名を v6 のまま上げていなかった**（裁定 D87〜D132 の直しが入っていた——品質床の相手を段ごとに走らせる規模の数え直し〔D88〕・品質床の相手のセッション〔D92〕・転記行 C を門と同じ模擬で出す〔D119・同値の帯の式は D98〕・転記行 E の対の見方〔採否表 P373・裁定 D130〕・転記行 G の器の一覧と転記行 I の数え方〔束の前の点検〕）。この版で v7 に上げた（前例は採否表 P239）。
 v3 からの変更（検分の二段目・四票の採否 P212〜P256・裁定 D75〜D86）: 転記行 C に**選定 × 確証の合成検出力**（採否表 P229）と、抽出場面を二層に分けない前提の但し書き（P245）、
 同点の割り方を正本の登録（無作為・selection.tie_break）に合わせた模擬を置く（P228）。転記行 D に **S4 の反証の検出力**と三分岐の線（裁定 D81）を足す。
@@ -12,12 +13,13 @@ v2 からの変更（段階 B 設計の検分の一段目・採否表 P190〜P21
 出力: records/B/design-facts-B.md と同 .json。
 """
 import os, sys, re, json, math, hashlib, datetime
-VERSION = 'v7'     # 出力に印字する版（v6 まで docstring と出力の版が食い違っていた・2026-09-19）
+VERSION = 'v8'     # 出力に印字する版（v6 まで docstring と出力の版が食い違っていた・2026-09-19）
 import numpy as np
 from scipy.stats import fisher_exact, binom
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from vprime_power import make_power
 import runs_B                      # 同値の帯は門と同じ関数を呼ぶ（裁定 D119）
+import rules_B                     # S4 の動作特性と品質床の数は、正本と集計器と同じ関数を呼ぶ（裁定 D118・D137・採否表 P389・P391）
 
 
 def make_power_cached(n):
@@ -137,8 +139,8 @@ se_diff = 100 * math.sqrt(4 * base_tune * (1 - base_tune) / tune_n)          # �
 z = 1.96
 REPS = 20000
 # **帯は門と同じ模擬で出す**（裁定 D119・2026-09-18）。前は素の区間の式（z × 候補どうしの差の標準誤差）で
-# ±13.8 pt を印字し、しかも**正本の鍵の名を出典に付けていた**。正本の当該の条はその式を「採らない」と明記しており、
-# 門の模擬は 21.5 pt を出す（系統外の検分で捕まった・採否表 P339）。
+# ±13.8 pt を印字し、しかも**正本の鍵の名を出典に付けていた**。正本の当該の条はその式を「採らない」と明記していた
+# （系統外の検分で捕まった・採否表 P339）。門の模擬の値は下の転記行 C にある（この注に数を打たない・採否表 P405）。
 _band = runs_B.equivalence_band(tune_n, tune_n, base_tune, T['selection']['candidates']['count'],
                                 reps=REPS, seed=[T['seeds']['tiebreak'] + 1, 0])
 band_pt = _band['q95_pt']
@@ -213,23 +215,13 @@ lo_sc = lambda a: min(SC, key=lambda sc: bs(a, sc))
 hi_sc = lambda a: max(SC, key=lambda sc: bs(a, sc))
 
 
-def ci_excl_zero(p_a, p_b, nn=None, zz=1.96):
-    """二標本の pt 差の 95% Wald 区間が零を外す（下がる側）確率。二項の畳み込みで厳密（正本 B_desc_S4.adjudication の量）。"""
-    nn = nn or n
-    k = np.arange(nn + 1)
-    pa, pb = binom.pmf(k, nn, p_a), binom.pmf(k, nn, p_b)
-    ra = k / nn
-    diff = ra[:, None] - ra[None, :]
-    se = np.sqrt(ra[:, None] * (1 - ra[:, None]) / nn + ra[None, :] * (1 - ra[None, :]) / nn)
-    se = np.where(se == 0, np.inf, se)
-    w = pa[:, None] * pb[None, :]
-    return float(w[(diff + zz * se) < 0].sum())
-
-
 S4F = T['descriptive_families']['B_desc_S4']
 s4_base = S4F['base_4B2507'] / S4F['base_n']
-S4_PT, S4_POWER_MIN = S4F['three_way']['effect_pt'], S4F['three_way']['power_min']
-s4_pow = {d: round(ci_excl_zero(max(s4_base - d / 100, 0.001), s4_base), 3) for d in (S4_PT, D_MAIN)}
+S4_PT = S4F['three_way']['effect_pt']
+S4_LAB = S4F['three_way']['labels']
+# **S4 の動作特性は、集計器が呼ぶ規則と同じ関数で数える**（`rules_B.s4_oc`・Newcombe・全数・裁定 D118）。
+# 前はこの行が検出力の規則の文（「検出力が…以上なら下がらなかった」）と Wald の区間の数のままで、正本の旧い鍵 `power_min` を読んでいた（採否表 P389）
+s4_oc = {d: rules_B.s4_oc(s4_base, n, d, T) for d in (0, S4_PT, D_MAIN)}
 # 合成の検出力（選定 × 確証・採否表 P229）
 # 選定の側は調整走行の基底（抽出場面をまとめた Onull）、確証の側は**族の登録された検定**（両側 Fisher・Holm の初段）を
 # 加算族の各場面の基底で出す（場面によって基底が違うので幅で示す）。
@@ -244,36 +236,25 @@ F['D'] = {'text': 'v 対 v_random の検出力（両側 Fisher・n=%d 対 %d・�
           '**加算族**（土台 Onull・m=%d）は基底が %s %.3f 〜 %s %.3f。%s の ±%d pt は %s、%s の ±%d pt は %s。'
           '**交差族**（m=%d）は初段の水準が下がる（%s の O-Ncold・±%d pt は %s）。'
           '±%d pt は中間の基底でも初段に届かない（%s の Onull・%s）。床に近い基底では下がる側が率の外に出て測れない（読み条項の余地の条項）。'
-          '**S4 の反証**（記述・(6b) の腕 対 ランダム方向・基底 %.4f・裁定 D81 の三分岐）: 真の低下 %d pt を %g%% 区間で捕まえる確率は %.3f、%d pt では %.3f。'
-          '区間が零を含んだとき、%d pt の検出力が %g 以上なら「下がらなかった（封印は当たり）」、下回れば「当否を言わない」。'
+          '**S4 の反証**（記述・(6b) の腕 対 ランダム方向・基底 %.4f・門 → 三分岐〔裁定 D134・D81・D118〕・札は結果だけ〔裁定 D135〕）: 相手の率が既測の基底で各腕 n=%d のとき、'
+          '真に何も起きていなければ「%s」%.3f・「%s」%.3f・「%s」%.3f、真の低下が %d pt なら「%s」%.3f・「%s」%.3f・「%s」%.3f、%d pt なら「%s」%.3f（`rules_B.s4_oc`・Newcombe・全数・門は含まない）。'
+          '**検出力は判定に使わない**（裁定 D118）。効き目 %d pt は相手の基底に対して相対で %.2f に当たり、それより小さい低下はこの場では排除しない（裁定 D136）。'
           '**合成の検出力**（選定で正しい組を選ぶ割合 × 加算族の初段〔両側 Fisher・場面ごとの基底で最小〜最大〕・採否表 P229）: 真の低下 %s。選定の側は調整走行の基底で出した割合である。'
           % (n, n, fam['B_sub']['m'], lo_sc('O-Ncold'), bs('O-Ncold', lo_sc('O-Ncold')), hi_sc('O-Ncold'), bs('O-Ncold', hi_sc('O-Ncold')),
              lo_sc('O-Ncold'), D_MAIN, two_side('B_sub', 'O-Ncold', lo_sc('O-Ncold'), D_MAIN), hi_sc('O-Ncold'), D_MAIN, two_side('B_sub', 'O-Ncold', hi_sc('O-Ncold'), D_MAIN),
              fam['B_add']['m'], lo_sc('Onull'), bs('Onull', lo_sc('Onull')), hi_sc('Onull'), bs('Onull', hi_sc('Onull')),
              lo_sc('Onull'), D_MAIN, two_side('B_add', 'Onull', lo_sc('Onull'), D_MAIN), hi_sc('Onull'), D_MAIN, two_side('B_add', 'Onull', hi_sc('Onull'), D_MAIN),
              fam['B_cross']['m'], EX[0], D_MAIN, two_side('B_cross', 'O-Ncold', EX[0], D_MAIN), D_SMALL, EX[1], two_side('B_add', 'Onull', EX[1], D_SMALL),
-             s4_base, S4_PT, 100 * 0.95, s4_pow[S4_PT], D_MAIN, s4_pow[D_MAIN], S4_PT, S4_POWER_MIN,
+             s4_base, n, S4_LAB[2], s4_oc[0][S4_LAB[2]], S4_LAB[3], s4_oc[0][S4_LAB[3]], S4_LAB[1], s4_oc[0][S4_LAB[1]],
+             S4_PT, S4_LAB[0], s4_oc[S4_PT][S4_LAB[0]], S4_LAB[2], s4_oc[S4_PT][S4_LAB[2]], S4_LAB[3], s4_oc[S4_PT][S4_LAB[3]],
+             D_MAIN, S4_LAB[0], s4_oc[D_MAIN][S4_LAB[0]], S4_PT, S4_PT / (100.0 * s4_base),
              '・'.join('%d pt で %.3f〜%.3f（選定の割合 %.3f）' % (d, v[0], v[1], v[2]) for d, v in sorted(combined.items()))),
-          'data': dict(rows=rows, s4_power={str(k): v for k, v in s4_pow.items()}, s4_base=round(s4_base, 4),
+          'data': dict(rows=rows, s4_oc={str(k): {lab_: round(v_, 4) for lab_, v_ in oc_.items()} for k, oc_ in s4_oc.items()}, s4_base=round(s4_base, 4),
                        combined_power={str(k): list(v) for k, v in combined.items()},
                        combined_power_by_scenario={str(k): v for k, v in combined_by_sc.items()})}
 
 # ---- E: 品質床（同じ腕の無操作との二標本・厳密値・裁定 D69 の射程） ----
 q, thr = q_items, -T['quality_floor']['threshold_pt'] / 100
-
-
-def q_null_exact(p):
-    """同じ真の正答率の二腕で、差が閾値以下（不合格）になる確率。二項の畳み込みで厳密に計算する。"""
-    pmf = binom.pmf(np.arange(q + 1), q, p)
-    d = np.arange(q + 1)[:, None] - np.arange(q + 1)[None, :]
-    return float(((d <= -thr * q) * (pmf[:, None] * pmf[None, :])).sum())
-
-
-def q_power_exact(p, drop):
-    pmf_a = binom.pmf(np.arange(q + 1), q, p)
-    pmf_b = binom.pmf(np.arange(q + 1), q, max(p - drop, 0.01))
-    d = np.arange(q + 1)[:, None] - np.arange(q + 1)[None, :]
-    return float(((d.T <= -thr * q) * (pmf_a[:, None] * pmf_b[None, :])).sum())
 
 
 def q_null_paired(delta):
@@ -290,18 +271,30 @@ def q_null_paired(delta):
     return tot
 
 
-null_q = {p: q_null_exact(p) for p in (0.5, 0.7, 0.9)}
+# **正本 `measured.quality_floor_multiplicity` と同じ関数**（`rules_B.qf_multiplicity`・境目の規則どおり・裁定 D137・採否表 P391）。
+# 前はこの行が自前の式（境目は同じ）で別の正答率を出し、正本の多重性の数は手で打った値だった
+QM = rules_B.qf_multiplicity(T, q_cells_post, bases=(0.5, T['quality_floor']['base_min_floor'], T['quality_floor']['base_min']))
+assert QM == {k: v for k, v in T['measured']['quality_floor_multiplicity'].items() if k != 'note'}, '転記行 E の多重性が正本と違う（正本を組み直していない）'
+QB = (0.5, T['quality_floor']['base_min_floor'], T['quality_floor']['base_min'])
+# 期待セル数は**判定するセル**（選定の段と選定後の段）だけで数える。前は相手の無操作のセルまで含めた総数を掛けていた（採否表の外で見つけた・2026-09-19）
+_key = lambda p: '%03d' % int(round(p * 100))
+null_q = {p: rules_B.qf_null_rate(p, q, T) for p in QB}
 null_pair = {dl: q_null_paired(dl) for dl in (0.05, 0.1, 0.2, 0.3)}
-pow_q = {p: q_power_exact(p, D_PICK * 1.5 / 100) for p in (0.7, 0.9)}
+pow_q = {p: rules_B.qf_power(p, QM['drop_pt'], q, T) for p in QB}
+assert all(abs(round(null_q[p], 4) - QM['cell_at_%s' % _key(p)]) < 1e-12 for p in QB), '転記行 E の一セルの値が正本と違う'
 acc_line = lambda d: '・'.join('%g で %.4f' % (k, v) for k, v in d.items())
 pow_line = lambda d: '・'.join('%g で %.3f' % (k, v) for k, v in d.items())
-F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・境目はちょうどの値を不合格とする）: 射程は選定の %d セル（土台 × 層 × 係数）に加え、選ばれた組での残りの介入 %d セルと、相手の無操作 %d セル（選定の段）＋%d セル（選定後の段・裁定 D88）。帰無発火率（同じ真の正答率で閾値以下になる確率・二項の畳み込みで厳密）は正答率 %s。真の低下 %.0f pt を捕まえる確率は %s。帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（裁定 D66・候補は器材の整備の段）。'
+F['E'] = {'text': '品質床（登録した問いの数 %d・閾値 %d pt・分子＝正答数・**率の分母は使えた試行**〔`quality_floor.denominator_rule`〕・相手＝同じ腕の無操作・境目はちょうどの値を不合格とする）: 射程は選定の %d セル（土台 × 層 × 係数）に加え、選ばれた組での残りの介入 %d セルと、相手の無操作 %d セル（選定の段）＋%d セル（選定後の段・裁定 D88）。'
+          '帰無発火率（一セル・二標本・同じ真の正答率で不合格になる確率・全数・`rules_B.qf_null_rate`）は正答率 %s。選定後の %d セルで一つ以上落ちる確率（独立の近似）は %s。真の低下 %d pt を捕まえる確率は %s（**正本 `measured.quality_floor_multiplicity` と同じ関数**・裁定 D137）。'
+          '帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（判定するセル %d・相手の無操作のセルは判定しないので数えない）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（裁定 D66・候補は器材の整備の段）。'
           '**相手の無操作は段 × 土台 × セッションごとに一つ**で、ここではセッションが段に一つの見込みで数えている（裁定 D92・走行が分かれれば相手のセルはその数だけ増える）。'
-          '**同じ問いを使うが二標本で比べる**ので、この行の帰無発火率と検出力は対にして読むより保守側である（採否表 P256）。**対の見方**（採否表 P373）: 無操作と腕で正誤が入れ替わる問いの割合 δ ごとの帰無発火率（入れ替わりは正→誤と誤→正が半々・厳密）は %s。介入が何もしなければ δ は零で、帰無の不合格も零である——**二標本の値は上限**である。無操作の相手は土台ごとに一つで多くのセルが共有するため、帰無での不合格は相関して塊で出る。課題は**無操作の正答率が %g 以上**のものを選ぶ（裁定 D85）。'
-          % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, q_noop_sel, q_noop_post, acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells,
+          '**同じ問いを使うが二標本で比べる**ので、この行の帰無発火率と検出力は対にして読むより保守側である（採否表 P256）。**対の見方**（採否表 P373）: 無操作と腕で正誤が入れ替わる問いの割合 δ ごとの帰無発火率（入れ替わりは正→誤と誤→正が半々・厳密）は %s。介入が何もしなければ δ は零で、帰無の不合格も零である——**二標本の値は上限**である。無操作の相手は土台ごとに一つで多くのセルが共有するため、帰無での不合格は相関して塊で出る。課題は**無操作の正答率が %g 以上**のものを選ぶ（裁定 D85・届かないときの手当ては `quality_floor.base_min_fallback`・裁定 D137）。'
+          % (q, T['quality_floor']['threshold_pt'], q_cells_sel, q_cells_post, q_noop_sel, q_noop_post, acc_line(null_q),
+             q_cells_post, '・'.join('%g で %.3f' % (p, QM['any_at_%s' % _key(p)]) for p in QB), QM['drop_pt'], pow_line(pow_q),
+             T['quality_floor']['base_min_floor'], (q_cells_sel + q_cells_post) * null_q[T['quality_floor']['base_min_floor']], q_cells_sel + q_cells_post,
              '・'.join('δ=%g で %.4f' % (k, v) for k, v in null_pair.items()), T['quality_floor']['base_min']),
           'data': {'null_exact': {str(k): v for k, v in null_q.items()}, 'null_paired': {str(k): v for k, v in null_pair.items()},
-                   'power_exact': {str(k): v for k, v in pow_q.items()},
+                   'power_exact': {str(k): v for k, v in pow_q.items()}, 'multiplicity': QM,
                    'cells': q_cells, 'cells_selection': q_cells_sel, 'cells_post': q_cells_post, 'cells_noop_selection': q_noop_sel, 'cells_noop_post': q_noop_post}}
 
 # ---- F: 費用と時間（バッチの記録値から出し直す・◐） ----

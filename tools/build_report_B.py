@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
-"""build_report_B.py v4 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
+"""build_report_B.py v5 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
+v5（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: **集計が読んだ門の記録と、渡された門の記録が同じか**を SHA で照らし、違えば止まる（採否表 P403）／**管理図の要約**の区画 K（全点と三つの判定・`--chart` は必須・裁定 D110・採否表 P410）／S4 の区画に門・封印の照合・相対の大きさ・観測した相手の率での動作特性（裁定 D134〜D136）／td の特異性の区画を族ごとの規則の札に（裁定 D133）／副位置の読みの区画に参照の行と合わせる前の比（裁定 D139・D133）。
 
 雛形の〔結果 X〕を、機械の区画で置き換える:
   A 要約／B 走行の記録（整合検査・抽出検査・セッション）／C 門1 と選定／D 確証の族の表／E 封印した符号との照合／
   F 記述の族／G S4 の反証（**同等性の規則・区間は Newcombe**・v4）／H 利益相反と情報状態／
-  I td の特異性とランダム方向の等質性（裁定 D123・D127・v4）／J 副位置の読み（`tools/layers_B.py` の出力・**必須**・裁定 D132・v4）
+  I td の特異性とランダム方向の等質性（裁定 D133・D127・v5）／J 副位置の読み（`tools/layers_B.py` の出力・**必須**・裁定 D132・参照の行は D139・v5）／
+  K 管理図の要約（`tools/control_chart_B.py` の出力・**必須**・裁定 D110・採否表 P410・v5）
 **散文に手計算の数を残さない**（正本 `report_rules.typed_numbers`）。数はすべて集計の json から来る。
 組み立ての後に走査器（`tools/report_lint.py`）を走らせる口を持つ（--lint）。
 用法: python tools/build_report_B.py --analysis records/B/analysis-B-<日付>.json --gate records/B/gate-B-<日付>.json \
@@ -15,7 +17,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v4'
+VERSION = 'v5'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--analysis', required=True)
@@ -23,6 +25,7 @@ ap.add_argument('--gate', required=True)
 ap.add_argument('--integrity', required=True, help='tools/integrity_B.py の json（必須・採否表 P293）')
 ap.add_argument('--sampling', required=True, help='抽出検査の封印 json（必須・採否表 P293）')
 ap.add_argument('--layers', required=True, help='tools/layers_B.py の json（副位置の読み・必須・裁定 D132）')
+ap.add_argument('--chart', required=True, help='tools/control_chart_B.py の json（管理図の要約・必須・裁定 D110・採否表 P410）')
 ap.add_argument('--allow-dry', action='store_true', help='検査用の口（合成データから組む・区画ごとに印を差し込む）')
 ap.add_argument('--force-problems', action='store_true', help='整合検査に不整合があっても組む（理由を記録に残すこと）')
 ap.add_argument('--template', default=os.path.join(REPO, 'records', 'B', 'results-report-template-B.md'))
@@ -38,6 +41,12 @@ SMP = runs_B.read_json(a.sampling) if a.sampling else None
 LY = runs_B.read_json(a.layers)
 assert LY.get('kind') == 'layers_B', '副位置の読みの記録の種類が違う'
 assert A.get('kind') == 'analyze_B' and G.get('kind') == 'gate_B', '集計または門の記録の種類が違う'
+CH = runs_B.read_json(a.chart)
+assert CH.get('kind') == 'control_chart_B', '管理図の記録の種類が違う'
+# **集計が読んだ門の記録と、渡された門の記録が同じか**（採否表 P403・2026-09-19）。前は照らさず、別の門の記録を渡しても組めた
+if A.get('gate_sha16') != runs_B.sha16_file(a.gate):
+    sys.exit('集計が読んだ門の記録（SHA16 %s）と、渡された門の記録（SHA16 %s）が違う——同じ門の記録で集計し直す（採否表 P403）'
+             % (A.get('gate_sha16'), runs_B.sha16_file(a.gate)))
 DRY = A.get('dry_marks') or []
 if DRY and not a.allow_dry:
     sys.exit('**合成データ（dry-run の印つき）から報告を組もうとしている**: %s。検査用は --allow-dry（採否表 P279）' % '・'.join(DRY))
@@ -139,17 +148,24 @@ for fam, rs in A['descriptive'].items():
     F_desc.append('')
 F_desc.append(PS['no_p_desc'])
 s4 = A['s4']
-G_s4 = block(['```', '判定: %s' % s4.get('verdict'),
+_ocf = lambda d: '・'.join('%s %s' % (k, fmt_n(v)) for k, v in (d or {}).items())
+_rs = s4.get('relative_size') or {}
+_oc = s4.get('oc_at_observed_partner') or {}
+G_s4 = block(['```', '札: %s（三分岐の前の門: %s・裁定 D134）' % (s4.get('verdict'), '・'.join(s4.get('gates') or []) or 'なし'),
+              '封印の値: %s・照合: %s（札とは別に出す・正本 B_desc_S4.seal_match・裁定 D135）' % (s4.get('seal_value'), s4.get('seal_match')),
               ('pt 差（(6b) − ランダム方向） %s・両側の区間 %s・（ランダム方向 − (6b)）の片側上限 %s pt・効き目 %s pt・相手の腕の率 %s・区間 %s'
                % (s4.get('diff_pt'), s4.get('ci'), s4.get('upper_one_sided_pt'), s4.get('effect_pt'), fmt_n(s4.get('partner_rate')), s4.get('interval'))
                if s4.get('partner_rate') is not None else '記録が無い'),
-              '封印: %s' % s4.get('sealed_prediction')] + list(s4.get('notes') or []) + ['```'])
-_td = ['| 対比 | 場面 | pt 差（v − td） | 区間 | 特異性 | 向き |', '|---|---|---|---|---|---|']
+              ('効き目の相対の大きさ（裁定 D136）: 観測した相手の率に対して %s・登録の基底に対して %s'
+               % (fmt_n(_rs.get('to_observed_partner')), fmt_n(_rs.get('to_registered_base'))) if _rs else None),
+              ('観測した相手の率 %s・各腕 n=%s での動作特性（判定には使わない）——真に零: %s／真に効き目ちょうど: %s'
+               % (fmt_n(_oc.get('partner_rate')), _oc.get('n_per_arm'), _ocf(_oc.get('at_zero')), _ocf(_oc.get('at_effect'))) if _oc else None)]
+             + list(s4.get('notes') or []) + ['```'])
+_td = ['| 対比 | 族 | 場面 | pt 差（v − td） | 区間 | p | Holm の閾値 | 確証の対比の札 | 特異性 |', '|---|---|---|---|---|---|---|---|---|']
 for t_ in A.get('td_specificity') or []:
-    _td.append('| %s | %s | %s | %s | %s | %s |' % (t_['id'], t_['scenario'], fmt_n(t_.get('diff_pt')),
-                                                [fmt_n(x) for x in (t_.get('ci') or [])] or '—',
-                                                {True: '書ける', False: '書かない（区間が零を含む）', None: '測れない'}[t_.get('write_specificity')],
-                                                t_.get('direction') or '—'))
+    _td.append('| %s | %s | %s | %s | %s | %s | %s | %s | %s |' % (t_['id'], t_.get('family'), t_['scenario'], fmt_n(t_.get('diff_pt')),
+                                                           [fmt_n(x) for x in (t_.get('ci') or [])] or '—', fmt_p(t_.get('p')),
+                                                           fmt_n(t_.get('holm_alpha')), t_.get('conf_label'), t_.get('label')))
 _hm = ['| 場面 | 腕 | 三本の率の差 pt | 測れた方向 | 注 |', '|---|---|---|---|---|']
 for h_ in A.get('homogeneity') or []:
     _hm.append('| %s | %s | %s | %s | %s |' % (h_['scenario'], h_['arm'], fmt_n(h_.get('spread_pt')), h_.get('measured'),
@@ -159,7 +175,26 @@ _ly = ['| 層 | n A／B | 射影の平均 A | 射影の平均 B | 平均の差 |
 for r_ in LY.get('rows') or []:
     _ly.append('| %s | %s／%s | %s | %s | %s | %s | %s |' % (r_['layer'], r_['n_A'], r_['n_B'], fmt_n(r_.get('mean_A')), fmt_n(r_.get('mean_B')),
                                                         fmt_n(r_.get('mean_diff')), fmt_n(r_.get('smd')), fmt_n(r_.get('auc'))))
-J_ly = block(['場面 %s・%s 対 %s・方向 %s（主位置から作った・単位ベクトル）。記述であり、目安も p も置かない。' % (LY['scenario'], LY['arm_A'], LY['arm_B'], LY['direction']), ''] + _ly)
+_ref = ['| 軸 | 層 | 平均の差 | 標準化した差 | AUC |', '|---|---|---|---|---|']
+for r_ in LY.get('reference_rows') or []:
+    _ref.append('| %s | %s | %s | %s | %s |' % (r_['axis'], r_['layer'], fmt_n(r_.get('mean_diff')), fmt_n(r_.get('smd')), fmt_n(r_.get('auc'))))
+if not LY.get('reference_rows'):
+    sys.exit('副位置の読みの記録に参照の行が無い（裁定 D139・tools/layers_B.py v2 で作り直す）')
+_raw = LY.get('raw_norm_ratio')
+J_ly = block(['場面 %s・%s 対 %s・方向 %s（主位置から作った・単位ベクトル）。記述であり、目安も p も置かない。' % (LY['scenario'], LY['arm_A'], LY['arm_B'], LY['direction']), ''] + _ly
+             + ['', '参照の行（同じ保存値を、同じ層のランダム方向の三本・td・Nk の単位方向に射影した・裁定 D139）:', ''] + _ref
+             + ['', '合わせる前の比（‖td‖/‖v̂‖ など・方向の要約統計・裁定 D133）: %s'
+                % ('・'.join('層 %s: %s' % (k, '・'.join('%s %s' % (n_, fmt_n(v_)) for n_, v_ in (v or {}).items())) for k, v in _raw.items()) if _raw else '記録が無い')])
+# **管理図の要約**（裁定 D110・採否表 P410・前の巡の採否 P323 の残り）——全点と三つの判定
+_pts = CH.get('points') or []
+_kind = lambda v: ('帯の外かつ有意' if '帯の外かつ有意' in v else ('帯の外だが有意でない' if '帯の外だが有意でない' in v else ('帯の内側' if v.startswith('帯の内側') else '判定しない点')))
+_kc = {k: sum(1 for p_ in _pts if _kind(p_.get('verdict', '')) == k) for k in ('帯の外かつ有意', '帯の外だが有意でない', '帯の内側', '判定しない点')}
+_kr = ['| 場面 | 腕 | セッション | 破局/n_ok | 初点との差 pt | p | 判定 |', '|---|---|---|---|---|---|---|']
+for p_ in _pts:
+    _kr.append('| %s | %s | %s | %s/%s | %s | %s | %s |' % (p_.get('scenario'), p_.get('arm'), p_.get('session'), p_.get('k'), p_.get('n'),
+                                                        fmt_n(p_.get('diff_pt')), fmt_p(p_.get('p')), _kind(p_.get('verdict', ''))))
+K_chart = block(['管理図の要約: 全点 %d・帯の外かつ有意 %d・帯の外だが有意でない %d・帯の内側 %d・判定しない点（初点・測れなかった）%d・点が一つのセル %d（帯 %s pt）'
+                 % (len(_pts), _kc['帯の外かつ有意'], _kc['帯の外だが有意でない'], _kc['帯の内側'], _kc['判定しない点'], len(CH.get('notes') or []), CH.get('band_pt')), ''] + _kr)
 H_coi = block(['```', T['selection']['coi_note'], T['publication']['dual_use'],
                '率盲検の外の経路: 同一性選別の距離／調整走行の率（選定に要る）／品質床の得点。本走行の率は整合検査まで見ない。',
                '起草者は段階 A の公開結果を見ている（封印予想の情報状態の欄に記す）。', '```'])
@@ -169,16 +204,17 @@ if len(_state) == 1:
     tpl = tpl.replace(_state[0], '- 状態: **報告**（雛形から組み立て器が機械で組んだ・結果の欄は機械の区画）。%s'
                       % ('**合成データから組んだ検査用の報告であり、本番ではない。**' if DRY else ''))
 for ph, txt in (('A', A_sum), ('B', B_run), ('C', C_gate), ('D', D_conf), ('E', E_sign), ('F', block(F_desc)), ('G', G_s4), ('H', H_coi),
-                ('I', I_td), ('J', J_ly)):
+                ('I', I_td), ('J', J_ly), ('K', K_chart)):
     key = '〔結果 %s〕' % ph
     if key not in tpl:
         sys.exit('雛形に %s が無い' % key)
     tpl = tpl.replace(key, txt)
-tpl += '\n\n## 11. 組み立ての記録（機械）\n\n- 器 `tools/build_report_B.py` %s・%s UTC。集計 `%s`（SHA16 %s）・門 `%s`（SHA16 %s）・副位置の読み `%s`（SHA16 %s）。\n' % (
+tpl += '\n\n## 11. 組み立ての記録（機械）\n\n- 器 `tools/build_report_B.py` %s・%s UTC。集計 `%s`（SHA16 %s）・門 `%s`（SHA16 %s・集計が読んだ門と一致）・副位置の読み `%s`（SHA16 %s）・管理図 `%s`（SHA16 %s）。\n' % (
     VERSION, datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'),
     os.path.relpath(a.analysis, REPO).replace('\\', '/'), runs_B.sha16_file(a.analysis),
     os.path.relpath(a.gate, REPO).replace('\\', '/'), runs_B.sha16_file(a.gate),
-    os.path.relpath(a.layers, REPO).replace('\\', '/'), runs_B.sha16_file(a.layers))
+    os.path.relpath(a.layers, REPO).replace('\\', '/'), runs_B.sha16_file(a.layers),
+    os.path.relpath(a.chart, REPO).replace('\\', '/'), runs_B.sha16_file(a.chart))
 tpl += '\n'.join([MB['begin'], '- 組み立ての記録は機械が書いた（この区画の中身は区画の記録と突合する）。', MB['end']]) + '\n'
 open(out_md, 'w', encoding='utf-8', newline='\n').write(tpl)
 # **機械の区画の記録**（-machine.json・段階 A の型・報告の走査器が突合する・v4）

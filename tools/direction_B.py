@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""direction_B.py v5 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
+"""direction_B.py v6 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
+v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 決定性 (ii) を**バッチの組成を変えた比較**にした——走行器と同じ組成（同じプロンプトを `runner.batch` 行）で取った主位置の活性と、一本流しの値を比べる（採否表 P396）。前は腕の並べ方を逆にした一本流しどうしを比べており、行列の形が変わらないので落ちようがなかった。主位置の活性を取る関数を本体の外（`main_position_activation`・`main_position_activation_batch`）に出し、端から端までの検査が同じ関数を呼べるようにした。
 
 正本 `design/contrasts-B.json` の `selection.position`・`selection.candidates`・`directions`・`activation_storage`・`runner` に従う。
 何をするか:
   (1) 腕 × 場面のプロンプトを組み、**プロンプトの最終トークン**（詰めでない最後の位置・`runner.padding`）の隠れ状態を、登録した層で取り出す。
-  (2) 決定性の検査は二条（裁定 D91）: **同じ並べ方**で二度取って完全一致（外れたら走行を止める）／**並べ方を変えて**一度取り、許容差の内側かを見る（外れたら記帳して登録者に上げる）。
+  (2) 決定性の検査は二条（裁定 D91）: **同じ並べ方**で二度取って完全一致（外れたら走行を止める）／**バッチの組成を変えて**（走行器と同じ組成）一度取り、許容差の内側かを見る（外れたら記帳して登録者に上げる・採否表 P396）。
   (3) 方向を作る: (6a) 静的 h_O − h_Osec／(6b) 負荷下 h_{O-Ncold} − h_{Osec-Ncold}／Nk 方向 h_Nk − h_N／腕対の差方向 h_Onull − h_N。
       いずれも**抽出場面の平均**。td は v̂ のノルムに合わせる（`directions.td`）。
   (4) 要約統計: 層ごとのノルム・方向どうしのコサイン・**平均を取る前の場面ごとの差ベクトルどうしのコサイン**（抽出場面の間の安定性・採否表 P237）。
@@ -20,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v5'
+VERSION = 'v6'
 STRICT = os.environ.get('OP4B_REQUIRE_FULL_SELFTEST') == '1'     # 実機の段では飛ばしを失敗に倒す（裁定 D122・採否表 P344）
 REPO = runs_B.REPO
 T = runs_B.load_T()
@@ -84,6 +85,25 @@ def assert_layer_alignment(model, input_ids, attention_mask, layer_idx, atol=0.0
     d = float((got['h'] - hs).abs().max())
     assert d <= atol, ('hidden_states[idx+1] と layers[idx] の出力が一致しない（層の対応が崩れている）', layer_idx, d)
     return d
+
+
+def main_position_activation(model, ids, layer_idx, rows=1):
+    """**主位置（プロンプトの最終トークン）**の活性（正本 `selection.position.main`）。同じプロンプトを rows 行並べたバッチで流し、零行目を返す。
+    rows=1 は一本流し。バッチの入力は同一なので詰めは起きず、最終トークンは列の最後にある。
+    `hidden_states[idx+1]` を取る——`layers[idx]` の出力と同じであることは `assert_layer_alignment` で確かめる。"""
+    import torch
+    t = torch.tensor([list(ids)] * int(rows), device=model.device)
+    am = torch.ones_like(t)
+    with torch.no_grad():
+        out = model(input_ids=t, attention_mask=am, output_hidden_states=True)
+    return out.hidden_states[hidden_states_index(layer_idx)][0, -1, :].detach().float().cpu().numpy()
+
+
+def main_position_activation_batch(model, ids, layer_idx, rows=None):
+    """**走行器と同じバッチの組成**（同じプロンプトを `runner.batch` 行・正本 `selection.batch_composition`）で取った主位置の活性。
+    決定性 (ii) は、これと一本流しの値を比べる（採否表 P396）。"""
+    batch_rows = int(rows or T['runner']['batch'])
+    return main_position_activation(model, ids, layer_idx, batch_rows)
 
 
 def h_norm_record(H, dirs):
@@ -172,7 +192,8 @@ def determinism_same_order(h1, h2):
 
 
 def determinism_cross_order(h1, h2, tol=None):
-    """**並べ方を変えて**取った活性が許容差の内側かを見る（裁定 D91 の (ii)）。外れたら記帳して登録者に上げる（止めない）。"""
+    """**バッチの組成を変えて**取った活性が許容差の内側かを見る（裁定 D91 の (ii)・採否表 P396）。外れたら記帳して登録者に上げる（止めない）。
+    名の `cross_order` は前の名残（前は並べ方を変えた一本流しどうしを比べていた）。"""
     tol = tol or T['activation_storage']['determinism']['cross_order_tolerance']
     rows = []
     if set(h1) != set(h2):      # **鍵の欠けを黙って無視しない**（裁定 D114・採否表 P325）
@@ -231,7 +252,7 @@ def _selftest():
     H4[k0] = H4[k0] * np.nan
     ok4, bad4 = determinism_same_order(H, H4)
     assert not ok4 and 'NaN' in bad4[0], 'NaN を別の名で報告していない'
-    # 決定性 (ii) 並べ方を変えた → 許容差
+    # 決定性 (ii) バッチの組成を変えた → 許容差（採否表 P396）
     tol = T['activation_storage']['determinism']['cross_order_tolerance']
     Hs = {k: vv + rng.normal(size=d) * 1e-6 for k, vv in H.items()}
     ok5, rows5 = determinism_cross_order(H, Hs)
@@ -251,7 +272,7 @@ def _selftest():
         except ImportError:
             raise SystemExit('torch が無い——実機の段では失敗に倒す（OP4B_REQUIRE_FULL_SELFTEST=1・裁定 D122）')
     print('[direction_B selftest] 層番号（期待値の表・%d 通り）・hidden_states の添字・ノルム合わせ・安定性・‖v̂‖ と ‖h‖ の比・'
-          '決定性の二条（同じ並べ方は完全一致／並べ方を変えたら cos %g・相対差 %g）: すべて通った'
+          '決定性の二条（同じ並べ方は完全一致／バッチの組成を変えたら cos %g・相対差 %g）: すべて通った'
           % (len(want), tol['cos_min'], tol['max_abs_over_norm']))
 
 
@@ -297,27 +318,15 @@ if __name__ == '__main__':
         msg = RUN.user_message(AT[arm], scen['text'], inst)
         return steer_B.apply_chat(tok, msg)
 
-    def main_position_activation(ids, layer_idx):
-        """**主位置（プロンプトの最終トークン）**の活性（正本 `selection.position.main`）。
-
-        左詰めのバッチでは最終トークンは列の最後にあるが、ここは一本ずつ流すので詰めは無い。
-        `hidden_states[idx+1]` を取る——`layers[idx]` の出力と同じであることは `assert_layer_alignment` で確かめる。
-        """
-        t = torch.tensor([ids], device=model.device)
-        am = torch.ones_like(t)
-        with torch.no_grad():
-            out = model(input_ids=t, attention_mask=am, output_hidden_states=True)
-        hs = out.hidden_states[hidden_states_index(layer_idx)]
-        return hs[0, -1, :].detach().float().cpu().numpy()
-
-    def collect(order):
-        """腕 × 場面 × 層の主位置の活性を集める。order は腕の並べ方（決定性の検査に使う）。"""
+    def collect(order, rows=1):
+        """腕 × 場面 × 層の主位置の活性を集める。order は腕の並べ方、rows はバッチの行数（1 は一本流し・決定性の検査に使う）。"""
         H = {}
         for arm in order:
             for sc in EXTRACT:
                 ids = prompt_ids(arm, sc)
                 for r in LAYER_RATIOS:
-                    H[(arm, sc, r)] = main_position_activation(ids, idxs[r])
+                    H[(arm, sc, r)] = (main_position_activation(model, ids, idxs[r]) if rows == 1
+                                       else main_position_activation_batch(model, ids, idxs[r], rows))
         return H
 
     # (1) 層の対応を実機で確かめる（抽出した層と介入する層が同じであること）
@@ -329,12 +338,12 @@ if __name__ == '__main__':
     # (2) 活性を二度取る（決定性の二条・裁定 D91）
     H1 = collect(PANEL_ARMS)
     H2 = collect(PANEL_ARMS)                       # 同じ並べ方
-    H3 = collect(list(reversed(PANEL_ARMS)))       # 並べ方を変えた
+    H3 = collect(PANEL_ARMS, rows=T['runner']['batch'])   # **バッチの組成を変えた**（走行器と同じ組成・採否表 P396）
     ok_same, bad_same = determinism_same_order(H1, H2)
     ok_cross, rows_cross = determinism_cross_order(H1, H3)
     if not ok_same:
         raise SystemExit('決定性 (i)（同じ並べ方で完全一致）に落ちた: %s' % bad_same[:4])
-    print('[direction_B] 決定性 (i) 完全一致・(ii) 許容差の内側 %s' % ok_cross)
+    print('[direction_B] 決定性 (i) 完全一致・(ii) バッチの組成（%d 行）を変えた値が許容差の内側 %s' % (T['runner']['batch'], ok_cross))
 
     # (3) 方向を作る（全方向を ‖v̂〕に合わせる・裁定 D102）
     dirs, stats = build_directions(H1)
@@ -352,7 +361,7 @@ if __name__ == '__main__':
     # 前は方向（差を平均したもの）だけを保存しており、正本が「保存する」と書く活性も、決定性の検査の二度分も残らなかった。
     act = os.path.join(out_dir, 'main_position_activations.npz')
     np.savez(act, **{'same_order__%s__%s__%s' % (arm, sc, r): v for (arm, sc, r), v in H1.items()},
-             **{'cross_order__%s__%s__%s' % (arm, sc, r): v for (arm, sc, r), v in H3.items()})
+             **{'batch_rows__%s__%s__%s' % (arm, sc, r): v for (arm, sc, r), v in H3.items()})
     act_sha = hashlib.sha256(open(act, 'rb').read()).hexdigest().upper()
     hrec = h_norm_record(H1, dirs)                     # 採否表 P356・調整走行の前に登録者に見せる
     write_layer_record(out_dir, n_layers, hrec)
@@ -361,7 +370,7 @@ if __name__ == '__main__':
     rec = {'kind': 'direction_B', 'version': VERSION, 'model': a.model, 'dtype': a.dtype, 'h_norm': hrec,
            'num_hidden_layers': n_layers, 'layer_indices': {str(r): idxs[r] for r in LAYER_RATIOS},
            'alignment_max_abs': align, 'determinism_same_order': bool(ok_same),
-           'determinism_cross_order': {'ok': bool(ok_cross), 'rows': rows_cross},
+           'determinism_cross_order': {'ok': bool(ok_cross), 'rows': rows_cross, 'compared': '一本流し 対 走行器と同じバッチの組成（%d 行）' % T['runner']['batch']},
            'stats': {str(r): stats[r] for r in LAYER_RATIOS}, 'npz_sha256': sha, 'activations_npz_sha256': act_sha,
            'arms': PANEL_ARMS, 'extraction_scenarios': EXTRACT,
            'contrasts_sha16': runs_B.sha16_file(runs_B.CPATH)}

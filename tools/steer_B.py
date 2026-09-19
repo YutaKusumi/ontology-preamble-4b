@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""steer_B.py v5 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床の生成と採点）。
+"""steer_B.py v6 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床の生成と採点）。
+v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: ランダム方向の割り当てを**交互**（試行の番号を方向の数で割った余り）にした（裁定 D140）。帯の起点（主位置）を**一つの関数 `main_position`** から出し、走行器がそれを呼び、自己検査がそれを検べる（採否表 P404）。
 
 正本 `design/contrasts-B.json` の `selection.apply`・`random_control`・`quality_floor`・`runner` に従う。
 規則（この器が守るもの）:
@@ -9,9 +10,9 @@
   - 介入の帯の起点は、**chat template を当てた組み立て済みの列の最後のトークン（主位置）**（裁定 D101 で template を当て、裁定 D124 で起点を主位置にした）。
     自己検査は起点を**独立の正解**（器を通さずに作った列の最後の位置）と照らし、復号して最終トークンと一致することを見る
     （`OP4B_TOKENIZER_DIR` に実トークナイザの置き場を渡したときに走る。**`OP4B_REQUIRE_FULL_SELFTEST=1` なら、飛ばすと失敗に倒す**・裁定 D122）。
-    関数の名 `scenario_start_index` は裁定 D124 の前の名残で、返すのは主位置である。
+    関数の名 `scenario_start_index` は裁定 D124 の前の名残で、返すのは主位置である。**起点の式は `main_position` 一つ**で、走行器もこれを呼ぶ（採否表 P404）。
   - ランダム方向は**調整走行と本走行で引き直す**（裁定 D84・種は `seeds.random_dirs` の tune と main）。
-  - 一腕の試行は方向の登録順に等分し、端数は登録順に一つずつ配る（`random_control.allocation`・調整走行にも当てる）。
+  - 一腕の試行の方向は**試行の番号を方向の数で割った余り**（交互・`random_control.allocation`・裁定 D140・調整走行にも当てる）。各方向の数は登録順の等分（端数は登録順に一つずつ）と同じ。
   - 品質床は**貪欲**（`quality_floor.generation`）で、**生成した文字列から記号を読み取る**（強制デコードは採らない・裁定 D120）。書式外は不正解に数え、api_error は一度だけ引き直す（`quality_floor.format_fail_rule`）。
   - 場面の試行は `runner.generation` の設定。詰めは左（`runner.padding`）。
 **この器は GPU の上でしか本走行できない。** 手元では `--selftest`（ノルム合わせ・割り当て・引き直し・種の再現を合成のベクトルで確かめる）が走る。
@@ -23,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v5'
+VERSION = 'v6'
 STRICT = os.environ.get('OP4B_REQUIRE_FULL_SELFTEST') == '1'     # 実機の段では飛ばしを失敗に倒す（裁定 D122・採否表 P344）
 REPO = runs_B.REPO
 T = runs_B.load_T()
@@ -57,22 +58,19 @@ def match_to_static(v, v_hat_static):
 
 
 def allocate(n_trials, count=N_RAND):
-    """一腕の試行を方向の登録順に等分し、端数は登録順に一つずつ配る（random_control.allocation）。"""
+    """各方向の試行の数（登録順に等分し、端数は登録順に一つずつ）。交互の割り当て（`direction_of`）の数と一致する（random_control.allocation）。"""
     base, rem = divmod(int(n_trials), int(count))
     return [base + (1 if i < rem else 0) for i in range(count)]
 
 
 def direction_of(trial_index, n_trials, count=N_RAND):
-    """試行の番号から方向の添字を決める（**再開しても変わらない**・採否表 P298）。
+    """試行の番号から方向の添字を決める——**試行の番号を方向の数で割った余り（交互）**（正本 `random_control.allocation`・裁定 D140）。
 
-    残り件数から割り直すと等分にならないので、常に全体の割り当てを基準にする。"""
-    al = allocate(n_trials, count)
-    acc = 0
-    for i, n in enumerate(al):
-        acc += n
-        if trial_index < acc:
-            return i
-    raise ValueError('試行の番号が全体の数を超えている: %s / %s' % (trial_index, n_trials))
+    試行の番号だけで決まるので**再開しても変わらない**（採否表 P298）。各方向の数は `allocate` と一致する。
+    前は登録順の連続した塊に割っており、方向がバッチ・時刻・セッションと交絡した（採否表 P398）。"""
+    if not 0 <= int(trial_index) < int(n_trials):
+        raise ValueError('試行の番号が全体の数の外にある: %s / %s' % (trial_index, n_trials))
+    return int(trial_index) % int(count)
 
 
 def apply_vector(h, v_hat, coef, sign):
@@ -87,6 +85,14 @@ def apply_chat(tokenizer, user_message):
                                               add_generation_prompt=True, tokenize=True))
 
 
+def main_position(ids, pad_len=0):
+    """**介入の帯の起点＝主位置（組み立て済みの列の最後のトークン）**の添字（正本 `selection.apply`・裁定 D124）。**起点の式はこの一つ**（採否表 P404）。
+
+    ids は組み立て済みのトークン列（chat template を当てたもの）。pad_len は左詰めの詰めの長さ——詰めを入れた列の中でも最終トークンを指す。
+    走行器（`run_stageB_local.run_cell`・`capture_resp_mean`）と `scenario_start_index` がこれを呼び、自己検査がこれを独立の正解と照らす。"""
+    return int(pad_len) + len(ids) - 1
+
+
 def scenario_start_index(tokenizer, arm_text, scen_text, instruction, pad_len=0):
     """介入の帯の**起点**＝**主位置（プロンプトの最終トークン）**（正本 `selection.apply`・裁定 D124・2026-09-18）。
 
@@ -97,7 +103,7 @@ def scenario_start_index(tokenizer, arm_text, scen_text, instruction, pad_len=0)
     pad_len は左詰めの詰めの長さ（この式では結果に効かないが、呼び手の意図を明示するために受ける）。
     """
     ids = apply_chat(tokenizer, _user_message(arm_text, scen_text, instruction))
-    return pad_len + len(ids) - 1
+    return main_position(ids, pad_len)
 
 
 def _user_message(arm_text, scen_text, instruction):
@@ -193,7 +199,7 @@ def _selftest():
     assert not np.allclose(a1, a2), '調整走行と本走行で引き直していない'
     assert np.allclose(a1, random_directions(v, 'tune', 0.5)[0]), '同じ引数で再現しない'
     assert not np.allclose(random_directions(v, 'main', 0.25)[0], random_directions(v, 'main', 0.75)[0]), '層で子ストリームが分かれていない'
-    # (5) 割り当てと、試行の番号から方向へ（再開しても変わらない・採否表 P298）
+    # (5) 割り当てと、試行の番号から方向へ（**交互**・裁定 D140・再開しても変わらない・採否表 P298）
     for n in (200, 201, 100, 7):
         al = allocate(n)
         assert sum(al) == n and max(al) - min(al) <= 1 and al == sorted(al, reverse=True), '割り当ての端数の配り方が規則と違う'
@@ -201,6 +207,17 @@ def _selftest():
     got = [direction_of(i, n) for i in range(n)]
     assert [got.count(i) for i in range(N_RAND)] == allocate(n), '試行から方向への写像が割り当てと合わない'
     assert [direction_of(i, n) for i in range(n // 2, n)] == got[n // 2:], '再開すると方向の割り当てが変わる'
+    # **交互であること**を、器を通さずに作った正解（番号を方向の数で割った余り）と照らす——塊に戻すとここで落ちる
+    assert got[:2 * N_RAND] == [i % N_RAND for i in range(2 * N_RAND)], ('割り当てが交互でない（裁定 D140）', got[:2 * N_RAND])
+    _bt = T['runner']['batch']
+    assert all(len({got[j] for j in range(b, min(b + _bt, n))}) == min(N_RAND, min(b + _bt, n) - b) for b in range(0, n, _bt)), \
+        'バッチの中に方向が混ざっていない（塊の割り当てに戻っている）'
+    # (5b) **帯の起点の関数**（採否表 P404）——器を通さずに作った正解（列の最後の位置）と照らす。詰めを入れても最終トークンを指す
+    for ids_ in ([5, 6, 7], [9], list(range(40))):
+        assert main_position(ids_) == len(ids_) - 1, ('起点が列の最後でない', ids_[:4], main_position(ids_))
+        for pad in (0, 3, 11):
+            padded = [0] * pad + list(ids_)
+            assert padded[main_position(ids_, pad)] == ids_[-1] and main_position(ids_, pad) == len(padded) - 1, ('詰めを入れると起点がずれる', pad)
     # (6) 加減の向き
     h = rng.normal(size=32)
     assert np.allclose(apply_vector(h, v, 2.0, +1) - h, 2.0 * v)
@@ -220,7 +237,7 @@ def _selftest():
     assert mg['max_new_tokens'] == T['runner']['generation']['max_tokens'] and mg['temperature'] == T['runner']['generation']['temperature']
         # (8) **帯の起点**（裁定 D101・採否表 P308）: 実トークナイザがあれば、起点のトークンを復号して場面本文の先頭に一致することを確かめる
     band = _selftest_band()
-    print('[steer_B selftest] 全方向 × 全係数 × 全層の合成 %d 通り・引き直し・層の子ストリーム・割り当てと再開・加減の向き・生成の設定・%s: すべて通った'
+    print('[steer_B selftest] 全方向 × 全係数 × 全層の合成 %d 通り・引き直し・層の子ストリーム・割り当て（交互）と再開・帯の起点の関数・加減の向き・生成の設定・%s: すべて通った'
           % (n_checked, band))
 
 

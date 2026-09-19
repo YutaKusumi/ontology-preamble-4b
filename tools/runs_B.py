@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""runs_B.py v4 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
+"""runs_B.py v5 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
+v5（2026-09-19・最後の系統外の巡の後）: 層別の計数から、常に零を足す死んだ行を消した（採否表 P409）。
 
 段階 B の相（正本 `tags`）と置き場:
   同一性選別 `idB`      : results/idB/idB__<スタック>__<場面>__<印>/      （manifest の stack・scenario）
@@ -17,7 +18,7 @@ import os, re, sys, json, glob, hashlib
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CPATH = os.path.join(REPO, 'design', 'contrasts-B.json')
-VERSION = 'v4'
+VERSION = 'v5'
 COUNT_FIELDS = ('trial_id', 'arm', 'status', 'catastrophe', 'choice', 'format_fail', 'style_a', 'style_b', 'mention', 'loop_flag', 'truncated', 'correct')
 
 
@@ -360,7 +361,8 @@ def counts_main_strata(T, tag=None, root=None, allow_dry=False):
                 c['n_ok'] += 1
                 c['cat'] += (r['catastrophe'] is True)
                 c['refuse'] += (r['choice'] == 'refuse')
-                c['ff'] += bool(r['format_fail'])
+                # 書式外の試行は層に入らない（`stratum_of` が None を返して上で飛ばす）ので、書式外は数えない
+                # （常に零を足す行があった・採否表 P409・2026-09-19 に消した）
     return C
 
 

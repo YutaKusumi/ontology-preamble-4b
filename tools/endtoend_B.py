@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""endtoend_B.py v2 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+"""endtoend_B.py v3 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+v3（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 試行の記録のバッチの行数（採否表 P406）・走行の記録の加えた量（P394）・層の割合と添字の食い違いで走行器が止まること（P393）・決定性 (ii) のバッチの組成の比較（P396）・ランダム方向の交互の割り当て（裁定 D140）を足した。
 
 系統の外への検分で、四票すべてが「**介入を掛けて走らせる器がまだ無い**」ことを最初に挙げた。
 本体を書いたので、**実重みが無くても通せるところまで通す**——
@@ -25,7 +26,7 @@
 """
 import os, sys, json, argparse, datetime, tempfile, shutil
 
-VERSION = 'v2'
+VERSION = 'v3'
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 REPO = os.path.dirname(HERE)
@@ -249,6 +250,7 @@ tag = T['tags']['main']
 run_key = '%s__%s__s1__e2e' % (tag, sc0)
 cells, raws_all, resp_all, n_cell, bt = [], [], {}, 5, 2          # 五試行・バッチ二（区切りを跨ぐ）
 arms_run = ['Onull', 'Onull+v', 'Onull+vrand']
+added = {}
 for arm in arms_run:
     cs = runs_B.cell_seed(T, T['seeds']['main'][sc0], 'main', (sc0, arm))
     o_ = RUN.run_cell(model, tok, scenario=sc0, arm=arm, layer_ratio=ratio, coef=1.0, n=n_cell,
@@ -256,6 +258,7 @@ for arm in arms_run:
     cells += o_['trials']
     raws_all += o_['raws']
     resp_all.update(o_['resp'])
+    added[arm] = o_.get('added_norm')
 # 正本の欄をそろえた manifest（整合検査がこの一覧を読む）
 T_b = dict(T)
 man = {'tag': tag, 'run_key': run_key, 'session': 1, 'n': n_cell, 'seed': T['seeds']['main'][sc0],
@@ -264,7 +267,8 @@ man = {'tag': tag, 'run_key': run_key, 'session': 1, 'n': n_cell, 'seed': T['see
        'pip_freeze_sha16': 'E2E', 'gpu': 'cpu', 'started': 'e2e', 'ended': 'e2e', 'dry_run': True,
        'scenario': sc0, 'arms': arms_run, 'layer': ratio, 'coef': 1.0, 'direction_ids': ['fixed', 'static', 'rand'],
        'dtype': str(next(model.parameters()).dtype).replace('torch.', ''), 'order': T['runner']['order_id'],
-       'transformers_version': __import__('transformers').__version__, 'refuse_rules_sha16': runs_B.sha16_file(RUN.REFUSE_RULES)}
+       'transformers_version': __import__('transformers').__version__, 'refuse_rules_sha16': runs_B.sha16_file(RUN.REFUSE_RULES),
+       'added_norm': added}
 try:
     RUN.write_cell(root, tag, run_key, man, cells, raws_all, resp_all)
     RUN.write_session(root, tag, 1, [run_key], {'gpu': 'cpu'})
@@ -278,6 +282,15 @@ try:
     check('(8b) 既にある記録に上書きしない', False, '上書きした')
 except SystemExit:
     check('(8b) 既にある記録に上書きしない', True, '止まった')
+# **バッチの実際の行数**（採否表 P406）: 器を通さずに数えた行数（五試行・バッチ二なら 2・2・2・2・1）と照らす
+_want_rows = [min((i // bt + 1) * bt, n_cell) - (i // bt) * bt for i in range(n_cell)]
+_got_rows = [c_['batch_rows'] for c_ in cells if c_['arm'] == 'Onull']
+check('(8g) 試行の記録にバッチの実際の行数が入る（採否表 P406）', _got_rows == _want_rows, '記録 %s／数え直し %s' % (_got_rows, _want_rows))
+# **加えた量**（採否表 P394）: 無操作は空、介入の腕は 係数 × ‖v̂〔static〕‖（ランダム方向の腕も同じ量）
+_nv = float(np.linalg.norm(loaded[('static', ratio)]))
+check('(8h) 走行器がセルの加えた量を返し、走行の記録に入る（採否表 P394）',
+      added.get('Onull') is None and abs((added.get('Onull+v') or 0) - _nv) < 1e-6 and abs((added.get('Onull+vrand') or 0) - _nv) < 1e-6,
+      '無操作 %s・静的 %s・ランダム %s（‖v̂‖ %.6g）' % (added.get('Onull'), added.get('Onull+v'), added.get('Onull+vrand'), _nv))
 # 読み口が読めるか
 cc = runs_B.counts_main(T, root=root, allow_dry=True)[0]
 check('(8c) 読み口（runs_B）が走行器の出力を読める', sum(c['n'] for c in cc.values()) == len(cells),
@@ -327,7 +340,8 @@ check('(9a) すべての種類の腕が走る（無操作・静的・ランダ�
 if 'Onull+vrand' in outs:
     got_ids = [t_['direction_id'] for t_ in outs['Onull+vrand']['trials']]
     want_ids = ['rand:%d' % steer_B.direction_of(t_['trial_index'], n_cell) for t_ in outs['Onull+vrand']['trials']]
-    check('(9b) ランダム方向の腕は試行ごとに登録順の等分で方向を持つ', got_ids == want_ids and len(set(got_ids)) > 1,
+    check('(9b) ランダム方向の腕は試行ごとに交互（番号を方向の数で割った余り・裁定 D140）で方向を持つ',
+          got_ids == want_ids and got_ids == ['rand:%d' % (t_['trial_index'] % T['random_control']['count']) for t_ in outs['Onull+vrand']['trials']],
           '記録 %s／登録の割り当て %s' % (got_ids, want_ids))
     V_, D_ = RUN.row_vectors(RUN.arm_plan('Onull+vrand'), loaded, ratio, list(range(n_cell)), n_cell, 'main')
     R_ = steer_B.random_directions(loaded[('static', ratio)], 'main', ratio)
@@ -392,6 +406,25 @@ finally:
 _man = np.stack([_o.hidden_states[k_ + 1][0, len(ids):, :].float().mean(0).numpy() for k_ in LIDX])
 d_man = float(np.abs(_man - m1[0].astype(np.float32)).max())
 check('(9h) 副位置の活性は、手で組んだ計算と一致する', d_man < 1e-2, '最大差 %.3g' % d_man)
+
+# (10) **層の割合と層の添字が食い違えば、走行器が走らせる前に止まる**（採否表 P393）
+try:
+    RUN.run_cell(model, tok, scenario=sc4, arm='Onull+v', layer_ratio=ratio, coef=1.0, n=2, cell_seed_value=1, tag=tag,
+                 run_key='e2e__badlayer', dirs=loaded, layer_idx=(li + 1) % n_layers, gen=gen, batch=bt, resp_layer_idxs=LIDX)
+    check('(10) 層の割合と添字の食い違いで止まる（採否表 P393）', False, '止まらなかった')
+except SystemExit as e:
+    check('(10) 層の割合と添字の食い違いで止まる（採否表 P393）', '層の割合' in str(e), str(e)[:80])
+# (11) **決定性 (ii) はバッチの組成を変えた比較**（採否表 P396）: 一本流しと、走行器と同じ組成（同じプロンプトを runner.batch 行）の主位置の活性
+_H1, _H3 = {}, {}
+for _arm in ('O', 'Osec'):
+    _s, _i = RUN.scenario_and_instruction(T['extraction_scenarios'][0])
+    _ids = steer_B.apply_chat(tok, RUN.user_message(AT[_arm], _s['text'], _i))
+    for _r in ratios:
+        _H1[(_arm, _r)] = direction_B.main_position_activation(model, _ids, idxs[_r])
+        _H3[(_arm, _r)] = direction_B.main_position_activation_batch(model, _ids, idxs[_r])
+_ok11, _rows11 = direction_B.determinism_cross_order(_H1, _H3)
+check('(11) 決定性 (ii): 一本流しと走行器と同じバッチの組成の主位置の活性が許容差の内側（採否表 P396）', _ok11,
+      'バッチ %d 行・%d 組・最小のコサイン %s' % (T['runner']['batch'], len(_rows11), min((r_['cos'] for r_ in _rows11 if r_.get('cos') is not None), default=None)))
 
 shutil.rmtree(tmp, ignore_errors=True)
 

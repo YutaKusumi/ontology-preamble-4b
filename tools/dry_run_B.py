@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""dry_run_B.py v4 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+"""dry_run_B.py v5 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+v5（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: S4 の札を結果だけの名にし（経路の名は正本の札から作る）、門で保留・封印の照合の三つを足した（裁定 D134・D135）。td の特異性の三つの札（裁定 D133）・様式門に当たった非有意（採否表 P401）・選定後の品質床の相手の重複（採否表 P403）・副位置の読みの参照の行（裁定 D139）・報告の管理図の要約と、門の記録の食い違いで報告の器が止まること（採否表 P410・P403）を足した。
 
 器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表の経路を、合成データ（`synth_B.py`）で作り、
 `gate_B.py`（門1 と選定）と `analyze_B.py`（本走行の集計と札）を走らせて、**どの経路が発火したか**を数える。
@@ -15,7 +16,7 @@ import runs_B
 
 T = runs_B.load_T()
 
-VERSION = 'v4'
+VERSION = 'v5'
 REPO = runs_B.REPO
 PY = sys.executable
 ap = argparse.ArgumentParser()
@@ -32,18 +33,22 @@ if os.path.exists(out_md) and not a.force:
 PATHS = ['確証', '確証（登録された向きと逆）', '封印した符号と一致', '判定不能（検閲）', '判定不能（採点欠落）', '判定不能（測れなかった）',
          '判定保留（書式外転位）', '判定保留（refuse 転位・差）', '判定保留（refuse 転位）', '判定保留（様式転位）', '注（様式）',
          '判定不能（品質床）', '非有意', '門1 を閉じる', '記録の不在（incomplete）', '全候補が非正', '同点の割り方',
-         '床・天井で選定から外す', 'S4: 下がった（外れ）', 'S4: 上がった（当たり）', 'S4: 下がらなかった（当たり）', 'S4: 当否を言わない', 'S4: 余地の条項',
+         '床・天井で選定から外す'] + ['S4: %s' % l_ for l_ in T['descriptive_families']['B_desc_S4']['three_way']['labels']] + ['S4: 余地の条項', 'S4: 門で保留',
+         'S4 の照合: 当たり', 'S4 の照合: 外れ', 'S4 の照合: 言えない',
          '希釈が効く場面（書式外が分子を食う）', '採点の規約（書式外と refuse に判定を付けない）', '門が開いていないと集計器が止まる', '束縛の食い違いで集計器が止まる',
          '中断と再開', '同一性選別の走行', '未測定（ループ・打ち切り）', '封印の欠けで止まる',
          # v4（2026-09-19・直しの監査で、判定の規則が器に入っていなかった件と、経路の表に無かった件を足した）
-         '等質性の注（ランダム方向の不均一）', '等質性の内側', 'td の特異性: 書かない', 'td の特異性: 書ける',
+         '等質性の注（ランダム方向の不均一）', '等質性の内側', 'td の特異性: 書かない', 'td の特異性: 書ける', 'td の特異性: td のほうが動いた',
          'refuse 門: 読めた分母だけで保留', '品質床の api_error の門（選定の段）', '品質床の api_error の門（選定後）',
          '様式・言及の欄が空（採点欠落）', '管理図: 帯の外かつ有意', '管理図: 帯の外だが有意でない', '管理図: 帯の内側', '管理図の注が対比に付く',
-         '副位置の読み（層ごとの分離）', 'S4 の区間は Newcombe', '報告の組み立て（全区画・走査器）']
+         '副位置の読み（層ごとの分離）', 'S4 の区間は Newcombe', '報告の組み立て（全区画・走査器）',
+         # v5（2026-09-19・最後の系統外の巡の後）
+         '様式門に当たった非有意（札は非有意のまま）', '集計: 選定後の相手の重複', '副位置の読み: 参照の行',
+         '報告: 管理図の要約', '報告: 門の記録の食い違いで止まる']
 _s4_labels = T['descriptive_families']['B_desc_S4']['three_way']['labels']
 _s4_paths = [p for p in PATHS if p.startswith('S4: ')]
-assert len(_s4_paths) == len(_s4_labels) + 1, (
-    '経路の表の S4 の枝が正本の札と合わない（余地の条項の一つを足した数になるはず）', _s4_paths, _s4_labels)
+assert _s4_paths == ['S4: %s' % l_ for l_ in _s4_labels] + ['S4: 余地の条項', 'S4: 門で保留'], (
+    '経路の表の S4 の枝が正本の札と合わない（札の四つ・余地の条項・門で保留の六つになるはず）', _s4_paths, _s4_labels)
 fired = {k: [] for k in PATHS}
 rows = []
 
@@ -54,7 +59,7 @@ def run(cmd):
 
 
 for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', 'scoring_gap', 's4_branches', 's4_up', 's4_floor', 'dilution_causal', 'incomplete',
-             'refuse_readable', 'api_error_gate', 'style_gap', 'chart', 's4_undecided', 's4_floor_rule'):
+             'refuse_readable', 'api_error_gate', 'style_gap', 'chart', 's4_undecided', 's4_floor_rule', 's4_gate', 'post_partner_dup'):
     root = os.path.join('results', '_synth', case)
     rc, out = run(['tools/synth_B.py', '--case', case, '--out-root', root])
     assert rc == 0, out
@@ -119,10 +124,14 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
         for h in A.get('homogeneity') or []:
             fired['等質性の注（ランダム方向の不均一）' if h.get('note') else '等質性の内側'].append(case) if h.get('note') is not None else None
         for t_ in A.get('td_specificity') or []:
-            if t_.get('write_specificity') is True:
-                fired['td の特異性: 書ける'].append(case)
-            elif t_.get('write_specificity') is False:
-                fired['td の特異性: 書かない'].append(case)
+            _tl = 'td の特異性: %s' % t_.get('label')           # 札は `rules_B.td_specificity_family` の三つ（裁定 D133）
+            if _tl in fired:
+                fired[_tl].append(case)
+        if any(q.get('missing') and '相手の重複' in str(q.get('note', '')) for q in (A.get('quality_post') or [])):
+            fired['集計: 選定後の相手の重複'].append(case)
+        for r in A['confirm']:
+            if r.get('label') == '非有意' and '判定保留（様式転位）' in (r.get('fired') or []):
+                fired['様式門に当たった非有意（札は非有意のまま）'].append(case)
         for r in A['confirm']:
             rg = r.get('refuse_gate') or {}
             if rg.get('hold') and not any('答えた' in x for x in rg.get('reasons', [])) and any('読めた' in x for x in rg.get('reasons', [])):
@@ -142,6 +151,10 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             aucs = [r_.get('auc') for r_ in LY['rows']]
             if all(x is not None for x in aucs) and aucs == sorted(aucs) and aucs[-1] > aucs[0]:
                 fired['副位置の読み（層ごとの分離）'].append(case)
+            # **参照の行**（裁定 D139）: 軸がそろい、層ごとに行があること
+            _ax = {r_['axis'] for r_ in (LY.get('reference_rows') or [])}
+            if _ax >= {'rand0', 'rand1', 'rand2', 'td', 'Nk'} and len(LY.get('reference_rows') or []) == len(_ax) * len(LY['rows']):
+                fired['副位置の読み: 参照の行'].append(case)
             # **報告の組み立ての通し**（2026-09-19）: 整合検査 → 抽出検査（対応表は公開の置き場の外）→ 報告の組み立て（走査器つき）
             import tempfile as _tf
             rc_i, out_i = run(['tools/integrity_B.py', '--tag', T['tags']['main'], '--root', root, '--allow-dry',
@@ -150,17 +163,31 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             rc_s, out_s = run(['tools/sample_inspection_B.py', '--tag', T['tags']['main'], '--root', root, '--allow-dry', '--keydir', _keys,
                                '--out', os.path.join(root, 'sampling-B-sample.txt'), '--force'])
             assert rc_s == 0, ('抽出検査が落ちた', out_s[-400:])
-            rc_r, out_r = run(['tools/build_report_B.py', '--analysis', os.path.join(root, 'analysis-B.json'), '--gate', os.path.join(root, 'gate-B.json'),
-                               '--integrity', os.path.join(root, 'integrity-B.json'), '--sampling', os.path.join(root, 'sampling-B-seal.json'),
-                               '--layers', os.path.join(root, 'layers-B.json'), '--allow-dry', '--force-problems',
-                               '--out', os.path.join(root, 'report-B.md'), '--force', '--lint'])
-            shutil.rmtree(_keys, ignore_errors=True)
+            _rep_cmd = ['tools/build_report_B.py', '--analysis', os.path.join(root, 'analysis-B.json'), '--gate', os.path.join(root, 'gate-B.json'),
+                        '--integrity', os.path.join(root, 'integrity-B.json'), '--sampling', os.path.join(root, 'sampling-B-seal.json'),
+                        '--layers', os.path.join(root, 'layers-B.json'), '--chart', os.path.join(root, 'chart-B.json'), '--allow-dry', '--force-problems',
+                        '--out', os.path.join(root, 'report-B.md'), '--force', '--lint']
+            rc_r, out_r = run(_rep_cmd)
             _rep = os.path.join(REPO, root, 'report-B.md')
             _txt = open(_rep, encoding='utf-8').read() if os.path.exists(_rep) else ''
             if rc_r == 0 and _txt and '〔結果' not in _txt and '{{' not in _txt:
                 fired['報告の組み立て（全区画・走査器）'].append(case)
             else:
                 rec['report_error'] = (out_r or '')[-600:]
+            # **管理図の要約**（採否表 P410）: 報告の本文に要約の行と、全点の表が出ること
+            _CHJ = json.load(open(os.path.join(REPO, root, 'chart-B.json'), encoding='utf-8'))
+            if rc_r == 0 and ('管理図の要約: 全点 %d・' % len(_CHJ.get('points') or [])) in _txt:
+                fired['報告: 管理図の要約'].append(case)
+            # **門の記録の食い違いで止まる**（採否表 P403）: 集計が読んだ門とは別の門の記録を渡す
+            _g2 = os.path.join(REPO, root, 'gate-B-other.json')
+            _GJ = json.load(open(os.path.join(REPO, root, 'gate-B.json'), encoding='utf-8'))
+            json.dump(dict(_GJ, note_dryrun='別の門の記録（検査用）'), open(_g2, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+            _cmd2 = [x if x != os.path.join(root, 'gate-B.json') else os.path.join(root, 'gate-B-other.json') for x in _rep_cmd]
+            _cmd2[_cmd2.index('--out') + 1] = os.path.join(root, 'report-B-other.md')
+            rc_g2, out_g2 = run(_cmd2)
+            if rc_g2 != 0 and '門の記録' in out_g2 and not os.path.exists(os.path.join(REPO, root, 'report-B-other.md')):
+                fired['報告: 門の記録の食い違いで止まる'].append(case)
+            shutil.rmtree(_keys, ignore_errors=True)
         for r in A['confirm']:
             lab = r.get('label')
             if lab in fired:
@@ -169,11 +196,16 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             if any('注（様式' in n for n in (r.get('notes') or [])):
                 fired['注（様式）'].append(case)
         v4 = A['s4'].get('verdict') or ''
-        for nm, key in (('S4: 下がった（外れ）', '下がった'), ('S4: 上がった（当たり）', '上がった'),
-                        ('S4: 下がらなかった（当たり）', '下がらなかった'),
-                        ('S4: 当否を言わない', '当否を言わない'), ('S4: 余地の条項', '余地の条項')):
-            if key in v4:
-                fired[nm].append('%s（%s）' % (case, v4))
+        # **札は結果だけ**（裁定 D135）: 経路の名は正本の札から作る。門に当たった回は門で保留（裁定 D134）
+        if A['s4'].get('gates'):
+            fired['S4: 門で保留'].append('%s（%s）' % (case, v4))
+        elif ('S4: %s' % v4) in fired:
+            fired['S4: %s' % v4].append(case)
+        elif '余地の条項' in v4:
+            fired['S4: 余地の条項'].append('%s（%s）' % (case, v4))
+        _sm = A['s4'].get('seal_match')
+        if ('S4 の照合: %s' % _sm) in fired:
+            fired['S4 の照合: %s' % _sm].append('%s（封印 %s・札 %s）' % (case, A['s4'].get('seal_value'), v4))
         if (A['sign_agreement'].get('agree') or 0) > 0:
             fired['封印した符号と一致'].append(case)
         rec['s4'] = A['s4'].get('verdict')

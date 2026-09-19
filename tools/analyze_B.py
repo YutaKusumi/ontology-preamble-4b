@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""analyze_B.py v5 —— 段階 B の本走行の集計と札（確証の族・門・記述の族・印字）。
+"""analyze_B.py v6 —— 段階 B の本走行の集計と札（確証の族・門・記述の族・印字）。
+v6（2026-09-19・最後の系統外の巡の後・**独立の目を通っていない**）: td の特異性を族ごとの規則で決める（`rules_B.td_specificity_family`・裁定 D133）／S4 の三分岐の前に門を当て（`rules_B.s4_gates`・D134）、札は結果だけにし、封印との照合を別に出す（`rules_B.s4_seal_match`・D135）・相対の大きさと観測した相手の率での動作特性を記録に入れる（D136）／様式門に当たった非有意は非有意のまま（`rules_B.style_hold_label`・採否表 P401）／検査用の口 `--no-gate` を廃し、門の記録の SHA を記録に入れる・選定後の品質床の相手の重複の番人（採否表 P403）。
 
 正本 `design/contrasts-B.json` に従う。**札は一つだけ**付け、ほかに当たった門は注に出す（`gate_order`）。
 門の順は**正本 `gate_order.order` を読む**（`rules_B.gate_order`・前は手書きの並びを持っていた・裁定 D130）。
@@ -22,11 +23,10 @@ from scipy.stats import fisher_exact, binom
 import runs_B
 import rules_B
 
-VERSION = 'v5'
+VERSION = 'v6'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
-ap.add_argument('--gate', default=None, help='tools/gate_B.py の json（選定の記録）')
-ap.add_argument('--no-gate', action='store_true', help='検査用の口（選定の記録を読まない）')
+ap.add_argument('--gate', required=True, help='tools/gate_B.py の json（選定の記録・必須——検査用の口 --no-gate は廃した・採否表 P403）')
 ap.add_argument('--seal', default=None, help='封印の記録（予想符号）')
 ap.add_argument('--root', default=None)
 ap.add_argument('--contrasts', default=None)
@@ -43,10 +43,10 @@ T = runs_B.load_T(a.contrasts)
 CEN, DG, RG, SG, QF, GO = T['censor'], T['dilution_gate'], T['refuse_gate'], T['style_gate'], T['quality_floor'], T['gate_order']
 PS, SC = T['print_strings'], T['scenarios']
 rate, pt = runs_B.rate, runs_B.pt
-if not (a.gate or a.no_gate):
-    sys.exit('--gate（tools/gate_B.py の出力）が要る（--no-gate は検査用）')
-G = runs_B.read_json(a.gate) if a.gate else None
-if G and G.get('kind') != 'gate_B':
+# **門の記録は必須**（採否表 P403・2026-09-19）。前は検査用の口 `--no-gate` が門の判定（裁定 D109）と束縛（裁定 D105）を一度に外せた
+G = runs_B.read_json(a.gate)
+GATE_SHA16 = runs_B.sha16_file(a.gate)          # 報告の組み立て器が、渡された門の記録と照らす（採否表 P403）
+if G.get('kind') != 'gate_B':
     sys.exit('門の記録の種類が違う: %s' % a.gate)
 SEAL = runs_B.read_json(a.seal) if a.seal else None
 SIGN_MAP = T['seal_format']['sign_map']          # 正本の語彙 → 集計器の記号（裁定 D121）
@@ -66,7 +66,7 @@ if SEAL is not None:
         sys.exit('封印の記録が確証の全対比を持っていない（裁定 D79・seal_format.scope）: 欠け %d 件。検査用は --allow-partial-seal' % len(SEAL_MISSING))
 
 # ---- 門の判定（裁定 D109・採否表 P318）: open でなければ既定で止まる ----
-if G is not None and G.get('verdict') != 'open' and not a.allow_not_open:
+if G.get('verdict') != 'open' and not a.allow_not_open:
     sys.exit('門1 の判定が open でない（%s）。集計しない（正本 gate_order.gate_stop・裁定 D109）。検査用は --allow-not-open'
              % G.get('verdict'))
 
@@ -78,7 +78,7 @@ CQ, idx_q = runs_B.counts_quality(T, root=a.root, allow_dry=a.allow_dry)
 DRY = sorted({m for recs in list(idx.values()) + list(idx_q.values()) for r in recs for m in r['dry_marks']})
 
 # ---- 選定した層 × 係数との束縛（裁定 D105・採否表 P304） ----
-PICK = (G or {}).get('selection', {}).get('pick') or {}
+PICK = G.get('selection', {}).get('pick') or {}
 BIND = []
 if PICK.get('layer') is not None:
     for recs in list(idx.values()) + list(idx_q.values()):
@@ -158,6 +158,16 @@ for arm in INTERV:                                  # **介入の腕の一覧か
     if noop is None:
         QF_MISSING.append(arm)
         QF_ROWS.append({'arm': arm, 'missing': True, 'note': '同じセッションの無操作の相手が無い（裁定 D92）'})
+        QF_FAIL.add(arm)
+        continue
+    # **相手の重複の番人**（正本 sessions.partner_duplicate_rule・採否表 P403・2026-09-19）。同じ番号の走行が二本あると
+    # 読み口が合算し、分母が倍になる。門の器には選定の段の番人があったが、選定後の段の相手はこの器が合算したまま読んでいた
+    _n_runs = len(idx_q.get(('post', base, None, None, session)) or [])
+    if _n_runs > 1 or noop.get('n', 0) > QF['items']:
+        QF_MISSING.append(arm)
+        QF_ROWS.append({'arm': arm, 'missing': True, 'partner_runs': _n_runs, 'partner_n': noop.get('n', 0),
+                        'note': '選定後の無操作の相手の重複（走行 %d 本・試行 %d 件・登録 %d 件）——合算しない（正本 sessions.partner_duplicate_rule）'
+                                % (_n_runs, noop.get('n', 0), QF['items'])})
         QF_FAIL.add(arm)
         continue
     if rules_B.api_error_gate(cell, noop, T):          # **api_error の率の差が門を超えたら判定しない**（裁定 D127・合格に数えない）
@@ -312,8 +322,12 @@ for famkey, F in T['families'].items():
         passed = r['holm_pass']
     for r in rows:
         if r.get('style_hold') and not _hard(r):
-            # 順位から外したので Holm の判定を持たない。**札は様式転位**（非有意に落とさない・裁定 D125）。
-            r['label'] = '判定保留（様式転位）'
+            # 順位から外したので Holm の判定を持たない（裁定 D125）。**名目の p が 0.05 以上なら非有意のまま**、
+            # 0.05 未満だけを様式転位の保留にする（`rules_B.style_hold_label`・正本 style_gate.label_rule_P401・採否表 P401）。
+            # 前は p に関わらず保留にし、非有意が保留に化けていた（起草者に有利な向き）。当たった事実は fired に残る（裁定 D94）
+            r['label'] = rules_B.style_hold_label(r.get('p'))
+            if r['label'] == '非有意':
+                r['notes'].append('様式門に当たったが名目の p が 0.05 以上なので非有意（様式門は確証の札にのみ作用する・style_gate.asymmetry）')
         else:
             if r.get('label') == '確証' and not r.get('holm_pass'):
                 r['label'] = '非有意'
@@ -370,32 +384,64 @@ for famkey, F in T['descriptive_families'].items():
         homog_note(rows[-1])
     DESC[famkey] = rows
 
-# ---- td の特異性（正本 B_desc_textdiff.specificity_rule・裁定 D123・`rules_B.td_specificity`） ----
+# ---- td の特異性（正本 B_desc_textdiff.specificity_rule・**裁定 D133**・`rules_B.td_specificity_family`） ----
+# 族（減算・加算）ごとに、場面ごとの（v の腕 対 td の腕）を一度に判定する。その場面の確証の対比（v 対 ランダム）の札と差を添える。
+# v5 までは裁定 D123 の数の基準（水準 1 − alpha_upper の区間だけ・向きも確証の成否も見ない）で、td のほうが動いた組でも「書ける」と出た。
+_CONF = {r['id']: r for r in FAMROWS}
+_TD_FAM = {'B_sub': ('sub', '-vtd'), 'B_add': ('add', '+vtd')}
 TD_SPEC = []
-for r in DESC.get('B_desc_textdiff', []):
-    if r.get('missing') or not r['B'].endswith('vtd') or r['A'].endswith('vtd'):      # v の腕 対 td の腕の対比だけ
-        continue
-    ts = rules_B.td_specificity(r['k_A'], r['n_A'], r['k_B'], r['n_B'], T)
-    TD_SPEC.append(dict(id=r['id'], scenario=r['scenario'], v_arm=r['A'], td_arm=r['B'], **ts))
+for _fk, (_pre, _td_sfx) in _TD_FAM.items():
+    _items = []
+    for r in DESC.get('B_desc_textdiff', []):
+        if r.get('missing') or not r['B'].endswith(_td_sfx) or r['A'].endswith('vtd') or r['A'].endswith('vrand'):
+            continue
+        _cid = '%s:%s:%s~%s' % (_pre, r['scenario'], r['A'], r['B'].replace('vtd', 'vrand'))    # その場面の確証の対比（v 対 ランダム）
+        _c = _CONF.get(_cid) or {}
+        _items.append(dict(id=r['id'], family=_fk, scenario=r['scenario'], v_arm=r['A'], td_arm=r['B'],
+                           k_v=r['k_A'], n_v=r['n_A'], k_td=r['k_B'], n_td=r['n_B'],
+                           conf_id=_cid, conf_label=_c.get('label'), conf_diff_pt=_c.get('diff_pt')))
+    if _items:
+        TD_SPEC += rules_B.td_specificity_family(_items, T)
 
 
-# ---- S4 の反証（三分岐・裁定 D81・判定の規則は裁定 D118・`rules_B.s4_verdict`） ----
+# ---- S4 の反証（**門 → 三分岐**・裁定 D81・D118・D134・札は結果だけ〔D135〕・封印との照合は別〔D135〕・効き目の読み〔D136〕） ----
 S4 = T['descriptive_families']['B_desc_S4']
 s4c = S4['contrasts'][0]
 s4A, s4B = cell(s4c['scenario'], s4c['A']), cell(s4c['scenario'], s4c['B'])
-s4 = {'id': s4c['id']}
-if s4A and s4B and s4A['n_ok'] and s4B['n_ok']:
-    # **判定は rules_B.s4_verdict**（同等性の規則・Newcombe・検出力を使わない・裁定 D118）。v4 までは検出力の規則と Wald の区間だった
-    v4_ = rules_B.s4_verdict(s4A['cat'], s4A['n_ok'], s4B['cat'], s4B['n_ok'], T)
-    s4.update({'diff_pt': round(v4_['diff_pt'], 3), 'ci': [round(x, 3) for x in v4_['ci']], 'rate_A': v4_['rate_A'], 'partner_rate': v4_['partner_rate'],
-               'upper_one_sided_pt': round(v4_['upper_one_sided_pt'], 3), 'effect_pt': v4_['effect_pt'], 'verdict': v4_['verdict'],
-               'interval': v4_['interval'], 'sealed_prediction': (SEAL or {}).get('s4') or S4['sealed_prediction'],
-               'k_A': s4A['cat'], 'n_A': s4A['n_ok'], 'k_B': s4B['cat'], 'n_B': s4B['n_ok']})
+S4_SEAL = (SEAL or {}).get('s4')
+s4 = {'id': s4c['id'], 'gates': [], 'outcome': None, 'seal_value': S4_SEAL,
+      'sealed_prediction': S4_SEAL or S4['sealed_prediction']}
+if s4A and s4B:
+    # **門を先に当てる**（`rules_B.s4_gates`・裁定 D134）。前は S4 に門が一つも無く、書式外が片腕だけ増えると反証の結果が分母で逆になった
+    s4['gates'] = rules_B.s4_gates(s4A, s4B, T, qf_fail=(s4c['A'] in QF_FAIL or s4c['B'] in QF_FAIL))
+    s4.update({'k_A': s4A['cat'], 'n_A': s4A['n_ok'], 'k_B': s4B['cat'], 'n_B': s4B['n_ok'],
+               'ff_pt_A': pt(rate(s4A['ff'], s4A['n_ok'])), 'ff_pt_B': pt(rate(s4B['ff'], s4B['n_ok'])),
+               'refuse_pt_A': pt(rate(s4A['refuse'], s4A['n_ok'])), 'refuse_pt_B': pt(rate(s4B['refuse'], s4B['n_ok']))})
+    if s4A['n_ok'] and s4B['n_ok']:
+        # **三分岐は rules_B.s4_verdict**（同等性の規則・Newcombe・検出力を使わない・裁定 D118）
+        v4_ = rules_B.s4_verdict(s4A['cat'], s4A['n_ok'], s4B['cat'], s4B['n_ok'], T)
+        s4.update({'diff_pt': round(v4_['diff_pt'], 3), 'ci': [round(x, 3) for x in v4_['ci']], 'rate_A': v4_['rate_A'], 'partner_rate': v4_['partner_rate'],
+                   'upper_one_sided_pt': round(v4_['upper_one_sided_pt'], 3), 'effect_pt': v4_['effect_pt'], 'interval': v4_['interval']})
+        # **相対の大きさと、観測した相手の率での動作特性**（裁定 D136）——判定には使わない。n は二腕の使えた試行の少ない方
+        _rb, _n4 = v4_['partner_rate'], int(min(s4A['n_ok'], s4B['n_ok']))
+        _reg = S4['base_4B2507'] / S4['base_n'] if S4.get('base_n') else None
+        s4['relative_size'] = {'to_observed_partner': (None if not _rb else round(v4_['effect_pt'] / (100.0 * _rb), 3)),
+                               'to_registered_base': (None if not _reg else round(v4_['effect_pt'] / (100.0 * _reg), 3))}
+        s4['oc_at_observed_partner'] = {'partner_rate': round(_rb, 4), 'n_per_arm': _n4,
+                                        'at_zero': {k: round(v, 4) for k, v in rules_B.s4_oc(_rb, _n4, 0, T).items()},
+                                        'at_effect': {k: round(v, 4) for k, v in rules_B.s4_oc(_rb, _n4, v4_['effect_pt'], T).items()}}
+        if not s4['gates']:
+            s4['outcome'] = v4_['verdict']
+    s4['verdict'] = s4['gates'][0] if s4['gates'] else (s4['outcome'] or '判定不能（測れなかった）')
+    if len(s4['gates']) > 1:
+        s4.setdefault('notes', []).append('当たった門: ' + '・'.join(s4['gates']))
     _h4 = HOMOG.get((s4c['scenario'], s4c['B']))
     if _h4 and _h4.get('note'):
-        s4['notes'] = ['注（ランダム方向の不均一・三本の率の差 %.1f pt）' % _h4['spread_pt']]
+        s4.setdefault('notes', []).append('注（ランダム方向の不均一・三本の率の差 %.1f pt）' % _h4['spread_pt'])
 else:
     s4['verdict'] = '表に載らない（記録が無い）'
+# **封印との照合は札と別に**（`rules_B.s4_seal_match`・正本 seal_match.table・裁定 D135）
+s4['seal_match'] = rules_B.s4_seal_match(s4['verdict'], S4_SEAL, T)
 
 # ---- 様式門の層別の副次（札を変えない） ----
 STRAT = []
@@ -434,8 +480,8 @@ first = PS['first_finding'].format(confirmed=counts['確証'], undecidable=count
                                    ff=counts['判定保留（書式外転位）'], refuse=counts['判定保留（refuse 転位）'] + counts['判定保留（refuse 転位・差）'],
                                    style=counts['判定保留（様式転位）'], ns=counts['非有意'])
 REC = {'kind': 'analyze_B', 'version': VERSION, 'generated_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
-       'contrasts_sha16': runs_B.sha16_file(a.contrasts or runs_B.CPATH), 'gate': (G or {}).get('verdict'),
-       'selection': (G or {}).get('selection', {}).get('pick'), 'counts': counts, 'confirm': FAMROWS, 'descriptive': DESC,
+       'contrasts_sha16': runs_B.sha16_file(a.contrasts or runs_B.CPATH), 'gate': G.get('verdict'), 'gate_sha16': GATE_SHA16,
+       'selection': G.get('selection', {}).get('pick'), 'counts': counts, 'confirm': FAMROWS, 'descriptive': DESC,
        's4': s4, 'td_specificity': TD_SPEC, 'homogeneity': [dict(scenario=k_[0], arm=k_[1], **v_) for k_, v_ in sorted(HOMOG.items())],
        'interval': T['interval']['method'], 'stratified': STRAT, 'mention': MENTION, 'by_direction': [dict(scenario=k_[0], arm=k_[1], direction_id=k_[2], **c_) for k_, c_ in sorted(BYDIR.items(), key=str)], 'chart_anomalies': CHART_BAD, 'binding': BIND,
        'sessions_checked': len(_sess), 'direction_ids': sorted(str(x) for x in POOL_IDS if x is not None), 'quality_post': QF_ROWS, 'orphan_arms': orphans, 'missing_cells': missing,
@@ -494,18 +540,23 @@ L += ['| %s | %s | %s | %d/%d | %s | %d |'
 if CHART_BAD:
     L += ['', '## 管理図の異常（正本 calibration.consequence・裁定 D110）', ''] +          ['- %s' % json.dumps(x, ensure_ascii=False) for x in CHART_BAD]
 L += ['',
-      '## S4 の反証（三分岐・裁定 D81・D95・判定の規則は裁定 D118）', '', '- 判定: **%s**' % s4.get('verdict')]
+      '## S4 の反証（門 → 三分岐・裁定 D81・D95・D118・D134〜D136）', '',
+      '- 札: **%s**（門 %s）' % (s4.get('verdict'), '・'.join(s4.get('gates') or []) or 'なし'),
+      '- 封印の値 %s・照合 **%s**（札とは別に出す・正本 `B_desc_S4.seal_match`・裁定 D135）' % (s4.get('seal_value'), s4.get('seal_match'))]
 if 'partner_rate' in s4:
-    L.append('- pt 差（(6b) − ランダム方向） %s・両側 95%% 区間 %s・（ランダム方向 − (6b)）の片側 95%% 上限 %s pt（効き目 %d pt 未満なら「下がらなかった」）・相手の腕の率 %.4f・区間は %s'
-             % (s4['diff_pt'], s4['ci'], s4['upper_one_sided_pt'], s4['effect_pt'], s4['partner_rate'], s4['interval']))
-    L += ['- %s' % x for x in s4.get('notes', [])]
-L += ['', '## td の特異性（場面ごと・正本 B_desc_textdiff.specificity_rule・裁定 D123）', '',
-      '- 区間の水準は `1 − alpha_upper`（確証の各族の水準より緩い——**特異性を書ける側に倒れやすい**・登録どおり）。区間は Newcombe。', '',
-      '| 対比 | 場面 | pt 差（v − td） | 区間 | 特異性 | 向き |', '|---|---|---|---|---|---|']
+    L.append('- pt 差（(6b) − ランダム方向） %s・両側 95%% 区間 %s・（ランダム方向 − (6b)）の片側 95%% 上限 %s pt（効き目 %s pt 未満なら「%s」）・相手の腕の率 %.4f・区間は %s'
+             % (s4['diff_pt'], s4['ci'], s4['upper_one_sided_pt'], s4['effect_pt'], T['descriptive_families']['B_desc_S4']['three_way']['labels'][2], s4['partner_rate'], s4['interval']))
+    L.append('- 効き目の相対の大きさ（裁定 D136）: 観測した相手の率に対して %s・登録の基底に対して %s。観測した相手の率での動作特性（真に零・真に効き目ちょうど）: %s／%s'
+             % (s4['relative_size']['to_observed_partner'], s4['relative_size']['to_registered_base'],
+                s4['oc_at_observed_partner']['at_zero'], s4['oc_at_observed_partner']['at_effect']))
+L += ['- %s' % x for x in s4.get('notes', [])]
+L += ['', '## td の特異性（族ごと・正本 B_desc_textdiff.specificity_rule・裁定 D133）', '',
+      '- 両側 Fisher・族の中で場面をまたいで Holm・区間は両側 95% の Newcombe。「書ける」は確証が立った場面で (v − td) が (v − ランダム) と同じ向きに零を外したときだけ。**「書かない」は「O に特有でない」を意味しない。**', '',
+      '| 対比 | 族 | 場面 | pt 差（v − td） | 区間 | p | Holm | 確証の対比の札 | 特異性 |', '|---|---|---|---|---|---|---|---|---|']
 for t_ in TD_SPEC:
-    L.append('| %s | %s | %s | %s | %s | %s |' % (t_['id'], t_['scenario'], None if t_.get('diff_pt') is None else round(t_['diff_pt'], 3),
-                                            None if not t_.get('ci') else [round(x, 3) for x in t_['ci']],
-                                            {True: '書ける', False: '**書かない**（区間が零を含む）', None: '測れない'}[t_['write_specificity']], t_.get('direction') or '—'))
+    L.append('| %s | %s | %s | %s | %s | %s | %s | %s | %s |' % (t_['id'], t_['family'], t_['scenario'], None if t_.get('diff_pt') is None else round(t_['diff_pt'], 3),
+                                                         None if not t_.get('ci') else [round(x, 3) for x in t_['ci']], fmt_p(t_.get('p')),
+                                                         t_.get('holm_alpha') and round(t_['holm_alpha'], 5), t_.get('conf_label'), t_.get('label')))
 if not TD_SPEC:
     L.append('- 表に載らない（v 対 td の記録が無い）')
 L += ['', '## ランダム方向の等質性（正本 random_control.homogeneity_rule・裁定 D127）', '',

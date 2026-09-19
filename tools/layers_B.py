@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""layers_B.py v1 —— 段階 B の**副位置の読み**（層ごとの分離・層別射影差・記述・裁定 D132・2026-09-19）。
+"""layers_B.py v2 —— 段階 B の**副位置の読み**（層ごとの分離・層別射影差・記述・裁定 D132・2026-09-19）。
+v2（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: **参照の行**を並べる（裁定 D139）——同じ保存値を、同じ層のランダム方向の三本（`main` の方向）・td・Nk の単位方向にも射影し、(6b) の行と同じ量を出す。読み条項「分離は機序の証拠ではない」（正本 `B_desc_layer.reading_D139`）。方向の要約統計（`directions.json`）があれば、合わせる前の ‖td‖/‖v̂‖ などを報告に渡す（裁定 D133）。
 
 正本 `descriptive_families.B_desc_layer.definition_D132` に従う（**データを見る前に登録した読み方**）:
   反証の場面（`B_desc_layer.scenario`）の無操作の二腕（`B_desc_layer.arms`＝O-Ncold と Osec-Ncold）の試行について、候補の各層で、
@@ -20,7 +21,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 
 
@@ -78,12 +79,40 @@ def load_resp(rec, trial_rows):
     return arrs, missing
 
 
+def reference_axes(T, dirs):
+    """射影の軸（層ごと）: 主の (6b) と、**参照の行**（裁定 D139）——ランダム方向の三本（本走行の `main` の方向・`steer_B.random_directions`）・td・Nk。"""
+    import steer_B
+    L = T['descriptive_families']['B_desc_layer']
+    ratios = [float(r) for r in T['selection']['candidates']['layers']]
+    axes = {'(6b)': {r: dirs[(L['direction'], r)] for r in ratios}}
+    for r in ratios:
+        for i, v in enumerate(steer_B.random_directions(dirs[('static', r)], 'main', r)):
+            axes.setdefault('rand%d' % i, {})[r] = v
+    for name in ('td', 'Nk'):
+        if all((name, r) in dirs for r in ratios):
+            axes[name] = {r: dirs[(name, r)] for r in ratios}
+    return axes
+
+
+def project_rows(acts_A, acts_B, axes, ratios):
+    """試行ごとの副位置の活性（［候補の層の数, 隠れ次元］）を、層ごとに各軸の単位方向へ射影し、二腕の分離（記述）を出す。"""
+    rows = []
+    for name, per in axes.items():
+        for li, ratio in enumerate(ratios):
+            u = np.asarray(per[ratio], dtype=float)
+            u = u / float(np.linalg.norm(u))
+            pa = [float(np.dot(a[li], u)) for a in acts_A]
+            pb = [float(np.dot(b[li], u)) for b in acts_B]
+            rows.append(dict(layer=ratio, axis=name, **separation(pa, pb)))
+    return rows
+
+
 def analyse(T, dirs, root=None, allow_dry=False):
     L = T['descriptive_families']['B_desc_layer']
     sc, (armA, armB), dname = L['scenario'], L['arms'], L['direction']
     ratios = list(T['selection']['candidates']['layers'])
     idx = runs_B.index_runs(T, T['tags']['main'], root, allow_dry=allow_dry)
-    proj = {armA: {r: [] for r in ratios}, armB: {r: [] for r in ratios}}
+    acts = {armA: [], armB: []}
     counts = {armA: {'ok': 0, 'no_resp': 0}, armB: {'ok': 0, 'no_resp': 0}}
     for key, recs in idx.items():
         for rec in recs:
@@ -100,15 +129,38 @@ def analyse(T, dirs, root=None, allow_dry=False):
                 if a.shape[0] != len(ratios):
                     raise SystemExit('副位置の活性の層の数（%d）が候補の層の数（%d）と違う: %s' % (a.shape[0], len(ratios), r['trial_id']))
                 counts[r['arm']]['ok'] += 1
-                for li, ratio in enumerate(ratios):
-                    u = dirs[(dname, float(ratio))]
-                    u = u / float(np.linalg.norm(u))
-                    proj[r['arm']][ratio].append(float(np.dot(a[li], u)))
-    rows_out = []
-    for ratio in ratios:
-        s = separation(proj[armA][ratio], proj[armB][ratio])
-        rows_out.append(dict(layer=ratio, **s))
-    return {'scenario': sc, 'arm_A': armA, 'arm_B': armB, 'direction': dname, 'rows': rows_out, 'counts': counts}
+                acts[r['arm']].append(a)
+    fr = [float(x) for x in ratios]
+    allrows = project_rows(acts[armA], acts[armB], reference_axes(T, dirs), fr)
+    rows_out = [dict((k, v) for k, v in x.items() if k != 'axis') for x in allrows if x['axis'] == '(6b)']
+    ref = [x for x in allrows if x['axis'] != '(6b)']
+    return {'scenario': sc, 'arm_A': armA, 'arm_B': armB, 'direction': dname, 'rows': rows_out, 'reference_rows': ref,
+            'reference_axes': sorted({x['axis'] for x in ref}), 'reading_D139': L.get('reading_D139'), 'counts': counts}
+
+
+def reference_rows_selftest():
+    """**参照の行**（裁定 D139）を合成の活性と方向で作って返す（直しの監査と自己検査が呼ぶ）。
+    合成は (6b) の方向にだけ二腕の差を入れてある——(6b) の行が分かれ、参照の行が並ぶことを確かめる。"""
+    T = runs_B.load_T()
+    rng = np.random.default_rng(29)
+    H = 24
+    ratios = [float(r) for r in T['selection']['candidates']['layers']]
+    dirs = {}
+    for r in ratios:
+        st = rng.normal(size=H)
+        for name in ('static', 'loaded', 'Nk', 'td'):
+            v = st if name == 'static' else rng.normal(size=H)
+            dirs[(name, r)] = v * (np.linalg.norm(st) / np.linalg.norm(v))
+    u6 = {r: dirs[('loaded', r)] / np.linalg.norm(dirs[('loaded', r)]) for r in ratios}
+    acts_A = [np.stack([rng.normal(size=H) + 1.5 * u6[r] for r in ratios]) for _ in range(60)]
+    acts_B = [np.stack([rng.normal(size=H) for r in ratios]) for _ in range(60)]
+    rows = project_rows(acts_A, acts_B, reference_axes(T, dirs), ratios)
+    main = [x for x in rows if x['axis'] == '(6b)']
+    assert all(x['auc'] is not None and x['auc'] > 0.8 for x in main), ('合成で (6b) の行が分かれない', [x['auc'] for x in main])
+    ref = [x for x in rows if x['axis'] != '(6b)']
+    assert {x['axis'] for x in ref} == {'rand0', 'rand1', 'rand2', 'td', 'Nk'}, ('参照の行の軸が足りない', sorted({x['axis'] for x in ref}))
+    assert len(ref) == 5 * len(ratios), '参照の行の数が軸 × 層でない'
+    return ref
 
 
 def _selftest():
@@ -125,7 +177,9 @@ def _selftest():
     # **別の実装**（scipy の Mann–Whitney）と照らす
     u = mannwhitneyu(a[:300], b[:300], alternative='two-sided').statistic
     assert abs(auc(a[:300], b[:300]) - u / (300 * 300)) < 1e-12, 'AUC が scipy の U と違う'
-    print('[layers_B selftest] AUC（既知の値・同点・scipy の U と一致）・標準化した差: すべて通った')
+    ref = reference_rows_selftest()
+    print('[layers_B selftest] AUC（既知の値・同点・scipy の U と一致）・標準化した差・参照の行（裁定 D139・軸 %s × 層 %d）: すべて通った'
+          % ('・'.join(sorted({x['axis'] for x in ref})), len({x['layer'] for x in ref})))
 
 
 if __name__ == '__main__':
@@ -147,6 +201,10 @@ if __name__ == '__main__':
     z = np.load(a.directions)
     dirs = {(k.split('__')[0], float(k.split('__')[1])): z[k] for k in z.files}
     R = analyse(T, dirs, a.root, a.allow_dry)
+    # **合わせる前の比**（‖td‖/‖v̂‖ など・方向の要約統計・裁定 D133 で報告に並べる）——抽出器の directions.json があれば渡す
+    _dj = os.path.splitext(a.directions)[0] + '.json'
+    _st = (json.load(open(_dj, encoding='utf-8')).get('stats') or {}) if os.path.exists(_dj) else {}
+    R['raw_norm_ratio'] = {str(k): (v or {}).get('raw_norm_ratio') for k, v in _st.items()} or None
     now = datetime.datetime.now(datetime.timezone.utc)
     jst = now.astimezone(datetime.timezone(datetime.timedelta(hours=9)))
     out_md = a.out or os.path.join(REPO, 'records', 'B', 'layers-B-%s.md' % jst.strftime('%Y-%m-%d'))
@@ -171,6 +229,12 @@ if __name__ == '__main__':
     for r in R['rows']:
         L.append('| %s | %s／%s | %s | %s | %s | %s | %s |' % (r['layer'], r['n_A'], r['n_B'], f(r.get('mean_A')), f(r.get('mean_B')),
                                                           f(r['mean_diff']), f(r['smd']), f(r['auc'])))
+    L += ['', '## 参照の行（裁定 D139・同じ保存値を別の軸に射影した）', '',
+          '- ' + (R.get('reading_D139') or ''), '',
+          '| 軸 | 層 | 平均の差 | 標準化した差 | AUC |', '|---|---|---|---|---|']
+    for r in R['reference_rows']:
+        L.append('| %s | %s | %s | %s | %s |' % (r['axis'], r['layer'], f(r['mean_diff']), f(r['smd']), f(r['auc'])))
+    L += ['', '- 合わせる前の比（方向の要約統計・裁定 D133）: %s' % (json.dumps(R.get('raw_norm_ratio'), ensure_ascii=False) if R.get('raw_norm_ratio') else '記録が無い（directions.json が無い）')]
     L += ['', '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。', '']
     open(out_md, 'w', encoding='utf-8', newline='\n').write('\n'.join(L))
     print('[layers_B] %s / %s' % (out_md, out_json))

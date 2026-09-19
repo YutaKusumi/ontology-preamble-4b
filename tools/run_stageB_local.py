@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""run_stageB_local.py v5 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+"""run_stageB_local.py v6 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: `run_cell` の頭で**層の割合と層の添字の対応**を確かめて止まる（`layer_binding_ok`・採否表 P393）／帯の起点を `steer_B.main_position` から出す（P404）／試行の記録に**バッチの実際の行数** `batch_rows`（P406）／セルの**加えた量** `added_norm` を返す（P394）／`generate` に渡す鍵を正本 `generation_explicit.passed_keys` に限る（裁定 D142 の条を足したため）／自己検査の締めの行が、飛ばした検査を「通った」に数えない（P397）。
 
 段階 A の走行器（`run_preamble_local.py` v2.7・vLLM の OpenAI 互換サーバ）は凍結物なので触らない。
 B は hook を掛けるため transformers を直に使うが、**プロンプトの組み立てと採点の経路は凍結物に合わせる**:
@@ -29,7 +30,7 @@ import numpy as np
 import runs_B
 import steer_B
 
-VERSION = 'v5'
+VERSION = 'v6'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FROZEN_RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
@@ -245,6 +246,14 @@ def _selftest():
     fields = T['trial_record_fields']['fields']
     rec = trial_record(**{f: None for f in fields})
     assert len(rec) == len(fields)
+    assert 'batch_rows' in fields, '試行の記録にバッチの行数の欄が無い（採否表 P406）'
+    # **層の割合と添字の対応**（採否表 P393）: 器を通さずに書いた期待値の表と照らし、一つずれた添字を止めることを確かめる
+    for (ratio_, n_, idx_) in ((0.5, 36, 17), (0.25, 36, 8), (0.75, 34, 25)):
+        assert layer_binding_ok(ratio_, idx_, n_) is True, ('正しい添字を拒んだ', ratio_, n_, idx_)
+        assert layer_binding_ok(ratio_, idx_ + 1, n_) is False and layer_binding_ok(ratio_, idx_ - 1, n_) is False, ('一つずれた添字を通した', ratio_, n_, idx_)
+    # 生成に渡す鍵は正本の一覧だけ（説明の欄を渡さない）
+    _ge = T['runner']['generation_explicit']
+    assert _ge.get('passed_keys') and all(isinstance(_ge[k], (int, float)) for k in _ge['passed_keys']), '生成に渡す鍵の一覧が無いか、数でない鍵がある'
     # **様式・言及・refuse の分類・ループは段階 A の凍結した関数で決まる**（正本 response_mode・v5）
     TF, RM = frozen_text_funcs(), response_mode_A()
     sent = ('', texts['O']['text'], sc['text'], inst)
@@ -268,6 +277,7 @@ def _selftest():
             raise SystemExit('torch が無いので hook の検査を飛ばした——実機の段では失敗に倒す（OP4B_REQUIRE_FULL_SELFTEST=1・裁定 D122）')
         print('[run_stageB_local selftest] hook の検査は**飛ばした**（torch が無い）')
         torch = None
+    hook_done = False
     if torch is not None:
         starts = [2, 0]
         h_pre = torch.zeros((2, 5, 3))
@@ -282,9 +292,13 @@ def _selftest():
         make_hook(V, 1.0, -1, [3, 3])(None, None, h2)
         assert float(h2[0, 3, 0]) == -1 and float(h2[1, 3, 1]) == -1 and float(h2[0, 3, 1]) == 0, '行ごとの方向が行に届いていない'
         assert make_hook(V, 1.0, -1, [3, 3], meta={'arm': 'x'}).op4b['arm'] == 'x', 'hook が中身を持っていない'
+        hook_done = True
+    # **締めの行は、走らせた検査だけを「通った」に数える**（採否表 P397・v6）。前は torch が無くて hook の検査を飛ばしても
+    # 「hook の帯と復号の段と行ごとの方向: すべて通った」と印字していた
     print('[run_stageB_local selftest] 組み立て（凍結走行器 SHA16 %s・振る舞いの照合つき）・腕の素材・腕の名から方向・指示・凍結パーサ（%s）・'
-          '試行の記録の欄 %d・様式と言及と refuse の分類とループ（段階 A の凍結した関数）・hook の帯と復号の段と行ごとの方向: すべて通った'
-          % (sha, sco['parser_sha16'], len(fields)))
+          '試行の記録の欄 %d・層の割合と添字の対応・様式と言及と refuse の分類とループ（段階 A の凍結した関数）%s'
+          % (sha, sco['parser_sha16'], len(fields),
+             '・hook の帯と復号の段と行ごとの方向: すべて通った' if hook_done else ': 通った。**hook の帯と復号の段と行ごとの方向の検査は飛ばした**（torch が無い）'))
 
 
 # ---- 本体（裁定 D117・2026-09-18・v5 で 2026-09-19 に直した） ----
@@ -310,6 +324,13 @@ def load_directions(npz_path, json_path=None):
                          % '・'.join(bad))
     meta = json.load(open(json_path, encoding='utf-8')) if json_path and os.path.exists(json_path) else {}
     return dirs, meta
+
+
+def layer_binding_ok(layer_ratio, layer_idx, n_layers):
+    """**層の割合と層の添字が正本の規則どおりに対応しているか**（正本 `selection.candidates.layer_index_rule`・採否表 P393）。
+    `direction_B.layer_index`（抽出器と同じ関数）で割合から添字を作り直し、渡された添字と照らす。"""
+    import direction_B
+    return int(layer_idx) == direction_B.layer_index(float(layer_ratio), int(n_layers))
 
 
 def register_hook(model, layer_idx, hook):
@@ -423,7 +444,7 @@ def capture_resp_mean(model, prompt_ids, resp_list, layer_idxs, hook_args=None, 
         pos = (am.cumsum(-1) - 1).clamp(min=0)
         handle = None
         if hook_args is not None:
-            starts = [pads[r] + P - 1 for r in range(len(seqs))]
+            starts = [steer_B.main_position(prompt_ids, pads[r]) for r in range(len(seqs))]      # **起点の式は一つ**（採否表 P404）
             handle = register_hook(model, hook_args['layer_idx'],
                                    make_hook(hook_args['vecs'][idxs], hook_args['coef'], hook_args['sign'], starts, meta={'capture': True}))
         try:
@@ -444,7 +465,8 @@ def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value
              dirs=None, layer_idx=None, gen=None, batch=None, start=0, store_resp=None, resp_layer_idxs=None):
     """一つのセル（場面 × 腕 × 層 × 係数）を走らせて、**試行の記録・生テキスト・副位置の活性**を返す（v5）。
 
-    返り値: {'trials': [...], 'raws': [...], 'resp': {trial_id: 配列}}。
+    返り値: {'trials': [...], 'raws': [...], 'resp': {trial_id: 配列}, 'added_norm': 加えた量のノルム（無操作は None）}。
+    **頭で層の割合と添字の対応を確かめる**（`layer_binding_ok`・採否表 P393）。
     **一つのバッチは一つの場面 × 一つの腕**（正本 `selection.batch_composition`・裁定 D124）なので、バッチ内の入力は同一で詰めは起きない。
     帯の起点は**主位置（列の最後）**。ランダム方向の腕は行ごとに違う方向を掛ける（`random_control.per_row`）。
     store_resp（既定: 調整走行と本走行）なら副位置の活性を取る。resp_layer_idxs は候補の各層の添字（正本の登録順）。
@@ -454,9 +476,13 @@ def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value
     batch = batch or T_['runner']['batch']
     gen = dict(gen or steer_B.main_generation())
     # **この機関が受け取る鍵だけを渡す**（裁定 D127・端から端までの検査で捕まえた）。
-    _na = set((T_['runner'].get('generation_explicit') or {}).get('not_applicable') or [])
-    gen.update({k: v for k, v in (T_['runner'].get('generation_explicit') or {}).items()
-                if k not in ('note', 'not_applicable', 'why') and k not in _na})
+    # **渡すのは正本 `generation_explicit.passed_keys` の鍵だけ**（説明の欄〔top_k の決め方など・裁定 D142〕を渡さない・v6）
+    _ge = T_['runner'].get('generation_explicit') or {}
+    _na = set(_ge.get('not_applicable') or [])
+    _keys = _ge.get('passed_keys')
+    if not _keys:
+        raise SystemExit('正本 runner.generation_explicit.passed_keys が無い（generate に渡す鍵の一覧・v6）')
+    gen.update({k: _ge[k] for k in _keys if k not in _na})
     max_new = int(gen['max_new_tokens'])
     if store_resp is None:
         store_resp = tag in (T_['tags']['tune'], T_['tags']['main'])
@@ -469,6 +495,18 @@ def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value
     plan = arm_plan(arm)
     if plan is not None and (dirs is None or layer_idx is None):
         raise SystemExit('介入の腕 %s には方向と層の添字が要る' % arm)
+    # **層の割合と層の添字の対応を、走らせる前に確かめる**（採否表 P393）。介入の層と副位置の層の添字が、割合と総層数から
+    # 作り直した値と違えば止まる。前は添字をそのまま受け取り、割合と食い違っていても誰も気づかなかった
+    # （記録の `layer` は割合なので、違う層に掛けても記録は正しく見える）
+    import direction_B
+    _nl = len(direction_B.decoder_layers(model))
+    if layer_idx is not None and layer_ratio is not None and not layer_binding_ok(layer_ratio, layer_idx, _nl):
+        raise SystemExit('層の割合 %s と層の添字 %s が対応しない（総層数 %d なら添字 %d・正本 layer_index_rule・採否表 P393）'
+                         % (layer_ratio, layer_idx, _nl, direction_B.layer_index(float(layer_ratio), _nl)))
+    if store_resp and resp_layer_idxs and list(resp_layer_idxs) != [direction_B.layer_index(float(r_), _nl) for r_ in T_['selection']['candidates']['layers']]:
+        raise SystemExit('副位置を取る層の添字 %s が、候補の層の割合から作り直した添字と違う（採否表 P393）' % list(resp_layer_idxs))
+    # **加えた量**（係数 × ‖v̂〔static〕‖・その層・採否表 P394）——全方向を ‖v̂‖ に合わせてあるので、ランダム方向の行も同じ量
+    added_norm = None if plan is None else float(coef) * float(np.linalg.norm(dirs[('static', layer_ratio)]))
     sco, TF, RM = scoring(), frozen_text_funcs(), response_mode_A()
     sent = ('', at, scen['text'], inst)
     eos = _eos_ids(model, tok)
@@ -485,7 +523,7 @@ def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value
         V, dir_ids = row_vectors(plan, dirs, layer_ratio, tidx, n, phase_for_random)
         inp = torch.tensor([ids] * k, device=model.device)
         am = torch.ones_like(inp)
-        starts = [inp.shape[1] - 1] * k                 # **主位置**（裁定 D124・詰めは起きない）
+        starts = [steer_B.main_position(ids)] * k       # **主位置**（裁定 D124・詰めは起きない・起点の式は一つ——採否表 P404）
         steer_B.assert_batch_uniform([at] * k, [scenario] * k)
         expected = None if plan is None else {'arm': arm, 'kind': plan['kind'], 'coef': float(coef), 'batch_index': bi}
 
@@ -518,7 +556,7 @@ def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value
         need = [j for j, o in enumerate(parsed1) if o is None]
         if need:
             V2 = None if V is None else V[need]
-            g2 = _gen(len(need), runs_B.retry_seed(cell_seed_value, bi), V2, [P - 1] * len(need))
+            g2 = _gen(len(need), runs_B.retry_seed(cell_seed_value, bi), V2, [steer_B.main_position(ids)] * len(need))
             for m_, j in enumerate(need):
                 r2, f2 = _response(g2[m_, P:], eos, max_new)
                 t2 = tok.decode(r2, skip_special_tokens=True)
@@ -547,11 +585,11 @@ def run_cell(model, tok, *, scenario, arm, layer_ratio, coef, n, cell_seed_value
                 seed=runs_B.recorded_seed(T_, cell_seed_value, i), run_key=run_key, runner_sha=RUNNER_SHA16, arms_spec=arm,
                 preamble_sha=AT[base_arm_of(arm)]['sha16'], model=model_name, sampling=gen,
                 layer=layer_ratio, coef=coef, direction_id=dir_ids[j],
-                batch_pos=j, proc_uuid=PROC, dry_run=False))
+                batch_pos=j, batch_rows=k, proc_uuid=PROC, dry_run=False))     # **バッチの実際の行数**（採否表 P406）
             raws.append({'trial_id': tid, 'text': raw_all[j], 'final': final_text[j], 'finish': finish[j],
                          'mode': s_['mode'], 'loop_period': s_['loop_period'], 'retry': j in need})
         done += k
-    return {'trials': trials, 'raws': raws, 'resp': resp}
+    return {'trials': trials, 'raws': raws, 'resp': resp, 'added_norm': added_norm}
 
 
 def manifest_env(model, tok):

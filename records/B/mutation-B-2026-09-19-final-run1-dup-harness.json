@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
  "version": "v4",
- "generated_utc": "2026-09-19T05:17:09Z",
+ "generated_utc": "2026-09-19T04:57:44Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -436,10 +436,10 @@
    "pipeline": true,
    "what": "選定後の品質床の無操作の相手が二本あっても合算して読む（分母が倍になる）",
    "kind": "analyze",
-   "changed": true,
+   "changed": false,
    "broken": "dup_post_partner",
-   "base": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.016667], 'confirm': 3, 'reverse': 1, 'style_hold': 1, 'agree'",
-   "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
+   "base": "(1, None)",
+   "mutated": "(1, None)"
   },
   {
    "name": "様式の欄の空を採点欠落に数えない",
@@ -455,6 +455,6 @@
    "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667], 'confirm': 4, 'reverse': 1, 'style"
   }
  ],
- "missed": 0,
+ "missed": 1,
  "total": 33
 }

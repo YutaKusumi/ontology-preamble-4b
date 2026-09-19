@@ -3,7 +3,7 @@
 - 起草: 南無弥勒如来（コーディネータ・Claude Opus 5）／登録者: 楠見優太
 - 状態: **雛形**。結果の欄はすべて置き字（亀甲括弧で囲んだ「結果」の欄）で、集計の器（`tools/analyze_B.py`）と副位置の読みの器（`tools/layers_B.py`）の出力から、組み立て器（`tools/build_report_B.py`）が機械の区画として埋める。**数は手で打たない**（正本 `report_rules.typed_numbers`）。
 - 位置づけ: 記録先行公開（正本 `publication.record_first`）の一部。凍結本文・正本・腕と方向の定義・封印予想は、データ生成の前に公開する。
-- 設計: 凍結した草案（草案12B を土台に、最後の系統外の巡の裁定を反映した版）。正本 `design/contrasts-B.json`（版 {{version}}）。本文と正本が食い違う場合は正本が勝つ。
+- 設計: 凍結した草案（草案13B——最後の系統外の巡の裁定 D133〜D143 を反映した版——を土台にした凍結本文）。正本 `design/contrasts-B.json`（版 {{version}}）。本文と正本が食い違う場合は正本が勝つ。
 
 ## 0. 要約（結果が出てから埋める・一段落）
 
@@ -23,6 +23,10 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 
 整合検査（`tools/integrity_B.py`・判定欄を読まない）と抽出検査（`tools/sample_inspection_B.py`・腕と場面を伏せた標本・対応表は公開の置き場の外・封印つき）の結果を、率を見る前に置く。環境・セッション・中断と再開・バッチの凍結は正本 `sessions`・`runner` のとおり。
 
+**管理図の要約**（無操作の腕の率をセッションの順に並べた全点と三つの判定・正本 `report_rules.control_chart`・裁定 D110）: 〔結果 K〕
+
+{{calibration/judgement}}
+
 ## 3. 門1 と選定
 
 〔結果 C〕
@@ -41,11 +45,18 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 
 〔結果 F〕
 
-**td の特異性とランダム方向の等質性**（裁定 D123・D127）: 〔結果 I〕
+**td の特異性とランダム方向の等質性**（裁定 D133・D127）: 〔結果 I〕
+
+{{reading_D128/td_specificity_D133}}
+
+- td の特異性の帰無の動作特性: {{measured/td_specificity_null/summary}}
+- 等質性の注の帰無の率: {{random_control/homogeneity_null_rate/summary}}
 
 {{descriptive_families/B_desc_textdiff/null_note_D123}}
 
-**副位置の読み（層ごとの分離・裁定 D132）**: 〔結果 J〕
+**副位置の読み（層ごとの分離・裁定 D132・参照の行は裁定 D139）**: 〔結果 J〕
+
+{{descriptive_families/B_desc_layer/reading_D139}}
 
 {{descriptive_families/B_desc_direction/static_separation_D132}}
 
@@ -54,6 +65,10 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 〔結果 G〕
 
 {{descriptive_families/B_desc_S4/adjudication}}
+
+{{descriptive_families/B_desc_S4/seal_match/note}}
+
+{{reading_D128/s4_effect_D136}}
 
 {{reading_D128/falsification_scope}}
 
@@ -87,11 +102,16 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 - 選定は加算の土台・抽出場面で行い、ほかの族と場面には外挿である。
 - **見落としの割合**: {{reading_D128/power_in_lead}}
 - 区間: {{interval/note}}
-- td の特異性の数の基準の水準は確証の各族の水準より緩く、**特異性を書ける側に倒れやすい**（正本 `B_desc_textdiff.specificity_rule`）。
+- td の特異性は族ごとに Holm を当てた両側の検定で決める（裁定 D133・正本 `B_desc_textdiff.specificity_rule`）。**「書かない」は「O に特有でない」を意味しない。**
+- S4 の効き目は {{descriptive_families/B_desc_S4/three_way/effect_pt}} pt の絶対値で、それより小さい低下は排除しない（裁定 D136）。三分岐の前の門に当たれば、反証の場は判定できない（裁定 D134）。
+- {{quality_floor/input_limitation}}
+- {{activation_storage/h_norm_limitation}}
+- {{runner/generation_explicit/top_k_limitation}}
 - {{random_control/homogeneity_rule}}
 - 判定器の妥当性は段階 A の測定を持ち越した。**介入のある腕は、A で判定器を測った腕に含まれない。**
 - 品質床の課題は公開の課題で、学習に含まれる可能性がある。得点の絶対値ではなく腕間の差だけを読む。
 - 族は相手の腕を共有するので独立でない。上界は和で置いた。
+- {{report_rules/post_final_round}}
 
 ## 9. 利益相反と情報状態
 
