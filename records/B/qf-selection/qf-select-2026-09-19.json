@@ -1,0 +1,214 @@
+{
+ "tool": "tools/qf_select_B.py v1",
+ "rule": "裁定 D145（正本 quality_floor.decision_order）",
+ "session": 1,
+ "session_record_sha16": "2CCC9E7E68223302",
+ "dry": false,
+ "problems": [],
+ "cells": {
+  "jcqa": {
+   "N": {
+    "n": 200,
+    "n_ok": 200,
+    "api_error": 0,
+    "correct": 183,
+    "format_fail": 1,
+    "truncated": 34,
+    "correct_but_format_fail": 0
+   },
+   "O-Ncold": {
+    "n": 200,
+    "n_ok": 200,
+    "api_error": 0,
+    "correct": 174,
+    "format_fail": 0,
+    "truncated": 0,
+    "correct_but_format_fail": 0
+   },
+   "Onull": {
+    "n": 200,
+    "n_ok": 200,
+    "api_error": 0,
+    "correct": 183,
+    "format_fail": 0,
+    "truncated": 0,
+    "correct_but_format_fail": 0
+   }
+  },
+  "jmmlu_stem": {
+   "N": {
+    "n": 200,
+    "n_ok": 200,
+    "api_error": 0,
+    "correct": 86,
+    "format_fail": 73,
+    "truncated": 159,
+    "correct_but_format_fail": 0
+   },
+   "O-Ncold": {
+    "n": 200,
+    "n_ok": 200,
+    "api_error": 0,
+    "correct": 104,
+    "format_fail": 24,
+    "truncated": 30,
+    "correct_but_format_fail": 0
+   },
+   "Onull": {
+    "n": 200,
+    "n_ok": 200,
+    "api_error": 0,
+    "correct": 107,
+    "format_fail": 22,
+    "truncated": 24,
+    "correct_but_format_fail": 0
+   }
+  }
+ },
+ "runs": [
+  {
+   "run_key": "qfcandB__jcqa__N__s1",
+   "task": "jcqa",
+   "arm": "N",
+   "input_form": "without_preamble",
+   "dir": "qfcandB/qfcandB__jcqa__N__s1"
+  },
+  {
+   "run_key": "qfcandB__jcqa__O-Ncold__s1",
+   "task": "jcqa",
+   "arm": "O-Ncold",
+   "input_form": "with_preamble",
+   "dir": "qfcandB/qfcandB__jcqa__O-Ncold__s1"
+  },
+  {
+   "run_key": "qfcandB__jcqa__Onull__s1",
+   "task": "jcqa",
+   "arm": "Onull",
+   "input_form": "with_preamble",
+   "dir": "qfcandB/qfcandB__jcqa__Onull__s1"
+  },
+  {
+   "run_key": "qfcandB__jmmlu_stem__N__s1",
+   "task": "jmmlu_stem",
+   "arm": "N",
+   "input_form": "without_preamble",
+   "dir": "qfcandB/qfcandB__jmmlu_stem__N__s1"
+  },
+  {
+   "run_key": "qfcandB__jmmlu_stem__O-Ncold__s1",
+   "task": "jmmlu_stem",
+   "arm": "O-Ncold",
+   "input_form": "with_preamble",
+   "dir": "qfcandB/qfcandB__jmmlu_stem__O-Ncold__s1"
+  },
+  {
+   "run_key": "qfcandB__jmmlu_stem__Onull__s1",
+   "task": "jmmlu_stem",
+   "arm": "Onull",
+   "input_form": "with_preamble",
+   "dir": "qfcandB/qfcandB__jmmlu_stem__Onull__s1"
+  }
+ ],
+ "decision": {
+  "bases": [
+   "O-Ncold",
+   "Onull"
+  ],
+  "base_min": 0.85,
+  "base_min_floor": 0.7,
+  "ff_threshold_pt": 10,
+  "rows": {
+   "jcqa": {
+    "min_acc": 0.87,
+    "max_ff_pt": 0.0,
+    "acc_N": 0.915,
+    "ff_N_pt": 0.5
+   },
+   "jmmlu_stem": {
+    "min_acc": 0.52,
+    "max_ff_pt": 12.0,
+    "acc_N": 0.43,
+    "ff_N_pt": 36.5
+   }
+  },
+  "branch": "(i)",
+  "input_form": "with_preamble",
+  "eligible": [
+   "jcqa"
+  ],
+  "chosen": null,
+  "reason": "前置きありで両方の土台が base_min 以上かつ書式外の率が閾値以下の候補がある。登録者がこの中から選ぶ（裁定 D66・推す順は task_tiebreak）"
+ },
+ "topk": {
+  "rule": "裁定 D142・段階 A と同じ版と起動の引数で vLLM を立て、起動の記録から既定の標本化の値を読む",
+  "reader_selftest": "ok",
+  "stageA_logs": [
+   {
+    "lines": [
+     "(APIServer pid=8320) WARNING 09-17 01:31:07 [model.py:1759] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.7, 'top_k': 20, 'top_p': 0.8}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`."
+    ],
+    "top_k_values": [
+     20
+    ],
+    "top_k": 20,
+    "file": "vllm-bridge-4B-2507-s1.log",
+    "sha16": "F7545CE008125A9B"
+   },
+   {
+    "lines": [
+     "(APIServer pid=2171) WARNING 09-14 09:41:17 [model.py:1759] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.7, 'top_k': 20, 'top_p': 0.8}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`."
+    ],
+    "top_k_values": [
+     20
+    ],
+    "top_k": 20,
+    "file": "vllm-identity-4B-2507-s1.log",
+    "sha16": "FA41ABFA807FB0A6"
+   },
+   {
+    "lines": [
+     "(APIServer pid=59824) WARNING 09-16 22:57:39 [model.py:1759] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.7, 'top_k': 20, 'top_p': 0.8}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`."
+    ],
+    "top_k_values": [
+     20
+    ],
+    "top_k": 20,
+    "file": "vllm-main-4B-2507-s1.log",
+    "sha16": "C06C3140396FA212"
+   },
+   {
+    "lines": [
+     "(APIServer pid=25612) WARNING 09-15 23:18:38 [model.py:1759] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.7, 'top_k': 20, 'top_p': 0.8}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`."
+    ],
+    "top_k_values": [
+     20
+    ],
+    "top_k": 20,
+    "file": "vllm-pilot-4B-2507-s1.log",
+    "sha16": "62742B685AA4475D"
+   }
+  ],
+  "vllm_stageA_from": "records/A/integrity-*.json（0.29.0）",
+  "lines": [
+   "(APIServer pid=4631) WARNING 09-19 08:57:47 [model.py:1759] Default vLLM sampling parameters have been overridden by the model's `generation_config.json`: `{'temperature': 0.7, 'top_k': 20, 'top_p': 0.8}`. If this is not intended, please relaunch vLLM instance with `--generation-config vllm`."
+  ],
+  "top_k_values": [
+   20
+  ],
+  "top_k": 20,
+  "server_args": {
+   "dtype": "bfloat16",
+   "max_model_len": 8192,
+   "gpu_memory_utilization": 0.9,
+   "seed": 0,
+   "port": 8000,
+   "served_model_name": "Qwen/Qwen3-4B-Instruct-2507",
+   "vllm": "0.29.0"
+  },
+  "server_up": true,
+  "log": "logs-B/vllm-topk-4B-2507-s1.log",
+  "log_sha16": "C47A564E6ECDB1C6",
+  "status": "read"
+ },
+ "fence": "本記録のいかなる記述も、AI に意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
