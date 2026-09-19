@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""integrity_B.py v3 —— 段階 B の走行の**整合検査**（率盲検・許可表方式）。
+"""integrity_B.py v4 —— 段階 B の走行の**整合検査**（率盲検・許可表方式）。
 
 **判定欄（catastrophe・choice・correct・style_a・style_b・mention）は読まない。** 許可した欄だけを取り出し、manifest と正本の登録に突き合わせる。
 当てる相（採否表 P230・**本走行の後だけでなく、調整走行と品質床にも当てる**）:
@@ -10,6 +10,8 @@
   生成の設定（`runner.generation`／品質床は `quality_floor.generation`）・
   層と係数が候補の格子にあるか・**バッチの大きさの凍結**（`runner.fixed_across_runs`）・**詰めの向き**（`runner.padding`）・
   走行キーとセッション記録の対応（`sessions.missing_rule`）・dry-run の印。
+  **登録の升目の欠け**（相ごとに正本から升目を列挙し、欠けを不整合にする・裁定 D126・採否表 P361・v4）・
+  **dtype・並べ方・transformers の版・refuse の規則の SHA** の走行を跨いだ同一性と正本との一致（採否表 P362・v4）。
 出力: records/B/integrity-<tag>-<日付>.{md,json}（--force が無ければ上書きしない）。不整合があれば非零で終わる。
 用法: python tools/integrity_B.py --tag stageB [--root results/_synth/all --allow-dry] [--force]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -18,7 +20,7 @@ import os, sys, json, argparse, datetime, collections
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v3'
+VERSION = 'v4'
 REPO = runs_B.REPO
 # 許可表は**正本から**作る（裁定 D97・器の中に手書きしない）
 _T0 = runs_B.load_T()
@@ -108,11 +110,12 @@ def check_cell(rec):
             except SystemExit:
                 cs = None
             if cs is not None:
-                bad_seed = [r for r in rs if r.get('seed') != runs_B.trial_seed(cs, r.get('trial_index'))]
+                # 記録の種は**バッチの種**（裁定 D127）。書く側と同じ `recorded_seed` で組み直す。
+                bad_seed = [r for r in rs if r.get('seed') != runs_B.recorded_seed(T, cs, r.get('trial_index'))]
                 if bad_seed:
                     problems.append('%s × %s: seed が正本の式で組み直した値と違う行が %d 件（先頭 trial_index %s・記録 %s・式 %s）'
                                     % (rk, arm, len(bad_seed), bad_seed[0].get('trial_index'), bad_seed[0].get('seed'),
-                                       runs_B.trial_seed(cs, bad_seed[0].get('trial_index'))))
+                                       runs_B.recorded_seed(T, cs, bad_seed[0].get('trial_index'))))
         for r in rs:
             if r.get('sampling') and {k: r['sampling'].get(k) for k in ('temperature', 'top_p')} != {k: gen_exp.get(k) for k in ('temperature', 'top_p')}:
                 problems.append('%s × %s: 生成の設定が登録と違う（%s）' % (rk, arm, r.get('sampling')))
@@ -135,6 +138,11 @@ def check_cell(rec):
         problems.append('%s: バッチ %s が設計定数（%s）と違う' % (rk, m['batch'], T['runner']['batch']))
     if m.get('padding') and m['padding'] not in ('left',):
         problems.append('%s: 詰めの向きが左でない（正本 runner.padding）: %s' % (rk, m['padding']))
+    # **dtype と並べ方は正本の値と照らす**（採否表 P362・v4）
+    if m.get('dtype') is not None and m['dtype'] != T['runner']['dtype']:
+        problems.append('%s: dtype %s が正本 runner.dtype（%s）と違う' % (rk, m['dtype'], T['runner']['dtype']))
+    if m.get('order') is not None and m['order'] != T['runner']['order_id']:
+        problems.append('%s: 並べ方 %s が正本 runner.order_id（%s）と違う' % (rk, m['order'], T['runner']['order_id']))
     # **全相で確かめる**（裁定 D126・2026-09-18）。前は本走行の相にしか掛かっておらず、
     # 調整走行・品質床・同一性選別では記録を丸ごと消しても零件だった（系統外の検分で走らせて捕まった・採否表 P352）。
     if rk not in sessions:
@@ -186,6 +194,30 @@ for key, c in sorted(cells_by_key.items(), key=str):
     if c['n_ok'] == 0:
         problems.append('%s × %s: **n_ok が零**（測れなかったセル・裁定 D96）' % (key[0], key[1]))
 
+# ---- 登録の升目の欠け（裁定 D126・採否表 P361・v4） ----
+# 相ごとに正本から升目を列挙し、記録に無い升目を不整合にする。前は調整走行の欠けを門が見るだけで、整合検査は升目を列挙していなかった。
+# 選定後の品質床の升目は門の選んだ組で決まるので、ここでは列挙しない（集計器が腕ごとに数えて「合格にしない」）。
+_have = set(cells_by_key)
+if PHASE == 'main':
+    _want = {(sc, arm) for sc in T['scenarios'] for arm in T['arms']['by_scenario'][sc]}
+    _have = {(k[0], k[1]) for k in _have}
+elif PHASE == 'tune':
+    _V, _R = T['selection']['tune']['arms']
+    _want = {(sc, l, cf, arm) for sc in T['selection']['tune']['scenarios'] for (l, cf) in CAND for arm in (_V, _R)}
+elif PHASE == 'quality':
+    _ops = {}
+    for _fk in ('B_sub', 'B_add'):
+        _c0 = T['families'][_fk]['contrasts'][0]
+        _ops[_c0['base_arm']] = _c0['A'][len(_c0['base_arm']):]        # 土台の腕と、そこに当てる演算（正本の対比から引く）
+    _want = {('selection', b + _ops[b], l, cf) for b in T['quality_floor']['arms'] for (l, cf) in CAND} |             {('selection', b, None, None) for b in T['quality_floor']['arms']}
+    _have = {(k[0], k[1], k[2], k[3]) for k in _have}
+else:
+    _want = {('transformers', T['identity_screen']['scenario'], arm) for arm in T['identity_screen']['arms_run']}
+_lack = sorted(_want - _have, key=str)
+if _lack:
+    problems.append('**登録の升目が %d 件欠けている**（先頭 %s・正本から列挙・裁定 D126・採否表 P361）'
+                    % (len(_lack), '・'.join(str(x) for x in _lack[:3])))
+
 # ---- 判定欄を読まないことの自己検査（率盲検・裁定 D97） ----
 if set(ALLOW) & set(BLIND):
     problems.append('許可表に判定欄が混ざっている: %s' % '・'.join(sorted(set(ALLOW) & set(BLIND))))
@@ -195,7 +227,8 @@ if set(ALLOW) & set(BLIND):
 # manifest には無いので、この検査は**常に飛んでいた**（系統外の検分で捕まった・採否表 P363）。
 # あわせて、値が空のときも黙って飛ばさず不整合に数える。
 FIX_KEYS = {'重みの rev': 'model_rev', 'tokenizer の版': 'tokenizer_rev', 'バッチの大きさ': 'batch',
-            '詰めの向き': 'padding', '走行器の SHA': 'runner_sha', '環境の SHA': 'pip_freeze_sha16'}
+            '詰めの向き': 'padding', '走行器の SHA': 'runner_sha', '環境の SHA': 'pip_freeze_sha16',
+            'dtype': 'dtype', '並べ方': 'order', 'transformers の版': 'transformers_version', 'refuse の規則の SHA': 'refuse_rules_sha16'}
 seen = {}
 for k, recs in idx.items():
     for rec in recs:

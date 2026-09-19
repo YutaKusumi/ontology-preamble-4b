@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""build_draftB.py v1 —— 段階 B の草案（と報告雛形）を原稿から組み立てる（段階 A の `build_draftA.py` の型・凍結した A の器は触らない）。
+"""build_draftB.py v2 —— 段階 B の草案（と報告雛形）を原稿から組み立てる（段階 A の `build_draftA.py` の型・凍結した A の器は触らない）。
+- **一覧の展開**（v2・2026-09-19）: 原稿の行 `{{list:正本のキー}}` を、正本の一覧の各項目の箇条に展開する（開示の五項目を依頼文と草案が同じ出所から組むため・裁定 D117）。
+- **裁定の台帳の検査**（v2・採否表 P376）: 原稿が引く裁定番号がすべて正本 `decisions` にあることを確かめ、無ければ止める。
+  数の走査器 `numbers_lint.py` は段階 A の凍結した器なので、この検査はそちらに足さず、B の組み立て器に置く。
 - 組み立ての前に `numbers_lint` の束縛検査（原稿の数はキー参照か構造）を走らせ、違反があれば止める。
 - 原稿の {{正本のキー}} を正本 JSON の値で置換する。
 - 草案（--kind draft）: §6 の「- **転記行 X** — 〔転記行 X〕」を設計事実 JSON の逐語で置換し、本文中の〔転記行 X〕を「〔転記行 X・§6〕」に改め、§6-補 に置換の記録を印字する。
@@ -26,6 +29,24 @@ sha = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hex
 rel = lambda p: os.path.relpath(p, REPO).replace('\\', '/')
 J = json.load(open(a.json, encoding='utf-8'))
 s = open(a.src, encoding='utf-8').read().replace('\r\n', '\n')
+
+# ---- 一覧の展開（v2） ----
+def _expand(m):
+    v, e = NL.resolve(J, m.group(1))
+    if e or not isinstance(v, list) or not v:
+        sys.exit('一覧の展開に失敗した（正本に一覧が無いか空）: %s' % m.group(0))
+    return '\n'.join('- %s' % x for x in v)
+
+
+s = re.sub(r'^\{\{list:([^{}]+)\}\}$', _expand, s, flags=re.M)
+
+# ---- 裁定の台帳の検査（v2・採否表 P376） ----
+LED = set((J.get('decisions') or {}).keys())
+_refs = {('D%s%s' % (m.group(1), m.group(2) or ''), 'D%s' % m.group(1))
+         for m in re.finditer(r'(?<![A-Za-z\d])D(\d+)(?:\s*\(([a-z])\))?', s)}
+_bad_led = sorted({full for full, bare in _refs if full not in LED and bare not in LED})
+if _bad_led:
+    sys.exit('原稿が引く裁定番号が正本の台帳（decisions）に無い: %s' % '・'.join(_bad_led))
 
 pre = NL.check_src(J, s)
 if pre:
@@ -77,7 +98,16 @@ assert not re.search(r'〔転記行 [A-Z]〕', t), '置き残しがある'
 assert not re.search(r'\{\{[^{}]*\}\}', t), '束縛の置き残しがある'
 open(a.out, 'w', encoding='utf-8', newline='\n').write(t)
 print('[build_draftB] written %s sha16 %s | 転記行 %s | 束縛したキーの種類 %d' % (rel(a.out), sha(a.out), ''.join(replaced) or '—', len(used)))
-nb, L = NL.report(J, a.json, a.src, [a.out], a.gen)
+# 束縛検査は**一覧を展開した後の原稿**に当てる（展開の印そのものは正本のキー参照ではない・v2）。
+# 展開した原稿は一時の置き場に書き、検査の記録の中の置き場の名は元の原稿の名に戻す。
+import tempfile as _tf
+_d = _tf.mkdtemp(prefix='draftB_')
+_exp = os.path.join(_d, os.path.basename(a.src))
+open(_exp, 'w', encoding='utf-8', newline='\n').write(s)
+nb, L = NL.report(J, a.json, _exp, [a.out], a.gen)
+L = [l.replace(os.path.relpath(_exp).replace('\\', '/'), rel(a.src) + '（一覧を展開した後）') for l in L]
+import shutil as _sh
+_sh.rmtree(_d, ignore_errors=True)
 os.makedirs(os.path.dirname(a.lint_report), exist_ok=True)
 open(a.lint_report, 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
 print('\n'.join(L[:12 + min(60, nb)]))

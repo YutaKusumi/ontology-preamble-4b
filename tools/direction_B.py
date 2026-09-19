@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""direction_B.py v4 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
+"""direction_B.py v5 —— 段階 B の**方向の抽出**（主位置の活性・方向の作成・決定性の検査・要約統計・v̂ の凍結）。
 
 正本 `design/contrasts-B.json` の `selection.position`・`selection.candidates`・`directions`・`activation_storage`・`runner` に従う。
 何をするか:
@@ -20,7 +20,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v4'
+VERSION = 'v5'
+STRICT = os.environ.get('OP4B_REQUIRE_FULL_SELFTEST') == '1'     # 実機の段では飛ばしを失敗に倒す（裁定 D122・採否表 P344）
 REPO = runs_B.REPO
 T = runs_B.load_T()
 PANEL = T['arms']['panel']
@@ -85,11 +86,25 @@ def assert_layer_alignment(model, input_ids, attention_mask, layer_idx, atol=0.0
     return d
 
 
-def write_layer_record(out_dir, n_layers):
-    """総層数と層の添字を**記帳**する（正本 `layer_index_rule` が求める・採否表 P283）。"""
+def h_norm_record(H, dirs):
+    """**‖v̂‖ と主位置の ‖h‖ の比を層ごとに**（正本 `activation_storage.h_norm_record`・裁定 D127・採否表 P356・2026-09-19）。
+
+    ‖h‖ は抽出場面の前置きの腕の主位置の活性のノルムの平均。係数の格子は ‖v̂‖ に対する比なので、
+    ‖v̂‖ が ‖h‖ に比べて小さいと九候補すべてが「何も起きない」域に入りうる——**調整走行の前に登録者に見せる**。"""
+    out = {}
+    for r in LAYER_RATIOS:
+        hn = float(np.mean([np.linalg.norm(H[(arm, sc, r)]) for arm in PANEL for sc in EX if (arm, sc, r) in H]))
+        vn = float(np.linalg.norm(dirs[('static', r)]))
+        out[str(r)] = {'h_norm_main': hn, 'vhat_norm': vn, 'vhat_over_h': (vn / hn) if hn else None}
+    return out
+
+
+def write_layer_record(out_dir, n_layers, h_norm=None):
+    """総層数と層の添字を**記帳**する（正本 `layer_index_rule` が求める・採否表 P283）。‖v̂‖ と ‖h‖ の比も書く（採否表 P356）。"""
     rec = {'num_hidden_layers': n_layers, 'ratios': LAYER_RATIOS,
            'layer_indices': {str(r): layer_index(r, n_layers) for r in LAYER_RATIOS},
-           'hidden_states_indices': {str(r): hidden_states_index(layer_index(r, n_layers)) for r in LAYER_RATIOS}}
+           'hidden_states_indices': {str(r): hidden_states_index(layer_index(r, n_layers)) for r in LAYER_RATIOS},
+           'h_norm': h_norm}
     os.makedirs(out_dir, exist_ok=True)
     json.dump(rec, open(os.path.join(out_dir, 'layers.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     return rec
@@ -224,7 +239,18 @@ def _selftest():
     Hb = {k: vv + rng.normal(size=d) * 1.0 for k, vv in H.items()}
     ok6, rows6 = determinism_cross_order(H, Hb)
     assert not ok6, '大きな差を許容差の内側と判定した'
-    print('[direction_B selftest] 層番号（期待値の表・%d 通り）・hidden_states の添字・ノルム合わせ・安定性・'
+    # ‖v̂‖ と ‖h‖ の比（採否表 P356）——器を通さずに一層だけ数え直して照らす
+    hr = h_norm_record(H, dirs)
+    r0 = LAYER_RATIOS[0]
+    hn0 = sum(float(np.sqrt((H[(a_, s_, r0)] ** 2).sum())) for a_ in PANEL for s_ in EX) / (len(PANEL) * len(EX))
+    assert abs(hr[str(r0)]['h_norm_main'] - hn0) < 1e-9, ('‖h‖ の記帳が数え直しと違う', hr[str(r0)], hn0)
+    assert abs(hr[str(r0)]['vhat_over_h'] - float(np.linalg.norm(dirs[('static', r0)])) / hn0) < 1e-9
+    if STRICT:
+        try:
+            import torch  # noqa: F401  実機の段では torch が要る（層の対応の検査・裁定 D122）
+        except ImportError:
+            raise SystemExit('torch が無い——実機の段では失敗に倒す（OP4B_REQUIRE_FULL_SELFTEST=1・裁定 D122）')
+    print('[direction_B selftest] 層番号（期待値の表・%d 通り）・hidden_states の添字・ノルム合わせ・安定性・‖v̂‖ と ‖h‖ の比・'
           '決定性の二条（同じ並べ方は完全一致／並べ方を変えたら cos %g・相対差 %g）: すべて通った'
           % (len(want), tol['cos_min'], tol['max_abs_over_norm']))
 
@@ -322,12 +348,21 @@ if __name__ == '__main__':
     npz = os.path.join(out_dir, 'directions.npz')
     np.savez(npz, **{'%s__%s' % (name, r): v for (name, r), v in dirs.items()})
     sha = hashlib.sha256(open(npz, 'rb').read()).hexdigest().upper()
-    write_layer_record(out_dir, n_layers)
-    rec = {'kind': 'direction_B', 'version': VERSION, 'model': a.model, 'dtype': a.dtype,
+    # **主位置の活性そのものを保存する**（正本 activation_storage.prompt_final・determinism.material・2026-09-19）。
+    # 前は方向（差を平均したもの）だけを保存しており、正本が「保存する」と書く活性も、決定性の検査の二度分も残らなかった。
+    act = os.path.join(out_dir, 'main_position_activations.npz')
+    np.savez(act, **{'same_order__%s__%s__%s' % (arm, sc, r): v for (arm, sc, r), v in H1.items()},
+             **{'cross_order__%s__%s__%s' % (arm, sc, r): v for (arm, sc, r), v in H3.items()})
+    act_sha = hashlib.sha256(open(act, 'rb').read()).hexdigest().upper()
+    hrec = h_norm_record(H1, dirs)                     # 採否表 P356・調整走行の前に登録者に見せる
+    write_layer_record(out_dir, n_layers, hrec)
+    print('[direction_B] ‖v̂‖／‖h‖（主位置・層ごと）: %s——**調整走行の前に登録者に見せる**（正本 activation_storage.h_norm_record）'
+          % {r_: (None if v_['vhat_over_h'] is None else round(v_['vhat_over_h'], 6)) for r_, v_ in hrec.items()})
+    rec = {'kind': 'direction_B', 'version': VERSION, 'model': a.model, 'dtype': a.dtype, 'h_norm': hrec,
            'num_hidden_layers': n_layers, 'layer_indices': {str(r): idxs[r] for r in LAYER_RATIOS},
            'alignment_max_abs': align, 'determinism_same_order': bool(ok_same),
            'determinism_cross_order': {'ok': bool(ok_cross), 'rows': rows_cross},
-           'stats': {str(r): stats[r] for r in LAYER_RATIOS}, 'npz_sha256': sha,
+           'stats': {str(r): stats[r] for r in LAYER_RATIOS}, 'npz_sha256': sha, 'activations_npz_sha256': act_sha,
            'arms': PANEL_ARMS, 'extraction_scenarios': EXTRACT,
            'contrasts_sha16': runs_B.sha16_file(runs_B.CPATH)}
     json.dump(rec, open(os.path.join(out_dir, 'directions.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

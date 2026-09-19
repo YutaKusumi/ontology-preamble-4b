@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v1 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v2 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
 
 系統の外への検分で、**差し戻しの原因そのものに戻しても両方の自己検査が「すべて通った」と印字する**ことが分かった。
 「検査が通った」を品質の証拠にしないために、**検査そのものを検査する**器を置く。
@@ -12,7 +12,7 @@
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -40,6 +40,41 @@ MUTATIONS = [
      ('int(math.floor(ratio * n_layers + 0.5)) - 1', 'int(math.floor(ratio * n_layers)) - 1'),
      ['direction_B.py'],
      '層の添字が一つずれる誤り'),
+    # ---- 直しの監査（2026-09-19）で器に入れた規則 ----
+    ('S4 の片側上限を狭める', 'D118', 'rules_B.py',
+     ('    one = newcombe(kB, nB, kA, nA, 0.90)', '    one = newcombe(kB, nB, kA, nA, 0.50)'),
+     ['rules_B.py'],
+     '「下がらなかった（封印は当たり）」が出やすくなる誤り（封印が当たりやすい側・起草者の引力と同じ側）'),
+    ('区間を Wald に戻す', 'D130', 'rules_B.py',
+     ('    lo = d - math.sqrt((p1 - l1) ** 2 + (u2 - p2) ** 2)', '    lo = d - _z(conf) * math.sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)'),
+     ['rules_B.py'],
+     '床の近くで被覆が崩れる区間に戻る誤り'),
+    ('等質性の境目を注に数える', 'D127', 'rules_B.py',
+     ("    return {'note': bool(spread > thr),", "    return {'note': bool(spread >= thr),"),
+     ['rules_B.py'],
+     '境目ちょうどに注を付ける誤り（正本は「超えたら」）'),
+    ('同方向の判定を大小の一致に戻す', 'D130', 'rules_B.py',
+     ('    return d1 is not None and d2 is not None and (d1 * d2) > 0', '    return d1 is not None and d2 is not None and (d2 > 0) == (d1 > 0)'),
+     ['rules_B.py'],
+     '差が零のとき、偽どうしで同方向と誤判定する誤り（系統外の検分で捕まった型）'),
+    ('読めた分母から書式外を除かない', 'D127', 'rules_B.py',
+     ("('readable', lambda c: c['n_ok'] - c['refuse'] - c['ff'])", "('readable', lambda c: c['n_ok'] - c['refuse'])"),
+     ['rules_B.py'],
+     '書式外による希釈が refuse 門をすり抜ける誤り'),
+    ('api_error の門を外す', 'D127', 'rules_B.py',
+     ('    return bool(d > thr + 1e-12)', '    return False'),
+     ['rules_B.py'],
+     '差のある欠測を品質床の門で止めない誤り'),
+    ('行ごとの方向を一本にする', 'D117', 'run_stageB_local.py',
+     ('                hs[i, int(st):, :] = hs[i, int(st):, :] + (add[i] if per_row else add)',
+      '                hs[i, int(st):, :] = hs[i, int(st):, :] + (add[0] if per_row else add)'),
+     ['run_stageB_local.py'],
+     'ランダム方向の腕のすべての行に同じ方向が掛かる誤り'),
+    ('様式の欄を空で書く', 'D117', 'run_stageB_local.py',
+     ("            'style_a': bool(mf['a']), 'style_b': bool(mf['b']), 'mention': bool(mf['c1']),",
+      "            'style_a': None, 'style_b': None, 'mention': None,"),
+     ['run_stageB_local.py'],
+     '様式門が実データで黙って効かない誤り（走行器 v4 まで実際にこうだった）'),
 ]
 
 # 合成データを通して確かめる変異（自己検査では見えない・裁定 D122／D125・D126・D121・D119）
@@ -66,6 +101,19 @@ PIPELINE_MUTATIONS = [
      ("if _gap_tune and not a.allow_missing_cells:", "if False:"),
      '調整走行の升目が欠けても判定が open のまま',
      'gate', 'drop_tune_cell'),
+    # ---- 直しの監査（2026-09-19）で集計器と読み口に繋いだ規則 ----
+    ('等質性の注を集計器が付けない', 'D127', 'analyze_B.py',
+     ("HOMOG = {k: rules_B.homogeneity(v, T) for k, v in HOMOG.items()}", "HOMOG = {k: dict(rules_B.homogeneity(v, T), note=False) for k, v in HOMOG.items()}"),
+     'ランダム方向の三本が不均一でも注が付かない',
+     'analyze', None),
+    ('td の特異性を集計器が数えない', 'D123', 'analyze_B.py',
+     ("    ts = rules_B.td_specificity(r['k_A'], r['n_A'], r['k_B'], r['n_B'], T)", "    ts = {'write_specificity': True}"),
+     'td が v と同じだけ動いても特異性を書ける（起草者の引力と同じ側）',
+     'analyze', None),
+    ('様式の欄の空を採点欠落に数えない', 'D117', 'runs_B.py',
+     ("        if phase != 'quality' and any(r.get(k) is None for k in ('style_a', 'style_b', 'mention')):", "        if False:"),
+     '走行器が様式を書かなくても、様式門が黙って素通りする（走行器 v4 まで実際にそうだった）',
+     'analyze', 'null_style'),
 ]
 
 
@@ -78,12 +126,26 @@ def break_data(root, how):
         d = sorted(glob.glob(os.path.join(root, 'tuneB', '*')))
         if d:
             shutil.rmtree(d[0], ignore_errors=True)
+    elif how == 'null_style':
+        # 本走行の一つの腕の試行の様式・言及の欄を空にする（走行器が様式を書かなかった場合・2026-09-19）
+        for f in sorted(glob.glob(os.path.join(root, 'stageB', '*', 'trials-*.jsonl')))[:1]:
+            rows = [json.loads(l) for l in open(f, encoding='utf-8') if l.strip()]
+            arm0 = next(r['arm'] for r in rows if '+v' in r['arm'] and 'vrand' not in r['arm'])
+            for r in rows:
+                if r['arm'] == arm0:
+                    r['style_a'] = r['style_b'] = r['mention'] = None
+            with open(f, 'w', encoding='utf-8', newline='\n') as fh:
+                for r in rows:
+                    fh.write(json.dumps(r, ensure_ascii=False) + '\n')
 
 
 def run(tool, cwd):
+    # **飛ばしを失敗に倒して走らせる**（裁定 D122・2026-09-19）。前は実トークナイザの置き場を渡し忘れると
+    # 帯の起点の検査が「飛ばした」で通り、変異を「守りが無い」と誤って記録した（実際に起きた）。
+    # いまは置き場が無ければ、変異を入れる前の土台の確認で止まる。
     p = subprocess.run([PY, os.path.join(cwd, 'tools', tool), '--selftest'],
                        capture_output=True, text=True, encoding='utf-8', cwd=cwd,
-                       env=dict(os.environ))
+                       env=dict(os.environ, OP4B_REQUIRE_FULL_SELFTEST='1'))
     return p.returncode, ((p.stdout or '') + (p.stderr or '')).strip().split('\n')[-1][:160]
 
 
@@ -138,7 +200,10 @@ def pipeline_probe(cwd, kind, root):
                   'confirm': sum(1 for c in d['confirm'] if str(c.get('label', '')).startswith('確証')),
                   'reverse': sum(1 for c in d['confirm'] if '逆' in str(c.get('label'))),
                   'style_hold': sum(1 for c in d['confirm'] if c.get('label') == '判定保留（様式転位）'),
-                  'agree': (d.get('sign_agreement') or {}).get('agree')}
+                  'agree': (d.get('sign_agreement') or {}).get('agree'),
+                  'homog_notes': sum(1 for c in d['confirm'] if any('不均一' in n for n in (c.get('notes') or []))),
+                  'td_write': sum(1 for t in (d.get('td_specificity') or []) if t.get('write_specificity')),
+                  'gap': sum(1 for c in d['confirm'] if c.get('label') == '判定不能（採点欠落）')}
 
 
 ap = argparse.ArgumentParser()

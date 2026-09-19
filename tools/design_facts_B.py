@@ -274,15 +274,32 @@ def q_power_exact(p, drop):
     return float(((d.T <= -thr * q) * (pmf_a[:, None] * pmf_b[None, :])).sum())
 
 
+def q_null_paired(delta):
+    """**対の見方**（採否表 P373・2026-09-19）: 同じ問いを貪欲に解くので、介入が何もしなければ答えは一致する。
+    無操作と腕で正誤が入れ替わる問いの割合を delta とし、入れ替わりは正→誤と誤→正が半々（正答率は変わらない帰無）とする。
+    入れ替わった問いの数 D ~ 二項(q, delta)、そのうち正→誤 L ~ 二項(D, 1/2)、差＝(D − 2L)/q が閾値以下になる確率を厳密に数える。"""
+    pD = binom.pmf(np.arange(q + 1), q, delta)
+    tot = 0.0
+    for D, w in enumerate(pD):
+        if w < 1e-300:
+            continue
+        L = np.arange(D + 1)
+        tot += w * float(binom.pmf(L, D, 0.5)[(D - 2 * L) <= -thr * q].sum())
+    return tot
+
+
 null_q = {p: q_null_exact(p) for p in (0.5, 0.7, 0.9)}
+null_pair = {dl: q_null_paired(dl) for dl in (0.05, 0.1, 0.2, 0.3)}
 pow_q = {p: q_power_exact(p, D_PICK * 1.5 / 100) for p in (0.7, 0.9)}
 acc_line = lambda d: '・'.join('%g で %.4f' % (k, v) for k, v in d.items())
 pow_line = lambda d: '・'.join('%g で %.3f' % (k, v) for k, v in d.items())
 F['E'] = {'text': '品質床（%d 問・%d pt・分子＝正答数・分母＝%d・相手＝同じ腕の無操作・境目はちょうどの値を不合格とする）: 射程は選定の %d セル（土台 × 層 × 係数）に加え、選ばれた組での残りの介入 %d セルと、相手の無操作 %d セル（選定の段）＋%d セル（選定後の段・裁定 D88）。帰無発火率（同じ真の正答率で閾値以下になる確率・二項の畳み込みで厳密）は正答率 %s。真の低下 %.0f pt を捕まえる確率は %s。帰無で誤って不合格にする期待セル数は、正答率 %g で %.2f（%d セル）。課題の出所・版・ライセンス・断片の SHA は凍結時に記帳する（裁定 D66・候補は器材の整備の段）。'
           '**相手の無操作は段 × 土台 × セッションごとに一つ**で、ここではセッションが段に一つの見込みで数えている（裁定 D92・走行が分かれれば相手のセルはその数だけ増える）。'
-          '**同じ問いを使うが二標本で比べる**ので、この行の帰無発火率と検出力は対にして読むより保守側である（採否表 P256）。無操作の相手は土台ごとに一つで多くのセルが共有するため、帰無での不合格は相関して塊で出る。課題は**無操作の正答率が %g 以上**のものを選ぶ（裁定 D85）。'
-          % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, q_noop_sel, q_noop_post, acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells, T['quality_floor']['base_min']),
-          'data': {'null_exact': {str(k): v for k, v in null_q.items()}, 'power_exact': {str(k): v for k, v in pow_q.items()},
+          '**同じ問いを使うが二標本で比べる**ので、この行の帰無発火率と検出力は対にして読むより保守側である（採否表 P256）。**対の見方**（採否表 P373）: 無操作と腕で正誤が入れ替わる問いの割合 δ ごとの帰無発火率（入れ替わりは正→誤と誤→正が半々・厳密）は %s。介入が何もしなければ δ は零で、帰無の不合格も零である——**二標本の値は上限**である。無操作の相手は土台ごとに一つで多くのセルが共有するため、帰無での不合格は相関して塊で出る。課題は**無操作の正答率が %g 以上**のものを選ぶ（裁定 D85）。'
+          % (q, T['quality_floor']['threshold_pt'], q, q_cells_sel, q_cells_post, q_noop_sel, q_noop_post, acc_line(null_q), D_PICK * 1.5, pow_line(pow_q), 0.7, q_cells * null_q[0.7], q_cells,
+             '・'.join('δ=%g で %.4f' % (k, v) for k, v in null_pair.items()), T['quality_floor']['base_min']),
+          'data': {'null_exact': {str(k): v for k, v in null_q.items()}, 'null_paired': {str(k): v for k, v in null_pair.items()},
+                   'power_exact': {str(k): v for k, v in pow_q.items()},
                    'cells': q_cells, 'cells_selection': q_cells_sel, 'cells_post': q_cells_post, 'cells_noop_selection': q_noop_sel, 'cells_noop_post': q_noop_post}}
 
 # ---- F: 費用と時間（バッチの記録値から出し直す・◐） ----
@@ -298,22 +315,33 @@ F['F'] = {'text': '費用と時間（草案4 の巡の追い問いの記録: %s 
                    'source_trials': rec_trials, 'source_units': {str(k): int(rec.group(1 + BATCHES.index(k))) for k in BATCHES}, 'stop_ratio': STOP_RATIO}}
 
 # ---- G・H・I ----
-exists = sorted(f for f in ('make_contrasts_B.py', 'design_facts_B.py', 'direction_B.py', 'steer_B.py', 'analyze_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'build_report_B.py', 'freeze_B.py', 'boot_stageB.py')
-                if os.path.exists(os.path.join(REPO, 'tools', f)))
-F['G'] = {'text': '凍結射程と器材の対応表: 腕・場面・族・選定規則・報告の決まり→`contrasts-B.json`／同一性→`identity_screen`（段階 A と共用）／方向の抽出と層ごとの記述→`direction_B.py`／加減・ランダム方向・品質床・強制デコード→`steer_B.py`／族・検閲・refuse 門・様式門・層別の副次→`analyze_B.py`／転記行→`design_facts_B.py`／整合と抽出検査→`integrity_B.py`・`sample_inspection_B.py`／報告→雛形・`build_report_B.py`・`report_lint.py`／凍結→`freeze_B.py`。採点の経路は凍結した走行器の関数を import する。**本草案の時点で実在する器材: %s。残りは凍結の前に整備する。**'
-          % '・'.join('`%s`' % f for f in exists)}
+_TOOLS_G = ('make_contrasts_B.py', 'rules_B.py', 'runs_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'gate_B.py', 'analyze_B.py',
+            'layers_B.py', 'control_chart_B.py', 'design_facts_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'build_report_B.py', 'freeze_B.py',
+            'synth_B.py', 'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_draftB.py')
+exists = [f for f in _TOOLS_G if os.path.exists(os.path.join(REPO, 'tools', f))]
+absent = [f for f in _TOOLS_G if f not in exists]
+F['G'] = {'text': '凍結射程と器材の対応表: 腕・場面・族・選定規則・報告の決まり→`contrasts-B.json`／判定の規則（S4・区間・refuse 門・等質性・td の特異性・api_error の門・門の並び）→`rules_B.py`／'
+                  '同一性→`identity_screen`（段階 A と共用）／方向の抽出・主位置の活性の保存・‖v̂‖ と ‖h‖ の比→`direction_B.py`／加減・ランダム方向・品質床の生成と採点→`steer_B.py`／'
+                  '一つのセルの走行と、試行の記録・生テキスト・副位置の活性の書き出し→`run_stageB_local.py`／門1 と選定→`gate_B.py`／族・門・記述の族・td の特異性・等質性→`analyze_B.py`／'
+                  '副位置の読み→`layers_B.py`／管理図→`control_chart_B.py`／転記行→`design_facts_B.py`／整合と抽出検査→`integrity_B.py`・`sample_inspection_B.py`／'
+                  '報告→雛形・`build_report_B.py`・`report_lint.py`／凍結→`freeze_B.py`／合成データ・経路・変異・端から端まで→`synth_B.py`・`dry_run_B.py`・`mutation_B.py`・`endtoend_B.py`。'
+                  '採点の経路は凍結した走行器の関数と、段階 A の様式の器の関数を呼ぶ（再実装しない）。**実在する器材: %s。実在しない器材: %s。**'
+                  '**まだ書いていない器・骨組みの器は正本 `disclosure.items` に列挙する**（相をまたいだ走らせ方の順・Colab での起動・品質床の走行の本体）。'
+          % ('・'.join('`%s`' % f for f in exists), '・'.join('`%s`' % f for f in absent) or 'なし')}
 F['H'] = {'text': 'seed: %s。tag: %s。' % (json.dumps(T['seeds'], ensure_ascii=False), json.dumps(T['tags'], ensure_ascii=False))}
 m4 = HF['models']['4B-2507']
 hid = m4['hidden_size']
 kb = hid * 2 / 1024
 n_layers_saved = len(T['selection']['candidates']['layers'])
-prompt_vecs = len(T['arms']['panel']) * len(SC) * n_layers_saved
+EXS = T['extraction_scenarios']
+prompt_vecs = len(T['arms']['panel']) * len(EXS) * n_layers_saved      # 抽出器が実際に取るのは**抽出場面**の主位置（2026-09-19 に数え方を直した）
 resp_gib = (t_tune + t_main) * n_layers_saved * hid * 2 / 2**30
 F['I'] = {'text': '活性保存（4B-2507・hidden %d・bf16・凍結 %d 層）: 主位置（プロンプトの最終トークン）は腕 × 場面 × 層ごとに一度だけ保存する——%d 本 × %.1f KB ＝ %.1f MB（試行に依らないため試行ごとに保存しない・草案4 からの変更）。副位置（応答トークン平均）は試行ごとに保存する——%s 試行 × %d 層 ≈ %.2f GiB（Drive）。重み %.2f GiB＋バッチ %d の生成の活性が L4 の %g%% の内側かは、調整走行の最初のセッションで実測する ◐。'
-          '**内訳と「全腕」の意味**（採否表 P256）: 副位置の %s 試行は調整走行 %s ＋ 本走行 %s で、同一性選別の %s は含まない。主位置の %d 本は**前置きの腕 %d 本 × 場面 %d × 層 %d**（介入の腕は含まない）。'
+          '**内訳と「全腕」の意味**（採否表 P256）: 副位置の %s 試行は調整走行 %s ＋ 本走行 %s で、同一性選別の %s は含まない。主位置の %d 本は**前置きの腕 %d 本 × 抽出場面 %d × 層 %d**（介入の腕は含まない・方向は抽出場面から作る）。'
+          '前は場面を全場面で数えており、抽出器が実際に取る本数と違っていた（2026-09-19 の直しの監査）。'
           '決定性の検査は主位置を**二度**保存して突き合わせるので、主位置の容量は %.1f MB になる（裁定 D77 の前段・採否表 P235）。'
           % (hid, n_layers_saved, prompt_vecs, kb, prompt_vecs * kb / 1024, fmt(t_tune + t_main), n_layers_saved, resp_gib, m4['safetensors_gib'], T['runner']['batch'], 90,
-             fmt(t_tune + t_main), fmt(t_tune), fmt(t_main), fmt(t_id), prompt_vecs, len(T['arms']['panel']), len(SC), n_layers_saved, 2 * prompt_vecs * kb / 1024),
+             fmt(t_tune + t_main), fmt(t_tune), fmt(t_main), fmt(t_id), prompt_vecs, len(T['arms']['panel']), len(EXS), n_layers_saved, 2 * prompt_vecs * kb / 1024),
           'data': {'prompt_vectors': prompt_vecs, 'response_gib': round(resp_gib, 3), 'prompt_mb_twice': round(2 * prompt_vecs * kb / 1024, 2)}}
 
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')

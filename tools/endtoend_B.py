@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""endtoend_B.py v1 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
+"""endtoend_B.py v2 —— 走行器と抽出器の本体を、**小さな模型で端から端まで通す**（裁定 D117・2026-09-18）。
 
 系統の外への検分で、四票すべてが「**介入を掛けて走らせる器がまだ無い**」ことを最初に挙げた。
 本体を書いたので、**実重みが無くても通せるところまで通す**——
@@ -14,6 +14,10 @@
   (5) 腕が混ざったバッチは**止まる**。
   (6) 凍結した方向のノルムが崩れていたら、走行器が**読み込みの時点で止まる**。
   (7) 試行の記録が正本の欄をそろえている。
+  (8) 走行器の出力を置き場に書き、本物の整合検査に通す（種・再開）。
+  (9) v2（2026-09-19・束の前の点検で見つけた穴）: **すべての種類の腕**を走らせる（前は無操作と +v の二腕だけで、
+      ランダム方向の腕が走らないことに気づかなかった）。ランダム方向の行ごとの割り当て・hook の中身の照合・
+      様式と言及と refuse の分類とループが段階 A の凍結した関数と一致・生テキストの書き出し・副位置の活性。
 **実重みでは何も確かめていない。** 模型は乱数で初期化したもので、率にも活性にも意味は無い。
 出力: records/B/endtoend-B-<日付>.{md,json}（--force が無ければ上書きしない）。
 用法: python tools/endtoend_B.py [--force] [--layers 4] [--hidden 64]
@@ -21,7 +25,7 @@
 """
 import os, sys, json, argparse, datetime, tempfile, shutil
 
-VERSION = 'v1'
+VERSION = 'v2'
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 REPO = os.path.dirname(HERE)
@@ -79,6 +83,9 @@ cfg.num_attention_heads = max(2, a.hidden // 32)
 cfg.num_key_value_heads = cfg.num_attention_heads
 torch.manual_seed(11)
 model = AutoModelForCausalLM.from_config(cfg)
+# **float32 に明示で揃える**（2026-09-19）。実物の設定を読んで作ると設定の dtype（bf16）になる版があり、
+# 「小さな模型は float32」を前提に置いた (8e) の期待が版によって変わった。小さな模型の数の照合（9g・9h）も float32 のほうが確か。
+model = model.float()
 model.eval()
 n_layers = model.config.num_hidden_layers
 ratios = T['selection']['candidates']['layers']
@@ -219,16 +226,172 @@ except SystemExit:
     check('(5) 腕が混ざったバッチを止める', True, '止まった')
 
 # (7) 一つのセルを本当に走らせて、記録の欄がそろうか
+LIDX = [idxs[r] for r in ratios]
 try:
     rows = RUN.run_cell(model, tok, scenario=T['scenarios'][0], arm='Onull+v', layer_ratio=ratio, coef=1.0,
                         n=3, cell_seed_value=12345, tag=T['tags']['main'], run_key='e2e__test',
-                        dirs=loaded, layer_idx=li, gen=gen, batch=2)
+                        dirs=loaded, layer_idx=li, gen=gen, batch=2, resp_layer_idxs=LIDX)['trials']
     need = set(T['trial_record_fields']['fields'])
     got = set(rows[0]) if rows else set()
     check('(7) セルを走らせて記録の欄がそろう', len(rows) == 3 and need <= got,
           '%d 行・欠けた欄 %s' % (len(rows), sorted(need - got) or 'なし'))
 except Exception as e:
     check('(7) セルを走らせて記録の欄がそろう', False, '%s: %s' % (type(e).__name__, e))
+
+# (8) **走行器の出力を置き場に書き、本物の整合検査に通す**（裁定 D117・D127・2026-09-19）。
+#     前は走行器が記録を書かず、走行器の出力は一度も集計の器に読まれていなかった。
+#     さらに種の単位が走行器（バッチの種）と整合検査・合成データ（試行の種）で食い違っており、
+#     **合成データは通り、本物の出力は全件落ちる**形になっていた。
+import subprocess
+root = os.path.join(tmp, 'runroot')
+sc0 = T['scenarios'][0]
+tag = T['tags']['main']
+run_key = '%s__%s__s1__e2e' % (tag, sc0)
+cells, raws_all, resp_all, n_cell, bt = [], [], {}, 5, 2          # 五試行・バッチ二（区切りを跨ぐ）
+arms_run = ['Onull', 'Onull+v', 'Onull+vrand']
+for arm in arms_run:
+    cs = runs_B.cell_seed(T, T['seeds']['main'][sc0], 'main', (sc0, arm))
+    o_ = RUN.run_cell(model, tok, scenario=sc0, arm=arm, layer_ratio=ratio, coef=1.0, n=n_cell,
+                      cell_seed_value=cs, tag=tag, run_key=run_key, dirs=loaded, layer_idx=li, gen=gen, batch=bt, resp_layer_idxs=LIDX)
+    cells += o_['trials']
+    raws_all += o_['raws']
+    resp_all.update(o_['resp'])
+# 正本の欄をそろえた manifest（整合検査がこの一覧を読む）
+T_b = dict(T)
+man = {'tag': tag, 'run_key': run_key, 'session': 1, 'n': n_cell, 'seed': T['seeds']['main'][sc0],
+       'batch': T['runner']['batch'], 'padding': 'left', 'model': 'e2e/random-init', 'model_rev': 'E2E',
+       'tokenizer_rev': 'E2E', 'runner_sha': runs_B.sha16_file(os.path.join(HERE, 'run_stageB_local.py')),
+       'pip_freeze_sha16': 'E2E', 'gpu': 'cpu', 'started': 'e2e', 'ended': 'e2e', 'dry_run': True,
+       'scenario': sc0, 'arms': arms_run, 'layer': ratio, 'coef': 1.0, 'direction_ids': ['fixed', 'static', 'rand'],
+       'dtype': str(next(model.parameters()).dtype).replace('torch.', ''), 'order': T['runner']['order_id'],
+       'transformers_version': __import__('transformers').__version__, 'refuse_rules_sha16': runs_B.sha16_file(RUN.REFUSE_RULES)}
+try:
+    RUN.write_cell(root, tag, run_key, man, cells, raws_all, resp_all)
+    RUN.write_session(root, tag, 1, [run_key], {'gpu': 'cpu'})
+    check('(8a) 走行器が記録とセッション記録を置き場に書く', os.path.exists(os.path.join(root, tag, run_key, 'manifest.json')),
+          '%d 行を書いた' % len(cells))
+except SystemExit as e:
+    check('(8a) 走行器が記録とセッション記録を置き場に書く', False, e)
+# 上書きしないこと
+try:
+    RUN.write_cell(root, tag, run_key, man, cells)
+    check('(8b) 既にある記録に上書きしない', False, '上書きした')
+except SystemExit:
+    check('(8b) 既にある記録に上書きしない', True, '止まった')
+# 読み口が読めるか
+cc = runs_B.counts_main(T, root=root, allow_dry=True)[0]
+check('(8c) 読み口（runs_B）が走行器の出力を読める', sum(c['n'] for c in cc.values()) == len(cells),
+      '読んだ試行 %d／書いた試行 %d' % (sum(c['n'] for c in cc.values()), len(cells)))
+# **本物の整合検査に通す**（種は「バッチの種」で組み直して照合される）
+p = subprocess.run([sys.executable, os.path.join(HERE, 'integrity_B.py'), '--tag', tag, '--root', root, '--allow-dry',
+                    '--out', os.path.join(tmp, 'i.md'), '--force'], capture_output=True, text=True, encoding='utf-8', cwd=REPO)
+ij = os.path.join(tmp, 'i.json')
+probs = json.load(open(ij, encoding='utf-8')).get('problems', []) if os.path.exists(ij) else ['記録が読めない']
+seed_probs = [x for x in probs if 'seed' in x]
+check('(8d) 走行器の種が整合検査の組み直しと一致する（裁定 D127）', not seed_probs,
+      ('種の不整合 %d 件' % len(seed_probs)) if seed_probs else '種の不整合 零')
+# この検査は**速さのために四点を登録から外している**——貪欲の生成・セルの試行数（本走行の n より小さい）・
+# 走らせるセルの数（登録の升目の一部だけ）・模型の dtype（小さな模型は float32）。
+# 整合検査は**その四点を捕まえるべき**であり（眠っていないことの確かめ）、**それ以外は零であるべき**である。
+_expected = ('生成の設定が登録と違う', '連番でない', '登録の升目', 'dtype')
+caught = [x for x in probs if 'seed' not in x and any(e in x for e in _expected)]
+other = [x for x in probs if 'seed' not in x and not any(e in x for e in _expected)]
+check('(8e) 検査のために登録から外した四点を、整合検査が捕まえる',
+      all(any(e in x for x in caught) for e in _expected),
+      '捕まえた %d 件（%s）' % (len(caught), '・'.join(e for e in _expected if any(e in x for x in caught))))
+check('(8e2) それ以外の不整合は零', not other, ('%d 件: %s' % (len(other), other[:2])) if other else '零')
+# 再開: 途中から走らせ直しても、同じ試行は同じ種を持つ
+cs = runs_B.cell_seed(T, T['seeds']['main'][sc0], 'main', (sc0, 'Onull'))
+full = RUN.run_cell(model, tok, scenario=sc0, arm='Onull', layer_ratio=ratio, coef=1.0, n=n_cell,
+                    cell_seed_value=cs, tag=tag, run_key='r', dirs=loaded, layer_idx=li, gen=gen, batch=bt, resp_layer_idxs=LIDX)['trials']
+part = RUN.run_cell(model, tok, scenario=sc0, arm='Onull', layer_ratio=ratio, coef=1.0, n=n_cell,
+                    cell_seed_value=cs, tag=tag, run_key='r', dirs=loaded, layer_idx=li, gen=gen, batch=bt, start=3, resp_layer_idxs=LIDX)['trials']
+same = all(a_['seed'] == b_['seed'] for a_, b_ in zip(full[3:], part))
+check('(8f) 途中から再開しても同じ試行は同じ種を持つ', same and len(part) == n_cell - 3,
+      '再開 %d 行・種の一致 %s' % (len(part), same))
+
+# (9) **すべての種類の腕**（v2・2026-09-19）。反証の場面にはすべての種類の腕がそろう。
+sc4 = T['falsification_scenario']
+kinds = {'Osec-Ncold': None, 'Onull+v': 'static', 'O-Ncold-v': 'static', 'Onull+vrand': 'random', 'O-Ncold+vNk': 'Nk',
+         'O-Ncold-vtd': 'td', 'Osec-Ncold+v6b': 'loaded'}
+outs, errs = {}, []
+for arm in kinds:
+    try:
+        outs[arm] = RUN.run_cell(model, tok, scenario=sc4, arm=arm, layer_ratio=ratio, coef=1.0, n=n_cell,
+                                 cell_seed_value=runs_B.cell_seed(T, T['seeds']['main'][sc4], 'main', (sc4, arm)),
+                                 tag=tag, run_key='e2e__s4', dirs=loaded, layer_idx=li, gen=gen, batch=bt, resp_layer_idxs=LIDX)
+    except BaseException as e:
+        errs.append('%s: %s' % (arm, str(e)[:80]))
+check('(9a) すべての種類の腕が走る（無操作・静的・ランダム・Nk・td・(6b)）', not errs and all(len(o['trials']) == n_cell for o in outs.values()),
+      ('止まった腕: %s' % errs) if errs else '腕 %d 種・各 %d 試行' % (len(outs), n_cell))
+if 'Onull+vrand' in outs:
+    got_ids = [t_['direction_id'] for t_ in outs['Onull+vrand']['trials']]
+    want_ids = ['rand:%d' % steer_B.direction_of(t_['trial_index'], n_cell) for t_ in outs['Onull+vrand']['trials']]
+    check('(9b) ランダム方向の腕は試行ごとに登録順の等分で方向を持つ', got_ids == want_ids and len(set(got_ids)) > 1,
+          '記録 %s／登録の割り当て %s' % (got_ids, want_ids))
+    V_, D_ = RUN.row_vectors(RUN.arm_plan('Onull+vrand'), loaded, ratio, list(range(n_cell)), n_cell, 'main')
+    R_ = steer_B.random_directions(loaded[('static', ratio)], 'main', ratio)
+    ok_v = all(np.allclose(V_[i], R_[steer_B.direction_of(i, n_cell)]) for i in range(n_cell))
+    check('(9b2) 行ごとの方向は、その試行に割り当てた方向そのもの', ok_v, '行ごとの一致 %s' % ok_v)
+# hook の中身の照合: 別の層に残った hook があれば、走らせる前に止まる
+_stray = direction_B.decoder_layers(model)[(li + 1) % n_layers].register_forward_hook(lambda m, i, o: o)
+try:
+    RUN.run_cell(model, tok, scenario=sc4, arm='Onull+v', layer_ratio=ratio, coef=1.0, n=2, cell_seed_value=1, tag=tag,
+                 run_key='e2e__stray', dirs=loaded, layer_idx=li, gen=gen, batch=bt, resp_layer_idxs=LIDX)
+    check('(9c) 掛けるべきでない層の hook を見つけて止まる（裁定 D122）', False, '止まらなかった')
+except SystemExit as e:
+    check('(9c) 掛けるべきでない層の hook を見つけて止まる（裁定 D122）', 'hook' in str(e), str(e)[:80])
+finally:
+    _stray.remove()
+# 様式・言及・refuse の分類・ループ・打ち切り: 生テキストの最終試行を、段階 A の凍結した関数で**別に**採点し直して照らす
+import response_mode_A as _RMA
+TF_ = RUN.frozen_text_funcs()
+s4s, s4i = RUN.scenario_and_instruction(sc4)
+bad_mode = []
+for arm, o in outs.items():
+    at_ = RUN.arm_texts()[RUN.base_arm_of(arm)]['text']
+    sent_ = ('', at_, s4s['text'], s4i)
+    for t_, r_ in zip(o['trials'], o['raws']):
+        mf = _RMA.measure(r_['final'], tuple(_RMA._norm(x) for x in sent_))
+        lp_ = TF_['loop_info'](r_['final'])
+        want_ = {'style_a': bool(mf['a']), 'style_b': bool(mf['b']), 'mention': bool(mf['c1']), 'loop_flag': bool(lp_['fired']),
+                 'truncated': r_['finish'] == 'length'}
+        if any(t_[k_] != v_ for k_, v_ in want_.items()) or t_['refuse_class'] is None:
+            bad_mode.append((t_['trial_id'], {k_: (t_[k_], v_) for k_, v_ in want_.items() if t_[k_] != v_}))
+check('(9d) 様式・言及・ループ・打ち切りが段階 A の関数の採点と一致し、refuse の分類が空でない', not bad_mode,
+      ('食い違い %d 件: %s' % (len(bad_mode), bad_mode[:1])) if bad_mode else '試行 %d 件すべて一致' % sum(len(o['trials']) for o in outs.values()))
+# 生テキスト: 置き場に書かれ、試行と行が対応する
+rawp = os.path.join(root, tag, run_key, 'raw-%s.jsonl' % run_key)
+rraw = [json.loads(l) for l in open(rawp, encoding='utf-8')] if os.path.exists(rawp) else []
+check('(9e) 生テキストが置き場に書かれ、試行と行が対応する', len(rraw) == len(cells) and all(r_.get('text') is not None and r_['trial_id'] == c_['trial_id']
+                                                                   for r_, c_ in zip(rraw, cells)),
+      '生テキストの行 %d／試行 %d・引き直しの印 %d 件' % (len(rraw), len(cells), sum('===RETRY===' in (r_.get('text') or '') for r_ in rraw)))
+# 副位置の活性: 置き場の npz・形・有限・小分けと一行ずつの一致・手で組んだ計算との一致
+rp = os.path.join(root, tag, run_key, 'resp-%s.npz' % run_key)
+zr = np.load(rp) if os.path.exists(rp) else None
+with_path = [c_ for c_ in cells if c_.get('resp_mean_path')]
+ok_shape = zr is not None and all(zr[c_['resp_mean_path'].split('#')[1]].shape == (len(ratios), cfg.hidden_size) and
+                                  np.isfinite(zr[c_['resp_mean_path'].split('#')[1]].astype(np.float32)).all() for c_ in with_path)
+check('(9f) 副位置の活性が置き場に書かれる（候補の層 × 隠れ次元・有限）', bool(with_path) and ok_shape,
+      '活性を持つ試行 %d／%d' % (len(with_path), len(cells)))
+resp_ids = [tok(r_['final'], add_special_tokens=False)['input_ids'][:6] or [0] for r_ in raws_all[:4]]
+_hv = np.stack([loaded[('static', ratio)]] * len(resp_ids))
+h_args = {'layer_idx': li, 'vecs': _hv, 'coef': 1.0, 'sign': +1}
+m4 = RUN.capture_resp_mean(model, ids, resp_ids, LIDX, h_args, rows=4)
+m1 = RUN.capture_resp_mean(model, ids, resp_ids, LIDX, h_args, rows=1)
+d41 = max(float(np.abs(a_.astype(np.float32) - b_.astype(np.float32)).max()) for a_, b_ in zip(m4, m1))
+check('(9g) 副位置の活性は、左詰めの小分けと一行ずつで一致する（位置の番号の扱い）', d41 < 1e-2, '最大差 %.3g（fp16 の丸めの内）' % d41)
+# 手で組む: 列をつなぎ、hook を掛けて順伝播し、応答の位置の平均を取る（器を通さない計算）
+_seq = torch.tensor([list(ids) + list(resp_ids[0])])
+_h = RUN.register_hook(model, li, RUN.make_hook(loaded[('static', ratio)], 1.0, +1, [len(ids) - 1]))
+try:
+    with torch.no_grad():
+        _o = model(input_ids=_seq, attention_mask=torch.ones_like(_seq), output_hidden_states=True)
+finally:
+    _h.remove()
+_man = np.stack([_o.hidden_states[k_ + 1][0, len(ids):, :].float().mean(0).numpy() for k_ in LIDX])
+d_man = float(np.abs(_man - m1[0].astype(np.float32)).max())
+check('(9h) 副位置の活性は、手で組んだ計算と一致する', d_man < 1e-2, '最大差 %.3g' % d_man)
 
 shutil.rmtree(tmp, ignore_errors=True)
 
@@ -249,7 +412,10 @@ L += ['', '## この検査が確認していないこと', '',
       '- したがって**破局率も活性のノルムも、この検査からは何も言えない**。',
       '- バッチ 16・実重み・実際のメモリでの挙動（OOM・KV キャッシュ・速度）は確かめていない。',
       '- 品質床の走行は含まない（課題が未定・裁定 D66）。',
-      '- 中断と再開・記録の書き出しの置き場・セッション記録の作成は、起動器（Colab の段）の側にある。', '',
+      '- **相をまたいだ走らせ方の順**（同一性選別 → 調整走行 → 品質床 → 本走行）と、Colab での起動は、'
+      '  まだ書いていない（一つのセルを走らせて書く口と、セッション記録を書く口までは書いた）。',
+      '- 様式と言及の照らし合わせ（9d）は、走行器と同じ段階 A の関数で採点し直したもので、**関数そのものの正しさ**は段階 A の検分と走行器の自己検査（見本の文）に拠る。',
+      '- 乱数の模型の出力はほぼすべて書式外になるので、**答えの読める試行（破局・refuse の判定）の経路は、ここでは走らない**（走行器の自己検査の見本の文で確かめた）。', '',
       '本記録のいかなる数値も、AI に意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。', '']
 open(out_md, 'w', encoding='utf-8', newline='\n').write('\n'.join(L))
 print('[endtoend_B] %s | %d 件中 落ちた検査 %d 件' % (os.path.relpath(out_md, REPO), len(checks), fails))

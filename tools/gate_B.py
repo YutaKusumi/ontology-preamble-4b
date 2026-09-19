@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""gate_B.py v3 —— 段階 B の**門1 と選定**（品質床の判定・希釈の門・床と天井・操作有効性・同値の帯・同点の割り方・非正の停止）。
+"""gate_B.py v4 —— 段階 B の**門1 と選定**（品質床の判定・api_error の門・希釈の門・床と天井・操作有効性・同値の帯・同点の割り方・非正の停止）。
 
 正本 `design/contrasts-B.json` の `quality_floor`・`dilution_gate`・`selection`・`gate1`・`censor`・`print_strings` に従う。
 入力: 調整走行（tag `tuneB`）と品質床の**選定の段**（tag `stageB-quality`・stage=selection）の走行の記録。
@@ -7,6 +7,7 @@
 判定:
   (1) 品質床（selection_cells）: 介入の腕の正答数と、同じ腕の無操作の正答数の差（pt）。差が threshold_pt の内側なら合格（**ちょうどは不合格**・boundary_rule）。
       候補の合格＝確証族の二つの土台の**両方**が合格（pass_rule）。
+      **api_error の率（分母は全試行）が腕と相手で api_error_gate_pt を超えて違うセルは判定しない**（合格に数えない・裁定 D127・v4 で足した・`rules_B.api_error_gate`）。
   (2) 門1: 合格する候補が一つも無ければ閉じる（`gate1.rule`・「操作不能」を記帳）。**方向の非存在は記帳しない。**
   (3) 希釈の門（選定・裁定 D76）: 候補の v 腕と v_random 腕の書式外率の差・refuse 率の差が threshold_pt 超なら、その候補を選定から外す。
   (4) 床と天井（採否表 P247）: 両腕とも censor.low 未満、または両腕とも censor.high 超の候補は外す。
@@ -20,8 +21,9 @@ import os, sys, json, math, hashlib, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
+import rules_B
 
-VERSION = 'v3'
+VERSION = 'v4'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--root', default=None)
@@ -107,6 +109,13 @@ for base in QF_ARMS:
         if cell is None or noop is None:
             qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
                           'note': '走行の記録が無い（%s）' % ('セル' if cell is None else '同じセッションの相手')})
+            continue
+        # **api_error の率の差が門を超えたら、そのセルの品質床を判定しない**（正本 quality_floor.api_error_gate・裁定 D127・`rules_B.api_error_gate`）。
+        # 判定しないセルは合格に数えない。v3 までは api_error を列に出すだけで、この門は無かった（直しの監査・2026-09-19）。
+        if rules_B.api_error_gate(cell, noop, T):
+            qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
+                          'api_error': cell.get('api_error', 0), 'noop_api_error': noop.get('api_error', 0),
+                          'note': '判定しない（api_error の率の差が %g pt を超える・裁定 D127）' % QF['api_error_gate_pt']})
             continue
         gap = cell.get('scoring_gap', 0) + noop.get('scoring_gap', 0)
         if gap:                                   # **採点欠落があれば判定しない**（裁定 D103・採否表 P320）

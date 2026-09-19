@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""sample_inspection_B.py v2 —— 段階 B の**抽出検査**（腕と場面を伏せた標本・目視の記録・対応表の封印）。段階 A の型。
+"""sample_inspection_B.py v3 —— 段階 B の**抽出検査**（腕と場面を伏せた標本・目視の記録・対応表の封印）。段階 A の型。
 
 何をするか:
   (1) 走行の記録から、セル（場面 × 腕）ごとに `--per-cell` 件を無作為に抜き、**腕と場面を伏せた標識**で並べた標本を書く（生本文の先頭 `--chars` 字）。
@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--tag', default=None)
@@ -97,19 +97,22 @@ if not a.force:
             sys.exit('既にある（--force で上書き）: %s' % p)
 idx = runs_B.index_runs(T, tag, a.root, allow_dry=a.allow_dry)
 rng = np.random.default_rng(a.seed if a.seed is not None else T['seeds']['sample_inspection'])
-cells = []
+# **セル（場面 × 腕）で束ねてから引く**（裁定 D130・採否表 P369・2026-09-19）。前は走行ごと × 腕でセルを作ったので、
+# 中断と再開で**セッションを跨いで**分かれたセルは、その数に比例して高い確率で引かれていた。
+by_cell = {}
 for k, recs in sorted(idx.items(), key=lambda kv: str(kv[0])):
     for rec in recs:
         raw = {}
         if rec['raw_path']:
             for r in runs_B.iter_jsonl(rec['raw_path']):
                 raw[r.get('trial_id')] = r.get('text') or ''
-        by_arm = {}
-        for r in runs_B.iter_jsonl(rec['trials_path'], ('trial_id', 'arm', 'scenario', 'status', 'style_b')):
+        for r in runs_B.iter_jsonl(rec['trials_path'], ('trial_id', 'arm', 'scenario', 'status', 'style_b', 'format_fail')):
             if r['status'] == 'ok':
-                by_arm.setdefault(r['arm'], []).append(r)
-        for arm, rs in sorted(by_arm.items()):
-            cells.append({'scenario': rs[0].get('scenario') or rec['manifest'].get('scenario'), 'arm': arm, 'rows': rs, 'raw': raw})
+                sc_ = r.get('scenario') or rec['manifest'].get('scenario')
+                c_ = by_cell.setdefault((sc_, r['arm']), {'scenario': sc_, 'arm': r['arm'], 'rows': [], 'raw': {}})
+                c_['rows'].append(r)
+                c_['raw'][r['trial_id']] = raw.get(r['trial_id'], '')
+cells = [by_cell[k] for k in sorted(by_cell, key=str)]
 take = max(1, int(round(len(cells) * a.fraction)))
 pick_cells = [cells[i] for i in sorted(rng.choice(len(cells), size=min(take, len(cells)), replace=False).tolist())]
 picked = []

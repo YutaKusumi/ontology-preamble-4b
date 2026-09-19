@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-"""steer_B.py v4 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床・強制デコード）。
+"""steer_B.py v5 —— 段階 B の**介入**（方向の加減・ランダム方向・品質床の生成と採点）。
 
 正本 `design/contrasts-B.json` の `selection.apply`・`random_control`・`quality_floor`・`runner` に従う。
 規則（この器が守るもの）:
-  - 加減は `h ← h ± α·v̂`（場面本文の開始位置から EOS まで・`register_forward_hook`・`selection.apply`）。α は**その層の v̂ のノルムに対する比**。
+  - 加減は `h ← h ± α·v̂`（**主位置〔組み立て済みの列の最後のトークン〕から EOS まで**・`register_forward_hook`・`selection.apply`・裁定 D124）。α は**その層の v̂ のノルムに対する比**。
   - すべての方向（v̂・Nk・td・(6b)・ランダム方向）を**係数を掛ける前の ‖v̂〔static〕‖** に合わせ、**係数は加減のときに一度だけ**掛ける（裁定 D75・D90）。
     自己検査は「**全方向 × 全係数 × 全層**で加わる量のノルムが一致する」ことを確かめる（裁定 D102——前は v 腕とランダム腕の対しか回さず、交差族に同じ穴が残った）。
-  - 介入の帯の起点は、**chat template を当てた列の中で場面の本文が始まる位置**（裁定 D101）。自己検査は起点のトークンを復号して場面本文の先頭と照合する
-    （`OP4B_TOKENIZER_DIR` に実トークナイザの置き場を渡したときに走る）。
+  - 介入の帯の起点は、**chat template を当てた組み立て済みの列の最後のトークン（主位置）**（裁定 D101 で template を当て、裁定 D124 で起点を主位置にした）。
+    自己検査は起点を**独立の正解**（器を通さずに作った列の最後の位置）と照らし、復号して最終トークンと一致することを見る
+    （`OP4B_TOKENIZER_DIR` に実トークナイザの置き場を渡したときに走る。**`OP4B_REQUIRE_FULL_SELFTEST=1` なら、飛ばすと失敗に倒す**・裁定 D122）。
+    関数の名 `scenario_start_index` は裁定 D124 の前の名残で、返すのは主位置である。
   - ランダム方向は**調整走行と本走行で引き直す**（裁定 D84・種は `seeds.random_dirs` の tune と main）。
   - 一腕の試行は方向の登録順に等分し、端数は登録順に一つずつ配る（`random_control.allocation`・調整走行にも当てる）。
-  - 品質床は**貪欲**（`quality_floor.generation`）。書式外は不正解に数え、api_error は一度だけ引き直す（`quality_floor.format_fail_rule`）。
+  - 品質床は**貪欲**（`quality_floor.generation`）で、**生成した文字列から記号を読み取る**（強制デコードは採らない・裁定 D120）。書式外は不正解に数え、api_error は一度だけ引き直す（`quality_floor.format_fail_rule`）。
   - 場面の試行は `runner.generation` の設定。詰めは左（`runner.padding`）。
 **この器は GPU の上でしか本走行できない。** 手元では `--selftest`（ノルム合わせ・割り当て・引き直し・種の再現を合成のベクトルで確かめる）が走る。
 用法: python tools/steer_B.py --selftest
@@ -21,7 +23,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
 import runs_B
 
-VERSION = 'v4'
+VERSION = 'v5'
+STRICT = os.environ.get('OP4B_REQUIRE_FULL_SELFTEST') == '1'     # 実機の段では飛ばしを失敗に倒す（裁定 D122・採否表 P344）
 REPO = runs_B.REPO
 T = runs_B.load_T()
 RC = T['random_control']
@@ -233,9 +236,13 @@ def _selftest_band(model_dir=None):
     try:
         from transformers import AutoTokenizer
     except Exception:
+        if STRICT:
+            raise SystemExit('帯の起点の検査を飛ばした（transformers が無い）——実機の段では失敗に倒す（OP4B_REQUIRE_FULL_SELFTEST=1・裁定 D122）')
         return '帯の起点（**飛ばした**——transformers が無い）'
     src = model_dir or os.environ.get('OP4B_TOKENIZER_DIR')
     if not src:
+        if STRICT:
+            raise SystemExit('帯の起点の検査を飛ばした（OP4B_TOKENIZER_DIR が無い）——実機の段では失敗に倒す（OP4B_REQUIRE_FULL_SELFTEST=1・裁定 D122）')
         return '帯の起点（**飛ばした**——OP4B_TOKENIZER_DIR が無い）'
     tok = AutoTokenizer.from_pretrained(src)
     scen, inst = '場面の本文がここから始まる。', '\n\n指示。'

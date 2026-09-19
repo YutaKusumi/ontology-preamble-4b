@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""runs_B.py v3 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
+"""runs_B.py v4 —— 段階 B の走行の記録を読む共有の口（段階 A の `runs_A.py` の型・**段階 A の器は触らない**）。
 
 段階 B の相（正本 `tags`）と置き場:
   同一性選別 `idB`      : results/idB/idB__<スタック>__<場面>__<印>/      （manifest の stack・scenario）
@@ -17,7 +17,7 @@ import os, re, sys, json, glob, hashlib
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CPATH = os.path.join(REPO, 'design', 'contrasts-B.json')
-VERSION = 'v3'
+VERSION = 'v4'
 COUNT_FIELDS = ('trial_id', 'arm', 'status', 'catastrophe', 'choice', 'format_fail', 'style_a', 'style_b', 'mention', 'loop_flag', 'truncated', 'correct')
 
 
@@ -27,7 +27,7 @@ def field_registry(T):
     assert f.get('fields') and f.get('blind') and f.get('integrity_allow'), '正本に試行の記録の鍵の登録が無い（裁定 D97）'
     return f
 ZERO = dict(n=0, n_ok=0, api_error=0, cat=0, refuse=0, ff=0, style_a=0, style_b=0, mention=0, loop=0, trunc=0, unmeas=0,
-            correct=0, scoring_gap=0, correct_format_fail=0)
+            correct=0, scoring_gap=0, style_gap=0, correct_format_fail=0)
 
 
 def load_T(path=None):
@@ -134,14 +134,22 @@ def cell_counts(trials_path, acc=None, phase='main'):
         # 凍結パーサ `is_catastrophic` は refuse に破局の判定を返さない規約なので、破局の欄の空で数えると
         # refuse が全件この札に落ち、確証の族が丸ごと判定不能になる（直しの確認の巡で実際に零になった）。
         # 書式外の試行は判定を持たないのが正しいので、ここには数えない。
+        gap = False
         if not ff:
             if (r.get('correct') is None) if phase == 'quality' else (r.get('choice') is None):
-                c['scoring_gap'] += 1              # 判定欄が空（採点前・採点漏れ）——裁定 D96・D103
+                gap = True                         # 判定欄が空（採点前・採点漏れ）——裁定 D96・D103
             # **逆向きの穴も塞ぐ**（裁定 D126・採否表 P364）: 選択が読めているのに破局の判定が空の試行は、
             # 黙って「破局でない」に数えられていた。凍結パーサは登録外の族に None を返すので、
             # 走行器が族を取り違えると率が下がる（起草者に有利な向き）。
             elif phase != 'quality' and r.get('choice') not in (None, 'refuse') and r['catastrophe'] is None:
-                c['scoring_gap'] += 1
+                gap = True
+        # **様式・言及の欄が空の場面の試行も採点欠落に数える**（正本 `response_mode.gap_rule`・2026-09-19）。
+        # 前は走行器がこれらを空で書き、ここは空を「該当なし」と数えていたので、様式門が実データでは黙って効かなかった
+        # （合成データは欄を埋めていたので検査は通っていた）。書式外の試行も様式は測る（段階 A の (b) は本文の先頭で決める）。
+        if phase != 'quality' and any(r.get(k) is None for k in ('style_a', 'style_b', 'mention')):
+            c['style_gap'] += 1
+            gap = True
+        c['scoring_gap'] += gap                    # 一つの試行は一度だけ数える
         c['cat'] += (r['catastrophe'] is True)
         c['refuse'] += (r['choice'] == 'refuse')
         c['ff'] += ff
@@ -235,25 +243,26 @@ def cell_index(T, phase, key):
             if x not in ARMS:
                 ARMS.append(x)
     STAGES = ['selection', 'post']
+    ESC = int(T['seeds']['cell_index_escape'])     # 逃げ道の幅（正本に登録・採否表 P378・前は器の中に手書きしていた）
     def _ai(arm):
         if arm in ARMS:
             return ARMS.index(arm)
         import hashlib as _h
-        return len(ARMS) + int(_h.sha256(str(arm).encode('utf-8')).hexdigest()[:8], 16) % 997   # 登録に無い腕も決定的に一意な番号を持つ
+        return len(ARMS) + int(_h.sha256(str(arm).encode('utf-8')).hexdigest()[:8], 16) % ESC   # 登録に無い腕も決定的に一意な番号を持つ
     if phase == 'identity':
         sc, arm = key
-        return (SCEN.index(sc) if sc in SCEN else len(SCEN)) * (len(ARMS) + 997) + _ai(arm)
+        return (SCEN.index(sc) if sc in SCEN else len(SCEN)) * (len(ARMS) + ESC) + _ai(arm)
     if phase == 'main':
         sc, arm = key
-        return SCEN.index(sc) * (len(ARMS) + 997) + _ai(arm)
+        return SCEN.index(sc) * (len(ARMS) + ESC) + _ai(arm)
     if phase == 'tune':
         sc, arm, l, c = key
-        return ((SCEN.index(sc) * (len(ARMS) + 997) + _ai(arm)) * len(LAY) + LAY.index(l)) * len(COE) + COE.index(c)
+        return ((SCEN.index(sc) * (len(ARMS) + ESC) + _ai(arm)) * len(LAY) + LAY.index(l)) * len(COE) + COE.index(c)
     if phase == 'quality':
         stage, arm, l, c = key
         li = LAY.index(l) if l in LAY else len(LAY)      # 無操作の相手は層・係数を持たない
         ci = COE.index(c) if c in COE else len(COE)
-        return ((STAGES.index(stage) * (len(ARMS) + 997) + _ai(arm)) * (len(LAY) + 1) + li) * (len(COE) + 1) + ci
+        return ((STAGES.index(stage) * (len(ARMS) + ESC) + _ai(arm)) * (len(LAY) + 1) + li) * (len(COE) + 1) + ci
     raise SystemExit('相の名が正本に無い: %s' % phase)
 
 
@@ -265,9 +274,35 @@ def cell_seed(T, run_seed, phase, key):
 
 
 def trial_seed(cell_s, trial_index):
-    """試行の種（正本 `seeds.derivation_formula`）。"""
+    """試行の種（正本 `seeds.derivation_formula`）。**記録には書かない**——下の `recorded_seed` を見よ。"""
     import numpy as _np
     return int(_np.random.SeedSequence([int(cell_s), int(trial_index)]).generate_state(1)[0])
+
+
+def batch_seed(cell_s, batch_index):
+    """バッチの種（正本 `seeds.unit_D127`・裁定 D127）。**試行単位の再現は主張しない。**"""
+    import numpy as _np
+    return int(_np.random.SeedSequence([int(cell_s), int(batch_index)]).generate_state(1)[0])
+
+
+def retry_seed(cell_s, batch_index, attempt=1):
+    """**書式外の引き直しの種**＝`SeedSequence([セルの種, バッチ番号, 引き直しの回])`（正本 `seeds.derivation_formula`・2026-09-19）。
+    前は走行器の中で「バッチの種 ＋ 一」と手書きしていた（登録の外の種）。引き直しは一回だけ（凍結走行器の規約）。"""
+    import numpy as _np
+    return int(_np.random.SeedSequence([int(cell_s), int(batch_index), int(attempt)]).generate_state(1)[0])
+
+
+def recorded_seed(T, cell_s, trial_index, start=0):
+    """**試行の記録に書く種**＝その試行が属する**バッチの種**（裁定 D127・2026-09-19）。
+
+    書く側（走行器・合成データ）と検べる側（整合検査）は**この一つの関数を呼ぶ**。
+    前は走行器がバッチの種を書き、整合検査と合成データは試行の種を使っていたので、
+    **合成データは整合検査を通り、本物の出力は全件落ちる**形になっていた
+    （起草者が裁定 D127 の直しで入れた食い違い・本体を書いて記録を集計に通す段で見つけた）。
+    **バッチの区切りはセルの頭（試行の番号 零）から数えた倍数に固定する**——中断して途中から再開しても、
+    同じ試行は同じバッチの番号に属し、同じ種を持つ（走行器は区切りをこれに合わせる）。
+    """
+    return batch_seed(cell_s, int(trial_index) // int(T['runner']['batch']))
 
 
 def counts_main_by_direction(T, tag=None, root=None, allow_dry=False):

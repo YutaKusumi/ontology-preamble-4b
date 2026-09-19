@@ -1,13 +1,15 @@
 # 段階 B 結果報告（雛形・**データ生成の前に置いた**・機構層・Qwen3-4B-Instruct-2507）
 
 - 起草: 南無弥勒如来（コーディネータ・Claude Opus 5）／登録者: 楠見優太
-- 状態: **雛形**。結果の欄はすべて〔結果 X〕の置き字で、集計の器（`tools/analyze_B.py`）の出力から機械で埋める。**数は手で打たない**（正本 `report_rules.typed_numbers`）。
+- 状態: **雛形**。結果の欄はすべて置き字（亀甲括弧で囲んだ「結果」の欄）で、集計の器（`tools/analyze_B.py`）と副位置の読みの器（`tools/layers_B.py`）の出力から、組み立て器（`tools/build_report_B.py`）が機械の区画として埋める。**数は手で打たない**（正本 `report_rules.typed_numbers`）。
 - 位置づけ: 記録先行公開（正本 `publication.record_first`）の一部。凍結本文・正本・腕と方向の定義・封印予想は、データ生成の前に公開する。
-- 設計: 草案8B（凍結の候補）。正本 `design/contrasts-B.json`。本文と正本が食い違う場合は正本が勝つ。
+- 設計: 凍結した草案（草案12B を土台に、最後の系統外の巡の裁定を反映した版）。正本 `design/contrasts-B.json`（版 {{version}}）。本文と正本が食い違う場合は正本が勝つ。
 
 ## 0. 要約（結果が出てから埋める・一段落）
 
 〔結果 A〕
+
+**見落としの割合（先に置く・裁定 D128・採否表 P352）**: {{reading_D128/power_in_lead}}
 
 ## 1. 何を測ったか
 
@@ -39,9 +41,21 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 
 〔結果 F〕
 
+**td の特異性とランダム方向の等質性**（裁定 D123・D127）: 〔結果 I〕
+
+{{descriptive_families/B_desc_textdiff/null_note_D123}}
+
+**副位置の読み（層ごとの分離・裁定 D132）**: 〔結果 J〕
+
+{{descriptive_families/B_desc_direction/static_separation_D132}}
+
 ## 6. S4 の反証（三分岐）
 
 〔結果 G〕
+
+{{descriptive_families/B_desc_S4/adjudication}}
+
+{{reading_D128/falsification_scope}}
 
 ## 7. 読み（正本 `reading_B`）
 
@@ -60,13 +74,21 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 - {{reading_B/clauses/11}}
 - {{reading_B/clauses/12}}
 - {{reading_B/clauses/13}}
+- {{reading_D128/nk_normalised}}
+- {{reading_D128/vhat_from_floor_pair}}
+- {{reading_D128/partial_removal}}
+- {{reading_D128/td_not_clean}}
 
 ## 8. 限界（結果を見る前に置く）
 
 - **主位置の方向の加減で率が動くかは、この走行の前には誰も測っていない。**
 - 書式外と refuse は分母に入り破局に数えない。希釈の門（腕の間の差 {{dilution_gate/threshold_pt}} pt）を置いたが、門の内側の差は残る。
 - 前置きの長さは腕で揃っていない。方向には長さの差に由来する位置の成分が混じりうる（腕は書き換えていない・トークン長は凍結時に記帳した）。
-- 選定は加算の土台・抽出場面で行い、ほかの族と場面には外挿である。合成の検出力（選定 × 確証）は高くない。
+- 選定は加算の土台・抽出場面で行い、ほかの族と場面には外挿である。
+- **見落としの割合**: {{reading_D128/power_in_lead}}
+- 区間: {{interval/note}}
+- td の特異性の数の基準の水準は確証の各族の水準より緩く、**特異性を書ける側に倒れやすい**（正本 `B_desc_textdiff.specificity_rule`）。
+- {{random_control/homogeneity_rule}}
 - 判定器の妥当性は段階 A の測定を持ち越した。**介入のある腕は、A で判定器を測った腕に含まれない。**
 - 品質床の課題は公開の課題で、学習に含まれる可能性がある。得点の絶対値ではなく腕間の差だけを読む。
 - 族は相手の腕を共有するので独立でない。上界は和で置いた。

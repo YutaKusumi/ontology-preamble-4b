@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""control_chart_B.py v2 —— 段階 B の**校正の管理図**（正本 `calibration`・起草者の見直し S1・実装検分の採否表 P276）。
+"""control_chart_B.py v3 —— 段階 B の**校正の管理図**（正本 `calibration`・起草者の見直し S1・実装検分の採否表 P276）。
 
 別置きの校正腕は置かない（試行が増えるため）。代わりに、**無操作の腕の率をセッションごとに並べる**。
   - 点: 腕 × 場面 × セッションの全分母破局率（分子＝破局・分母＝n_ok）。
   - 初点: 同じ腕 × 場面の**最初のセッション**（初点は判定しない）。
-  - 帯: `calibration.band_pt`（二標本・両側・厳密 Fisher）。外れたら「器の異常」を記帳し、**その走行を含む対比の確証札に注を付す**。
+  - 帯: `calibration.band_pt`（二標本・両側・厳密 Fisher）。**帯を超え、かつ p が `calibration.alpha` 未満のときだけ**「器の異常」を記帳し、**その走行を含む対比の確証札に注を付す**（v3・2026-09-19・正本 `calibration.judgement`・v2 までは p を判定に使っていなかった）。
 限界（正本 `calibration.limitation`）: 同じ腕 × 場面が一つのセッションに収まる場合、点は一つだけで管理図にならない。その旨を印字する。
 出力: records/B/control-chart-B-<日付>.{md,json}（--force が無ければ上書きしない）。
 用法: python tools/control_chart_B.py [--root <results>] [--allow-dry] [--force]
@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from scipy.stats import fisher_exact
 import runs_B
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--root', default=None)
@@ -28,6 +28,7 @@ T = runs_B.load_T(a.contrasts)
 CAL = T['calibration']
 NOOP = set(T['arms']['noop'])
 BAND = CAL['band_pt'] / 100.0
+ALPHA = CAL['alpha']
 
 idx = runs_B.index_runs(T, T['tags']['main'], a.root, allow_dry=a.allow_dry)
 points, anomalies, notes = [], [], []
@@ -54,9 +55,16 @@ for (sc, arm), pts in sorted(by_cell.items(), key=str):
             base = pts[0]
             pval = float(fisher_exact([[p['k'], p['n'] - p['k']], [base['k'], base['n'] - base['k']]])[1])
             d = (p['rate'] or 0) - (base['rate'] or 0)
-            out = abs(d) > BAND
-            row.update({'diff_pt': round(100 * d, 3), 'p': pval, 'outside': out,
-                        'verdict': ('**帯の外**（器の異常を記帳し、この走行を含む対比の確証札に注を付す）' if out else '帯の内側')})
+            # **帯を超え、かつ厳密検定の p が alpha 未満のときだけ異常**（正本 calibration.judgement・裁定 D127・採否表 P350）。
+            # v2 までは差だけで判定し、正本が「厳密」と書く検定の p を一度も使っていなかった。
+            # この直しは異常の札を減らす向き（小さな n の揺れで札が立たない）であり、起草者の引力と同じ側——正本に書いた。
+            band_out = abs(d) > BAND
+            out = band_out and (pval < ALPHA)
+            row.update({'diff_pt': round(100 * d, 3), 'p': pval, 'outside': out, 'band_outside': band_out,
+                        'verdict': ('**帯の外かつ有意**（器の異常を記帳し、この走行を含む対比の確証札に注を付す）' if out else
+                                    ('帯の外だが有意でない（異常にしない・p を印字する）' if band_out else '帯の内側'))})
+            if abs(abs(d) - BAND) < 1e-9:
+                row['verdict'] += '・境目に一致（%g pt）' % CAL['band_pt']
             if out:
                 anomalies.append({'scenario': sc, 'arm': arm, 'run_key': p['run_key'], 'diff_pt': row['diff_pt']})
         points.append(row)
