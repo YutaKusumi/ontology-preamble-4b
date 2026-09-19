@@ -28,7 +28,7 @@ ap.add_argument('--force-problems', action='store_true', help='整合検査に�
 ap.add_argument('--template', default=os.path.join(REPO, 'records', 'B', 'results-report-template-B.md'))
 ap.add_argument('--out', default=None)
 ap.add_argument('--force', action='store_true')
-ap.add_argument('--lint', action='store_true', help='組み立ての後に報告の走査器（tools/report_lint.py）を走らせる（裁定 D112・採否表 P320）')
+ap.add_argument('--lint', action='store_true', help='組み立ての後に報告の走査器（tools/report_lint.py）を走らせる（裁定 D112・採否表 P327）')
 a = ap.parse_args()
 T = runs_B.load_T()
 A = runs_B.read_json(a.analysis)
@@ -91,9 +91,9 @@ C_gate = block(['```',
                 (G['selection'].get('tie_note') or ''), (G['selection'].get('nonpositive_stop') or ''),
                 '```'])
 fmt_p = lambda x: ('—' if x is None else ('%.3g' % x if x >= 1e-5 else '<1e-5'))
-fmt_n = lambda x: ('—' if x is None else ('%g' % round(float(x), 4)))      # 丸めない浮動小数を報告に出さない（採否表 P328）
+fmt_n = lambda x: ('—' if x is None else ('%g' % round(float(x), 4)))      # 丸めない浮動小数を報告に出さない（採否表 P335〔二体目 G1〕）
 
-# **雛形の数を正本から組み直して突き合わせる**（裁定 D112・採否表 P319）。
+# **雛形の数を正本から組み直して突き合わせる**（裁定 D112・採否表 P326）。
 _src = os.path.splitext(a.template)[0] + '.src.md'
 if os.path.exists(_src):
     import subprocess, tempfile as _tf, shutil as _sh
@@ -185,7 +185,7 @@ open(out_md, 'w', encoding='utf-8', newline='\n').write(tpl)
 import report_lint as _RL
 _RL.write_sidecar(out_md, tpl, T, 'tools/build_report_B.py %s' % VERSION)
 if a.lint:
-    # **報告の走査器を走らせる**（裁定 D112・採否表 P320）。前は口上が持つと書いて argparse に口が無かった。
+    # **報告の走査器を走らせる**（裁定 D112・採否表 P327）。前は口上が持つと書いて argparse に口が無かった。
     import subprocess
     lint = os.path.join(REPO, 'tools', 'report_lint.py')
     if not os.path.exists(lint):

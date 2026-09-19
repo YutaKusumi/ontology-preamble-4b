@@ -85,7 +85,7 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             if rc_stop != 0:
                 fired['封印の欠けで止まる'].append(case)
             cmd += ['--seal', seal, '--allow-partial-seal']
-        # **門が開いていなければ止まることを先に確かめる**（裁定 D109・採否表 P315）
+        # **門が開いていなければ止まることを先に確かめる**（裁定 D109・採否表 P318）
         if G.get('verdict') != 'open':
             rc_stop2, _ = run(cmd)
             if rc_stop2 != 0:
@@ -199,7 +199,7 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
         if unmeas:
             fired['未測定（ループ・打ち切り）'].append(case)
         if case == 'dilution_causal':
-            # **恒真にしない**（裁定 D111・採否表 P309）。書式外の差・見かけの破局率の差・札の三つがそろって初めて発火。
+            # **恒真にしない**（裁定 D111・採否表 P310）。書式外の差・見かけの破局率の差・札の三つがそろって初めて発火。
             cc = runs_B.counts_main(T, root=root, allow_dry=True)[0]
             v, r = cc.get(('N1', 'Onull+v')), cc.get(('N1', 'Onull+vrand'))
             if v and r:

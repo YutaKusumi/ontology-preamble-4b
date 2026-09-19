@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
-"""build_draftB.py v2 —— 段階 B の草案（と報告雛形）を原稿から組み立てる（段階 A の `build_draftA.py` の型・凍結した A の器は触らない）。
+"""build_draftB.py v3 —— 段階 B の草案（と報告雛形）を原稿から組み立てる（段階 A の `build_draftA.py` の型・凍結した A の器は触らない）。
 - **一覧の展開**（v2・2026-09-19）: 原稿の行 `{{list:正本のキー}}` を、正本の一覧の各項目の箇条に展開する（開示の五項目を依頼文と草案が同じ出所から組むため・裁定 D117）。
 - **裁定の台帳の検査**（v2・採否表 P376）: 原稿が引く裁定番号がすべて正本 `decisions` にあることを確かめ、無ければ止める。
   数の走査器 `numbers_lint.py` は段階 A の凍結した器なので、この検査はそちらに足さず、B の組み立て器に置く。
+- **採否表の引用の照合**（v3・2026-09-19）: 組み上げた文書・正本・器材の「採否表 P…」を `tools/citations_B.py` で採否表と照らし、
+  違反があれば終了コードを立てる（束の前の点検で、手で打った引用の誤りが多数見つかったため）。
 - 組み立ての前に `numbers_lint` の束縛検査（原稿の数はキー参照か構造）を走らせ、違反があれば止める。
 - 原稿の {{正本のキー}} を正本 JSON の値で置換する。
 - 草案（--kind draft）: §6 の「- **転記行 X** — 〔転記行 X〕」を設計事実 JSON の逐語で置換し、本文中の〔転記行 X〕を「〔転記行 X・§6〕」に改め、§6-補 に置換の記録を印字する。
@@ -111,4 +113,11 @@ _sh.rmtree(_d, ignore_errors=True)
 os.makedirs(os.path.dirname(a.lint_report), exist_ok=True)
 open(a.lint_report, 'w', encoding='utf-8', newline='\n').write('\n'.join(L) + '\n')
 print('\n'.join(L[:12 + min(60, nb)]))
-sys.exit(1 if nb else 0)
+# ---- 採否表の引用の照合（v3） ----
+import citations_B as _CB
+_cv, _ct = _CB.check_all(REPO, docs=[rel(a.out)])
+print('[build_draftB] 採否表の引用の照合（`tools/citations_B.py` %s）: 引用 %d・裁定の照合 %d・札の照合 %d・違反 %d'
+      % (_CB.VERSION, _ct['cit'], _ct['d'], _ct['label'], len(_cv)))
+for _w, _p, _y in _cv[:40]:
+    print('  違反: %s %s —— %s' % (_w, _p, _y))
+sys.exit(1 if (nb or _cv) else 0)

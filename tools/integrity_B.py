@@ -92,10 +92,10 @@ def check_cell(rec):
                 problems.append('%s × %s: preamble_sha が一つでない' % (rk, arm))
             elif want_sha and next(iter(shas)) != want_sha:
                 problems.append('%s × %s: **preamble_sha が正本 arms.sha16 と違う**（%s 対 %s）' % (rk, arm, next(iter(shas)), want_sha))
-        # 「書式外なのに正答」の検査は**ここには置けない**（裁定 D113・採否表 P314）。
+        # 「書式外なのに正答」の検査は**ここには置けない**（裁定 D113・採否表 P313）。
         # 正答の欄は率盲検の欄なので、許可表で読む行では恒に空になり、この検査は決して発火しなかった。
         # 規約は採点器（steer_B.score_quality）が保証し、読み口が数えた件数を門と集計器が読んで止める。
-        # **正本の式で組み直した値と突き合わせる**（正本 seeds.derivation_formula・裁定 D107・採否表 P310）。
+        # **正本の式で組み直した値と突き合わせる**（正本 seeds.derivation_formula・裁定 D107・採否表 P312）。
         # 前は走行の種と直に比べていたので、実機が正本に従えば必ず落ちる状態だった。
         run_seed = next(iter(seeds_exp)) if len(seeds_exp) == 1 else m.get('seed')
         if run_seed is not None:
@@ -144,7 +144,7 @@ def check_cell(rec):
     if m.get('order') is not None and m['order'] != T['runner']['order_id']:
         problems.append('%s: 並べ方 %s が正本 runner.order_id（%s）と違う' % (rk, m['order'], T['runner']['order_id']))
     # **全相で確かめる**（裁定 D126・2026-09-18）。前は本走行の相にしか掛かっておらず、
-    # 調整走行・品質床・同一性選別では記録を丸ごと消しても零件だった（系統外の検分で走らせて捕まった・採否表 P352）。
+    # 調整走行・品質床・同一性選別では記録を丸ごと消しても零件だった（系統外の検分で走らせて捕まった・採否表 P349）。
     if rk not in sessions:
         problems.append('%s: セッション記録が無い（正本 sessions.missing_rule・裁定 D126）' % rk)
     else:
@@ -224,7 +224,7 @@ if set(ALLOW) & set(BLIND):
 
 # ---- 走行を跨いだ同一性（runner.fixed_across_runs・採否表 P274） ----
 # **manifest に実在する欄で見る**（裁定 D126・2026-09-18）。`versions` はセッション記録の欄であって
-# manifest には無いので、この検査は**常に飛んでいた**（系統外の検分で捕まった・採否表 P363）。
+# manifest には無いので、この検査は**常に飛んでいた**（系統内の検分で捕まった・採否表 P362）。
 # あわせて、値が空のときも黙って飛ばさず不整合に数える。
 FIX_KEYS = {'重みの rev': 'model_rev', 'tokenizer の版': 'tokenizer_rev', 'バッチの大きさ': 'batch',
             '詰めの向き': 'padding', '走行器の SHA': 'runner_sha', '環境の SHA': 'pip_freeze_sha16',

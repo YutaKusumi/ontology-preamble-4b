@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v2 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v3 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
 
 系統の外への検分で、**差し戻しの原因そのものに戻しても両方の自己検査が「すべて通った」と印字する**ことが分かった。
 「検査が通った」を品質の証拠にしないために、**検査そのものを検査する**器を置く。
@@ -12,7 +12,7 @@
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -75,6 +75,15 @@ MUTATIONS = [
       "            'style_a': None, 'style_b': None, 'mention': None,"),
      ['run_stageB_local.py'],
      '様式門が実データで黙って効かない誤り（走行器 v4 まで実際にこうだった）'),
+    # ---- 採否表の引用の照合（2026-09-19・束の前の点検で手で打った引用の誤りが多数見つかった） ----
+    ('引用の裁定の照合を外す', '—', 'citations_B.py',
+     ('                if not (ds & rd):', '                if False:'),
+     ['citations_B.py'],
+     '引用の括弧の裁定と、引いた採否表の行の裁定が食い違っても止めない誤り（直す前の器材に実際に四十件余りあった型）'),
+    ('出所の札の照合を外す', '—', 'citations_B.py',
+     ('                if not ok(voters):', '                if False:'),
+     ['citations_B.py'],
+     '系統内の検分が挙げた所見に「系統外の検分」の札を付けても止めない誤り（独立の票の記録が水増しされる側）'),
 ]
 
 # 合成データを通して確かめる変異（自己検査では見えない・裁定 D122／D125・D126・D121・D119）

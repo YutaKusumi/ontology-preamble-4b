@@ -1,3 +1,8 @@
+# 器材のソース（逐語・参照）（参照・関わる問い (b)(g)・機械生成・2026-09-19 01:57 UTC）
+
+## `tools/make_contrasts_B.py`（SHA16 6D1316F32992EE42・799 行）
+
+```python
 # -*- coding: utf-8 -*-
 """make_contrasts_B.py v8 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
 v7 からの変更（v8・草案11B〜12B・2026-09-18〜19）: **版の名を v7 のまま上げていなかった**（器材の直しの確認の裁定 D101〜D116・系統の外への検分の裁定 D117〜D131・束の前の点検と裁定 D132 の直しが入っていた）。この版で v8 に上げた（前例は採否表 P239）。変更の中身は各巡の採否表・裁定の記録と `records/B/tooling-record-B-2026-09-18.md` にある。2026-09-19 には、S4 の動作特性を判定の規則の器 `rules_B` で生成のときに数える形・開示の五項目 `disclosure.items`・副位置の読み方（裁定 D132）・報告の走査器の鍵を置き、**採否表の引用の番号と出所の札を直した**（`records/B/citation-check-2026-09-19.md`）。
@@ -797,3 +802,4 @@ open(OUT, 'w', encoding='utf-8', newline='\n').write(s)
 print('[contrasts-B] written %s sha16 %s | m %d | 本走行の腕 %d（場面ごと %s）| 候補 %d 組'
       % (OUT, hashlib.sha256(s.encode('utf-8')).hexdigest()[:16].upper(), sum(F['m'] for F in fam.values()),
          len(main_arms), '・'.join('%s %d' % (sc, len(arms_by_scenario[sc])) for sc in SC), len(LAYERS) * len(COEFS)))
+```

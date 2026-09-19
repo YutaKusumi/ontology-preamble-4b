@@ -140,7 +140,7 @@ def quality_generation():
     """品質床の生成の設定（**貪欲**・正本 quality_floor.generation・裁定 D78）。"""
     g = T['quality_floor']['generation']
     assert g['temperature'] == 0, '品質床は貪欲（temperature 零）でなければならない（裁定 D78）'
-    if g.get('max_tokens') is None:      # **黙って落とさない**（裁定 D103・採否表 P325）
+    if g.get('max_tokens') is None:      # **黙って落とさない**（裁定 D103・採否表 P328）
         raise SystemExit('品質床の最大トークン数が未定（裁定 D66 と採否表 P216 で決める）。'
                          'このまま実機に渡すと transformers の既定で走り、例外も警告も出ない')
     return _to_hf(g, greedy=True)
@@ -168,7 +168,7 @@ def _selftest():
         assert len(rs) == N_RAND
         for r in rs:
             assert abs(float(np.linalg.norm(r)) - nv) < 1e-9, 'ランダム方向のノルムが ‖v̂‖ に合っていない（裁定 D90）'
-    # (2) **合成の検査**（裁定 D102・採否表 P306・P310）: 加わる量のノルムが
+    # (2) **合成の検査**（裁定 D102・採否表 P309・P311）: 加わる量のノルムが
     #     **全方向（v̂・Nk・td・(6b)・ランダム方向） × 全係数 × 全層**で一致する。
     #     前は v 腕とランダム腕の対しか回さなかったため、交差族と S4 の反証に同じ穴が残った。
     raw = {'Nk': rng.normal(size=32) * 7.0, 'td': rng.normal(size=32) * 0.2, 'loaded': rng.normal(size=32) * 3.5}
@@ -218,7 +218,7 @@ def _selftest():
         assert 'max_new_tokens' in qg, '品質床の最大トークン数が黙って落ちている（裁定 D103）'
     assert set(mg) <= {'do_sample', 'temperature', 'top_p', 'max_new_tokens'}, '生成の設定に transformers が知らない鍵が混ざる'
     assert mg['max_new_tokens'] == T['runner']['generation']['max_tokens'] and mg['temperature'] == T['runner']['generation']['temperature']
-        # (8) **帯の起点**（裁定 D101・採否表 P305）: 実トークナイザがあれば、起点のトークンを復号して場面本文の先頭に一致することを確かめる
+        # (8) **帯の起点**（裁定 D101・採否表 P308）: 実トークナイザがあれば、起点のトークンを復号して場面本文の先頭に一致することを確かめる
     band = _selftest_band()
     print('[steer_B selftest] 全方向 × 全係数 × 全層の合成 %d 通り・引き直し・層の子ストリーム・割り当てと再開・加減の向き・生成の設定・%s: すべて通った'
           % (n_checked, band))

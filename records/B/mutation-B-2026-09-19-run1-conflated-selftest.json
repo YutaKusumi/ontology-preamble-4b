@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
  "version": "v3",
- "generated_utc": "2026-09-19T01:30:59Z",
+ "generated_utc": "2026-09-19T01:24:51Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -84,7 +84,7 @@
    ],
    "missed": [],
    "lines": {
-    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '当否を言わない', 0.7070567376539129, np.float64(0.3335191915017552))"
+    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '下がらなかった（封印は当たり）', 0.2450702712391273, np.float64(0.6186078173912847))"
    }
   },
   {
@@ -191,12 +191,12 @@
    "target": "citations_B.py",
    "applied": true,
    "what": "引用の括弧の裁定と、引いた採否表の行の裁定が食い違っても止めない誤り（直す前の器材に実際に四十件余りあった型）",
-   "caught": [
+   "caught": [],
+   "missed": [
     "citations_B.py"
    ],
-   "missed": [],
    "lines": {
-    "citations_B.py": "AssertionError: 裁定の食い違いを止めない（札なし）"
+    "citations_B.py": "[citations_B] 自己検査: すべて通った"
    }
   },
   {
@@ -210,7 +210,7 @@
    ],
    "missed": [],
    "lines": {
-    "citations_B.py": "AssertionError: 札の食い違いを止めない（裁定なし）"
+    "citations_B.py": "AssertionError: 札の食い違いを止めない"
    }
   },
   {
@@ -318,6 +318,6 @@
    "mutated": "(0, {'holm_alpha': [0.00625, 0.007143, 0.0125, 0.0125, 0.016667, 0.016667, 0.025], 'confirm': 3, 'reverse': 1,"
   }
  ],
- "missed": 0,
+ "missed": 1,
  "total": 23
 }

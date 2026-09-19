@@ -53,7 +53,7 @@ DRY = sorted({m for recs in list(idx_tune.values()) + list(idx_q.values()) for r
 
 # ---- セッション記録（正本 sessions.enforced_by・裁定 D126・2026-09-18） ----
 # 正本は「門・集計器・整合検査の**三つ**が確かめる」と書いているのに、門は一度も読んでいなかった
-# （系統外の検分で、記録を丸ごと消しても判定 open・終了コード 0 で通ることが示された・採否表 P352）。
+# （系統外の検分で、記録を丸ごと消しても判定 open・終了コード 0 で通ることが示された・採否表 P349）。
 _SESS = runs_B.sessions_by_run_key(runs_B.load_sessions(a.root))
 _miss = sorted({rec['run_key'] for recs in list(idx_tune.values()) + list(idx_q.values())
                 for rec in recs if rec['run_key'] not in _SESS})
@@ -61,7 +61,7 @@ if _miss and not a.allow_no_sessions:
     sys.exit('走行キーのセッション記録が無い（正本 sessions.missing_rule・裁定 D126）: %s%s。検査用は --allow-no-sessions'
              % ('・'.join(_miss[:6]), ' ほか %d 件' % (len(_miss) - 6) if len(_miss) > 6 else ''))
 
-# ---- 登録された升目の欠け（裁定 D126・採否表 P362） ----
+# ---- 登録された升目の欠け（裁定 D126・採否表 P361） ----
 # 調整走行の升目が欠けると候補は黙って選定から外れるが、判定は open のままだった。
 _want_tune = {(sc, l, c, arm) for sc in EX for (l, c) in CANDS for arm in (V_ARM, R_ARM)}
 _gap_tune = sorted(_want_tune - set(CT), key=str)
@@ -100,7 +100,7 @@ for base in QF_ARMS:
         noop = partner('selection', base, session)
         # **相手のセルに走行が二本以上あれば止める**（正本 sessions.partner_duplicate_rule・裁定 D126）。
         # 鍵の種類は数えても鍵の中の本数は数えていなかったので、同じ番号の二本が黙って合算され、
-        # 分母が倍になって門1 が誤って閉じる形が残っていた（採否表 P361）。
+        # 分母が倍になって門1 が誤って閉じる形が残っていた（採否表 P360）。
         if noop is not None and noop.get('n', 0) > QF['items']:
             qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True,
                           'note': '無操作の相手の試行が %d 件あり、登録の %d 件を超える（走行が二本以上ある・裁定 D126）'
@@ -118,7 +118,7 @@ for base in QF_ARMS:
                           'note': '判定しない（api_error の率の差が %g pt を超える・裁定 D127）' % QF['api_error_gate_pt']})
             continue
         gap = cell.get('scoring_gap', 0) + noop.get('scoring_gap', 0)
-        if gap:                                   # **採点欠落があれば判定しない**（裁定 D103・採否表 P320）
+        if gap:                                   # **採点欠落があれば判定しない**（裁定 D103・採否表 P319）
             qrows.append({'base': base, 'arm': arm, 'layer': l, 'coef': c, 'missing': True, 'scoring_gap': gap,
                           'note': '判定欄が空の試行が %d 件ある（採点が済むまで判定しない・裁定 D103）' % gap})
             continue
@@ -159,7 +159,7 @@ for (l, c) in CANDS:
         both_high = (pv is not None and pr is not None and pv > CEN['high'] and pr > CEN['high'])
         row['censored'] = bool(both_low or both_high)
         row['censor_side'] = '床' if both_low else ('天井' if both_high else None)
-        # **帯の境目に一致した値は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P327）
+        # **帯の境目に一致した値は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P332）
         row['censor_boundary'] = [name for name, val, thr in
                                   (('床', pv, CEN['low']), ('床', pr, CEN['low']), ('天井', pv, CEN['high']), ('天井', pr, CEN['high']))
                                   if val is not None and abs(val - thr) < 1e-12]
@@ -199,7 +199,7 @@ if gate1_open and elig:
     band = runs_B.equivalence_band(n_v, n_r, p0, k, reps=a.reps,
                                    seed=[T['seeds']['tiebreak'] + 1, _tie_mix])
     q95 = band['q95_pt']
-    # **帯の境目に一致した候補は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P327）
+    # **帯の境目に一致した候補は印字する**（正本 report_rules.band_edge・裁定 D115・採否表 P332）
     tied = [{'layer': r['layer'], 'coef': r['coef'], 'eff_pt': r['eff_pt'],
              'boundary': abs((best - r['eff_pt']) - q95) < 1e-9} for r in elig if (best - r['eff_pt']) <= q95]
 
@@ -219,7 +219,7 @@ lines.append(PS['selection_direction'])
 if stop:
     lines.append(PS['nonpositive'].format(eff=max((r['eff_pt'] for r in elig), default=None)))
 
-# **登録された升目の欠けも incomplete に倒す**（裁定 D126・採否表 P362）。
+# **登録された升目の欠けも incomplete に倒す**（裁定 D126・採否表 P361）。
 # 前は調整走行の升目が欠けても判定は open のままで、最良の候補の置き場が欠けても選定が黙って変わった。
 if _gap_tune and not a.allow_missing_cells:
     incomplete = True

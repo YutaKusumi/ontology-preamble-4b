@@ -143,7 +143,7 @@ def build_directions(H):
             v = per[name]['mean']
             raw_ratio[name] = (float(np.linalg.norm(v)) / float(np.linalg.norm(v_hat))) if np.linalg.norm(v_hat) else None
             if name != 'static':
-                v = match_norm(v, v_hat)      # **全方向を ‖v̂〔static〕‖ に合わせる**（裁定 D102・採否表 P306・P310）
+                v = match_norm(v, v_hat)      # **全方向を ‖v̂〔static〕‖ に合わせる**（裁定 D102・採否表 P309・P311）
             out[(name, ratio)] = v
         stats[ratio] = {
             'norms': {name: float(np.linalg.norm(out[(name, ratio)])) for name in pairs},
@@ -175,7 +175,7 @@ def determinism_cross_order(h1, h2, tol=None):
     """**並べ方を変えて**取った活性が許容差の内側かを見る（裁定 D91 の (ii)）。外れたら記帳して登録者に上げる（止めない）。"""
     tol = tol or T['activation_storage']['determinism']['cross_order_tolerance']
     rows = []
-    if set(h1) != set(h2):      # **鍵の欠けを黙って無視しない**（裁定 D114・採否表 P318）
+    if set(h1) != set(h2):      # **鍵の欠けを黙って無視しない**（裁定 D114・採否表 P325）
         rows.append({'key': '（鍵の集合）', 'ok': False,
                      'note': '鍵の集合が違う: %s' % sorted(set(h1) ^ set(h2), key=str)[:4]})
     for k in sorted(set(h1) & set(h2), key=str):
@@ -274,7 +274,7 @@ if __name__ == '__main__':
         sys.exit('torch／transformers が無い: %s（この器は GPU の上で走らせる。手元の検査は --selftest）' % e)
     out_dir = a.out or os.path.join(REPO, 'results', 'dirB')
     os.makedirs(out_dir, exist_ok=True)
-    # 置き場を直に渡せるようにする（版を固定し、Hub への問い合わせを避ける・裁定 D115・採否表 P328）
+    # 置き場を直に渡せるようにする（版を固定し、Hub への問い合わせを避ける・裁定 D115・採否表 P335〔二体目 G8〕）
     tok = AutoTokenizer.from_pretrained(os.environ.get('OP4B_TOKENIZER_DIR') or a.model)
     tok.padding_side = 'left'                                  # 正本 runner.padding
     model = AutoModelForCausalLM.from_pretrained(a.model, torch_dtype=getattr(torch, a.dtype), device_map='auto')

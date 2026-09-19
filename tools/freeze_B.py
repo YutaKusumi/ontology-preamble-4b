@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v4 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v5 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
 
 凍結するもの（正本 `publication.record_first`・草案8B §2.11）:
   凍結本文（草案）・正本 `design/contrasts-B.json`・腕と方向の定義・器材・報告の雛形・**封印予想**。
@@ -13,6 +13,7 @@
   - v̂ の SHA（`selection.vector_fix`）と方向の要約統計（ノルム・コサイン・場面間の安定性）
 封印予想（`seal_format`）: 確証の各対比の符号と S4 の反証。**B のデータを一つも見る前**に書き、情報状態と時機を添える。
 凍結の後の変更はすべて**逸脱**とし、番号・日付・理由・登録者の承認を記帳する（`deviation.rule`）。
+**採否表の引用の照合**（v5・2026-09-19）: 正本・草案・報告雛形・器材の「採否表 P…」を `tools/citations_B.py` で照らし、違反があれば止める。
 出力: records/B/FREEZE-RECORD-B.md と同 .json（--force が無ければ上書きしない）。
 用法: python tools/freeze_B.py --draft design/design-stageB-draft12.md [--seal records/B/seal-B.json] [--values records/B/freeze-values-B.json] [--force]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -21,7 +22,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v4'
+VERSION = 'v5'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -34,7 +35,7 @@ CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_prea
              'refuse の分類の規則（丙）': 'arms/materials-draft/hei/refuse-rules-v2.json'}
 TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 'build_draftB.py', 'numbers_lint.py', 'gate_B.py', 'analyze_B.py',
          'layers_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'synth_B.py',
-         'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py']
+         'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py']
 NEED_VALUES = ['model_rev', 'tokenizer_rev', 'num_hidden_layers', 'layer_indices', 'arm_token_lengths',
                'quality_task', 'quality_base_accuracy', 'v_hat_sha256', 'direction_stats', 'h_norm_ratio',
                'identity_osec_ncold_decision', 's4_effect_decision']
@@ -101,14 +102,14 @@ else:
         blockers.append('封印の予想符号が正本の一覧（seal_format.sign_values）に無い: %s（使える語: %s・裁定 D121）' % ('・'.join(_bad), '・'.join(sorted(_vals))))
     if SEAL.get('s4') and SEAL['s4'] not in _vals:
         blockers.append('S4 の反証の封印が正本の一覧に無い: %s（裁定 D121）' % SEAL['s4'])
-    # **正本の鍵の登録から見る**（手書きの並びを置かない・裁定 D115・採否表 P328）
+    # **正本の鍵の登録から見る**（手書きの並びを置かない・裁定 D115・採否表 P335〔二体目 G5〕）
     for need, label in sorted(T['seal_format']['record_keys'].items()):
         if need in ('signs', 's4'):
             continue                      # 上で別に見ている
         if not SEAL.get(need):
             blockers.append('封印の記録に欄が無い: %s（%s・seal_format.record_keys）' % (need, label))
 # 整備の記録に載る SHA16 が現物と一致するかを見る（実装検分の採否表 P299——古い記録のまま凍結しない）。
-# **止める門の前に置く**（裁定 D112・採否表 P321）。前は門の後ろにあったので、古い記録だけのときに
+# **止める門の前に置く**（裁定 D112・採否表 P322）。前は門の後ろにあったので、古い記録だけのときに
 # 記録が書かれ、しかも「点検であり凍結ではない」と事実でないことを書いていた。
 import re as _re
 rec_path = os.path.join(REPO, 'records', 'B', 'tooling-record-B-2026-09-18.md')
@@ -125,6 +126,11 @@ if stale:
     blockers.append('器材の整備の記録の SHA16 が現物と違う（記録を作り直してから凍結する）: %s' % '・'.join(stale))
 if unlisted:
     blockers.append('器材の整備の記録に載っていない器材がある（記録に足す）: %s' % '・'.join(unlisted))
+# **採否表の引用の照合**（v5）: 手で打った引用が別の行を指していないか（裁定の番号と出所の札で照らせる範囲）
+import citations_B
+_cv, _ct = citations_B.check_all(REPO)
+if _cv:
+    blockers.append('採否表の引用の照合に違反が %d 件ある（`tools/citations_B.py`）: %s' % (len(_cv), '・'.join('%s %s' % (w, p) for w, p, _ in _cv[:5])))
 
 if blockers and not a.allow_missing:
     print('[freeze_B] 凍結できない（--allow-missing は点検用）:')
@@ -134,7 +140,7 @@ if blockers and not a.allow_missing:
 
 REC = {'kind': 'freeze_B', 'version': VERSION, 'frozen_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'), 'frozen_jst': jst.strftime('%Y-%m-%d %H:%M'),
        'frozen': frozen, 'values': VALUES, 'seal': SEAL, 'seal_sha256': (None if not a.seal else __import__('hashlib').sha256(open(a.seal, 'rb').read()).hexdigest().upper()),
-       'stale_record_hashes': stale, 'unlisted_tools': unlisted, 'blockers': blockers, 'deviations': [],
+       'stale_record_hashes': stale, 'unlisted_tools': unlisted, 'citation_violations': len(_cv), 'blockers': blockers, 'deviations': [],
        'deviation_rule': T['deviation']['rule'], 'record_first': T['publication']['record_first']}
 json.dump(REC, open(out_json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 L = ['# 段階 B 凍結記録（機械生成・`tools/freeze_B.py` %s）' % VERSION, '',

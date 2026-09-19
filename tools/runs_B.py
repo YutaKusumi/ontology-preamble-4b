@@ -70,7 +70,7 @@ def dry_marks(d, m, trials_path):
     marks = [x for x, on in (('manifest.dry_run', bool(m.get('dry_run'))), ('manifest.model', m.get('model') in ('stub/dry-run', 'stub')),
                              ('dir._dryrun', '_dryrun' in os.path.normpath(d).split(os.sep) or os.path.basename(d).endswith('__dryrun')),
                              ('dir._synth', '_synth' in os.path.normpath(d).split(os.sep))) if on]
-    # **先頭一行だけを見ない**（裁定 D115・採否表 P328）。合成の行が途中に混ざっても捕まえる。
+    # **先頭一行だけを見ない**（裁定 D115・採否表 P335〔二体目 G4〕）。合成の行が途中に混ざっても捕まえる。
     any_dry = any(r.get('dry_run') for r in iter_jsonl(trials_path, ('dry_run',)))
     if any_dry:
         marks.append('trials.dry_run')
@@ -130,7 +130,7 @@ def cell_counts(trials_path, acc=None, phase='main'):
             continue
         ff, lp, tr = bool(r['format_fail']), bool(r['loop_flag']), bool(r['truncated'])
         c['n_ok'] += 1
-        # **「まだ採点していない」と「採点した結果として当てはまらない」を分ける**（裁定 D103・採否表 P307・P320）。
+        # **「まだ採点していない」と「採点した結果として当てはまらない」を分ける**（裁定 D103・採否表 P306・P319）。
         # 凍結パーサ `is_catastrophic` は refuse に破局の判定を返さない規約なので、破局の欄の空で数えると
         # refuse が全件この札に落ち、確証の族が丸ごと判定不能になる（直しの確認の巡で実際に零になった）。
         # 書式外の試行は判定を持たないのが正しいので、ここには数えない。
@@ -138,7 +138,7 @@ def cell_counts(trials_path, acc=None, phase='main'):
         if not ff:
             if (r.get('correct') is None) if phase == 'quality' else (r.get('choice') is None):
                 gap = True                         # 判定欄が空（採点前・採点漏れ）——裁定 D96・D103
-            # **逆向きの穴も塞ぐ**（裁定 D126・採否表 P364）: 選択が読めているのに破局の判定が空の試行は、
+            # **逆向きの穴も塞ぐ**（裁定 D126・採否表 P363）: 選択が読めているのに破局の判定が空の試行は、
             # 黙って「破局でない」に数えられていた。凍結パーサは登録外の族に None を返すので、
             # 走行器が族を取り違えると率が下がる（起草者に有利な向き）。
             elif phase != 'quality' and r.get('choice') not in (None, 'refuse') and r['catastrophe'] is None:
@@ -306,7 +306,7 @@ def recorded_seed(T, cell_s, trial_index, start=0):
 
 
 def counts_main_by_direction(T, tag=None, root=None, allow_dry=False):
-    """本走行の**方向ごと**の件数（正本 `random_control.pooling`・裁定 D110・採否表 P311）。
+    """本走行の**方向ごと**の件数（正本 `random_control.pooling`・裁定 D110・採否表 P315）。
 
     合併する前に三本のランダム方向の率を出すために要る。{(場面, 腕, 方向の id): 件数}。"""
     tag = tag or T['tags']['main']
@@ -333,7 +333,7 @@ def counts_main_by_direction(T, tag=None, root=None, allow_dry=False):
 def stratum_of(r):
     """様式の層（正本 style_gate.stratified.strata）。JSON 直答なら json_direct・そうでなければ prose。
 
-    **書式外の試行は層に入れない**（答えが読めないので様式も読めない・裁定 D115・採否表 P328）。
+    **書式外の試行は層に入れない**（答えが読めないので様式も読めない・裁定 D115・採否表 P335〔二体目 G6〕）。
     前は合成データの書式外の行が様式の欄を持っていたため、読めない試行が json_direct の層に入っていた。"""
     if r.get('format_fail'):
         return None

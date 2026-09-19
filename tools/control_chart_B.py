@@ -48,7 +48,7 @@ for (sc, arm), pts in sorted(by_cell.items(), key=str):
         if i == 0:
             row['verdict'] = '初点（判定しない）'
         elif p['rate'] is None or pts[0]['rate'] is None:
-            # **使える試行が零の点は判定しない**（裁定 D110・採否表 P323）。
+            # **使える試行が零の点は判定しない**（裁定 D110・採否表 P324）。
             # 前は空を零と読んで差を計算し、測れなかった点に「器の異常」の札を付けていた。
             row['verdict'] = '測れなかった（使えた試行が零・判定しない）'
         else:
