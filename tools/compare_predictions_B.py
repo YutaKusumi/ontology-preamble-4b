@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""compare_predictions_B.py v1 —— 段階 B の**封印した予想の照合**（登録者とコーディネータ・正本 `predictions.compare_rules`・登録者裁定 D148）。
+"""compare_predictions_B.py v1.1 —— 段階 B の**封印した予想の照合**（登録者とコーディネータ・正本 `predictions.compare_rules`・登録者裁定 D148）。
 
 結果（門の記録と集計の記録）と、封印した二人の予想（`records/predictions/predictions-{registrant,coordinator}-B-<日付>.json`）を照らし、
 予想者ごとに、種別（向き・S4・全体）ごとの**的中・外れ・照合不能・予想しない**の件数と、外れと照合不能の一覧を書く。
@@ -14,7 +14,8 @@
 - 予想の JSON は照合の前に `seal_B.check_predictions` で照らし（欄の欠け・選択肢の外・予想者・様式の名・封印の出所・封印の経緯の記録の SHA-256）、外れたら照合せずに止める。
 - 集計の記録は、渡された門の記録から作ったもの（`gate_sha16`）でなければ止める。合成データの印があれば、検査用の口（--allow-dry）でなければ止める。
 v1（2026-09-19 の夜・封印の後・**結果の前**・独立の目を通っていない）。上の写し方のうち、正本に書かれていなかった所（門1 が閉じた回・判定保留の扱い・逆向きの確証の向き）は
-起草者の解釈で、正本 `predictions.compare_rules.interpretation` に置いた（登録者の確認を待つ）。
+起草者の解釈で、正本 `predictions.compare_rules.interpretation` に置いた。
+v1.1（同じ夜・結果の前）: 上の解釈が**登録者裁定 D149 で確定した**ので、口上のこの一句だけを改めた（振る舞いは v1 と同じ）。
 出力: records/B/predictions-check-B.md と同 .json（--out で変える・--force が無ければ上書きしない）。要約は報告の組み立て器が区画 L に機械で写す。
 用法: python tools/compare_predictions_B.py --gate records/B/gate-B-<日付>.json [--analysis records/B/analysis-B-<日付>.json] [--force] ／ --selftest
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -26,7 +27,7 @@ import runs_B
 import rules_B
 import seal_B
 
-VERSION = 'v1'
+VERSION = 'v1.1'
 REPO = runs_B.REPO
 V_HIT, V_MISS, V_NA, V_NP = '的中', '外れ', '照合不能', '予想しない'
 VERDICTS = (V_HIT, V_MISS, V_NA, V_NP)
