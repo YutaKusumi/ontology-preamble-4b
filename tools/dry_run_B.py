@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""dry_run_B.py v5 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+"""dry_run_B.py v6 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+v6（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: **予想の照合**（`tools/compare_predictions_B.py`）を通す経路——門が開いた回は集計と門の記録で、門1 が閉じた回は門の記録だけで照らす——と、報告の区画 L の経路を足した。照らすのは**封印した実物の予想**（`records/predictions`）で、合成データの結果と照らした出力は合成データの置き場に置き、印を付ける。
 v5（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: S4 の札を結果だけの名にし（経路の名は正本の札から作る）、門で保留・封印の照合の三つを足した（裁定 D134・D135）。td の特異性の三つの札（裁定 D133）・様式門に当たった非有意（採否表 P401）・選定後の品質床の相手の重複（採否表 P403）・副位置の読みの参照の行（裁定 D139）・報告の管理図の要約と、門の記録の食い違いで報告の器が止まること（採否表 P410・P403）を足した。
 
 器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表の経路を、合成データ（`synth_B.py`）で作り、
@@ -16,7 +17,7 @@ import runs_B
 
 T = runs_B.load_T()
 
-VERSION = 'v5'
+VERSION = 'v6'
 REPO = runs_B.REPO
 PY = sys.executable
 ap = argparse.ArgumentParser()
@@ -44,7 +45,9 @@ PATHS = ['確証', '確証（登録された向きと逆）', '封印した符�
          '副位置の読み（層ごとの分離）', 'S4 の区間は Newcombe', '報告の組み立て（全区画・走査器）',
          # v5（2026-09-19・最後の系統外の巡の後）
          '様式門に当たった非有意（札は非有意のまま）', '集計: 選定後の相手の重複', '副位置の読み: 参照の行',
-         '報告: 管理図の要約', '報告: 門の記録の食い違いで止まる']
+         '報告: 管理図の要約', '報告: 門の記録の食い違いで止まる',
+         # v6（2026-09-19 の夜・封印の後）
+         '予想の照合（両者・向き・S4・全体）', '予想の照合: 門1 が閉じた回', '報告: 予想の照合の区画']
 _s4_labels = T['descriptive_families']['B_desc_S4']['three_way']['labels']
 _s4_paths = [p for p in PATHS if p.startswith('S4: ')]
 assert _s4_paths == ['S4: %s' % l_ for l_ in _s4_labels] + ['S4: 余地の条項', 'S4: 門で保留'], (
@@ -163,9 +166,23 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             rc_s, out_s = run(['tools/sample_inspection_B.py', '--tag', T['tags']['main'], '--root', root, '--allow-dry', '--keydir', _keys,
                                '--out', os.path.join(root, 'sampling-B-sample.txt'), '--force'])
             assert rc_s == 0, ('抽出検査が落ちた', out_s[-400:])
+            # **予想の照合**（v6・裁定 D148）: 封印した実物の予想を、合成データの結果と照らす（出力は合成データの置き場・印つき）
+            rc_p, out_p = run(['tools/compare_predictions_B.py', '--gate', os.path.join(root, 'gate-B.json'), '--analysis', os.path.join(root, 'analysis-B.json'),
+                               '--allow-dry', '--out', os.path.join(root, 'predictions-check-B.md'), '--force'])
+            _PCJ = os.path.join(REPO, root, 'predictions-check-B.json')
+            if rc_p == 0 and os.path.exists(_PCJ):
+                _pc = json.load(open(_PCJ, encoding='utf-8'))
+                _m = sum(F_['m'] for F_ in T['families'].values())
+                if len(_pc['results']) == 2 and _pc.get('dry_marks') and all(
+                        sum(R_['counts']['向き'].values()) == _m and sum(R_['counts']['S4'].values()) == 1 and sum(R_['counts']['全体'].values()) == 2
+                        for R_ in _pc['results'].values()):
+                    fired['予想の照合（両者・向き・S4・全体）'].append(case)
+            else:
+                rec['compare_error'] = (out_p or '')[-600:]
             _rep_cmd = ['tools/build_report_B.py', '--analysis', os.path.join(root, 'analysis-B.json'), '--gate', os.path.join(root, 'gate-B.json'),
                         '--integrity', os.path.join(root, 'integrity-B.json'), '--sampling', os.path.join(root, 'sampling-B-seal.json'),
-                        '--layers', os.path.join(root, 'layers-B.json'), '--chart', os.path.join(root, 'chart-B.json'), '--allow-dry', '--force-problems',
+                        '--layers', os.path.join(root, 'layers-B.json'), '--chart', os.path.join(root, 'chart-B.json'),
+                        '--predictions-check', os.path.join(root, 'predictions-check-B.json'), '--allow-dry', '--force-problems',
                         '--out', os.path.join(root, 'report-B.md'), '--force', '--lint']
             rc_r, out_r = run(_rep_cmd)
             _rep = os.path.join(REPO, root, 'report-B.md')
@@ -178,6 +195,9 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             _CHJ = json.load(open(os.path.join(REPO, root, 'chart-B.json'), encoding='utf-8'))
             if rc_r == 0 and ('管理図の要約: 全点 %d・' % len(_CHJ.get('points') or [])) in _txt:
                 fired['報告: 管理図の要約'].append(case)
+            # **予想の照合の区画**（v6）: 二人の要約の行と、封印の順の注が本文に出ること
+            if rc_r == 0 and all(('%s: 向き（' % w_) in _txt for w_ in ('登録者', 'コーディネータ')) and '予想の独立（封印の順の注）' in _txt:
+                fired['報告: 予想の照合の区画'].append(case)
             # **門の記録の食い違いで止まる**（採否表 P403）: 集計が読んだ門とは別の門の記録を渡す
             _g2 = os.path.join(REPO, root, 'gate-B-other.json')
             _GJ = json.load(open(os.path.join(REPO, root, 'gate-B.json'), encoding='utf-8'))
@@ -210,6 +230,19 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             fired['封印した符号と一致'].append(case)
         rec['s4'] = A['s4'].get('verdict')
         rec['sign_agreement'] = A['sign_agreement']
+    # **門1 が閉じた回の予想の照合**（v6）: 門の記録だけで照らし、向き・S4・本数は照合不能、門1 だけを照らす
+    if (not G['gate1']['open']) and G['verdict'] != 'incomplete':
+        rc_pc, out_pc = run(['tools/compare_predictions_B.py', '--gate', os.path.join(root, 'gate-B.json'), '--allow-dry',
+                             '--out', os.path.join(root, 'predictions-check-B.md'), '--force'])
+        _PCJ = os.path.join(REPO, root, 'predictions-check-B.json')
+        _g1k = T['predictions']['fields']['gate1']['key']
+        if rc_pc == 0 and os.path.exists(_PCJ):
+            _pc = json.load(open(_PCJ, encoding='utf-8'))
+            if all(all(r_['verdict'] in ('照合不能', '予想しない') for r_ in R_['rows'] if r_['key'] != _g1k)
+                   and [r_['verdict'] for r_ in R_['rows'] if r_['key'] == _g1k] in (['的中'], ['外れ']) for R_ in _pc['results'].values()):
+                fired['予想の照合: 門1 が閉じた回'].append(case)
+        else:
+            rec['compare_error'] = (out_pc or '')[-600:]
     # 合成データの中身から確かめる経路（採否表 P300〜P302）
     import glob as _g
     mainroot = os.path.join(REPO, root, T['tags']['main'])
@@ -257,6 +290,8 @@ L += ['', '## 場合ごとの結果', '', '| 場合 | 門の判定 | 札の内�
 for r in rows:
     if r.get('report_error'):
         L.append('- **報告の組み立てが通らなかった**（%s）: %s' % (r['case'], r['report_error'].replace('\n', ' ')[:400]))
+    if r.get('compare_error'):
+        L.append('- **予想の照合が通らなかった**（%s）: %s' % (r['case'], r['compare_error'].replace('\n', ' ')[:400]))
 for r in rows:
     L.append('| %s | %s | %s | %s | %s |' % (r['case'], r['gate_verdict'],
                                              '・'.join('%s %d' % (k, v) for k, v in sorted(r['labels'].items())) or '—',

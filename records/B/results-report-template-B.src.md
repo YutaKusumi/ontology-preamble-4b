@@ -41,6 +41,8 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 
 **封印した予想符号との照合**: 〔結果 E〕
 
+**登録者とコーディネータの予想との照合**（正本 `predictions.compare_rules`・写し方の解釈は `predictions.compare_rules.interpretation`・裁定 D148）: 〔結果 L〕
+
 ## 5. 記述の族（p を印字しない）
 
 〔結果 F〕

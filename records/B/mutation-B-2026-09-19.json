@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
- "version": "v6",
- "generated_utc": "2026-09-19T11:16:25Z",
+ "version": "v7",
+ "generated_utc": "2026-09-19T11:46:49Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -84,7 +84,7 @@
    ],
    "missed": [],
    "lines": {
-    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '10 pt 以上の低下は否定', 0.2450702712391273, np.float64(0.6186078173912847))"
+    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '当否を言わない', 0.7070567376539129, np.float64(0.3335191915017552))"
    }
   },
   {
@@ -480,6 +480,76 @@
    }
   },
   {
+   "name": "非有意を照合不能に写す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "「どちらでもない」の予想が、非有意の結果でも照合不能に落ちる誤り（正本 compare_rules.direction の違反・当たりも外れも数えられなくなる）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('写し方が違う（得た・望んだ）', {'sub:S4:O-Ncold-v~O-Ncold-vrand': ('照合不能', '的中'), 'add:N1:Onull+v~Onull+vrand': ('照合不能', '外れ')})"
+   }
+  },
+  {
+   "name": "逆向きの確証を封印の向きで写す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "札の向き（集計の記号）を読まず、確証をすべて低下に写す誤り（逆向きに立った確証が、低下と予想した人の的中に化ける）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('写し方が違う（得た・望んだ）', {'sub:SK:O-Ncold-v~O-Ncold-vrand': ('外れ', '的中')})"
+   }
+  },
+  {
+   "name": "確証の本数の帯の境目を外す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "帯の上の端の本数（3・8・16 本）が帯に入らない誤り（照合不能に落ちる）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('帯の写し方', 0, None)"
+   }
+  },
+  {
+   "name": "照合で集計と門の記録の照合を外す",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "別の門の記録から作った集計で照合できてしまう誤り",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: 止まらなかった: 門の記録の食い違い"
+   }
+  },
+  {
+   "name": "予想しないを照合に数える",
+   "ruling": "D148",
+   "target": "compare_predictions_B.py",
+   "applied": true,
+   "what": "「予想しない」の欄を外れに数える誤り（正本 compare_rules.not_predicted の違反）",
+   "caught": [
+    "compare_predictions_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "compare_predictions_B.py": "AssertionError: ('写し方が違う（得た・望んだ）', {'cross:N1:O-Ncold+vNk~O-Ncold+vrand': ('外れ', '予想しない')})"
+   }
+  },
+  {
    "name": "書式外の境目を当たりに数える",
    "ruling": "D145",
    "target": "qf_select_B.py",
@@ -666,5 +736,5 @@
   }
  ],
  "missed": 0,
- "total": 48
+ "total": 53
 }

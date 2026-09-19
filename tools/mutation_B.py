@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v6 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v7 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v7（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: 予想の照合の器（`compare_predictions_B`）の写し方と照らしを外す型を五つ足した（非有意の写し方・逆向きの確証の向き・帯の境目・集計と門の記録の照合・予想しないの数え方）。
 v6（2026-09-19 の夜・封印の後・独立の目を通っていない）: 封印した予想の照合（`seal_B.check_predictions`）の五つの検査を外す型を足した（出所の SHA・向き・封印の経緯の記録の SHA・予想者・様式の名）。
 v5（2026-09-19 の後刻）: 腕の本文の末尾の改行を残して読む誤り（走行器 v6 まで実際にこうだった・O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった）を足した。
 v4（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 最後の巡の所見を入れ直した型を足した——td の特異性の向きを見ない（裁定 D133）・S4 の門を外す（D134）・S4 の封印の照合をしない（D135）・品質床の境目を合格に数える（D137）・ランダム方向を塊に戻す（D140）・様式門の札を保留に戻す（採否表 P401）・層の添字の照合を外す（P393）・相手の重複の番人を外す（P403）。帯の起点の変異は起点の関数（P404）に当て直した。
@@ -15,7 +16,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v6'
+VERSION = 'v7'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -171,6 +172,27 @@ MUTATIONS = [
      ("            if d.get(k) != M[k]:", "            if False:"),
      ['seal_B.py'],
      '別の段・別の版の書式で作った予想の JSON を通す誤り（正本 predictions.compare_rules.validation）'),
+    # ---- 予想の照合の器（v7・2026-09-19 の夜・結果の前） ----
+    ('非有意を照合不能に写す', 'D148', 'compare_predictions_B.py',
+     ("            d[cid] = ('どちらでもない', lab)", "            d[cid] = (None, lab)"),
+     ['compare_predictions_B.py'],
+     '「どちらでもない」の予想が、非有意の結果でも照合不能に落ちる誤り（正本 compare_rules.direction の違反・当たりも外れも数えられなくなる）'),
+    ('逆向きの確証を封印の向きで写す', 'D148', 'compare_predictions_B.py',
+     ("            v = inv.get(r.get('sign'))", "            v = inv.get('下')"),
+     ['compare_predictions_B.py'],
+     '札の向き（集計の記号）を読まず、確証をすべて低下に写す誤り（逆向きに立った確証が、低下と予想した人の的中に化ける）'),
+    ('確証の本数の帯の境目を外す', 'D148', 'compare_predictions_B.py',
+     ('        if lo <= n <= hi:', '        if lo <= n < hi:'),
+     ['compare_predictions_B.py'],
+     '帯の上の端の本数（3・8・16 本）が帯に入らない誤り（照合不能に落ちる）'),
+    ('照合で集計と門の記録の照合を外す', 'D148', 'compare_predictions_B.py',
+     ("        if A.get('gate_sha16') != runs_B.sha16_file(gate_path):", '        if False:'),
+     ['compare_predictions_B.py'],
+     '別の門の記録から作った集計で照合できてしまう誤り'),
+    ('予想しないを照合に数える', 'D148', 'compare_predictions_B.py',
+     ("        add('向き', cid, want, got, why, v)", "        add('向き', cid, want, got, why, V_MISS if want == NP else v)"),
+     ['compare_predictions_B.py'],
+     '「予想しない」の欄を外れに数える誤り（正本 compare_rules.not_predicted の違反）'),
     ('書式外の境目を当たりに数える', 'D145', 'qf_select_B.py',
      ("    t1 = [k for k in keys if row[k]['min_acc'] >= bmin and row[k]['max_ff'] <= thr]",
       "    t1 = [k for k in keys if row[k]['min_acc'] >= bmin and row[k]['max_ff'] < thr]"),
