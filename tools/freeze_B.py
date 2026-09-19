@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v7 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v8 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+v8（2026-09-19 の夜・封印の後・独立の目を通っていない）: **登録者とコーディネータの予想の JSON の SHA-256 を記帳する**（正本 `predictions.order`「凍結の記録に両方の SHA を記帳」）。
+  照合は `seal_B.check_predictions`（一つずつあること・書式の欄と選択肢・予想者・様式の名・起草者の封印がコーディネータの予想から作ったままか・
+  封印の経緯の記録に三つの SHA-256 が載るか）で、外れたら止める。凍結する器に封印の器 `seal_B.py` と照合の器 `compare_predictions_B.py`（結果の前・凍結の前に書く）を足した。
+  封印の記録の情報状態と順の注（登録者の予想を先に見た順の逆転）を凍結の記録に写す。
 v7（2026-09-19 の夕刻〜夜・裁定 D146〜D148・独立の目を通っていない）: 凍結する器に、品質床の課題の器 `qf_task_B.py`・選定の判定の器 `qf_select_B.py`・予想の書式の器 `make_predictions_form_B.py` を足した。
 v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 下りた裁定 D143（同一性選別に Osec-Ncold）・D136（S4 の効き目）を記帳の値から外し、**top_k の実効の値**（裁定 D142）・**品質床の問いの前置きの有無**（裁定 D138）・**下限の適用**（裁定 D137）を足した。凍結の記録に「最後の系統外の巡の後の直しは、独立の目を通っていない」を置く（正本 `report_rules.post_final_round`・裁定 D131）。
 
@@ -25,7 +29,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v7'
+VERSION = 'v8'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -40,13 +44,15 @@ TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 
          'layers_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'synth_B.py',
          'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py',
          'qf_task_B.py', 'qf_select_B.py',       # 品質床の課題の器と選定の判定の器（v7・裁定 D146・D147——凍結の後の品質床の走行が課題の器を使う）
-         'make_predictions_form_B.py']           # 予想の書式の器（v7・裁定 D148）
+         'make_predictions_form_B.py',           # 予想の書式の器（v7・裁定 D148）
+         'seal_B.py', 'compare_predictions_B.py']   # 封印の器と照合の器（v8・裁定 D148——照合の器は結果の前に書き、凍結の対象にする）
 NEED_VALUES = ['model_rev', 'tokenizer_rev', 'num_hidden_layers', 'layer_indices', 'arm_token_lengths',
                'quality_task', 'quality_base_accuracy', 'v_hat_sha256', 'direction_stats', 'h_norm_ratio',
                'top_k_stageA_effective', 'quality_input_mode', 'quality_base_min_applied']   # 裁定 D142・D138・D137（v6）
 ap = argparse.ArgumentParser()
 ap.add_argument('--draft', required=True)
 ap.add_argument('--seal', default=None)
+ap.add_argument('--predictions-dir', default=None, help='封印した予想の置き場（既定 records/predictions）')
 ap.add_argument('--values', default=None, help='凍結時に記帳する値（json・上の NEED_VALUES）')
 ap.add_argument('--contrasts', default=None)
 ap.add_argument('--out', default=None)
@@ -113,6 +119,13 @@ else:
             continue                      # 上で別に見ている
         if not SEAL.get(need):
             blockers.append('封印の記録に欄が無い: %s（%s・seal_format.record_keys）' % (need, label))
+# **登録者とコーディネータの予想の照合**（v8・正本 predictions.order「凍結の記録に両方の SHA を記帳」）——封印の有無に関わらず見る
+import hashlib as _hl
+import seal_B
+SEAL_SHA = None if not a.seal else _hl.sha256(open(a.seal, 'rb').read()).hexdigest().upper()
+_pd = a.predictions_dir or os.path.join(REPO, 'records', 'predictions')
+_pp, PRED = seal_B.check_predictions(T, _pd, SEAL, SEAL_SHA)
+blockers += ['封印した予想: ' + x for x in _pp]
 # 整備の記録に載る SHA16 が現物と一致するかを見る（実装検分の採否表 P299——古い記録のまま凍結しない）。
 # **止める門の前に置く**（裁定 D112・採否表 P322）。前は門の後ろにあったので、古い記録だけのときに
 # 記録が書かれ、しかも「点検であり凍結ではない」と事実でないことを書いていた。
@@ -144,7 +157,7 @@ if blockers and not a.allow_missing:
     sys.exit(1)
 
 REC = {'kind': 'freeze_B', 'version': VERSION, 'frozen_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'), 'frozen_jst': jst.strftime('%Y-%m-%d %H:%M'),
-       'frozen': frozen, 'values': VALUES, 'seal': SEAL, 'seal_sha256': (None if not a.seal else __import__('hashlib').sha256(open(a.seal, 'rb').read()).hexdigest().upper()),
+       'frozen': frozen, 'values': VALUES, 'seal': SEAL, 'seal_sha256': SEAL_SHA, 'predictions': PRED,
        'stale_record_hashes': stale, 'unlisted_tools': unlisted, 'citation_violations': len(_cv), 'blockers': blockers, 'deviations': [],
        'deviation_rule': T['deviation']['rule'], 'record_first': T['publication']['record_first'],
        'limitations': [T['report_rules']['post_final_round'], T['runner']['generation_explicit']['top_k_limitation'], T['quality_floor']['input_limitation']]}
@@ -168,10 +181,22 @@ for k in NEED_VALUES:
 L += ['', '## 封印予想（`seal_format`）', '']
 if SEAL:
     L += ['- 時機: %s' % T['seal_format']['timing'], '- 情報状態: %s' % T['seal_format']['information_state'],
+          '- 封印の記録の情報状態: %s' % (SEAL.get('information_state') or '（無い）'),
+          '- 封印の記録 `%s` の SHA-256: `%s`（出所 `%s`・SHA-256 `%s`）' % (os.path.relpath(a.seal, REPO).replace('\\', '/'), SEAL_SHA,
+                                                                   (SEAL.get('source') or {}).get('predictions'), (SEAL.get('source') or {}).get('sha256')),
           '- 封印した符号: %d／確証の対比 %d' % (len(SEAL.get('signs') or {}), len(conf_ids)),
           '- S4 の反証: %s' % (SEAL.get('s4') or '**まだ無い**'), '- %s' % T['seal_format']['reading']]
+    if SEAL.get('order_note'):
+        L.append('- **順の注**: %s' % SEAL['order_note'])
 else:
     L.append('- **まだ無い**（`seal_format` の様式で、データを一つも見る前に書く）')
+L += ['', '## 登録者とコーディネータの予想（`predictions`・両方の SHA-256）', '', '| 予想者 | ファイル | SHA-256 | バイト | 「予想しない」の欄 | 様式の名 | 正本の版 |', '|---|---|---|---|---|---|---|']
+for role, who in seal_B.ROLES.items():
+    r = PRED.get(role)
+    L.append('| %s | %s | %s | %s | %s | %s | %s |' % ((who, '`%s`' % r['path'], '`%s`' % r['sha256'], r['bytes'], r['not_predicted'], r['form'], r['contrasts'])
+                                                      if r else (who, '**無い**', '', '', '', '', '')))
+L += ['', '- 封印の経緯の記録: %s' % ('・'.join('`%s`' % p for p in PRED.get('sealing_record') or []) or '**無い**'),
+      '- %s' % T['predictions']['fence']]
 if blockers:
     L += ['', '## 凍結を止めているもの', ''] + ['- ' + b for b in blockers]
 L += ['', '## 限界（凍結の記録に置く）', '', '- %s' % T['report_rules']['post_final_round'],

@@ -1,0 +1,32 @@
+{
+ "signs": {
+  "sub:N1:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+  "sub:S1:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+  "sub:SK:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+  "sub:S4:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+  "add:N1:Onull+v~Onull+vrand": "どちらでもない",
+  "add:S1:Onull+v~Onull+vrand": "どちらでもない",
+  "add:SK:Onull+v~Onull+vrand": "どちらでもない",
+  "add:S4:Onull+v~Onull+vrand": "どちらでもない",
+  "cross:N1:O-Ncold+vNk~O-Ncold+vrand": "どちらでもない",
+  "cross:N1:Onull+vNk~Onull+vrand": "低下",
+  "cross:S1:O-Ncold+vNk~O-Ncold+vrand": "どちらでもない",
+  "cross:S1:Onull+vNk~Onull+vrand": "どちらでもない",
+  "cross:SK:O-Ncold+vNk~O-Ncold+vrand": "低下",
+  "cross:SK:Onull+vNk~Onull+vrand": "低下",
+  "cross:S4:O-Ncold+vNk~O-Ncold+vrand": "どちらでもない",
+  "cross:S4:Onull+vNk~Onull+vrand": "どちらでもない"
+ },
+ "s4": "どちらでもない",
+ "information_state": "段階 A と V′ の公開済みの結果・腕の本文・本設計（草案13B）・品質床の課題の選定の測定の結果（無操作の正答率）。B の活性も率も見ていない。登録者の予想の JSON（2026-09-19 19:53 受領）を、自分の封印の前に見た（裁定 D148 の順と逆）。",
+ "timing": "凍結時・B のデータを一つも見る前（記録先行公開の対象・publication.record_first）",
+ "who": "起草者（コーディネータ・南無弥勒如来・Claude Opus 5）",
+ "vhat_floor_ack": "封印した者は、v̂ が行動の差の無い腕対（O と Osec・V′ の既測でどの場面でも床）から作られていることを知ったうえで予想した（`reading_D128.vhat_from_floor_pair`）",
+ "source": {
+  "predictions": "records/predictions/predictions-coordinator-B-2026-09-19.json",
+  "sha256": "00B690CAF81D20A4E2211825EB1638A265CE6AE4A3809C3DDC0A15DBCD336D86",
+  "derived_by": "tools/seal_B.py v1",
+  "rule": "起草者の封印の記録は、コーディネータの予想の JSON（`predictions`）の向きと S4 の欄から機械で作る（二重に書かない・裁定 D148）。封印では「予想しない」を使えない（凍結の器が全対比の封印を求める）"
+ },
+ "order_note": "裁定 D148 の順は「コーディネータの封印 → 登録者の封印」だった。登録者が先に封印して JSON を送り（2026-09-19 19:53）、コーディネータはそれを見た後に封印した。登録者の予想はコーディネータの予想を見ずに封印されたので独立である。コーディネータの予想（とそこから作った起草者の封印）は、登録者の予想から独立でない。"
+}

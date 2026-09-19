@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
- "version": "v5",
- "generated_utc": "2026-09-19T10:03:06Z",
+ "version": "v6",
+ "generated_utc": "2026-09-19T11:16:25Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -410,6 +410,76 @@
    }
   },
   {
+   "name": "封印の出所の SHA-256 を照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "封印の後にコーディネータの予想の JSON が書き換わっても、凍結の器が通す誤り",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 封印の出所の SHA-256 を替える"
+   }
+  },
+  {
+   "name": "封印の向きを予想の JSON と照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "起草者の封印の向きがコーディネータの予想の JSON と違っても通す誤り（封印を二重に書いた形・seal_format.from_predictions の違反）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 封印の向きを一つ替える"
+   }
+  },
+  {
+   "name": "封印の経緯の記録の SHA を照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "封印の経緯の記録に載る SHA-256 と現物が違っても通す誤り（封印の後に登録者の予想のファイルが替わっても分からない）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 封印の経緯の記録の登録者の SHA が違う"
+   }
+  },
+  {
+   "name": "予想者の欄を名の役と照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "登録者のファイルにコーディネータの予想が入っていても通す誤り（照合が二人の予想を取り違える）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 登録者のファイルの予想者がコーディネータ"
+   }
+  },
+  {
+   "name": "予想の様式の名を照らさない",
+   "ruling": "D148",
+   "target": "seal_B.py",
+   "applied": true,
+   "what": "別の段・別の版の書式で作った予想の JSON を通す誤り（正本 predictions.compare_rules.validation）",
+   "caught": [
+    "seal_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "seal_B.py": "AssertionError: 止まらなかった: 登録者の予想の様式の名が違う"
+   }
+  },
+  {
    "name": "書式外の境目を当たりに数える",
    "ruling": "D145",
    "target": "qf_select_B.py",
@@ -596,5 +666,5 @@
   }
  ],
  "missed": 0,
- "total": 43
+ "total": 48
 }

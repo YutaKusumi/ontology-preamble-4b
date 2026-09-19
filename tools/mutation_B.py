@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v5 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v6 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v6（2026-09-19 の夜・封印の後・独立の目を通っていない）: 封印した予想の照合（`seal_B.check_predictions`）の五つの検査を外す型を足した（出所の SHA・向き・封印の経緯の記録の SHA・予想者・様式の名）。
 v5（2026-09-19 の後刻）: 腕の本文の末尾の改行を残して読む誤り（走行器 v6 まで実際にこうだった・O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった）を足した。
 v4（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 最後の巡の所見を入れ直した型を足した——td の特異性の向きを見ない（裁定 D133）・S4 の門を外す（D134）・S4 の封印の照合をしない（D135）・品質床の境目を合格に数える（D137）・ランダム方向を塊に戻す（D140）・様式門の札を保留に戻す（採否表 P401）・層の添字の照合を外す（P393）・相手の重複の番人を外す（P403）。帯の起点の変異は起点の関数（P404）に当て直した。
 
@@ -14,7 +15,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v5'
+VERSION = 'v6'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -149,6 +150,27 @@ MUTATIONS = [
       "    return js"),
      ['make_predictions_form_B.py'],
      '封印の JSON が V′ 様式の名と保存の名のまま出る誤り（どの段の予想か JSON から分からなくなる）'),
+    # ---- 封印した予想の照合（v6・2026-09-19 の夜・封印の後・凍結の器が呼ぶ `seal_B.check_predictions`） ----
+    ('封印の出所の SHA-256 を照らさない', 'D148', 'seal_B.py',
+     ("        if src.get('sha256') != info['coordinator']['sha256']:", "        if False:"),
+     ['seal_B.py'],
+     '封印の後にコーディネータの予想の JSON が書き換わっても、凍結の器が通す誤り'),
+    ('封印の向きを予想の JSON と照らさない', 'D148', 'seal_B.py',
+     ("        if diff or set(seal.get('signs') or {}) != set(conf):", "        if False:"),
+     ['seal_B.py'],
+     '起草者の封印の向きがコーディネータの予想の JSON と違っても通す誤り（封印を二重に書いた形・seal_format.from_predictions の違反）'),
+    ('封印の経緯の記録の SHA を照らさない', 'D148', 'seal_B.py',
+     ("            if s not in txt:", "            if False:"),
+     ['seal_B.py'],
+     '封印の経緯の記録に載る SHA-256 と現物が違っても通す誤り（封印の後に登録者の予想のファイルが替わっても分からない）'),
+    ('予想者の欄を名の役と照らさない', 'D148', 'seal_B.py',
+     ("        if v.get(F['who']['key']) != who:", "        if False:"),
+     ['seal_B.py'],
+     '登録者のファイルにコーディネータの予想が入っていても通す誤り（照合が二人の予想を取り違える）'),
+    ('予想の様式の名を照らさない', 'D148', 'seal_B.py',
+     ("            if d.get(k) != M[k]:", "            if False:"),
+     ['seal_B.py'],
+     '別の段・別の版の書式で作った予想の JSON を通す誤り（正本 predictions.compare_rules.validation）'),
     ('書式外の境目を当たりに数える', 'D145', 'qf_select_B.py',
      ("    t1 = [k for k in keys if row[k]['min_acc'] >= bmin and row[k]['max_ff'] <= thr]",
       "    t1 = [k for k in keys if row[k]['min_acc'] >= bmin and row[k]['max_ff'] < thr]"),
