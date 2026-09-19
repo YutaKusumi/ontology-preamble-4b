@@ -139,6 +139,16 @@ MUTATIONS = [
       "    r3 = [k for k in keys if row[k]['min_acc'] < floor or row[k]['max_ff'] > thr]"),
      ['qf_select_B.py'],
      'どの候補も手当ての下限に届かないとき、止まらずに付けない側へ戻って先へ進む誤り（裁定 D145 で止まる側に決めた・起草者の引力の側）'),
+    ('予想の書式の向きの欄の鍵から前置きを落とす', 'D148', 'make_predictions_form_B.py',
+     ("                pills(F['direction']['key_prefix'] + c['id'], F['direction']['options'], NP, DG, pred=True)))",
+      "                pills(c['id'], F['direction']['options'], NP, DG, pred=True)))"),
+     ['make_predictions_form_B.py'],
+     '予想の JSON の向きの鍵が正本の決まり（b.dir.）と違い、照合の器が対比を引けなくなる誤り'),
+    ('予想の書式の封印の JS の置き換えを外す', 'D148', 'make_predictions_form_B.py',
+     ("    return js.replace(V5_META, \"form:'%s',program:'%s',contrasts:'%s'\" % (M['form'], M['program'], M['contrasts'])).replace(V5_DL, M['download'])",
+      "    return js"),
+     ['make_predictions_form_B.py'],
+     '封印の JSON が V′ 様式の名と保存の名のまま出る誤り（どの段の予想か JSON から分からなくなる）'),
     ('書式外の境目を当たりに数える', 'D145', 'qf_select_B.py',
      ("    t1 = [k for k in keys if row[k]['min_acc'] >= bmin and row[k]['max_ff'] <= thr]",
       "    t1 = [k for k in keys if row[k]['min_acc'] >= bmin and row[k]['max_ff'] < thr]"),
@@ -346,7 +356,8 @@ if not a.force:
 tmp = tempfile.mkdtemp(prefix='mutB_')
 rows, n_bad = [], 0
 try:
-    for sub in ('tools', 'design', 'arms'):
+    # records/predictions は予想の書式の器が封印の JS を流用する元（V′ 様式）を持つ（裁定 D148・2026-09-19 の夜に足した——足す前は、書式の器の自己検査が一時の置き場で元を見つけられず、変異を入れる前の土台の確認で止まった）
+    for sub in ('tools', 'design', 'arms', os.path.join('records', 'predictions')):
         src = os.path.join(REPO, sub)
         if os.path.isdir(src):
             shutil.copytree(src, os.path.join(tmp, sub))

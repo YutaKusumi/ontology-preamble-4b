@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
  "version": "v5",
- "generated_utc": "2026-09-19T09:21:49Z",
+ "generated_utc": "2026-09-19T10:03:06Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -382,6 +382,34 @@
    }
   },
   {
+   "name": "予想の書式の向きの欄の鍵から前置きを落とす",
+   "ruling": "D148",
+   "target": "make_predictions_form_B.py",
+   "applied": true,
+   "what": "予想の JSON の向きの鍵が正本の決まり（b.dir.）と違い、照合の器が対比を引けなくなる誤り",
+   "caught": [
+    "make_predictions_form_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "make_predictions_form_B.py": "AssertionError: 向きの欄が確証の対比と合わない"
+   }
+  },
+  {
+   "name": "予想の書式の封印の JS の置き換えを外す",
+   "ruling": "D148",
+   "target": "make_predictions_form_B.py",
+   "applied": true,
+   "what": "封印の JSON が V′ 様式の名と保存の名のまま出る誤り（どの段の予想か JSON から分からなくなる）",
+   "caught": [
+    "make_predictions_form_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "make_predictions_form_B.py": "AssertionError: JS の置き換えが無い"
+   }
+  },
+  {
    "name": "書式外の境目を当たりに数える",
    "ruling": "D145",
    "target": "qf_select_B.py",
@@ -568,5 +596,5 @@
   }
  ],
  "missed": 0,
- "total": 41
+ "total": 43
 }
