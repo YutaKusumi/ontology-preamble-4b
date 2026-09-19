@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_B.py v11 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+"""make_contrasts_B.py v12 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+v11 からの変更（v12・2026-09-19 の夕刻・課題の選定の測定の後）: 登録者裁定 D147——品質床の課題は**甲（JCommonsenseQA・前置きあり）**（判定の順の枝 (i) で条件を満たした唯一の候補）。あわせて裁定 D142 の規則どおり、**B の top_k を読めた値に揃えた**（課題の選定の測定と同じランタイムで立てた vLLM と、Drive に残っていた段階 A の起動の記録が、どれも同じ値を印字した）。値はセッション記録と判定の記録から読む（`measured.top_k_stageA_effective`・`quality_floor.selected`・手で打たない）。実重みを走らせたので、開示の「実機で走らせていないこと」を改めた。**独立の目を通っていない**（裁定 D131）。
 v10 からの変更（v11・2026-09-19 の夕刻・品質床の課題の選定の準備）: 登録者裁定 D145（課題の選定の判定の順——裁定 D137 と D138 の食い違いを、正答率を見る前に解いた）と D146（測り方の登録——候補二つ・断片・問いの組み立て・記号の読み取り・バッチ・測る腕・生テキストの扱い）を入れた（`quality_floor.decision_order`・`task_candidates`・`presentation`・`extraction_rule`・`fragment_rule`・`batching`・`candidate_session`・`raw_publication`）。
 登録した値（ファイルの SHA256・断片の id と SHA256）は `tools/qf_task_B.py --register` が書く記録 `records/B/qf-selection/qf-sources-B.json` から写す（`task_registered`・手で打たない）。相 `qfcand`（tag `qfcandB`）と、その走行の記録の欄を足した。**独立の目を通っていない**（裁定 D131）。
 v9 からの変更（v10・草案13B の改め・2026-09-19 の後刻）: 登録者裁定 D144——**Nk の本文は「観自在菩薩として現れてください。」**で、素材のファイル名の読み（kanzeon）と食い違って見えた件（最後の巡の束に腕の本文が無く、系統外の一人目がファイル名から「観世音前置き」と読んだ）。素材の置き場を盤から先に引き、B の八腕の本文の表（`arms.texts`）・名の注・段階 A の読み条項 (i) の引き継ぎ（`reading_B.nk_name_form`）・束の欠けの開示を置いた。あわせて、確かめの途中で見つけた欠陥——**B の走行器だけが腕の本文の末尾の改行を残して読み、O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった**——を直すため、字数を走行器が送る本文（凍結走行器の `rd` と同じく前後の空白を除いた本文）で数え、組み立ての条に書いた。**この直しも独立の目を通っていない**（裁定 D131）。
@@ -503,14 +504,23 @@ identity = {'gate': '0.5（段階 A と共用）', 'stacks': ['API', 'vLLM', 'tr
 # **この機関（transformers の generate）が受け取る設定だけを登録する**（裁定 D127・端から端までの検査で捕まえた）。
 # presence_penalty・frequency_penalty は API の側の設定で、transformers の GenerationConfig には無い——
 # 渡すと例外で止まる。段階 A の経路（vLLM）との違いを、not_applicable に書いて残す。
-GEN_ALL = {'top_k': 0, 'min_p': 0.0, 'repetition_penalty': 1.0, 'no_repeat_ngram_size': 0}
+# ---- 裁定 D147（2026-09-19 の夕刻）: top_k は裁定 D142 の規則どおり、読めた値に揃える。値は課題の選定の測定のセッション記録から読む（手で打たない） ----
+QF_SESSION_REC = 'results/sessions-B/qfcandB__s1.json'
+_tk = json.load(open(os.path.join(REPO, *QF_SESSION_REC.split('/')), encoding='utf-8'))['topk']
+assert _tk.get('status') == 'read' and isinstance(_tk.get('top_k'), int), ('top_k が読めていない（裁定 D142）', _tk.get('status'))
+assert _tk.get('top_k_values') == [_tk['top_k']], ('起動の記録の top_k が一つに決まらない', _tk.get('top_k_values'))
+assert all(x.get('top_k_values') == [_tk['top_k']] for x in (_tk.get('stageA_logs') or [])), '段階 A の起動の記録の top_k が、立て直した vLLM の値と違う'
+TOPK_EFF = int(_tk['top_k'])
+GEN_ALL = {'top_k': TOPK_EFF, 'min_p': 0.0, 'repetition_penalty': 1.0, 'no_repeat_ngram_size': 0}
 GEN_TOPK = {'passed_keys': sorted(GEN_ALL),
             'passed_keys_note': '`generate` に渡すのは `passed_keys` の鍵だけ（説明の欄を渡さない・2026-09-19）',
             'top_k_rule': ('**top_k の決め方**（裁定 D142・2026-09-19）: 同一性選別の段で、段階 A と同じ版・同じ起動の引数で vLLM を立て、**起動の記録に印字される既定の標本化の値**（top_k）を読む。'
                            'B の top_k はその値に揃え、値を凍結時に記帳する（`top_k_stageA_effective`）。**読めなければ上の `top_k` のまま**とし、段階 A と食い違いうることを限界に書く。\n'
                            '段階 A の走行器は top_k を送っておらず、記録に実効の値が無い（再現の記録 K195・採否表 P402）——三スタックの同一性選別が「スタックの差」と「top_k の差」を混ぜうる。'
-                           'vLLM の既定の振る舞いは版に依るので、実機で初めて分かる'),
-            'top_k_limitation': 'top_k は段階 A の vLLM の起動の記録から読んで揃える（裁定 D142）。読めなかった場合は正本の値のままで、段階 A の実効の値と食い違いうる（凍結の記録にどちらかを書く）'}
+                           'vLLM の既定の振る舞いは版に依るので、実機で初めて分かる\n'
+                           '**読めた値は %d**（裁定 D147・2026-09-19 の夕刻）——課題の選定の測定と同じランタイムで、段階 A と同じ版・同じ起動の引数で立てた vLLM が、機種の `generation_config.json` の値を既定にしたと印字した。'
+                           'Drive に残っていた段階 A の起動の記録（同一性選別・パイロット・本走行・橋）も同じ行を印字していた。上の `top_k` をこの値に揃えた（`measured.top_k_stageA_effective`）') % TOPK_EFF,
+            'top_k_limitation': 'top_k は段階 A の vLLM の起動の記録から読んで揃えた（裁定 D142・D147）。段階 A の実効の値は起動の記録の印字から読んだもので、段階 A の走行器が送った値ではない（段階 A は top_k を送っていない）'}
 GEN_NA = {'not_applicable': ['presence_penalty', 'frequency_penalty'],
           'why': 'API の側の設定で、transformers の `GenerationConfig` に無い（渡すと例外で止まる）。段階 A は別の経路（vLLM）で走ったので、この二つが段階 A で効いていたかは**確かめていない**'}
 runner = {'batch': 16,
@@ -804,20 +814,19 @@ DISCLOSURE_ITEMS = {
     '骨組みの器': [
         '走行器 `run_stageB_local.py` の起動の段（`__main__`）は、方向を読んでノルムを確かめたところで止まる。**どのセルをどの順に走らせるかは、上の「まだ書いていない器」が渡す**。'],
     '実機で走らせていないこと': [
-        '**実重み（Qwen3-4B-Instruct-2507）では一行も走らせていない。**手元に GPU が無い。',
+        '**実重み（Qwen3-4B-Instruct-2507）で走らせたのは、凍結の前の品質床の課題の選定の測定だけ**（無操作・貪欲・Colab・裁定 D146・`quality_floor.candidate_session`）。**場面の試行と、介入を掛けた生成は、まだ一行も走らせていない。**',
         '端から端までの検査は、**乱数で初期化した小さな Qwen3 形**で行った（大きさは端から端までの検査の記録にある）。トークナイザだけは登録機種の現物を使った。**模型の率にも活性にも意味は無い。**',
         'バッチ生成・bf16・実メモリでの挙動（メモリ不足・KV キャッシュ・速度）、実重みでの決定性の余裕、実重みでの ‖v̂‖ と ‖h‖ の比、実重みでの書式外の率と様式の率——いずれも確かめていない。',
-        'vLLM の既定の標本化の値（top_k）と、品質床の前置きで書式外が増えるか——いずれも実機で初めて分かる（裁定 D142・D138）。'],
+        '**課題の選定の測定で分かったこと**（裁定 D147）: 前置きを付けた甲の無操作は書式外が無かった。vLLM の既定の top_k は読めた。介入を掛けたときの書式外の率は、まだ分からない。'],
     '未定の登録値': [
-        '**品質床の課題**（裁定 D66・登録者が選ぶ）。**測り方と判定の順は、正答率を見る前に登録した**（裁定 D145・D146・`quality_floor.decision_order`・`candidate_session`）。'
-        '正答率の下限（`quality_floor.base_min`）は**実測を見ても動かさない**（裁定 D145・届かないときは手当て `quality_floor.base_min_fallback`・裁定 D137）。前置きを付けて測るか付けない側に戻るかは、判定の順の枝で決まる（裁定 D138・D145）。',
-        '**top_k の実効の値**（裁定 D142）: 段階 A と同じ版・同じ起動の引数の vLLM の起動の記録から読む（`runner.generation_explicit.top_k_rule`）。**課題の選定の測定と同じランタイムで読む**（裁定 D146）。',
+        '**品質床の課題は決まった**（裁定 D147・甲・前置きあり・`quality_floor.selected`）。**top_k も読めた値に揃えた**（裁定 D142・D147・`measured.top_k_stageA_effective`）。どちらも凍結時に記帳する値に写す。',
         '凍結時に記帳する値（重みの版・トークナイザの版・総層数と層の添字・腕ごとのトークン長・v̂ の SHA・方向の要約統計・‖v̂‖ と ‖h‖ の比・top_k の実効の値）。',
         '**封印予想**（確証の族の全対比と S4 の反証・データを一つも見る前に書く）。'],
     '合成データでしか確かめていないこと': [
         '門1 と選定・集計の札・S4 の三分岐・希釈の門・様式門・refuse 門・品質床の判定と api_error の門・管理図・td の特異性・等質性の注・副位置の読み——**分析側の経路はすべて合成データ**で確かめた（`tools/dry_run_B.py`）。**合成データは起草者が作ったもの**で、起草者が想像しなかった壊れ方は入っていない。',
         '自己検査の検査（変異）も、**起草者が選んだ誤り**に限る（`tools/mutation_B.py`）。',
-        '品質床の課題の選定の判定（`tools/qf_select_B.py`・裁定 D145）は**合成の件数**で全枝を確かめ、測定の起動器（`tools/colab/boot_stageB.py`）は**小さな乱数の模型**で端から端まで通した（DRY）。実重みの応答での記号の読み取りは、まだ誰も見ていない。',
+        '品質床の課題の選定の判定（`tools/qf_select_B.py`・裁定 D145）は**合成の件数**で全枝を確かめ、測定の起動器（`tools/colab/boot_stageB.py`）は**小さな乱数の模型**で端から端まで通した（DRY）。'
+        '実重みの応答での記号の読み取りは、測定の後に起草者が生テキストで点検しただけである（登録の外・`records/B/qf-selection/qf-candidates-result-2026-09-19.md` §5）。',
         '直しの監査（`records/reviews/B/external-round/verify_fixes_B_external.py`）も起草者が書いた器である。**監査の器そのものに誤りが三度あった**（直す前の走行で二度——変異の記録の鍵の取り違え／直した後の走行で一度——二つのセッションに分けて置いた腕の一方だけを消し、登録の升目の欠けの検査を当てたことにならなかった。いずれも出力を別名で残した）。',
         '**最後の系統外の巡の後の直し（採否 P384〜P412・裁定 D133〜D143）は、独立の目を通っていない**（裁定 D131）。起草者の監査（`records/reviews/B/final-round/verify_fixes_B_final.py`・枠は監査の前に登録）で、直す前と直した後を当て直しただけである。']}
 
@@ -971,6 +980,8 @@ T = {'id': 'contrasts-B', 'version': 'draft13-2026-09-19',
                    'D143': '同一性選別の比較に Osec-Ncold を足す（甲・2026-09-19 承認・登録者の裁定待ちだった件）',
                    'D144': 'Nk の名の扱い——B の八腕の本文の表を正本と草案に置き、素材の置き場を盤から先に引き、段階 A の読み条項 (i)（Nk は Ncold と同一語形・名の力に帰さない）を引き継ぎ、系統外の一人目との追い問いと束の欠けを記録に残す（甲・2026-09-19 承認・起草者の提案どおり）',
                    'D145': '品質床の課題の選定の判定の順——両方の土台で見る・(i) 下限と書式外を満たす候補から登録者が選ぶ (ii) 無ければ手当ての下限で低い方の正答率が最も高いもの (iii) 書式外だけで落ちるなら付けない側に戻る (iv) 手当ての下限にも届かなければ止めて登録者に上げる・下限は実測を見て動かさない（甲・2026-09-19 承認・起草者の推奨どおり・正答率を見る前）',
+                   'D147': ('品質床の課題は甲（JCommonsenseQA・前置きあり）——判定の順の枝 (i) で条件を満たした唯一の候補（登録者の選定・裁定 D66）。'
+                            'あわせて裁定 D142 の規則どおり B の top_k を読めた値（%d）に揃える（甲・2026-09-19 承認）') % TOPK_EFF,
                    'D146': '品質床の課題の選定の測り方——候補は JCommonsenseQA（JGLUE v1.3 の検証）と JMMLU の STEM の科目（MMLU の公式の分類）・各 %d 問を seeds.quality で引く・零ショットの指示文を逐語で登録・記号の読み取りの規則・バッチは断片の順に左詰め・測る腕は O-Ncold と Onull の前置きありと N・生テキストは公開せず SHA だけ・候補のデータを手元に取る・同じランタイムで top_k を確かめる（甲・2026-09-19 承認・起草者の推奨どおり・正答率を見る前）' % Q_ITEMS,
                    'D100': '実装検分は差し戻し。器材を直したうえで**同じ二体**にもう一度見せ、そのあとに系統外へ回す（登録者の指示・2026-09-18。'
                            '二巡目を新規個体にする決まりからの逸脱で、理由は「差し戻しという厳しい検分をした者に直しを見てもらうのが確か」。'
@@ -1076,6 +1087,28 @@ if os.path.exists(_qreg_p):
                  'さらに出所の記録の全長の SHA256 とも照らして（記録の SHA16 を先に正本と照らす）、違えば止まる')}
 else:
     T['quality_floor']['task_registered'] = None
+# ---- 裁定 D147: 選定（判定の記録から写す・手で打たない） ----
+QF_SELECT_REC = 'records/B/qf-selection/qf-select-2026-09-19.json'
+_sel = json.load(open(os.path.join(REPO, *QF_SELECT_REC.split('/')), encoding='utf-8'))
+QF_CHOSEN = 'jcqa'                                    # 登録者の選定（裁定 D66・D147）
+assert _sel['decision']['branch'] == '(i)' and QF_CHOSEN in _sel['decision']['eligible'] and not _sel['problems'], '選定が判定の記録と合わない'
+_cells = _sel['cells'][QF_CHOSEN]
+T['quality_floor']['selected'] = {
+    'key': QF_CHOSEN, 'label': next(c['label'] for c in quality['task_candidates'] if c['key'] == QF_CHOSEN),
+    'name': next(c['name'] for c in quality['task_candidates'] if c['key'] == QF_CHOSEN),
+    'input_form': _sel['decision']['input_form'], 'branch': _sel['decision']['branch'], 'eligible': list(_sel['decision']['eligible']),
+    'decision_record': QF_SELECT_REC, 'decision_record_sha16': hashlib.sha256(open(os.path.join(REPO, *QF_SELECT_REC.split('/')), 'rb').read().replace(b'\r\n', b'\n')).hexdigest()[:16].upper(),
+    'fragment_sha16': T['quality_floor']['task_registered']['by_key'][QF_CHOSEN]['fragment_sha16'],
+    'base_correct': {a: _cells[a]['correct'] for a in quality['arms']}, 'base_n_ok': {a: _cells[a]['n_ok'] for a in quality['arms']},
+    'base_format_fail': {a: _cells[a]['format_fail'] for a in quality['arms']},
+    'base_min_applied': quality['base_min'],
+    'rule': ('**品質床の課題は甲（JCommonsenseQA）で、前置きを付けて測る**（裁定 D147・2026-09-19 の夕刻・登録者の選定・裁定 D66）。判定の順（裁定 D145）の枝 (i) で、'
+             '条件を満たした候補は甲だけだった（判定の記録 `%s`）。下限は `base_min` のまま動かしていない（裁定 D145）。問いは登録した断片（`task_registered`）をそのまま使う') % QF_SELECT_REC}
+T['measured']['top_k_stageA_effective'] = {
+    'value': TOPK_EFF, 'source': QF_SESSION_REC + ' の topk', 'status': _tk['status'], 'relaunch_log': _tk.get('log'), 'relaunch_log_sha16': _tk.get('log_sha16'),
+    'relaunch_vllm': (_tk.get('server_args') or {}).get('vllm'), 'stageA_logs': [{'file': x['file'], 'sha16': x['sha16']} for x in (_tk.get('stageA_logs') or [])],
+    'note': ('裁定 D142 の値（裁定 D147）。課題の選定の測定と同じランタイムで立てた vLLM の起動の記録と、Drive に残っていた段階 A の起動の記録の、既定の標本化の値の行から読んだ'
+             '（`tools/colab/boot_stageB.py` の読み口・読み方の自己検査つき）。**段階 A の走行器が送った値ではない**（段階 A は top_k を送っていない）')}
 s = json.dumps(T, ensure_ascii=False, indent=1) + '\n'
 open(OUT, 'w', encoding='utf-8', newline='\n').write(s)
 print('[contrasts-B] written %s sha16 %s | m %d | 本走行の腕 %d（場面ごと %s）| 候補 %d 組'

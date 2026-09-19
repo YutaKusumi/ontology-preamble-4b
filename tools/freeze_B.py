@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v6 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v7 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+v7（2026-09-19 の夕刻・裁定 D146・D147・独立の目を通っていない）: 凍結する器に、品質床の課題の器 `qf_task_B.py` と選定の判定の器 `qf_select_B.py` を足した。
 v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 下りた裁定 D143（同一性選別に Osec-Ncold）・D136（S4 の効き目）を記帳の値から外し、**top_k の実効の値**（裁定 D142）・**品質床の問いの前置きの有無**（裁定 D138）・**下限の適用**（裁定 D137）を足した。凍結の記録に「最後の系統外の巡の後の直しは、独立の目を通っていない」を置く（正本 `report_rules.post_final_round`・裁定 D131）。
 
 凍結するもの（正本 `publication.record_first`・草案8B §2.11）:
@@ -24,7 +25,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v6'
+VERSION = 'v7'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -37,7 +38,8 @@ CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_prea
              'refuse の分類の規則（丙）': 'arms/materials-draft/hei/refuse-rules-v2.json'}
 TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 'build_draftB.py', 'numbers_lint.py', 'gate_B.py', 'analyze_B.py',
          'layers_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'synth_B.py',
-         'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py']
+         'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py',
+         'qf_task_B.py', 'qf_select_B.py']       # 品質床の課題の器と選定の判定の器（v7・裁定 D146・D147——凍結の後の品質床の走行が課題の器を使う）
 NEED_VALUES = ['model_rev', 'tokenizer_rev', 'num_hidden_layers', 'layer_indices', 'arm_token_lengths',
                'quality_task', 'quality_base_accuracy', 'v_hat_sha256', 'direction_stats', 'h_norm_ratio',
                'top_k_stageA_effective', 'quality_input_mode', 'quality_base_min_applied']   # 裁定 D142・D138・D137（v6）
