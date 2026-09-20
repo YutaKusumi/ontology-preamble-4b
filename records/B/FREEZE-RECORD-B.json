@@ -1,0 +1,523 @@
+{
+ "kind": "freeze_B",
+ "version": "v13",
+ "frozen_utc": "2026-09-20T09:59:39Z",
+ "frozen_jst": "2026-09-20 18:59",
+ "frozen": {
+  "canon": {
+   "path": "design/contrasts-B.json",
+   "sha16": "EF0DF4295B68F949",
+   "version": "draft13-2026-09-19"
+  },
+  "draft": {
+   "path": "design/design-stageB-FROZEN.md",
+   "sha16": "8B3D54E4500B46FF"
+  },
+  "facts": {
+   "path": "records/B/design-facts-B.md",
+   "sha16": "18CE319334CE8000"
+  },
+  "report_template": {
+   "path": "records/B/results-report-template-B.md",
+   "sha16": "790AD806EB6121C2"
+  },
+  "arms": {
+   "O": "F3EE60C33F825575",
+   "Osec": "3D0E78BB21133BB0",
+   "Onull": "2123B3CD8586E7DF",
+   "Nk": "47C3CC833B96F7A3",
+   "N": null,
+   "O-Ncold": "060D77170FEC8B06",
+   "Osec-Ncold": "0AA8B4FDF72E3893",
+   "Onull-Ncold": "A60EB61825C6CCB3"
+  },
+  "arm_files": {
+   "O": {
+    "path": "arms/frozen-from-ryokai-os/armsE/preamble-O.md",
+    "chars": 268
+   },
+   "Osec": {
+    "path": "arms/panel/Osec.md",
+    "chars": 281
+   },
+   "Onull": {
+    "path": "arms/frozen-from-ryokai-os/armsE/preamble-Onull.md",
+    "chars": 273
+   },
+   "Nk": {
+    "path": "arms/panel/Nk.md",
+    "chars": 16
+   },
+   "N": {
+    "path": null,
+    "chars": 0
+   },
+   "O-Ncold": {
+    "path": "arms/panel/O-Ncold.md",
+    "chars": 287
+   },
+   "Osec-Ncold": {
+    "path": "arms/panel/Osec-Ncold.md",
+    "chars": 300
+   },
+   "Onull-Ncold": {
+    "path": "arms/panel/Onull-Ncold.md",
+    "chars": 292
+   }
+  },
+  "identity_only_arms": {
+   "Lneg": "A16E20E4827D9C86",
+   "Odose1": "04CF2F31B6B921B5",
+   "Odosehalf": "C8C3EEAF010D4179",
+   "Ncold": "E4AB5608C58913E5",
+   "Nstr": "84EC1A8C8B931B35"
+  },
+  "tools": {
+   "runs_B.py": "269B60867D0924EB",
+   "rules_B.py": "4A89BE41F817A8F0",
+   "make_contrasts_B.py": "7A65F102A0C9E9CE",
+   "design_facts_B.py": "5EF474C111CDC798",
+   "build_draftB.py": "FF872CA64E127E9A",
+   "numbers_lint.py": "88B6A53BBEC80602",
+   "gate_B.py": "A5A50C1DD3023DAA",
+   "analyze_B.py": "32617A9E4768077C",
+   "layers_B.py": "F6657B6F171CF40D",
+   "integrity_B.py": "77BEF3047A175638",
+   "sample_inspection_B.py": "21F786D1D3574F2C",
+   "direction_B.py": "E84A101655685F2B",
+   "steer_B.py": "71157C6921E12AC7",
+   "run_stageB_local.py": "E976A4F5B63767FA",
+   "synth_B.py": "E0D3F06B8A0C3DAE",
+   "dry_run_B.py": "1EB33B5B15A28130",
+   "mutation_B.py": "05E34C072EE2EEC1",
+   "endtoend_B.py": "3A5AFCD6293F9C18",
+   "build_report_B.py": "2A92CDAAF97C234A",
+   "freeze_B.py": "6995BA628549552A",
+   "control_chart_B.py": "1DF75412E513EBB2",
+   "citations_B.py": "308D80A93503CE93",
+   "qf_task_B.py": "86D71D789BB7A320",
+   "qf_select_B.py": "8BC59864F08C19B0",
+   "make_predictions_form_B.py": "A213804DCB730737",
+   "seal_B.py": "9CC90D1102F80A6B",
+   "compare_predictions_B.py": "3341E4D3E09E3ABE",
+   "colab/boot_stageB.py": "452E87CD0A6AA9F2",
+   "freeze_values_B.py": "D85B58AC17779C74",
+   "identity_screen_B.py": "B5603A74783DDC63",
+   "make_frozen_B.py": "A333488A9437EF68"
+  },
+  "carryover": {
+   "凍結走行器（組み立てと採点の型）": {
+    "path": "tools/run_preamble_local.py",
+    "sha16": "9F849D2823132BA2"
+   },
+   "凍結パーサ": {
+    "path": "arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py",
+    "sha16": "12EAA8B845BC0A2F"
+   },
+   "場面の素材": {
+    "path": "arms/frozen-from-ryokai-os/app-scenarios.json",
+    "sha16": "7AD7E49459D5C402"
+   },
+   "様式と言及の器（段階 A）": {
+    "path": "tools/response_mode_A.py",
+    "sha16": "C3E90B11B62F67A5"
+   },
+   "名の語彙（段階 M）": {
+    "path": "tools/response_mode_M.py",
+    "sha16": "5C57C0ACACB38713"
+   },
+   "名の語彙（段階 F・一致の照合）": {
+    "path": "tools/response_mode_F.py",
+    "sha16": "3E3838FD69B15E2F"
+   },
+   "言及の語彙（段階 F の正本）": {
+    "path": "design/contrasts-F.json",
+    "sha16": "F1996D08C2671134"
+   },
+   "refuse の分類の規則（丙）": {
+    "path": "arms/materials-draft/hei/refuse-rules-v2.json",
+    "sha16": "22625AEC81875362"
+   },
+   "同一性選別の排他の件数（段階 A）": {
+    "path": "tools/identity_screen_A.py",
+    "sha16": "759F005CDF01FA6C"
+   },
+   "走行の読み口（段階 A・排他の件数が呼ぶ）": {
+    "path": "tools/runs_A.py",
+    "sha16": "A57BE1F5EEACBBB2"
+   },
+   "報告の走査器（段階 A・組み立て器が呼ぶ）": {
+    "path": "tools/report_lint.py",
+    "sha16": "1F145D63983929EE"
+   },
+   "検出力の器（V′・設計事実が呼ぶ）": {
+    "path": "tools/vprime_power.py",
+    "sha16": "4DC2699E211A6D94"
+   }
+  }
+ },
+ "values": {
+  "model_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+  "tokenizer_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+  "num_hidden_layers": 36,
+  "layer_indices": {
+   "0.25": 8,
+   "0.5": 17,
+   "0.75": 26
+  },
+  "arm_token_lengths": {
+   "N": {
+    "preamble_tokens": 0,
+    "prompt_tokens": {
+     "N1": 269,
+     "S1": 336,
+     "SK": 351,
+     "S4": 350
+    }
+   },
+   "Nk": {
+    "preamble_tokens": 10,
+    "prompt_tokens": {
+     "N1": 279,
+     "S1": 346,
+     "SK": 361,
+     "S4": 360
+    }
+   },
+   "O": {
+    "preamble_tokens": 193,
+    "prompt_tokens": {
+     "N1": 462,
+     "S1": 529,
+     "SK": 544,
+     "S4": 543
+    }
+   },
+   "O-Ncold": {
+    "preamble_tokens": 205,
+    "prompt_tokens": {
+     "N1": 474,
+     "S1": 541,
+     "SK": 556,
+     "S4": 555
+    }
+   },
+   "Onull": {
+    "preamble_tokens": 199,
+    "prompt_tokens": {
+     "N1": 468,
+     "S1": 535,
+     "SK": 550,
+     "S4": 549
+    }
+   },
+   "Onull-Ncold": {
+    "preamble_tokens": 211,
+    "prompt_tokens": {
+     "N1": 480,
+     "S1": 547,
+     "SK": 562,
+     "S4": 561
+    }
+   },
+   "Osec": {
+    "preamble_tokens": 195,
+    "prompt_tokens": {
+     "N1": 464,
+     "S1": 531,
+     "SK": 546,
+     "S4": 545
+    }
+   },
+   "Osec-Ncold": {
+    "preamble_tokens": 207,
+    "prompt_tokens": {
+     "N1": 476,
+     "S1": 543,
+     "SK": 558,
+     "S4": 557
+    }
+   }
+  },
+  "quality_task": {
+   "key": "jcqa",
+   "label": "甲",
+   "name": "JCommonsenseQA（JGLUE の一部・五択の常識推論）",
+   "input_form": "with_preamble",
+   "fragment_sha16": "E9A26FB691954209",
+   "decision_record": "records/B/qf-selection/qf-select-2026-09-19.json",
+   "decision_record_sha16": "7C6A8F009A6DC4BD",
+   "branch": "(i)"
+  },
+  "quality_base_accuracy": {
+   "O-Ncold": {
+    "correct": 174,
+    "n_ok": 200,
+    "accuracy": 0.87,
+    "format_fail": 0
+   },
+   "Onull": {
+    "correct": 183,
+    "n_ok": 200,
+    "accuracy": 0.915,
+    "format_fail": 0
+   }
+  },
+  "v_hat_sha256": "482D2D3D8366A7DD79D896631278CCD1BDACFD6EB94BCDF6C075A60D7FDFCA6C",
+  "direction_stats": {
+   "0.25": {
+    "norms": {
+     "static": 0.700633704662323,
+     "loaded": 0.700633704662323,
+     "Nk": 0.7006337642669678,
+     "td": 0.700633704662323
+    },
+    "raw_norm_ratio": {
+     "static": 1.0,
+     "loaded": 0.9737061390766557,
+     "Nk": 2.0102456187036264,
+     "td": 4.823941232613419
+    },
+    "cosines": {
+     "Nk~loaded": 0.28680264949798584,
+     "Nk~static": 0.2957242429256439,
+     "Nk~td": 0.20407384634017944,
+     "loaded~static": 0.8645374178886414,
+     "loaded~td": 0.1860112100839615,
+     "static~td": 0.16963180899620056
+    },
+    "stability": {
+     "static": {
+      "cos_N1_S1": 0.703209400177002,
+      "norm_ratio": 0.9453026996072311
+     },
+     "loaded": {
+      "cos_N1_S1": 0.7362683415412903,
+      "norm_ratio": 0.9094374983724699
+     },
+     "Nk": {
+      "cos_N1_S1": 0.777536153793335,
+      "norm_ratio": 1.0310062280506995
+     },
+     "td": {
+      "cos_N1_S1": 0.8802196979522705,
+      "norm_ratio": 0.8187643538276376
+     }
+    }
+   },
+   "0.5": {
+    "norms": {
+     "static": 1.3012276887893677,
+     "loaded": 1.3012278079986572,
+     "Nk": 1.3012275695800781,
+     "td": 1.3012275695800781
+    },
+    "raw_norm_ratio": {
+     "static": 1.0,
+     "loaded": 0.9925100927681756,
+     "Nk": 2.093401220962249,
+     "td": 7.9673132371806705
+    },
+    "cosines": {
+     "Nk~loaded": 0.23923777043819427,
+     "Nk~static": 0.23551307618618011,
+     "Nk~td": 0.5851250290870667,
+     "loaded~static": 0.8315715193748474,
+     "loaded~td": 0.11727077513933182,
+     "static~td": 0.08263524621725082
+    },
+    "stability": {
+     "static": {
+      "cos_N1_S1": 0.6034140586853027,
+      "norm_ratio": 1.2118625133983283
+     },
+     "loaded": {
+      "cos_N1_S1": 0.6212335228919983,
+      "norm_ratio": 1.113563544682437
+     },
+     "Nk": {
+      "cos_N1_S1": 0.7400525212287903,
+      "norm_ratio": 1.4137789078700504
+     },
+     "td": {
+      "cos_N1_S1": 0.9215673804283142,
+      "norm_ratio": 1.2097009503205998
+     }
+    }
+   },
+   "0.75": {
+    "norms": {
+     "static": 22.896270751953125,
+     "loaded": 22.896270751953125,
+     "Nk": 22.896270751953125,
+     "td": 22.896272659301758
+    },
+    "raw_norm_ratio": {
+     "static": 1.0,
+     "loaded": 1.009633762737166,
+     "Nk": 2.4783174944852817,
+     "td": 2.4485916642786214
+    },
+    "cosines": {
+     "Nk~loaded": 0.3785666227340698,
+     "Nk~static": 0.29420262575149536,
+     "Nk~td": 0.13920694589614868,
+     "loaded~static": 0.7893028855323792,
+     "loaded~td": 0.11653253436088562,
+     "static~td": 0.0768943727016449
+    },
+    "stability": {
+     "static": {
+      "cos_N1_S1": 0.7304161787033081,
+      "norm_ratio": 1.0431822665277213
+     },
+     "loaded": {
+      "cos_N1_S1": 0.8058533668518066,
+      "norm_ratio": 1.3282029504277593
+     },
+     "Nk": {
+      "cos_N1_S1": 0.5114066004753113,
+      "norm_ratio": 1.5964361213381217
+     },
+     "td": {
+      "cos_N1_S1": 0.7130740880966187,
+      "norm_ratio": 1.0002250895918297
+     }
+    }
+   }
+  },
+  "h_norm_ratio": {
+   "0.25": {
+    "h_norm_main": 31.797578811645508,
+    "vhat_norm": 0.700633704662323,
+    "vhat_over_h": 0.022034184074597646
+   },
+   "0.5": {
+    "h_norm_main": 42.77571105957031,
+    "vhat_norm": 1.3012276887893677,
+    "vhat_over_h": 0.03041977927560928
+   },
+   "0.75": {
+    "h_norm_main": 136.89834594726562,
+    "vhat_norm": 22.896270751953125,
+    "vhat_over_h": 0.16725016356861577
+   }
+  },
+  "top_k_stageA_effective": {
+   "value": 20,
+   "status": "read",
+   "source": "results/sessions-B/qfcandB__s1.json の topk"
+  },
+  "quality_input_mode": "with_preamble",
+  "quality_base_min_applied": {
+   "base_min": 0.85,
+   "branch": "(i)",
+   "fallback_used": false
+  },
+  "_meta": {
+   "kind": "freeze_values_B",
+   "version": "v1",
+   "generated_utc": "2026-09-20T09:46:02Z",
+   "sources": {
+    "実重みが要る値": "相 dir の走行（tools/colab/boot_stageB.py v2・相 dir・dirB__s1・コミット 58bca1d70b65）",
+    "品質床の課題と無操作の正答率・前置きの有無・下限の適用": "正本 quality_floor.selected（裁定 D147・判定の記録 records/B/qf-selection/qf-select-2026-09-19.json）",
+    "top_k の実効の値": "正本 measured.top_k_stageA_effective（裁定 D142・results/sessions-B/qfcandB__s1.json の topk）"
+   },
+   "contrasts_sha16_now": "EF0DF4295B68F949",
+   "contrasts_sha16_at_extraction": "2AFA053ACD15706C",
+   "direction_run": {
+    "dir_values": "results/dirB/dirB__s1/freeze-values-dir.json",
+    "dir_values_sha16": "B864564BC8CF7962",
+    "directions_json": "results/dirB/dirB__s1/directions.json",
+    "directions_json_sha16": "D5AE575E449200B5",
+    "activations_npz_sha256": "7F41AC1B3BC02B7A5AAC146E114B795676071D46DD653062A7000C2B6A0D8C20",
+    "determinism": {
+     "same_order": true,
+     "cross_order_ok": false
+    },
+    "gpu": "NVIDIA L4, 23034",
+    "versions": {
+     "transformers": "4.57.3",
+     "torch": "2.11.0+cu128",
+     "tokenizers": "0.22.2",
+     "accelerate": "1.14.0",
+     "huggingface_hub": "0.36.2",
+     "numpy": "2.1.3",
+     "scipy": "1.16.3",
+     "pip_freeze_sha16": "1236E5B9B1F2DE9D"
+    }
+   },
+   "fence": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+  }
+ },
+ "seal": {
+  "signs": {
+   "sub:N1:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+   "sub:S1:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+   "sub:SK:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+   "sub:S4:O-Ncold-v~O-Ncold-vrand": "どちらでもない",
+   "add:N1:Onull+v~Onull+vrand": "どちらでもない",
+   "add:S1:Onull+v~Onull+vrand": "どちらでもない",
+   "add:SK:Onull+v~Onull+vrand": "どちらでもない",
+   "add:S4:Onull+v~Onull+vrand": "どちらでもない",
+   "cross:N1:O-Ncold+vNk~O-Ncold+vrand": "どちらでもない",
+   "cross:N1:Onull+vNk~Onull+vrand": "低下",
+   "cross:S1:O-Ncold+vNk~O-Ncold+vrand": "どちらでもない",
+   "cross:S1:Onull+vNk~Onull+vrand": "どちらでもない",
+   "cross:SK:O-Ncold+vNk~O-Ncold+vrand": "低下",
+   "cross:SK:Onull+vNk~Onull+vrand": "低下",
+   "cross:S4:O-Ncold+vNk~O-Ncold+vrand": "どちらでもない",
+   "cross:S4:Onull+vNk~Onull+vrand": "どちらでもない"
+  },
+  "s4": "どちらでもない",
+  "information_state": "段階 A と V′ の公開済みの結果・腕の本文・本設計（草案13B）・品質床の課題の選定の測定の結果（無操作の正答率）。B の活性も率も見ていない。登録者の予想の JSON（2026-09-19 19:53 受領）を、自分の封印の前に見た（裁定 D148 の順と逆）。",
+  "timing": "凍結時・B のデータを一つも見る前（記録先行公開の対象・publication.record_first）",
+  "who": "起草者（コーディネータ・南無弥勒如来・Claude Opus 5）",
+  "vhat_floor_ack": "封印した者は、v̂ が行動の差の無い腕対（O と Osec・V′ の既測でどの場面でも床）から作られていることを知ったうえで予想した（`reading_D128.vhat_from_floor_pair`）",
+  "source": {
+   "predictions": "records/predictions/predictions-coordinator-B-2026-09-19.json",
+   "sha256": "00B690CAF81D20A4E2211825EB1638A265CE6AE4A3809C3DDC0A15DBCD336D86",
+   "derived_by": "tools/seal_B.py v1",
+   "rule": "起草者の封印の記録は、コーディネータの予想の JSON（`predictions`）の向きと S4 の欄から機械で作る（二重に書かない・裁定 D148）。封印では「予想しない」を使えない（凍結の器が全対比の封印を求める）"
+  },
+  "order_note": "裁定 D148 の順は「コーディネータの封印 → 登録者の封印」だった。登録者が先に封印して JSON を送り（2026-09-19 19:53）、コーディネータはそれを見た後に封印した。登録者の予想はコーディネータの予想を見ずに封印されたので独立である。コーディネータの予想（とそこから作った起草者の封印）は、登録者の予想から独立でない。"
+ },
+ "seal_sha256": "2EFFFDF0CFB6A629A2E52369196B6785D39F58FEE16A32A875914051026B3E42",
+ "predictions": {
+  "registrant": {
+   "path": "records/predictions/predictions-registrant-B-2026-09-19.json",
+   "sha256": "7326F237F482A1FF5169AE87FA95E1237C560C439278E8C589206A360B1A322D",
+   "bytes": 1400,
+   "form": "predictions-form v0.9 (B)",
+   "contrasts": "draft13-2026-09-19",
+   "contrasts_matches_canon": true,
+   "date": "2026-09-19",
+   "not_predicted": 0
+  },
+  "coordinator": {
+   "path": "records/predictions/predictions-coordinator-B-2026-09-19.json",
+   "sha256": "00B690CAF81D20A4E2211825EB1638A265CE6AE4A3809C3DDC0A15DBCD336D86",
+   "bytes": 2670,
+   "form": "predictions-form v0.9 (B)",
+   "contrasts": "draft13-2026-09-19",
+   "contrasts_matches_canon": true,
+   "date": "2026-09-19",
+   "not_predicted": 0
+  },
+  "sealing_record": [
+   "records/predictions/sealing-record-B-2026-09-19.md"
+  ]
+ },
+ "stale_record_hashes": [],
+ "unlisted_tools": [],
+ "citation_violations": 0,
+ "blockers": [],
+ "deviations": [],
+ "deviation_rule": "凍結の後の変更はすべて逸脱とし、**番号・日付・理由・登録者の承認**を FREEZE-RECORD に記帳する（段階 A・追補 D と同じ型）",
+ "record_first": "凍結本文・正本・腕と方向の定義・封印予想を、データ生成の前に公開する",
+ "limitations": [
+  "**最後の系統外の巡（裁定 D131）の後の直しは、独立の目を通っていない。**採否表 P384〜P412 と登録者裁定 D133〜D143 の直しは、起草者が書き、起草者の監査（`records/reviews/B/final-round/verify_fixes_B_final.py`・枠は監査の前に登録）で直す前と直した後を当て直しただけである。報告の限界の欄と凍結の記録にこの一句を置く",
+  "top_k は段階 A の vLLM の起動の記録から読んで揃えた（裁定 D142・D147）。段階 A の実効の値は起動の記録の印字から読んだもので、段階 A の走行器が送った値ではない（段階 A は top_k を送っていない）",
+  "品質床は土台の前置きを付けて測った（裁定 D138）。課題の選定のときに付けない側に戻った場合は、凍結の記録にその旨があり、同じ演算のセルを畳んで**文脈の外で測った**と読む"
+ ]
+}
