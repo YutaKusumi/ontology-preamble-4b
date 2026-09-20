@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v9 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v10 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v10（2026-09-20・残りの相の起動器の後・独立の目を通っていない）: 腕の素材の引き当てで同一性選別の一覧を合わせない型を足した。
 v9（2026-09-20・方向の抽出の後・独立の目を通っていない）: 凍結の値の器の型を一つ足した（DRY〔乱数の模型〕の値を凍結の値に通す）。
 v8（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: 方向の抽出器 v7 の二つの型を足した（決定性 (i) の不一致で止めない・腕ごとのトークン長で場面を落とす）。
 v7（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: 予想の照合の器（`compare_predictions_B`）の写し方と照らしを外す型を五つ足した（非有意の写し方・逆向きの確証の向き・帯の境目・集計と門の記録の照合・予想しないの数え方）。
@@ -18,7 +19,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v9'
+VERSION = 'v10'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -89,6 +90,11 @@ MUTATIONS = [
       '                hs[i, int(st):, :] = hs[i, int(st):, :] + (add[0] if per_row else add)'),
      ['run_stageB_local.py'],
      'ランダム方向の腕のすべての行に同じ方向が掛かる誤り'),
+    ('同一性選別の腕の素材を引かない', 'D143', 'run_stageB_local.py',
+     ("    _sha = dict(T['arms']['sha16'], **{k: v for k, v in (T['identity_screen'].get('arms_sha16') or {}).items() if v})",
+      "    _sha = dict(T['arms']['sha16'])"),
+     ['run_stageB_local.py'],
+     '同一性選別の十三腕のうち B の盤に無い五腕（Lneg・Odose1・Odosehalf・Ncold・Nstr）の素材が引けず、相 identity が走らない誤り'),
     ('様式の欄を空で書く', 'D117', 'run_stageB_local.py',
      ("            'style_a': bool(mf['a']), 'style_b': bool(mf['b']), 'mention': bool(mf['c1']),",
       "            'style_a': None, 'style_b': None, 'mention': None,"),

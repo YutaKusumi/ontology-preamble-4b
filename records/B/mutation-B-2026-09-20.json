@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
- "version": "v9",
- "generated_utc": "2026-09-19T22:13:29Z",
+ "version": "v10",
+ "generated_utc": "2026-09-19T23:55:06Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -214,6 +214,20 @@
    }
   },
   {
+   "name": "同一性選別の腕の素材を引かない",
+   "ruling": "D143",
+   "target": "run_stageB_local.py",
+   "applied": true,
+   "what": "同一性選別の十三腕のうち B の盤に無い五腕（Lneg・Odose1・Odosehalf・Ncold・Nstr）の素材が引けず、相 identity が走らない誤り",
+   "caught": [
+    "run_stageB_local.py"
+   ],
+   "missed": [],
+   "lines": {
+    "run_stageB_local.py": "AssertionError: ('同一性選別の腕の素材が引けない（正本 identity_screen.arms_sha16 と合わせて引く）', ['Lneg', 'Odose1', 'Odosehalf', 'Ncold', 'Nstr'])"
+   }
+  },
+  {
    "name": "様式の欄を空で書く",
    "ruling": "D117",
    "target": "run_stageB_local.py",
@@ -336,7 +350,7 @@
    ],
    "missed": [],
    "lines": {
-    "run_stageB_local.py": "腕の本文が凍結走行器の rd で読んだ本文と違う（末尾の改行など）: O・Onull・Osec"
+    "run_stageB_local.py": "腕の本文が凍結走行器の rd で読んだ本文と違う（末尾の改行など）: Lneg・O・Onull・Osec"
    }
   },
   {
@@ -778,5 +792,5 @@
   }
  ],
  "missed": 0,
- "total": 56
+ "total": 57
 }

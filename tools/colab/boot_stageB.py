@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-"""boot_stageB.py v2 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
+"""boot_stageB.py v3 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
+v3（2026-09-20・残りの相・独立の目を通っていない）: **データを作る相を全部書いた**——同一性選別（identity）・調整走行（tune）・品質床（quality・段は OP4B_STAGE で selection と post）・本走行（main）。
+  いずれも走行キーを走らせる前に記帳し、書き終えたセルは飛ばす（再開）。介入のある相は**凍らせた v̂**（相 dir の出力）を読み、SHA-256 を凍結の値と照らす。
+  本走行と選定後の品質床は、**門の記録が選んだ層 × 係数でしか走らせない**（正本 selection.binding）。DRY では試行と生成の長さを減らし、門の記録が無ければ先頭の候補を使う（印を残す）。
 v2（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: **相 dir** を足した——凍結の前に、前置きの腕 × 抽出場面 × 候補の層の**主位置の活性だけ**を実重みで取り、
   方向（v̂ ほか）・要約統計・‖v̂‖／‖h‖・層の添字・腕ごとのトークン長を書く（`direction_B.extract`・**生成しない・率は一つも作らない**・正本 `activation_storage.pre_freeze_run`）。
   止める条件は登録どおり（層の対応の崩れ・決定性 (i) の不一致・自己検査・重みの版・GPU）。決定性 (ii) の外れは止めずに記帳する。相 qfcand の流れは変えていない。
-相（OP4B_PHASE）: **qfcand**（品質床の課題の選定の測定 → 同じランタイムで top_k の確かめ）と **dir**（凍結の前の方向の抽出・v2）。同一性選別・調整走行・品質床・本走行の相は、まだ書いていない。
+相（OP4B_PHASE）: **qfcand**（品質床の課題の選定の測定 → top_k の確かめ）・**dir**（凍結の前の方向の抽出・活性だけ）・**identity**（同一性選別）・**tune**（調整走行）・**quality**（品質床・段は OP4B_STAGE）・**main**（本走行）。
 運用: コーディネータが登録者の Chrome 越しに Colab を操作する——**ランタイムの選択と結果の zip のダウンロードもコーディネータ**（登録者の指示・2026-09-19）。
 登録者の手に残すのは Drive 接続の OAuth 同意と、プラン・支払い。資格情報は入力しない（HF_TOKEN のポップアップはキャンセル・公開の重み）。
 セルに打つのは一行だけ（先頭の下線は type が先頭十数字を落とす事故の緩衝・<commit> は 40 桁）:
@@ -27,8 +30,8 @@ DRY（手元の検査・OP4B_DRY=1）: 小さな乱数の模型（登録機種�
 """
 import os, sys, re, json, time, glob, shutil, signal, hashlib, datetime, subprocess, urllib.request
 
-VERSION = 'v2'
-PHASES = ('qfcand', 'dir')
+VERSION = 'v3'
+PHASES = ('qfcand', 'dir', 'identity', 'tune', 'quality', 'main')
 T0 = time.time(); LOG = []
 PHASE = os.environ.get('OP4B_PHASE', 'qfcand')
 SESSION = int(os.environ.get('OP4B_SESSION', '1'))
@@ -100,7 +103,7 @@ else:
     if not head_ok:
         shutil.rmtree(REPO, ignore_errors=True)
         sh(['git', 'clone', '--filter=blob:none', '--no-checkout', REPO_URL, REPO])
-        sh(['git', '-C', REPO, 'sparse-checkout', 'set', '--cone', 'tools', 'arms', 'design', 'records'])
+        sh(['git', '-C', REPO, 'sparse-checkout', 'set', '--cone', 'tools', 'arms', 'design', 'records', 'results'])   # results は凍らせた方向を読むため（v3）
         sh(['git', '-C', REPO, 'checkout', '-q', COMMIT])
 HEAD = sh(['git', '-C', REPO, 'rev-parse', 'HEAD'], check=False).stdout.strip() if os.path.isdir(os.path.join(REPO, '.git')) else 'no-git'
 if not DRY and HEAD != COMMIT:
@@ -118,9 +121,11 @@ if PHASE == 'qfcand':
     if T['quality_floor'].get('task_registered') is None:
         sys.exit('[boot] 正本に品質床の課題の登録が無い（quality_floor.task_registered・裁定 D146）')
 else:
-    TAG = T['tags'].get('dir')                    # 相 dir の置き場（正本 tags.dir・v2）
-    if not TAG or not T['activation_storage'].get('pre_freeze_run'):
-        sys.exit('[boot] 正本に相 dir の登録が無い（tags.dir・activation_storage.pre_freeze_run）')
+    TAG = T['tags'].get(PHASE)                    # 相の置き場（正本 tags・v2〜v3）
+    if not TAG:
+        sys.exit('[boot] 正本 tags に相 %s の置き場が無い' % PHASE)
+    if PHASE == 'dir' and not T['activation_storage'].get('pre_freeze_run'):
+        sys.exit('[boot] 正本に相 dir の登録が無い（activation_storage.pre_freeze_run）')
 mark('repo', head=HEAD[:12], commit_fixed=FIXED, persist=PERSIST, canon_version=T['version'])
 
 # ---- 2. GPU（正本 runner.environment）
@@ -237,7 +242,9 @@ if PHASE == 'qfcand':
         mark('fragment', task=cand['key'], files=len(files), fragment_sha16=QT.registered(cand['key'])['fragment_sha16'])
     SELFTESTS = ('run_stageB_local.py', 'qf_task_B.py', 'steer_B.py')
 else:
-    SELFTESTS = ('run_stageB_local.py', 'direction_B.py', 'steer_B.py')     # 相 dir: 抽出器の自己検査（層番号・ノルム合わせ・決定性の二条・トークン長）
+    SELFTESTS = ('run_stageB_local.py', 'direction_B.py', 'steer_B.py')     # 相 dir ほか: 走行器・抽出器・介入の器の自己検査
+    if PHASE == 'quality':
+        SELFTESTS = SELFTESTS + ('qf_task_B.py',)                          # 品質床は課題の器も
 ENVX = dict(os.environ, OP4B_REQUIRE_FULL_SELFTEST='1', PYTHONIOENCODING='utf-8', OP4B_TOKENIZER_DIR=MPATH)   # 帯の起点の検査は実トークナイザで（飛ばすと失敗）
 for tool in SELFTESTS:
     r = subprocess.run([sys.executable, os.path.join(REPO, 'tools', tool), '--selftest'], cwd=REPO, env=ENVX, capture_output=True, text=True, encoding='utf-8', errors='replace')
@@ -296,6 +303,188 @@ if PHASE == 'dir':
     print('[boot] 完了 phase=dir session=%d・層 %s・‖v̂‖／‖h‖ %s・決定性 (ii) %s・壁時計 %.0f 秒。%s'
           % (SESSION, DREC['layer_indices'], {k_: (None if v_['vhat_over_h'] is None else round(v_['vhat_over_h'], 6)) for k_, v_ in DREC['h_norm'].items()},
              DREC['determinism_cross_order']['ok'], time.time() - T0, CLAUSE), flush=True)
+    sys.exit(0)
+
+# ---- 相 identity・tune・quality・main（v3・2026-09-20）: データを作る相（場面の試行と品質床のセル） ----
+if PHASE in ('identity', 'tune', 'quality', 'main'):
+    import direction_B
+    import steer_B
+    STAGE = os.environ.get('OP4B_STAGE', 'selection')            # 品質床の段（selection・post）
+    LAY = list(T['selection']['candidates']['layers'])
+    COE = list(T['selection']['candidates']['coefficients'])
+    NL = model.config.num_hidden_layers
+    LIDX = {r: direction_B.layer_index(r, NL) for r in LAY}
+    RESP_IDX = [LIDX[r] for r in LAY]
+    DIRS = None
+    if PHASE != 'identity':
+        if DRY:
+            # DRY は**同じ置き場に相 dir で作った小さな模型の方向**を読む（実機の v̂ は層の数も次元も違う）
+            dnpz = os.path.join(RES_P, T['tags']['dir'], '%s__s1' % T['tags']['dir'], 'directions.npz')
+            if not os.path.exists(dnpz):
+                halt('[boot] DRY: 先に相 dir を DRY で走らせて小さな模型の方向を作る（%s）' % dnpz)
+            mark('directions_dry', path=os.path.relpath(dnpz, PERSIST))
+        else:
+            # **凍らせた v̂ で走らせる**（正本 selection.vector_fix）——凍結の値の SHA-256 と現物を照らす
+            FV = runs_B.read_json(os.path.join(REPO, 'records', 'B', 'freeze-values-B.json'))
+            dnpz = os.path.join(REPO, 'results', T['tags']['dir'], '%s__s1' % T['tags']['dir'], 'directions.npz')
+            if not os.path.exists(dnpz):
+                halt('[boot] 凍らせた方向が無い（相 dir の出力）: %s' % dnpz)
+            _dsha = hashlib.sha256(open(dnpz, 'rb').read()).hexdigest().upper()
+            if _dsha != FV.get('v_hat_sha256'):
+                halt('[boot] 方向の SHA-256 が凍結の値と違う（%s… 対 %s…）——凍らせた v̂ で走らせる' % (_dsha[:16], str(FV.get('v_hat_sha256'))[:16]))
+        DIRS, DMETA = RUN.load_directions(dnpz, os.path.splitext(dnpz)[0] + '.json')
+        if DMETA.get('num_hidden_layers') not in (None, NL):
+            halt('[boot] 方向を抽出した機種の総層数（%s）が、いまの機種（%s）と違う' % (DMETA.get('num_hidden_layers'), NL))
+        if not DRY:
+            mark('directions', sha256=_dsha[:12], n=len(DIRS), layer_indices=LIDX)
+    PICK = None
+    if PHASE == 'main' or (PHASE == 'quality' and STAGE == 'post'):
+        # **選んだ層 × 係数でしか走らせない**（正本 selection.binding・裁定 D105）——門の記録から読む
+        _gs = sorted(glob.glob(os.path.join(REPO, 'records', 'B', 'gate-B-*.json')))
+        if _gs:
+            _G = runs_B.read_json(_gs[-1])
+            if _G.get('verdict') != 'open' or not (_G.get('gate1') or {}).get('open'):
+                halt('[boot] 門の判定が %s——本走行と選定後の品質床は走らせない（正本 gate1）' % _G.get('verdict'))
+            PICK = dict(_G['selection']['pick'] or {})
+            if PICK.get('layer') not in LAY or PICK.get('coef') not in COE:
+                halt('[boot] 門の記録の層 × 係数が候補の格子に無い: %s' % PICK)
+            mark('gate', record=os.path.basename(_gs[-1]), layer=PICK['layer'], coef=PICK['coef'])
+        elif DRY:
+            PICK = {'layer': LAY[0], 'coef': COE[0], 'dry': True}     # DRY は門の記録が無くても通す（印を残す）
+            mark('gate', record='（DRY・門の記録が無いので先頭の候補を使う）', layer=PICK['layer'], coef=PICK['coef'])
+        else:
+            halt('[boot] 門の記録が無い（選定の凍結の後に走らせる・正本 selection.binding）')
+    ITEMS, QT, CAND_Q, SEL_Q = None, None, None, None
+    if PHASE == 'quality':
+        if STAGE not in ('selection', 'post'):
+            halt('[boot] 品質床の段が登録に無い: %s（selection か post・OP4B_STAGE）' % STAGE)
+        os.environ.setdefault('OP4B_QF_CACHE', os.path.join(os.path.expanduser('~'), '.cache', 'op4b-qf') if DRY else '/content/op4b-qf-cache')
+        import qf_task_B as QT
+        SEL_Q = T['quality_floor']['selected']
+        CAND_Q = next(c for c in QT.candidates() if c['key'] == SEL_Q['key'])
+        QT.fetch(CAND_Q, verify=True)
+        _frag = QT.fragment(CAND_Q)
+        QT.verify_fragment(CAND_Q, _frag)
+        ITEMS = _frag[:DRY_N] if DRY else _frag
+        mark('fragment', task=CAND_Q['key'], items=len(ITEMS), fragment_sha16=QT.registered(CAND_Q['key'])['fragment_sha16'])
+
+    # --- 走らせる組（走行キーは走らせる前に記帳する） ---
+    PLAN = []
+    if PHASE == 'identity':
+        _IS = T['identity_screen']
+        for arm in _IS['arms_run']:
+            PLAN.append({'rk': '%s__transformers__%s__s%d' % (TAG, arm, SESSION), 'kind': 'scene', 'scenario': _IS['scenario'], 'arm': arm,
+                         'n': _IS['n'], 'seed': T['seeds']['identity_transformers'], 'layer': None, 'coef': None,
+                         'key': (_IS['scenario'], arm), 'extra': {'stack': 'transformers', 'scenario': _IS['scenario'], 'arms': [arm]}})
+    elif PHASE == 'tune':
+        _TU = T['selection']['tune']
+        for sc in _TU['scenarios']:
+            for _l in LAY:
+                for _c in COE:
+                    for arm in _TU['arms']:
+                        PLAN.append({'rk': '%s__%s__L%sC%s__%s__s%d' % (TAG, sc, _l, _c, arm, SESSION), 'kind': 'scene', 'scenario': sc,
+                                     'arm': arm, 'n': T['n_tune'], 'seed': T['seeds']['tune'][sc], 'layer': _l, 'coef': _c,
+                                     'key': (sc, arm, _l, _c), 'extra': {'scenario': sc, 'layer': _l, 'coef': _c, 'arm': arm}})
+    elif PHASE == 'main':
+        for _cell in T['main_cells']:
+            sc, arm = _cell['scenario'], _cell['arm']
+            _iv = ('+v' in arm) or ('-v' in arm)
+            _l, _c = (PICK['layer'], PICK['coef']) if _iv else (None, None)
+            PLAN.append({'rk': '%s__%s__%s__s%d' % (TAG, sc, arm, SESSION), 'kind': 'scene', 'scenario': sc, 'arm': arm, 'n': _cell['n'],
+                         'seed': T['seeds']['main'][sc], 'layer': _l, 'coef': _c, 'key': (sc, arm),
+                         'extra': {'scenario': sc, 'arms': [arm], 'layer': _l, 'coef': _c}})
+    else:
+        _QF = T['quality_floor']
+        _OPS = {'O-Ncold': '-v', 'Onull': '+v'}           # 正本 quality_floor.operations（減算の土台・加算の土台）
+        if STAGE == 'selection':
+            _bases = list(_QF['arms'])
+            _cells = [(b + _OPS[b], _l, _c) for b in _bases for _l in LAY for _c in COE]
+        else:
+            _interv = sorted(a for a in T['arms']['main'] if '+v' in a or '-v' in a)
+            _done = {b + _OPS[b] for b in _QF['arms']}
+            _cells = [(a, PICK['layer'], PICK['coef']) for a in _interv if a not in _done]
+            _bases = sorted({a.split('+v')[0].split('-v')[0] for a, _, _ in _cells})
+        for b in _bases:      # 無操作の相手は**段 × 土台 × セッションごとに一つ**（裁定 D88・D92）
+            PLAN.append({'rk': '%s__%s__noop__%s__s%d' % (TAG, STAGE, b, SESSION), 'kind': 'quality', 'arm': b, 'n': len(ITEMS),
+                         'seed': T['seeds']['quality'], 'layer': None, 'coef': None, 'key': (STAGE, b, None, None),
+                         'extra': {'stage': STAGE, 'arm': b, 'layer': None, 'coef': None}})
+        for (a, _l, _c) in _cells:
+            PLAN.append({'rk': '%s__%s__%s__L%sC%s__s%d' % (TAG, STAGE, a, _l, _c, SESSION), 'kind': 'quality', 'arm': a, 'n': len(ITEMS),
+                         'seed': T['seeds']['quality'], 'layer': _l, 'coef': _c, 'key': (STAGE, a, _l, _c),
+                         'extra': {'stage': STAGE, 'arm': a, 'layer': _l, 'coef': _c}})
+    if DRY:
+        for p in PLAN:
+            if p['kind'] == 'scene':
+                p['n'] = max(2, min(p['n'], DRY_N))       # DRY は試行を減らす（バッチの境目は跨ぐ）
+    for p in PLAN:
+        if p['rk'] not in RUN_KEYS:
+            RUN_KEYS.append(p['rk'])
+    save_session()
+    mark('plan', phase=PHASE, stage=(STAGE if PHASE == 'quality' else None), cells=len(PLAN), trials=sum(p['n'] for p in PLAN))
+
+    _GEN = None
+    if DRY:
+        _GEN = dict(steer_B.main_generation(), max_new_tokens=int(os.environ.get('OP4B_DRY_TOKENS', '16')))   # DRY は短く打ち切る
+    for p in PLAN:
+        _d = os.path.join(RES_P, TAG, p['rk'])
+        if os.path.exists(os.path.join(_d, 'manifest.json')):
+            mark('skip', run_key=p['rk'])
+            continue
+        if os.path.isdir(_d):
+            shutil.rmtree(_d)                              # manifest の無い置き場は書きかけ（セルは最後に一度だけ書く）
+        _cs = runs_B.cell_seed(T, p['seed'], PHASE, p['key'])
+        _li = LIDX[p['layer']] if p['layer'] is not None else None
+        t1, started = time.time(), now()
+        if p['kind'] == 'scene':
+            out = RUN.run_cell(model, tok, scenario=p['scenario'], arm=p['arm'], layer_ratio=p['layer'], coef=p['coef'], n=p['n'],
+                               cell_seed_value=_cs, tag=TAG, run_key=p['rk'], dirs=DIRS, layer_idx=_li, gen=_GEN, resp_layer_idxs=RESP_IDX)
+        else:
+            out = RUN.run_quality_cell(model, tok, items=ITEMS, arm=p['arm'], stage=STAGE, task=SEL_Q['key'], cell_seed_value=_cs,
+                                       tag=TAG, run_key=p['rk'], layer_ratio=p['layer'], coef=p['coef'], dirs=DIRS, layer_idx=_li,
+                                       input_form=SEL_Q['input_form'])
+        _extra = dict(p['extra'], added_norm=out.get('added_norm'))
+        if PHASE in ('tune', 'main'):
+            _ids = sorted({str(t.get('direction_id')) for t in out['trials'] if t.get('direction_id') is not None})
+            _extra['direction_ids'] = _ids or ['none']
+        if PHASE == 'quality':
+            _extra['task_source_sha16'] = QT.source_sha16(CAND_Q)
+        man = dict(RUN.manifest_env(model, tok), tag=TAG, run_key=p['rk'], session=SESSION, n=p['n'], seed=p['seed'],
+                   pip_freeze_sha16=VER['pip_freeze_sha16'], gpu=gpu, started=started, ended=now(), dry_run=DRY,
+                   model_id=REV['id'], model_rev=REV.get('full') or 'dry', tokenizer_rev=REV.get('full') or 'dry', clause=CLAUSE, **_extra)
+        RUN.write_cell(RES_P, TAG, p['rk'], man, out['trials'], out['raws'], out.get('resp'))
+        _tr = out['trials']
+        _ok = [r for r in _tr if r['status'] == 'ok']
+        _c = {'n': len(_tr), 'n_ok': len(_ok), 'api_error': len(_tr) - len(_ok), 'seconds': round(time.time() - t1, 1),
+              'format_fail': sum(1 for r in _ok if r.get('format_fail'))}
+        if PHASE == 'quality':
+            _c['correct'] = sum(1 for r in _ok if r.get('correct') is True)
+        else:
+            _c['cat'] = sum(1 for r in _ok if r.get('catastrophe'))
+            _c['refuse'] = sum(1 for r in _ok if r.get('refuse'))
+        SREC['counts'][p['rk']] = _c
+        mark('cell', run_key=p['rk'], **_c)
+        save_session()
+    if 'model' in globals():
+        del model
+    import gc
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    _files, _raws = {}, {}
+    for p in PLAN:
+        for f in sorted(glob.glob(os.path.join(RES_P, TAG, p['rk'], '*'))):
+            rel = os.path.relpath(f, RES_P).replace('\\', '/')
+            (_raws if os.path.basename(f).startswith('raw-') else _files)[rel] = runs_B.sha16_file(f)
+    SREC.update(ended=now(), files_sha16_lf=_files, raw_sha16_lf=_raws, wall_s=round(time.time() - T0, 1),
+                stage=(STAGE if PHASE == 'quality' else None), pick=PICK)
+    _sp2 = save_session()
+    if not DRY:
+        _zp = shutil.make_archive(os.path.join(PERSIST, 'stageB-%s%s-s%d-%s' % (PHASE, ('-' + STAGE) if PHASE == 'quality' else '', SESSION,
+                                                                                datetime.date.today().isoformat())), 'zip', RES_P, base_dir=TAG)
+        print('[boot] zip → %s。コーディネータが Drive の Web UI からダウンロードし、SHA16 はセッション記録の files_sha16_lf・raw_sha16_lf と突合する。' % _zp, flush=True)
+    print('[boot] 完了 phase=%s%s session=%d 走行キー %d・試行 %d・壁時計 %.0f 秒。%s'
+          % (PHASE, ('・段 ' + STAGE) if PHASE == 'quality' else '', SESSION, len(PLAN), sum(c['n'] for c in SREC['counts'].values()),
+             time.time() - T0, CLAUSE), flush=True)
     sys.exit(0)
 
 # ---- 6. 走行（候補 × 腕・走行キーは走らせる前に記帳する）

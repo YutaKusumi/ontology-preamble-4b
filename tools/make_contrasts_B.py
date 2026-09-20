@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_B.py v18 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+"""make_contrasts_B.py v21 —— 段階 B の正本 `design/contrasts-B.json` を、再設計（登録者裁定 D4 (a)・D5・D3 (d)・D7（2026-09-13）と D57・D58・D68〜D74・D75〜D86（2026-09-18））から決定的に生成する（手書き禁止・再実行同一バイト）。
+v21（v20 の続き・同日）: 開示の「骨組みの器」も直した——どのセルをどの順に走らせるかは、**Colab の起動器の相**が渡す（走行器の起動の段は方向を読んで止まるまま）。
+v19 からの変更（v20・2026-09-20・残りの相の起動器を書いた後）: 開示を事実に改めた——Colab の起動器は**データを作る相をすべて持つ**（同一性選別・調整走行・品質床の二段・本走行・相 dir・課題の選定の測定）。相の間の順（整合検査 → 門1 → 選定の凍結 → 選定後の品質床 → 本走行）は人手で進める形であることと、**残りの相は小さな模型で試運転しただけで実重みでは走らせていない**ことを書いた。
+v18 からの変更（v19・2026-09-20・残りの相の起動器を書く前）: 同一性選別の十三腕の**素材の SHA16**（`identity_screen.arms_sha16`）を段階 A の正本から機械で写した。B の盤は八腕で、選別の十三腕には B の登録に無い腕（Lneg・Odose1・Odosehalf・Ncold・Nstr）が含まれる——走行器がその素材を引けず、整合検査も `preamble_sha` を照らせなかった（起動器を書く段で分かった）。
 v17 からの変更（v18・2026-09-20・方向の抽出の後）: 相の置き場の鍵を `tags.direction` から **`tags.dir`** に改めた——起動器の相の名（`OP4B_PHASE=dir`）と走行の記録の相の名にそろえる（凍結の器が「起動器に書かれていない相」を見るとき、名が違うと書いてある相を見落とす）。値（置き場 `dirB`）は変えていない。
 v16 からの変更（v17・2026-09-20・方向の抽出を走らせた後）: 開示を事実に改めた——実重みで走らせたのは品質床の課題の選定の測定**と凍結の前の方向の抽出（活性だけ・生成なし）**。実重みで分からないままの一覧から、決定性の二条と ‖v̂‖／‖h‖ を外した（走行で測った・決定性 (ii) は一行が許容差の外）。**独立の目を通っていない**（裁定 D131）。
 v15 からの変更（v16・2026-09-20・凍結の前の方向の抽出の準備）: 相 dir の置き場 `tags.direction` と、走らせ方の登録 `activation_storage.pre_freeze_run`（活性だけ・生成しない・手順の表との順の違い・記帳する値・止める条件・置き場・見せ方）を置いた。開示の Colab の項に相 dir を足した。**独立の目を通っていない**（裁定 D131）。
@@ -498,6 +501,10 @@ _CMP_SRC = dict(_idA['compared_sources'], **{'Osec-Ncold': 'stageVp'})
 _N_DIFF = len(_idA['indicators']) * len(_CMP)
 identity = {'gate': '0.5（段階 A と共用）', 'stacks': ['API', 'vLLM', 'transformers'], 'n': n_id, 'scenario': 'N1', 'arms': len(_idA['arms_run']),
             'arms_run': list(_idA['arms_run']), 'compared_arms': _CMP, 'compared_sources': _CMP_SRC,
+            'arms_sha16': {a: CANON_A['arms']['sha16'].get(a) for a in _idA['arms_run']},
+            'arms_sha16_source': ('段階 A の正本 `design/contrasts-A.json` の `arms.sha16` から機械で写す（手で打たない・v19）。'
+                                  '**走行器は B の登録（`arms.sha16`）とこの一覧を合わせて腕の素材を引き当て**、整合検査は同じ合わせた一覧で `preamble_sha` を照らす——'
+                                  '選別の十三腕には B の盤に無い腕が含まれるので、合わせないと素材が引けず、照合も素通りしていた'),
             'arms_source': '段階 A の正本 `design/contrasts-A.json` の identity_screen から機械で引く（採否表 P231・手で打たない）。**比べる腕だけは、段階 A の一覧に Osec-Ncold を足した**（裁定 D143）',
             'metric_mean_pt': 5, 'metric_max_pt': 12, 'metric': '段階 A §2.9 と同じ（各セルの絶対差の平均が mean_pt 以内かつ最大が max_pt 以内）',
             'rate_definition': '腕ごとに三つの率（%s）を n_ok の分母で出し、スタック間の**同じ腕 × 同じ率**の絶対差（pt）を %d 個並べる（採否表 P231・段階 A と同じ式・比べる腕は裁定 D143 で一つ足した）' % ('・'.join(_idA['indicators']), _N_DIFF),
@@ -896,16 +903,14 @@ judge_validity = {'carry_over': '段階 A の判定器の妥当性の測定（4B
 # ---- 開示の五項目の中身（裁定 D117・2026-09-19 に正本へ移した） ----
 DISCLOSURE_ITEMS = {
     'まだ書いていない器': [
-        '**相をまたいだ走らせ方の順**（同一性選別 → 方向の抽出 → 調整走行 → 品質床 → 本走行）を束ねる器。一つのセルを走らせる口（`run_stageB_local.run_cell`・品質床は `run_quality_cell`）と、試行の記録・生テキスト・副位置の活性・セッション記録を置き場に書く口（`write_cell`・`write_session`）までは書いた。',
-        '**Colab での起動**のうち、同一性選別・調整走行・品質床（選定の段・選定後の段）・本走行の相。**書いたのは課題の選定の測定（相 qfcand）と top_k の確かめ（裁定 D146・2026-09-19 の夕刻）、'
-        '凍結の前の方向の抽出（相 dir・活性だけ・2026-09-20）だけ**（`tools/colab/boot_stageB.py`）。',
+        '**相の間を続けて走らせる器**（同一性選別 → 方向の抽出 → 調整走行 → 品質床 → 本走行を一つの流れで回す器）は置かない——相ごとに Colab の起動器で走らせ、間に手元の器（整合検査・抽出検査・門1）と登録者の確認を挟む（`tools/colab/boot_stageB.py` の PHASES に相がそろった・2026-09-20）。一つのセルを走らせる口（`run_stageB_local.run_cell`・品質床は `run_quality_cell`）と、試行の記録・生テキスト・副位置の活性・セッション記録を置き場に書く口（`write_cell`・`write_session`）までは書いた。',
         '品質床の**報告の行**——下限に届かず手当て（裁定 D137）の下で走らせたときに印字する、観測した無操作の正答率での一セルと選定後のセル数での帰無発火率（対の見方を主・二標本を上限・`quality_floor.base_min_fallback`）。'
         '対の見方は問いごとの正誤の入れ替わりから数えるので、走行の記録と一緒に書く。**品質床のセルそのものは書いた**（`run_stageB_local.run_quality_cell`・裁定 D146）。選定の記録の器（`tools/qf_select_B.py`）は、二標本の上限だけを印字する。'
         '採点の関数（`steer_B.score_quality`・記号の読み取りは `qf_task_B.extract_letter`）と門の判定（`gate_B`）はある。'],
     '骨組みの器': [
-        '走行器 `run_stageB_local.py` の起動の段（`__main__`）は、方向を読んでノルムを確かめたところで止まる。**どのセルをどの順に走らせるかは、上の「まだ書いていない器」が渡す**。'],
+        '走行器 `run_stageB_local.py` の起動の段（`__main__`）は、方向を読んでノルムを確かめたところで止まる。**どのセルをどの順に走らせるかは、Colab の起動器の相が渡す**（`tools/colab/boot_stageB.py`・2026-09-20）。'],
     '実機で走らせていないこと': [
-        '**実重み（Qwen3-4B-Instruct-2507）で走らせたのは、凍結の前の品質床の課題の選定の測定と、凍結の前の方向の抽出（相 dir・活性だけ・生成なし・2026-09-20）**（無操作・貪欲・Colab・裁定 D146・`quality_floor.candidate_session`）。**場面の試行と、介入を掛けた生成は、まだ一行も走らせていない。**',
+        '**実重み（Qwen3-4B-Instruct-2507）で走らせたのは、凍結の前の品質床の課題の選定の測定と、凍結の前の方向の抽出（相 dir・活性だけ・生成なし・2026-09-20）**（無操作・貪欲・Colab・裁定 D146・`quality_floor.candidate_session`）。**場面の試行と、介入を掛けた生成は、まだ一行も走らせていない。** **残りの相（同一性選別・調整走行・品質床の二段・本走行）は起動器に書いたが、実重みでは一度も走らせていない**（小さな乱数の模型での試運転だけ・2026-09-20）',
         '端から端までの検査は、**乱数で初期化した小さな Qwen3 形**で行った（大きさは端から端までの検査の記録にある）。トークナイザだけは登録機種の現物を使った。**模型の率にも活性にも意味は無い。**',
         'バッチ生成・bf16・実メモリでの挙動（メモリ不足・KV キャッシュ・速度）、実重みでの書式外の率と様式の率——いずれも確かめていない。',
         '**課題の選定の測定で分かったこと**（裁定 D147）: 前置きを付けた甲の無操作は書式外が無かった。vLLM の既定の top_k は読めた。介入を掛けたときの書式外の率は、まだ分からない。'],
@@ -979,6 +984,7 @@ assert {(c['scenario'], c['A']) for c in desc['B_desc_rand_vs_noop']['contrasts'
 assert all(c['B'] in noop_by_scenario[c['scenario']] for c in desc['B_desc_rand_vs_noop']['contrasts']), 'ランダム方向の相手が無操作の腕でない'
 assert set(noop_arms) == {a for v in noop_by_scenario.values() for a in v}, '無操作の腕の和集合が場面ごとの置き方と合わない'
 assert identity['arms'] == len(identity['arms_run']) == 13, '同一性選別の腕の数と一覧が合わない'
+assert [a for a, v in identity['arms_sha16'].items() if v is None] == ['N'], '同一性選別の腕の素材の SHA16 が段階 A の正本から揃わない'
 assert not any(a in main_arms for a in ('Onull+vrandNk',)), '族ごとの統制腕を増やしていない（裁定 D75 の甲）'
 
 T = {'id': 'contrasts-B', 'version': 'draft13-2026-09-19',

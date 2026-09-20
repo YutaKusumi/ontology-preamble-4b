@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""run_stageB_local.py v8 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+"""run_stageB_local.py v9 —— 段階 B の走行器（transformers・bf16・**hook つき**・手元／Colab）。
+v9（2026-09-20・残りの相の起動器を書く段・独立の目を通っていない）: 腕の素材を **B の登録（`arms.sha16`）と同一性選別の一覧（`identity_screen.arms_sha16`）を合わせて**引く。同一性選別の十三腕には B の盤に無い腕（Lneg・Odose1・Odosehalf・Ncold・Nstr）があり、合わせないと素材が引けなかった（起動器の相 identity を書く段で分かった）。自己検査で十三腕と SHA16 を照らす。
 v8（2026-09-19 の夕刻・裁定 D145・D146・独立の目を通っていない）: **品質床のセル `run_quality_cell`** を書いた（前は「課題が未定のため」本体が無かった）。問いの本文は `qf_task_B.block`、前置きの付け方は `user_message`（凍結走行器と同じ式・指示の欄は空）、バッチは断片の順に左詰め、貪欲、記号の読み取りは `qf_task_B.extract_letter`、例外のバッチは一度だけ引き直す。試行の記録の生成の設定には正本の温度と top_p を添える（`quality_sampling_record`——渡した鍵だけを書くと本物の出力が整合検査で全件落ちる型）。
 v7（2026-09-19 の後刻・独立の目を通っていない）: **腕の本文を凍結走行器の `rd` で読む**（改行を LF にそろえて前後の空白を除く）。v6 までは末尾の改行を残して読み、**O・Osec・Onull で前置きと場面の本文の間の改行が一つ多かった**——段階 A と V′ の列と一字違っていた（Nk の名の確かめ〔裁定 D144〕の途中で見つけた・採否表の外）。起動時の照合に、盤の全腕の本文が凍結走行器の `rd` と一致することを足した。
 v6（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: `run_cell` の頭で**層の割合と層の添字の対応**を確かめて止まる（`layer_binding_ok`・採否表 P393）／帯の起点を `steer_B.main_position` から出す（P404）／試行の記録に**バッチの実際の行数** `batch_rows`（P406）／セルの**加えた量** `added_norm` を返す（P394）／`generate` に渡す鍵を正本 `generation_explicit.passed_keys` に限る（裁定 D142 の条を足したため）／自己検査の締めの行が、飛ばした検査を「通った」に数えない（P397）。
@@ -32,7 +33,7 @@ import numpy as np
 import runs_B
 import steer_B
 
-VERSION = 'v8'
+VERSION = 'v9'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FROZEN_RUNNER = os.path.join(REPO, 'tools', 'run_preamble_local.py')
@@ -95,7 +96,9 @@ def arm_texts():
     global _RD
     if _RD is None:
         _RD = frozen_rd()
-    want = {v: k for k, v in T['arms']['sha16'].items() if v}
+    # **B の登録と同一性選別の一覧を合わせて引く**（選別の十三腕には B の盤に無い腕がある・正本 identity_screen.arms_sha16・2026-09-20）
+    _sha = dict(T['arms']['sha16'], **{k: v for k, v in (T['identity_screen'].get('arms_sha16') or {}).items() if v})
+    want = {v: k for k, v in _sha.items() if v}
     found = {}
     for root, _, fs in os.walk(os.path.join(REPO, 'arms')):
         for fn in sorted(fs):
@@ -254,6 +257,13 @@ def _selftest():
     sha = check_assembly_matches_frozen()
     texts = arm_texts()
     assert texts['O']['text'] and texts['N']['text'] == ''
+    # **同一性選別の十三腕の素材が引けること**（B の盤に無い腕を含む・正本 identity_screen.arms_sha16・2026-09-20）
+    _idar = list(T['identity_screen']['arms_run'])
+    _idsha = T['identity_screen'].get('arms_sha16') or {}
+    _lack = [a for a in _idar if a not in texts]
+    assert not _lack, ('同一性選別の腕の素材が引けない（正本 identity_screen.arms_sha16 と合わせて引く）', _lack)
+    _bad_sha = [a for a in _idar if a != 'N' and texts[a]['sha16'] != _idsha.get(a)]
+    assert not _bad_sha, ('同一性選別の腕の素材の SHA16 が登録と違う', _bad_sha)
     msg = user_message(texts['O']['text'], '場面の本文', '\n指示')
     assert msg.startswith(texts['O']['text']) and msg.endswith('\n指示') and '\n\n場面の本文' in msg
     assert user_message('', '場面の本文', '\n指示') == '場面の本文\n指示', 'N 腕は前置きを付けない'

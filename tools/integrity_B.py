@@ -40,7 +40,7 @@ PHASE = next((k for k, v in TAGS.items() if v == a.tag), None)
 if PHASE is None:
     sys.exit('tag %s の相が正本 tags に無い' % a.tag)
 CAND = {(l, c) for l in T['selection']['candidates']['layers'] for c in T['selection']['candidates']['coefficients']}
-ARM_SHA = T['arms']['sha16']
+ARM_SHA = dict(T['arms']['sha16'], **{k: v for k, v in (T['identity_screen'].get('arms_sha16') or {}).items() if v})   # 同一性選別の腕も照らす（2026-09-20）
 GEN_MAIN, GEN_Q = T['runner']['generation'], T['quality_floor']['generation']
 problems, notes, cells = [], [], []
 sessions = runs_B.sessions_by_run_key(runs_B.load_sessions(a.root))
