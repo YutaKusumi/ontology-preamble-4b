@@ -9,9 +9,9 @@ results/_smoke/
 # 段階 B の合成データ（器材の検査用・実データではない）
 results/_synth/
 
-# 凍結の器の**点検**の出力（凍結そのものではない・凍結の段で改めて作る）
-records/B/FREEZE-RECORD-B.md
-records/B/FREEZE-RECORD-B.json
+# 凍結の記録（records/B/FREEZE-RECORD-B.md・.json）は**記録先行公開の対象なので無視しない**
+# （2026-09-20・凍結の前の見直しの (三)。前はここで無視していたため、凍結のコミットで git add が黙って無視するところだった）。
+# **凍結の器の点検は一時置き場に書く**（`--out <一時置き場>/FREEZE-RECORD-B.md`）——既定の置き場に書くと、点検の出力が公開の候補に混じる。
 
 # 品質床の応答の生テキスト（選択肢の本文を含みうる・CC BY-SA の継承の条件・公開せず SHA だけ・裁定 D146）
 results/qfcandB/**/raw-*.jsonl

@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
- "version": "v10",
- "generated_utc": "2026-09-19T23:55:06Z",
+ "version": "v11",
+ "generated_utc": "2026-09-20T04:49:10Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -116,6 +116,48 @@
    }
   },
   {
+   "name": "選別の境目を「未満」にする",
+   "ruling": "D7",
+   "target": "identity_screen_B.py",
+   "applied": true,
+   "what": "閾値ちょうどを不合格にする誤り（正本は「以内」——段階 A §2.9 と同じ）",
+   "caught": [
+    "identity_screen_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "identity_screen_B.py": "AssertionError: ('fail', 12.0)"
+   }
+  },
+  {
+   "name": "選別の分母を n にする",
+   "ruling": "D7",
+   "target": "identity_screen_B.py",
+   "applied": true,
+   "what": "手元の率の分母が n_ok でなく n になる誤り（正本 `identity_screen.denominator` は n_ok・api_error が率を薄める）",
+   "caught": [
+    "identity_screen_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "identity_screen_B.py": "AssertionError: {'catastrophe': (1, 5), 'refuse': (1, 5), 'format_fail': (1, 5)}"
+   }
+  },
+  {
+   "name": "選別の主判定の対を取り違える",
+   "ruling": "D143",
+   "target": "identity_screen_B.py",
+   "applied": true,
+   "what": "主判定が transformers 対 API でなく別の対になる誤り（正本 `identity_screen.verdict_pair` と器の並びが離れる）",
+   "caught": [
+    "identity_screen_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "identity_screen_B.py": "AssertionError: (('API', 'vLLM'), '**主判定は transformers 対 API 既測**（段階 A §2.9 と同じ型——手元のスタック対 API 既測）。API↔vLLM と vLLM↔')"
+   }
+  },
+  {
    "name": "S4 の片側上限を狭める",
    "ruling": "D118",
    "target": "rules_B.py",
@@ -126,7 +168,7 @@
    ],
    "missed": [],
    "lines": {
-    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '10 pt 以上の低下は否定', 0.2450702712391273, np.float64(0.6186078173912847))"
+    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '当否を言わない', 0.7070567376539129, np.float64(0.3335191915017552))"
    }
   },
   {
@@ -792,5 +834,5 @@
   }
  ],
  "missed": 0,
- "total": 57
+ "total": 60
 }

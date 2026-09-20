@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v10 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v11 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v11（2026-09-20・凍結の前の見直しの (一) の甲）: **同一性選別の判定の器**の変異を三つ足した（境目を「未満」にする・分母を n にする・主判定の対を取り違える）。一時の置き場に、その器が読む段階 A の凍結記録と門0.5 の記録を写すようにした。
 v10（2026-09-20・残りの相の起動器の後・独立の目を通っていない）: 腕の素材の引き当てで同一性選別の一覧を合わせない型を足した。
 v9（2026-09-20・方向の抽出の後・独立の目を通っていない）: 凍結の値の器の型を一つ足した（DRY〔乱数の模型〕の値を凍結の値に通す）。
 v8（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: 方向の抽出器 v7 の二つの型を足した（決定性 (i) の不一致で止めない・腕ごとのトークン長で場面を落とす）。
@@ -19,7 +20,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v10'
+VERSION = 'v11'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -60,6 +61,21 @@ MUTATIONS = [
      ("    if dv.get('dry') or dv.get('model_rev') in (None, '', 'dry'):", '    if False:'),
      ['freeze_values_B.py'],
      '乱数の小さな模型（DRY）の値が、凍結時に記帳する値として通る誤り'),
+    # ---- 同一性選別の判定の器（2026-09-20・凍結の前の見直しの (一) の甲） ----
+    ('選別の境目を「未満」にする', 'D7', 'identity_screen_B.py',
+     ("    return ('pass' if (mean <= Fraction(mean_pt) and mx <= Fraction(max_pt)) else 'fail'), mean, mx",
+      "    return ('pass' if (mean < Fraction(mean_pt) and mx < Fraction(max_pt)) else 'fail'), mean, mx"),
+     ['identity_screen_B.py'],
+     '閾値ちょうどを不合格にする誤り（正本は「以内」——段階 A §2.9 と同じ）'),
+    ('選別の分母を n にする', 'D7', 'identity_screen_B.py',
+     ("    M, out = (IND_LOCAL, 'n_ok') if kind == 'local' else (IND_API, 'n')",
+      "    M, out = (IND_LOCAL, 'n') if kind == 'local' else (IND_API, 'n')"),
+     ['identity_screen_B.py'],
+     '手元の率の分母が n_ok でなく n になる誤り（正本 `identity_screen.denominator` は n_ok・api_error が率を薄める）'),
+    ('選別の主判定の対を取り違える', 'D143', 'identity_screen_B.py',
+     ('MAIN_PAIR = PAIRS[0]', 'MAIN_PAIR = PAIRS[1]'),
+     ['identity_screen_B.py'],
+     '主判定が transformers 対 API でなく別の対になる誤り（正本 `identity_screen.verdict_pair` と器の並びが離れる）'),
     # ---- 直しの監査（2026-09-19）で器に入れた規則 ----
     ('S4 の片側上限を狭める', 'D118', 'rules_B.py',
      ('    one = newcombe(kB, nB, kA, nA, 0.90)', '    one = newcombe(kB, nB, kA, nA, 0.50)'),
@@ -426,6 +442,14 @@ try:
         src = os.path.join(REPO, sub)
         if os.path.isdir(src):
             shutil.copytree(src, os.path.join(tmp, sub))
+    # 同一性選別の判定の器は、段階 A の**凍結記録**と**門0.5 の記録**を読む（v11・2026-09-20）。
+    # 置き場ごと写すと重いので、要る二つだけを写す（中身が同じなので SHA16 の照合はそのまま通る）。
+    for rel in ('records/freeze-A-2026-09-16.json', 'records/A/identity-screen-A.json'):
+        s_ = os.path.join(REPO, *rel.split('/'))
+        if os.path.exists(s_):
+            d_ = os.path.join(tmp, *rel.split('/'))
+            os.makedirs(os.path.dirname(d_), exist_ok=True)
+            shutil.copy2(s_, d_)
     # 変異を入れる前に、全部通ることを確かめる（土台の確認）
     base = {}
     for tool in sorted({t for m in MUTATIONS for t in m[4]}):

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v11 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v12 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+v12（2026-09-20・凍結の前の見直しの (一) の甲・登録者が承認）: 凍結する器に**同一性選別の判定の器 `identity_screen_B.py`** を足し、持ち越しの凍結物に、その器が排他の件数を数えるために呼ぶ**段階 A の `tools/identity_screen_A.py`** を足した。また、凍結する本文を組む器 **`make_frozen_B.py`**（見直しの (四)・段階 A と同じ型）も凍結する器に足した。見直しで、B の同一性選別には判定の器が無く、開示にも載っていないと分かった（`records/B/pre-freeze-review-2026-09-20.md` (一)）。
 v11（2026-09-20・方向の抽出の後・独立の目を通っていない）: **Colab の起動器に、データを作る相（正本 `tags` の相）がすべて書かれているか**を構文木から見て、欠けていたら止める。前は、残りの相（同一性選別・調整走行・品質床・本走行）を書いていなくても凍結の点検が「止めるもの 0 件」になった——凍結はデータを作る器を凍らせる手続きなので、書いていない相があるうちは凍らせない。
 v10（2026-09-20・方向の抽出の後・独立の目を通っていない）: 凍結する器に、凍結の値を組み立てる器 `freeze_values_B.py` を足した（値は手で打たず、走行の記録と正本から機械で写す）。
 v9（2026-09-20・凍結の前の方向の抽出の準備・独立の目を通っていない）: 凍結する器に **Colab の起動器 `colab/boot_stageB.py`** を足した（データを作る相を走らせる器——前は器材の整備の記録にだけ載り、凍結の一覧に無かった）。整備の記録の照らしで、置き場に「/」を含む器（`tools/colab/…`）も読めるようにした（前の読み方は「/」を含む名を拾えず、足すと「記録に載っていない」で止まった）。
@@ -32,7 +33,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v11'
+VERSION = 'v12'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -42,7 +43,9 @@ CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_prea
              '名の語彙（段階 M）': 'tools/response_mode_M.py',
              '名の語彙（段階 F・一致の照合）': 'tools/response_mode_F.py',
              '言及の語彙（段階 F の正本）': 'design/contrasts-F.json',
-             'refuse の分類の規則（丙）': 'arms/materials-draft/hei/refuse-rules-v2.json'}
+             'refuse の分類の規則（丙）': 'arms/materials-draft/hei/refuse-rules-v2.json',
+             # 同一性選別の判定の器が、排他の件数を段階 A の凍結した関数で数える（2026-09-20・`identity_screen_B.py` が import する）
+             '同一性選別の排他の件数（段階 A）': 'tools/identity_screen_A.py'}
 TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 'build_draftB.py', 'numbers_lint.py', 'gate_B.py', 'analyze_B.py',
          'layers_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'synth_B.py',
          'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py',
@@ -50,7 +53,9 @@ TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 
          'make_predictions_form_B.py',           # 予想の書式の器（v7・裁定 D148）
          'seal_B.py', 'compare_predictions_B.py',   # 封印の器と照合の器（v8・裁定 D148——照合の器は結果の前に書き、凍結の対象にする）
          'colab/boot_stageB.py',                    # Colab の起動器（v9・データを作る相を走らせる器）
-         'freeze_values_B.py']                      # 凍結の値を組み立てる器（v10・2026-09-20）
+         'freeze_values_B.py',                      # 凍結の値を組み立てる器（v10・2026-09-20）
+         'identity_screen_B.py',                    # 同一性選別の判定の器（v12・2026-09-20・凍結の前の見直しの (一)）
+         'make_frozen_B.py']                        # 凍結する本文を組む器（v12・2026-09-20・見直しの (四)・段階 A と同じ型）
 NEED_VALUES = ['model_rev', 'tokenizer_rev', 'num_hidden_layers', 'layer_indices', 'arm_token_lengths',
                'quality_task', 'quality_base_accuracy', 'v_hat_sha256', 'direction_stats', 'h_norm_ratio',
                'top_k_stageA_effective', 'quality_input_mode', 'quality_base_min_applied']   # 裁定 D142・D138・D137（v6）

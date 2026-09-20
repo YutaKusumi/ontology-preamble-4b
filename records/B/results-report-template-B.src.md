@@ -23,6 +23,8 @@ O の枠組みに対応する線形方向を主位置（プロンプトの最終
 
 整合検査（`tools/integrity_B.py`・判定欄を読まない）と抽出検査（`tools/sample_inspection_B.py`・腕と場面を伏せた標本・対応表は公開の置き場の外・封印つき）の結果を、率を見る前に置く。環境・セッション・中断と再開・バッチの凍結は正本 `sessions`・`runner` のとおり。
 
+**同一性選別（三スタックの距離）**: 判定と表は `records/B/identity-screen-B.md`（器 `tools/identity_screen_B.py`）に置く。{{identity_screen/verdict_pair}}。{{identity_screen/fail_reading}}
+
 **管理図の要約**（無操作の腕の率をセッションの順に並べた全点と三つの判定・正本 `report_rules.control_chart`・裁定 D110）: 〔結果 K〕
 
 {{calibration/judgement}}

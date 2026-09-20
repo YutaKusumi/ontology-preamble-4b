@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""design_facts_B.py v8 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+"""design_facts_B.py v9 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+v9（2026-09-20・凍結の前の見直しの (一) の甲）: 転記行 G の同一性の欄に**判定の器 `identity_screen_B.py`**を書き、実在の一覧に足した。
 v8（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 転記行 D の S4 の文を**いまの規則**（門 → 三分岐・同等性・札は結果だけ・裁定 D118・D134〜D136）で組み、数は `rules_B.s4_oc` から出す（前は検出力の規則の文と Wald の区間の数が残り、正本の旧い鍵 `power_min` を読んでいた・採否表 P389）。転記行 E の帰無発火率・検出力・多重性を**正本の `measured.quality_floor_multiplicity` と同じ関数**（`rules_B.qf_null_rate`・`qf_power`・`qf_multiplicity`）から出し、下限 0.85 の値を足す（採否表 P390）。多重性の数は正本と同じ関数から出す（採否表 P391・裁定 D137）。「分母＝200」を「登録した問いの数」に改めた。注の古い数を消した（採否表 P405）。
 v6 からの変更（v7・2026-09-18〜19）: **版の名を v6 のまま上げていなかった**（裁定 D87〜D132 の直しが入っていた——品質床の相手を段ごとに走らせる規模の数え直し〔D88〕・品質床の相手のセッション〔D92〕・転記行 C を門と同じ模擬で出す〔D119・同値の帯の式は D98〕・転記行 E の対の見方〔採否表 P373・裁定 D130〕・転記行 G の器の一覧と転記行 I の数え方〔束の前の点検〕）。この版で v7 に上げた（前例は採否表 P239）。
 v3 からの変更（検分の二段目・四票の採否 P212〜P256・裁定 D75〜D86）: 転記行 C に**選定 × 確証の合成検出力**（採否表 P229）と、抽出場面を二層に分けない前提の但し書き（P245）、
@@ -13,7 +14,7 @@ v2 からの変更（段階 B 設計の検分の一段目・採否表 P190〜P21
 出力: records/B/design-facts-B.md と同 .json。
 """
 import os, sys, re, json, math, hashlib, datetime
-VERSION = 'v8'     # 出力に印字する版（v6 まで docstring と出力の版が食い違っていた・2026-09-19）
+VERSION = 'v9'     # 出力に印字する版（v6 まで docstring と出力の版が食い違っていた・2026-09-19）
 import numpy as np
 from scipy.stats import fisher_exact, binom
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -312,11 +313,11 @@ F['F'] = {'text': '費用と時間（草案4 の巡の追い問いの記録: %s 
 # ---- G・H・I ----
 _TOOLS_G = ('make_contrasts_B.py', 'rules_B.py', 'runs_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'gate_B.py', 'analyze_B.py',
             'layers_B.py', 'control_chart_B.py', 'design_facts_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'build_report_B.py', 'freeze_B.py',
-            'synth_B.py', 'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_draftB.py')
+            'synth_B.py', 'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_draftB.py', 'identity_screen_B.py')
 exists = [f for f in _TOOLS_G if os.path.exists(os.path.join(REPO, 'tools', f))]
 absent = [f for f in _TOOLS_G if f not in exists]
 F['G'] = {'text': '凍結射程と器材の対応表: 腕・場面・族・選定規則・報告の決まり→`contrasts-B.json`／判定の規則（S4・区間・refuse 門・等質性・td の特異性・api_error の門・門の並び）→`rules_B.py`／'
-                  '同一性→`identity_screen`（段階 A と共用）／方向の抽出・主位置の活性の保存・‖v̂‖ と ‖h‖ の比→`direction_B.py`／加減・ランダム方向・品質床の生成と採点→`steer_B.py`／'
+                  '同一性→`identity_screen`（登録は段階 A と共用・判定の器は `identity_screen_B.py`〔排他の件数は段階 A の凍結した関数を呼ぶ〕）／方向の抽出・主位置の活性の保存・‖v̂‖ と ‖h‖ の比→`direction_B.py`／加減・ランダム方向・品質床の生成と採点→`steer_B.py`／'
                   '一つのセルの走行と、試行の記録・生テキスト・副位置の活性の書き出し→`run_stageB_local.py`／門1 と選定→`gate_B.py`／族・門・記述の族・td の特異性・等質性→`analyze_B.py`／'
                   '副位置の読み→`layers_B.py`／管理図→`control_chart_B.py`／転記行→`design_facts_B.py`／整合と抽出検査→`integrity_B.py`・`sample_inspection_B.py`／'
                   '報告→雛形・`build_report_B.py`・`report_lint.py`／凍結→`freeze_B.py`／合成データ・経路・変異・端から端まで→`synth_B.py`・`dry_run_B.py`・`mutation_B.py`・`endtoend_B.py`。'
