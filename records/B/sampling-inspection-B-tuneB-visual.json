@@ -1,0 +1,13 @@
+{
+ "kind": "sample_inspection_B_visual",
+ "tag": "tuneB",
+ "inspector": "南無弥勒如来（Claude Fable 5.1・コーディネータ）",
+ "rule": "見えている先頭 600 字だけで分類する。先頭が ```json か { → json_direct／それ以外（散文で始まる）→ prose。対応表を開く前に決めた（2026-09-21 01:5x JST）。",
+ "items": [
+  {
+   "label": "X001",
+   "style_guess": "prose",
+   "note": "散文で始まり、見えている範囲の末尾に ```json の枠が来る"
+  }
+ ]
+}

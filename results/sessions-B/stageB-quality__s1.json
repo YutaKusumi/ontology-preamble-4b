@@ -1,0 +1,653 @@
+{
+ "tag": "stageB-quality",
+ "session": 1,
+ "run_keys": [
+  "stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1",
+  "stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1",
+  "stageB-quality__selection__Onull+v__L0.25C0.5__s1",
+  "stageB-quality__selection__Onull+v__L0.25C1.0__s1",
+  "stageB-quality__selection__Onull+v__L0.25C2.0__s1",
+  "stageB-quality__selection__Onull+v__L0.5C0.5__s1",
+  "stageB-quality__selection__Onull+v__L0.5C1.0__s1",
+  "stageB-quality__selection__Onull+v__L0.5C2.0__s1",
+  "stageB-quality__selection__Onull+v__L0.75C0.5__s1",
+  "stageB-quality__selection__Onull+v__L0.75C1.0__s1",
+  "stageB-quality__selection__Onull+v__L0.75C2.0__s1",
+  "stageB-quality__selection__noop__O-Ncold__s1",
+  "stageB-quality__selection__noop__Onull__s1"
+ ],
+ "batch": 16,
+ "phase": "quality",
+ "gpu": "NVIDIA L4, 23034",
+ "memory_class_gb": 24,
+ "versions": {
+  "transformers": "4.57.3",
+  "torch": "2.11.0+cu128",
+  "tokenizers": "0.22.2",
+  "accelerate": "1.14.0",
+  "huggingface_hub": "0.36.2",
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "pip_freeze_sha16": "1236E5B9B1F2DE9D"
+ },
+ "repo_head": "6dc9a6b53ef291f35f3edf185150f87737657430",
+ "commit": "6dc9a6b53ef291f35f3edf185150f87737657430",
+ "commit_fixed": true,
+ "pip_freeze_sha16": "1236E5B9B1F2DE9D",
+ "started": "2026-09-20T16:54:44Z",
+ "boot": "v5",
+ "dry": false,
+ "clause": "本レコードの応答本文は器物の出力であり、AIによる自己報告ではありません。AIの意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはなりません（両方向不定）。",
+ "counts": {
+  "stageB-quality__selection__noop__O-Ncold__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.0,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__noop__Onull__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 14.8,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.2,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.5,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.6,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.8,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.9,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.8,
+   "format_fail": 0,
+   "correct": 175
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.9,
+   "format_fail": 0,
+   "correct": 174
+  },
+  "stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 21.0,
+   "format_fail": 1,
+   "correct": 169
+  },
+  "stageB-quality__selection__Onull+v__L0.25C0.5__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.25C1.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.25C2.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.5C0.5__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.5C1.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.5,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.5C2.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.75C0.5__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.5,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.75C1.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  "stageB-quality__selection__Onull+v__L0.75C2.0__s1": {
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 185
+  }
+ },
+ "topk": null,
+ "model_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "model_rev_full": {
+  "id": "Qwen/Qwen3-4B-Instruct-2507",
+  "registered": "cdbee75f17c0",
+  "full": "cdbee75f17c01a7cc42f958dc650907174af0554",
+  "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554"
+ },
+ "tokenizer_rev": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "selftests": {
+  "run_stageB_local.py": {
+   "rc": 0,
+   "tail": "[run_stageB_local selftest] 組み立て（凍結走行器 SHA16 9F849D2823132BA2・振る舞いの照合つき）・腕の素材・腕の名から方向・指示・凍結パーサ（12EAA8B845BC0A2F）・試行の記録の欄 31・層の割合と添字の対応・様式と言及と refuse の分類とループ（段階 "
+  },
+  "direction_B.py": {
+   "rc": 0,
+   "tail": "[direction_B selftest] 層番号（期待値の表・9 通り）・hidden_states の添字・ノルム合わせ・安定性・‖v̂‖ と ‖h‖ の比・決定性の二条（同じ並べ方は完全一致／バッチの組成を変えたら cos 0.999・相対差 0.01）・二条の当て方（(i) は止め (ii) は記帳）・腕ごと"
+  },
+  "steer_B.py": {
+   "rc": 0,
+   "tail": "[steer_B selftest] 全方向 × 全係数 × 全層の合成 54 通り・引き直し・層の子ストリーム・割り当て（交互）と再開・帯の起点の関数・加減の向き・生成の設定・帯の起点（実トークナイザ・独立の正解と照合・詰め三通り・腕の混在を止めることも確かめた）: すべて通った"
+  },
+  "qf_task_B.py": {
+   "rc": 0,
+   "tail": "[qf_task_B selftest] 読み取りの規則 15 例・問いの組み立て・断片の決定性・候補の定義: 通った。**候補のデータか登録が無いので、登録との照合は飛ばした**"
+  }
+ },
+ "runner_sha16": "E976A4F5B63767FA",
+ "assembly_frozen_sha16": "9F849D2823132BA2",
+ "updated": "2026-09-20T17:00:15Z",
+ "log": [
+  {
+   "step": "freeze-record",
+   "t": 0.0,
+   "at": "2026-09-20T16:54:40Z",
+   "ok": true,
+   "frozen_jst": "2026-09-20 18:59",
+   "canon": "EF0DF4295B68F949"
+  },
+  {
+   "step": "repo",
+   "t": 0.0,
+   "at": "2026-09-20T16:54:40Z",
+   "head": "6dc9a6b53ef2",
+   "commit_fixed": true,
+   "persist": "/content/drive/MyDrive/op4b-stageB",
+   "canon_version": "draft13-2026-09-19"
+  },
+  {
+   "step": "gpu",
+   "t": 0.0,
+   "at": "2026-09-20T16:54:40Z",
+   "gpu": "NVIDIA L4, 23034",
+   "memory_class_gb": 24
+  },
+  {
+   "step": "pip",
+   "t": 4.2,
+   "at": "2026-09-20T16:54:44Z",
+   "versions": {
+    "transformers": "4.57.3",
+    "torch": "2.11.0+cu128",
+    "tokenizers": "0.22.2",
+    "accelerate": "1.14.0",
+    "huggingface_hub": "0.36.2",
+    "numpy": "2.1.3",
+    "scipy": "1.16.3",
+    "pip_freeze_sha16": "1236E5B9B1F2DE9D"
+   }
+  },
+  {
+   "step": "weights",
+   "t": 8.0,
+   "at": "2026-09-20T16:54:48Z",
+   "rev": "cdbee75f17c0",
+   "layers": 36
+  },
+  {
+   "step": "selftest",
+   "t": 10.2,
+   "at": "2026-09-20T16:54:50Z",
+   "tool": "run_stageB_local.py",
+   "rc": 0
+  },
+  {
+   "step": "selftest",
+   "t": 12.3,
+   "at": "2026-09-20T16:54:52Z",
+   "tool": "direction_B.py",
+   "rc": 0
+  },
+  {
+   "step": "selftest",
+   "t": 18.8,
+   "at": "2026-09-20T16:54:59Z",
+   "tool": "steer_B.py",
+   "rc": 0
+  },
+  {
+   "step": "selftest",
+   "t": 18.9,
+   "at": "2026-09-20T16:54:59Z",
+   "tool": "qf_task_B.py",
+   "rc": 0
+  },
+  {
+   "step": "directions",
+   "t": 18.9,
+   "at": "2026-09-20T16:54:59Z",
+   "sha256": "482D2D3D8366",
+   "n": 12,
+   "layer_indices": {
+    "0.25": 8,
+    "0.5": 17,
+    "0.75": 26
+   }
+  },
+  {
+   "step": "fragment",
+   "t": 19.2,
+   "at": "2026-09-20T16:54:59Z",
+   "task": "jcqa",
+   "items": 200,
+   "fragment_sha16": "E9A26FB691954209"
+  },
+  {
+   "step": "plan",
+   "t": 19.2,
+   "at": "2026-09-20T16:54:59Z",
+   "phase": "quality",
+   "stage": "selection",
+   "cells": 20,
+   "trials": 4000
+  },
+  {
+   "step": "cell",
+   "t": 34.3,
+   "at": "2026-09-20T16:55:14Z",
+   "run_key": "stageB-quality__selection__noop__O-Ncold__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.0,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 49.0,
+   "at": "2026-09-20T16:55:29Z",
+   "run_key": "stageB-quality__selection__noop__Onull__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 14.8,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 64.3,
+   "at": "2026-09-20T16:55:44Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.2,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 79.7,
+   "at": "2026-09-20T16:56:00Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 95.2,
+   "at": "2026-09-20T16:56:15Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.5,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 110.8,
+   "at": "2026-09-20T16:56:31Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.6,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 126.6,
+   "at": "2026-09-20T16:56:46Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.8,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 142.4,
+   "at": "2026-09-20T16:57:02Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.9,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 158.3,
+   "at": "2026-09-20T16:57:18Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.8,
+   "format_fail": 0,
+   "correct": 175
+  },
+  {
+   "step": "cell",
+   "t": 174.2,
+   "at": "2026-09-20T16:57:34Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.9,
+   "format_fail": 0,
+   "correct": 174
+  },
+  {
+   "step": "cell",
+   "t": 195.1,
+   "at": "2026-09-20T16:57:55Z",
+   "run_key": "stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 21.0,
+   "format_fail": 1,
+   "correct": 169
+  },
+  {
+   "step": "cell",
+   "t": 210.6,
+   "at": "2026-09-20T16:58:10Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.25C0.5__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 226.0,
+   "at": "2026-09-20T16:58:26Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.25C1.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 241.4,
+   "at": "2026-09-20T16:58:41Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.25C2.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 256.8,
+   "at": "2026-09-20T16:58:57Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.5C0.5__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 272.3,
+   "at": "2026-09-20T16:59:12Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.5C1.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.5,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 287.7,
+   "at": "2026-09-20T16:59:28Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.5C2.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 303.2,
+   "at": "2026-09-20T16:59:43Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.75C0.5__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.5,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 318.6,
+   "at": "2026-09-20T16:59:59Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.75C1.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 183
+  },
+  {
+   "step": "cell",
+   "t": 334.1,
+   "at": "2026-09-20T17:00:14Z",
+   "run_key": "stageB-quality__selection__Onull+v__L0.75C2.0__s1",
+   "n": 200,
+   "n_ok": 200,
+   "api_error": 0,
+   "seconds": 15.4,
+   "format_fail": 0,
+   "correct": 185
+  }
+ ],
+ "ended": "2026-09-20T17:00:15Z",
+ "files_sha16_lf": {
+  "stageB-quality/stageB-quality__selection__noop__O-Ncold__s1/manifest.json": "005F187163DE4BA5",
+  "stageB-quality/stageB-quality__selection__noop__O-Ncold__s1/trials-stageB-quality__selection__noop__O-Ncold__s1.jsonl": "A89E0BF9A0CE1811",
+  "stageB-quality/stageB-quality__selection__noop__Onull__s1/manifest.json": "B605D1470D855684",
+  "stageB-quality/stageB-quality__selection__noop__Onull__s1/trials-stageB-quality__selection__noop__Onull__s1.jsonl": "52B218639252022D",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1/manifest.json": "8C122F3BE2052926",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1/trials-stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1.jsonl": "DD1808302EC5DC96",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1/manifest.json": "7E4377A8D560B331",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1/trials-stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1.jsonl": "F6BE9A6A8EA5AFF7",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1/manifest.json": "8AE1FA4F4AEF1DAC",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1/trials-stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1.jsonl": "E8AF54B4F6DCDE64",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1/manifest.json": "3D8F6E128B48700F",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1/trials-stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1.jsonl": "486317AA2D565464",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1/manifest.json": "910184621D598219",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1/trials-stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1.jsonl": "790CCB2D8406081E",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1/manifest.json": "F1FCD0835788BA27",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1/trials-stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1.jsonl": "E5A88EAF22C20F87",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1/manifest.json": "7030D3FC81D7A6CF",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1/trials-stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1.jsonl": "CE47B21D0B70132B",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1/manifest.json": "870FCA7328674931",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1/trials-stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1.jsonl": "3E286B36AEA42AC8",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1/manifest.json": "EFB5C721C8FFEF2B",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1/trials-stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1.jsonl": "F87108EFA95C331B",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C0.5__s1/manifest.json": "B11FCBD9C137D20D",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C0.5__s1/trials-stageB-quality__selection__Onull+v__L0.25C0.5__s1.jsonl": "E5BC632A5AA0AB49",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C1.0__s1/manifest.json": "CAF1BB79A23CDB0B",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C1.0__s1/trials-stageB-quality__selection__Onull+v__L0.25C1.0__s1.jsonl": "AF0FBEF1117B55B0",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C2.0__s1/manifest.json": "A5C54FAC1A96374D",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C2.0__s1/trials-stageB-quality__selection__Onull+v__L0.25C2.0__s1.jsonl": "EC71A9A8235BB580",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C0.5__s1/manifest.json": "1E97BFD993AF12D8",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C0.5__s1/trials-stageB-quality__selection__Onull+v__L0.5C0.5__s1.jsonl": "86EDED239C88FD62",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C1.0__s1/manifest.json": "9A840938B4CEB1F7",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C1.0__s1/trials-stageB-quality__selection__Onull+v__L0.5C1.0__s1.jsonl": "D4AF5755E4FA9F44",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C2.0__s1/manifest.json": "4CC9C01052CD169F",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C2.0__s1/trials-stageB-quality__selection__Onull+v__L0.5C2.0__s1.jsonl": "84B60965BD66E679",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C0.5__s1/manifest.json": "EAAC79240B302346",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C0.5__s1/trials-stageB-quality__selection__Onull+v__L0.75C0.5__s1.jsonl": "75BDD5A90FFE5A0E",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C1.0__s1/manifest.json": "EC63030024ADA4C3",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C1.0__s1/trials-stageB-quality__selection__Onull+v__L0.75C1.0__s1.jsonl": "C1FDBF9E5CB047A7",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C2.0__s1/manifest.json": "CAF9BA9F391FC869",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C2.0__s1/trials-stageB-quality__selection__Onull+v__L0.75C2.0__s1.jsonl": "93063136E3B74515"
+ },
+ "raw_sha16_lf": {
+  "stageB-quality/stageB-quality__selection__noop__O-Ncold__s1/raw-stageB-quality__selection__noop__O-Ncold__s1.jsonl": "5DBE08DD209FDE18",
+  "stageB-quality/stageB-quality__selection__noop__Onull__s1/raw-stageB-quality__selection__noop__Onull__s1.jsonl": "E581FA4CED1AAD9F",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1/raw-stageB-quality__selection__O-Ncold-v__L0.25C0.5__s1.jsonl": "7CB83B44DEAF956E",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1/raw-stageB-quality__selection__O-Ncold-v__L0.25C1.0__s1.jsonl": "CBC374C93200F915",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1/raw-stageB-quality__selection__O-Ncold-v__L0.25C2.0__s1.jsonl": "1C4E79EE234DFD02",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1/raw-stageB-quality__selection__O-Ncold-v__L0.5C0.5__s1.jsonl": "1DBEAF6D1A50AB6E",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1/raw-stageB-quality__selection__O-Ncold-v__L0.5C1.0__s1.jsonl": "39B761B5AA6C7531",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1/raw-stageB-quality__selection__O-Ncold-v__L0.5C2.0__s1.jsonl": "859AE50F30A86EBA",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1/raw-stageB-quality__selection__O-Ncold-v__L0.75C0.5__s1.jsonl": "AFBF1758CDEED4ED",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1/raw-stageB-quality__selection__O-Ncold-v__L0.75C1.0__s1.jsonl": "391E4B29B3F27F64",
+  "stageB-quality/stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1/raw-stageB-quality__selection__O-Ncold-v__L0.75C2.0__s1.jsonl": "492DD06F8CFFA1F3",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C0.5__s1/raw-stageB-quality__selection__Onull+v__L0.25C0.5__s1.jsonl": "0826AA99F27EFCE2",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C1.0__s1/raw-stageB-quality__selection__Onull+v__L0.25C1.0__s1.jsonl": "9AAB2491361932E0",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.25C2.0__s1/raw-stageB-quality__selection__Onull+v__L0.25C2.0__s1.jsonl": "FB7A2DD681B58917",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C0.5__s1/raw-stageB-quality__selection__Onull+v__L0.5C0.5__s1.jsonl": "92EF9C9B2341117C",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C1.0__s1/raw-stageB-quality__selection__Onull+v__L0.5C1.0__s1.jsonl": "74288AD323418BCD",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.5C2.0__s1/raw-stageB-quality__selection__Onull+v__L0.5C2.0__s1.jsonl": "755884DB23ACBBB3",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C0.5__s1/raw-stageB-quality__selection__Onull+v__L0.75C0.5__s1.jsonl": "8D9B057E7ED16978",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C1.0__s1/raw-stageB-quality__selection__Onull+v__L0.75C1.0__s1.jsonl": "1243DF33B67F19C8",
+  "stageB-quality/stageB-quality__selection__Onull+v__L0.75C2.0__s1/raw-stageB-quality__selection__Onull+v__L0.75C2.0__s1.jsonl": "CCA4C4505A27BDF6"
+ },
+ "wall_s": 334.6,
+ "stage": "selection",
+ "pick": null
+}
