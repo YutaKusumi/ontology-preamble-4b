@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""run_plan_B.py v1 —— 段階 B の**走行の段取り**（`records/B/run-plan-B.md`）を、正本と設計事実から機械で組む（2026-09-20・凍結前の見直しの (あ)）。
+"""run_plan_B.py v2 —— 段階 B の**走行の段取り**（`records/B/run-plan-B.md`）を、正本と設計事実から機械で組む（2026-09-20・凍結前の見直しの (あ)）。
+v2（2026-09-20・Fable 5.1 の見直し）: 後の相が読む記録（同一性選別の判定・門の記録）は**コミットして push し、その後のコミットを固定して起動する**ことを段に明記した——起動器は固定したコミットの中の記録しか読めない。
 
 なぜ: 段階 A は走らせる前に段取り（`records/A/main/main-plan-A.md`）を書いた——相の順・tag・試行数・seed・セッションの割り方・
       相の間に何を確かめるか・中断と再開・止める規則。B にはこれが無く、開示に「相の間は人手で進める」とだけあった。
@@ -14,7 +15,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 FACTS = runs_B.read_json(os.path.join(REPO, 'records', 'B', 'design-facts-B.json'))
@@ -76,17 +77,19 @@ p('')
 p('| 段 | すること | 器 | 確かめること・進む条件 |')
 p('|---|---|---|---|')
 p('| 1 | 同一性選別を走らせる | 起動器 `OP4B_PHASE=identity` | zip を回収し、整合検査 `python tools/integrity_B.py --tag %s` が**不整合 0** |' % TAGS['identity'])
-p('| 2 | 同一性選別を判定する | `python tools/identity_screen_B.py` | 番人（採点欠落・欄・重複・種）を通り、`records/B/identity-screen-B.{json,md}` が書ける。**合否は進む条件ではない**（`fail_reading`）。判定は登録者に見せる |')
-p('| 3 | 調整走行を走らせる | 起動器 `OP4B_PHASE=tune` | 起動器は判定の記録が無ければ始めない。zip を回収し、整合検査 `--tag %s` が不整合 0。**率盲検の抽出検査** `python tools/sample_inspection_B.py --tag %s --keydir <公開の外>` を先に通す（対応表は公開の置き場の外） |' % (TAGS['tune'], TAGS['tune']))
+p('| 2 | 同一性選別を判定する | `python tools/identity_screen_B.py` | 番人（採点欠落・欄・重複・種）を通り、`records/B/identity-screen-B.{json,md}` が書ける。**合否は進む条件ではない**（`fail_reading`）。判定は登録者に見せ、**記録をコミットして push する**（起動器は固定したコミットの中の記録しか読めない） |')
+p('| 3 | 調整走行を走らせる | 起動器 `OP4B_PHASE=tune`（**判定の記録を含むコミット**を固定） | 起動器は判定の記録が無ければ始めない。zip を回収し、整合検査 `--tag %s` が不整合 0。**率盲検の抽出検査** `python tools/sample_inspection_B.py --tag %s --keydir <公開の外>` を先に通す（対応表は公開の置き場の外） |' % (TAGS['tune'], TAGS['tune']))
 p('| 4 | 品質床（選定の段） | 起動器 `OP4B_PHASE=quality OP4B_STAGE=selection` | zip を回収し、整合検査 `--tag %s` が不整合 0 |' % TAGS['quality'])
-p('| 5 | 門1 と選定 | `python tools/gate_B.py` | 判定 open なら選んだ層 × 係数と同値の帯を**登録者に見せる**。closed／escalate（全候補が非正など）なら止めて登録者に上げる（正本 `withdrawal`） |')
-p('| 6 | 品質床（選定後の段） | 起動器 `OP4B_PHASE=quality OP4B_STAGE=post` | 選んだ層 × 係数でしか走らない（正本 `selection.binding`）。整合検査が不整合 0・`gate_B` を再度通して post の行を得る |')
-p('| 7 | 本走行 | 起動器 `OP4B_PHASE=main` | 選んだ層 × 係数でしか走らない。**本走行の率は整合検査まで見ない**（率盲検） |')
+p('| 5 | 門1 と選定 | `python tools/gate_B.py` | 判定 open なら選んだ層 × 係数と同値の帯を**登録者に見せる**。closed／escalate（全候補が非正など）なら止めて登録者に上げる（正本 `withdrawal`）。open なら**門の記録をコミットして push する**（後の相の起動器が読む） |')
+p('| 6 | 品質床（選定後の段） | 起動器 `OP4B_PHASE=quality OP4B_STAGE=post`（**門の記録を含むコミット**を固定） | 選んだ層 × 係数でしか走らない（正本 `selection.binding`）。整合検査が不整合 0・`gate_B` を再度通して post の行を得る |')
+p('| 7 | 本走行 | 起動器 `OP4B_PHASE=main`（同上） | 選んだ層 × 係数でしか走らない。**本走行の率は整合検査まで見ない**（率盲検） |')
 p('| 8 | 率盲検の整合検査・抽出検査 | `integrity_B --tag %s`・`sample_inspection_B --tag %s` | 不整合 0・標本の目視と対応表の照合 |' % (TAGS['main'], TAGS['main']))
 p('| 9 | 集計 | `control_chart_B` → `analyze_B --gate … --seal records/B/seal-B.json --chart …` → `layers_B` → `compare_predictions_B` | 集計器は門の記録の正本 SHA16 を照らして止まる。予想の照合は**一度だけ** |')
 p('| 10 | 報告 | `build_report_B --identity records/B/identity-screen-B.json … --lint` | 走査器が違反 0・漢数字の一覧を読み手が照らす・`block_rebuild`（走らせ直して一字一句で突き合わせる） |')
 p('| 11 | 検分 → 公開 → 反映メモ B | — | 登録者の判断 |')
 p('')
+p('- **後の相が読む記録（同一性選別の判定・門の記録）は、コミットして push してから、その後のコミットを固定して次の相を起動する。**'
+  '起動器は固定したコミットの中の記録しか読めない。凍結の記録との照合は正本・器材・持ち越しの SHA16 なので、記録を足したコミットでも通る（記録は凍結物ではない）。')
 p('- 相の間は**必ず手元に回収して確かめてから**次へ進む。起動器は書き終えたセルを飛ばすので、中断からの再開は同じ相をもう一度起動すればよい（セッション番号は正本 `sessions.number_rule`）。')
 p('')
 p('## 3. 起動の一行（Colab のセルに打つのは一行だけ・先頭の下線は入力の先頭が落ちる事故の緩衝）')

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""identity_screen_B.py v2 —— 段階 B の**同一性選別の判定**（三スタックの距離・正本 `identity_screen`・裁定 D7・D143・2026-09-20）。
+"""identity_screen_B.py v3 —— 段階 B の**同一性選別の判定**（三スタックの距離・正本 `identity_screen`・裁定 D7・D143・2026-09-20）。
+v3（2026-09-20・Fable 5.1 の見直し・登録者の指示）: **P421 の直しに欠陥があった**——n_ok == n を求めると、正本が認める api_error の残り（一度引き直してなお落ちた行）で止まる。行数 n == 登録の n に改め、api_error は件数を印字して分母から除くだけにした（欠けと重複は行数で捕まる）。
 
 v2（2026-09-20・四票の採否 P418〜P421・P426〜P428・登録者裁定）:
   - **採点欠落の番人**（P418・P420）: 段階 A の `exclusive_counts` は、判定の欄が空いた試行を黙って「その他」に数える
@@ -51,7 +52,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 import identity_screen_A as ISA          # 凍結物（段階 A）——排他の件数の関数だけを使う
 
-VERSION = 'v2'
+VERSION = 'v3'
 REPO = runs_B.REPO
 A_CANON = os.path.join(REPO, 'design', 'contrasts-A.json')
 A_RECORD = os.path.join(REPO, 'records', 'A', 'identity-screen-A.json')
@@ -345,10 +346,15 @@ if __name__ == '__main__':
     if gap_only and not a.allow_scoring_gap:
         sys.exit('番人が止めた（採点欠落・検査用の口は --allow-scoring-gap）:\n  ' + '\n  '.join(gap_only))
     # **n_ok は登録の n と等しいことを求める**（P421・前は「n 未満」だけを見ていた）
-    off = [(arm, EX[arm]['n_ok']) for arm in S['arms_run'] if EX[arm]['n_ok'] != S['n']]
+    # **行数 n が登録の n と等しいことを求める**（P421・v3 で n_ok から行数に改めた——Fable 5.1 の見直し）。
+    # 正本は「例外で落ちたバッチは一度だけ引き直し、なお落ちればその行を api_error にする」と登録し、率の分母は n_ok（api_error を除く）である。
+    # v2 は n_ok == n を求めたので、正本が認める api_error の残りで止まり、検査用の口（印が残り、報告の組み立て器が拒む）しか道が無かった。
+    # 行数で見れば、欠け（少ない）と重複（多い）はそのまま捕まり、api_error は件数を印字して分母から除くだけになる。
+    off = [(arm, EX[arm]['n']) for arm in S['arms_run'] if EX[arm]['n'] != S['n']]
     short = [arm for arm, _ in off]
+    api_err = {arm: EX[arm]['n'] - EX[arm]['n_ok'] for arm in S['arms_run'] if EX[arm]['n'] != EX[arm]['n_ok']}
     if off and not a.allow_incomplete:
-        sys.exit('n_ok が登録の n（%d）と違う腕（%s）——足りなければ api_error の再走行で揃え、多ければ走行の重複を疑う。検査用の口は --allow-incomplete'
+        sys.exit('行数が登録の n（%d）と違う腕（%s）——少なければ走行の欠け、多ければ走行の重複を疑う。検査用の口は --allow-incomplete'
                  % (S['n'], '・'.join('%s %d' % x for x in off)))
     # **走行の種の照合**（P427・段階 A の器と同じ型。試行ごとの種の組み直しは整合検査の仕事）
     want_seed = T['seeds']['identity_transformers']
@@ -376,7 +382,7 @@ if __name__ == '__main__':
          'contrasts_sha16': runs_B.sha16_file(a.contrasts or runs_B.CPATH), 'stage_A_inputs': PINS, 'dev_marks': sorted(set(marks)),
          'verdict': verdict, 'mean_abs_diff_pt': float(mean), 'max_abs_diff_pt': float(mx),
          'mean_pt': S['metric_mean_pt'], 'max_pt': S['metric_max_pt'], 'n_differences': len(MD),
-         'tables': TABLES, 'local_counts': EX, 'short_arms': short, 'n_off': dict(off),
+         'tables': TABLES, 'local_counts': EX, 'short_arms': short, 'n_off': dict(off), 'api_error': api_err,
          'guards': {'stops_bypassed': gap_only, 'notes': NOTES, 'scoring_gap': {k: v.get('scoring_gap', 0) for k, v in G['cross'].items()},
                     'duplicate_trial_ids': G['dup_ids'], 'field_missing': G['field_missing'][:20], 'field_missing_total': len(G['field_missing'])},
          'seeds': {'registered': want_seed, 'by_run': G['seeds'], 'mismatch': seed_bad},
@@ -394,9 +400,9 @@ if __name__ == '__main__':
          % (MAIN_PAIR[0], MAIN_PAIR[1], '合格' if verdict == 'pass' else '不合格', len(MD), float(mean), S['metric_mean_pt'], float(mx), S['metric_max_pt']),
          '- 不合格のときの読み: %s' % S['fail_reading'], '- %s' % R['no_constant_change'], '- %s' % R['aux_note'],
          '- **番人**（採点欠落・欄・数え方・重複・種）: 止めたもの %d 件（検査用の口で通したもの %d 件）・注 %d 件。'
-         '採点欠落の合計 %d 件・重複 %d 腕・欄の欠け %d 件・種の不一致 %d 走行'
+         '採点欠落の合計 %d 件・重複 %d 腕・欄の欠け %d 件・種の不一致 %d 走行・**api_error の残り %d 件**（分母 n_ok から除く・正本の登録どおり）'
          % (0, len(gap_only), len(NOTES), sum((v.get('scoring_gap') or 0) for v in G['cross'].values()),
-            len(G['dup_ids']), len(G['field_missing']), len(seed_bad)),
+            len(G['dup_ids']), len(G['field_missing']), len(seed_bad), sum(api_err.values())),
          '- 重みの版: B の走行 %s／段階 A の vLLM は**未照合**（門0.5 の記録に版が無い・機種は %s）'
          % ('・'.join(sorted({str(v.get('model_rev')) for v in G['revs'].values()})) or '（無い）', RA.get('model')), '',
          '## 三スタックの距離（記述・主判定は上の一対）', '', '| 対 | 差の数 | 平均（pt） | 最大（pt） | B の八腕の平均 | B の八腕の最大 |', '|---|---|---|---|---|---|']

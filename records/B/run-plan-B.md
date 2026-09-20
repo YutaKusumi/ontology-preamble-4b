@@ -1,4 +1,4 @@
-# 段階 B 走行の段取り（走らせる前・2026-09-20 17:16 日本時間・コーディネータ）
+# 段階 B 走行の段取り（走らせる前・2026-09-20 18:03 日本時間・コーディネータ）
 
 - 性格: 正本 `procedure` の相を、Colab の起動器 `tools/colab/boot_stageB.py` で**一相ずつ**走らせ、相の間に手元の器で確かめて登録者の確認を挟む段取り。数は正本（SHA16 EF0DF4295B68F949）と設計事実（`records/B/design-facts-B.json`）から機械で組んだ。
 - 書いた人: コーディネータ（南無弥勒如来・**Claude Fable 5.1**〔この段取りを書いた時点の機種〕）。Colab は登録者の Chrome 越しにコーディネータが操作し、ランタイムの選択と結果の zip の取り出しもコーディネータが行う。**Drive の同意・プラン・支払いだけ登録者**。
@@ -24,17 +24,18 @@
 | 段 | すること | 器 | 確かめること・進む条件 |
 |---|---|---|---|
 | 1 | 同一性選別を走らせる | 起動器 `OP4B_PHASE=identity` | zip を回収し、整合検査 `python tools/integrity_B.py --tag idB` が**不整合 0** |
-| 2 | 同一性選別を判定する | `python tools/identity_screen_B.py` | 番人（採点欠落・欄・重複・種）を通り、`records/B/identity-screen-B.{json,md}` が書ける。**合否は進む条件ではない**（`fail_reading`）。判定は登録者に見せる |
-| 3 | 調整走行を走らせる | 起動器 `OP4B_PHASE=tune` | 起動器は判定の記録が無ければ始めない。zip を回収し、整合検査 `--tag tuneB` が不整合 0。**率盲検の抽出検査** `python tools/sample_inspection_B.py --tag tuneB --keydir <公開の外>` を先に通す（対応表は公開の置き場の外） |
+| 2 | 同一性選別を判定する | `python tools/identity_screen_B.py` | 番人（採点欠落・欄・重複・種）を通り、`records/B/identity-screen-B.{json,md}` が書ける。**合否は進む条件ではない**（`fail_reading`）。判定は登録者に見せ、**記録をコミットして push する**（起動器は固定したコミットの中の記録しか読めない） |
+| 3 | 調整走行を走らせる | 起動器 `OP4B_PHASE=tune`（**判定の記録を含むコミット**を固定） | 起動器は判定の記録が無ければ始めない。zip を回収し、整合検査 `--tag tuneB` が不整合 0。**率盲検の抽出検査** `python tools/sample_inspection_B.py --tag tuneB --keydir <公開の外>` を先に通す（対応表は公開の置き場の外） |
 | 4 | 品質床（選定の段） | 起動器 `OP4B_PHASE=quality OP4B_STAGE=selection` | zip を回収し、整合検査 `--tag stageB-quality` が不整合 0 |
-| 5 | 門1 と選定 | `python tools/gate_B.py` | 判定 open なら選んだ層 × 係数と同値の帯を**登録者に見せる**。closed／escalate（全候補が非正など）なら止めて登録者に上げる（正本 `withdrawal`） |
-| 6 | 品質床（選定後の段） | 起動器 `OP4B_PHASE=quality OP4B_STAGE=post` | 選んだ層 × 係数でしか走らない（正本 `selection.binding`）。整合検査が不整合 0・`gate_B` を再度通して post の行を得る |
-| 7 | 本走行 | 起動器 `OP4B_PHASE=main` | 選んだ層 × 係数でしか走らない。**本走行の率は整合検査まで見ない**（率盲検） |
+| 5 | 門1 と選定 | `python tools/gate_B.py` | 判定 open なら選んだ層 × 係数と同値の帯を**登録者に見せる**。closed／escalate（全候補が非正など）なら止めて登録者に上げる（正本 `withdrawal`）。open なら**門の記録をコミットして push する**（後の相の起動器が読む） |
+| 6 | 品質床（選定後の段） | 起動器 `OP4B_PHASE=quality OP4B_STAGE=post`（**門の記録を含むコミット**を固定） | 選んだ層 × 係数でしか走らない（正本 `selection.binding`）。整合検査が不整合 0・`gate_B` を再度通して post の行を得る |
+| 7 | 本走行 | 起動器 `OP4B_PHASE=main`（同上） | 選んだ層 × 係数でしか走らない。**本走行の率は整合検査まで見ない**（率盲検） |
 | 8 | 率盲検の整合検査・抽出検査 | `integrity_B --tag stageB`・`sample_inspection_B --tag stageB` | 不整合 0・標本の目視と対応表の照合 |
 | 9 | 集計 | `control_chart_B` → `analyze_B --gate … --seal records/B/seal-B.json --chart …` → `layers_B` → `compare_predictions_B` | 集計器は門の記録の正本 SHA16 を照らして止まる。予想の照合は**一度だけ** |
 | 10 | 報告 | `build_report_B --identity records/B/identity-screen-B.json … --lint` | 走査器が違反 0・漢数字の一覧を読み手が照らす・`block_rebuild`（走らせ直して一字一句で突き合わせる） |
 | 11 | 検分 → 公開 → 反映メモ B | — | 登録者の判断 |
 
+- **後の相が読む記録（同一性選別の判定・門の記録）は、コミットして push してから、その後のコミットを固定して次の相を起動する。**起動器は固定したコミットの中の記録しか読めない。凍結の記録との照合は正本・器材・持ち越しの SHA16 なので、記録を足したコミットでも通る（記録は凍結物ではない）。
 - 相の間は**必ず手元に回収して確かめてから**次へ進む。起動器は書き終えたセルを飛ばすので、中断からの再開は同じ相をもう一度起動すればよい（セッション番号は正本 `sessions.number_rule`）。
 
 ## 3. 起動の一行（Colab のセルに打つのは一行だけ・先頭の下線は入力の先頭が落ちる事故の緩衝）

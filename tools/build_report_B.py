@@ -220,6 +220,8 @@ L_pred = block(['```'] + [_CMP.summary_line(who, R) for who, R in PC['results'].
 IS = runs_B.read_json(a.identity)
 if IS.get('kind') != 'identity_screen_B':
     sys.exit('--identity は tools/identity_screen_B.py の出力を渡す（kind が違う: %s）' % IS.get('kind'))
+if IS.get('version') not in ('v2', 'v3'):
+    sys.exit('同一性選別の記録の版が古い（%s）。番人の欄を持つ版（v2 以降）を渡す' % IS.get('version'))
 if not DRY and (IS.get('dev_marks') or []):
     sys.exit('同一性選別の記録に検査用の印がある（%s）。本番の報告には渡さない' % '・'.join(IS['dev_marks']))
 _ist = IS['tables']
@@ -230,8 +232,9 @@ M_ident = block(['```',
                 + ['%s: 平均 %.3f pt・最大 %.3f pt（B の八腕: 平均 %.3f pt・最大 %.3f pt）'
                    % (k_, t_['all']['mean_pt'], t_['all']['max_pt'], t_['b_panel']['mean_pt'], t_['b_panel']['max_pt'])
                    for k_, t_ in _ist.items()]
-                + ['採点欠落 %d 件・trial_id の重複 %d 腕・種の不一致 %d 走行（番人・採否表 P418〜P421・P427）'
-                   % (sum((IS['guards']['scoring_gap'] or {}).values()), len(IS['guards']['duplicate_trial_ids'] or {}), len(IS['seeds']['mismatch'] or {})),
+                + ['採点欠落 %d 件・trial_id の重複 %d 腕・種の不一致 %d 走行・api_error の残り %d 件（分母から除く）（番人・採否表 P418〜P421・P427）'
+                   % (sum(((IS.get('guards') or {}).get('scoring_gap') or {}).values()), len((IS.get('guards') or {}).get('duplicate_trial_ids') or {}),
+                      len((IS.get('seeds') or {}).get('mismatch') or {}), sum((IS.get('api_error') or {}).values())),
                    '記録 `%s`（SHA16 %s）・%s' % (os.path.relpath(a.identity, REPO).replace('\\', '/'), runs_B.sha16_file(a.identity), IS['aux_note']),
                    IS['fail_reading'], '```'])
 H_coi = block(['```', T['selection']['coi_note'], T['publication']['dual_use'],
