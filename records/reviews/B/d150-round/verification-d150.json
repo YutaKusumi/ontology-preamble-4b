@@ -1,0 +1,208 @@
+{
+ "kind": "verify_d150",
+ "version": "v1",
+ "generated_utc": "2026-09-20T06:03:25Z",
+ "contrasts_sha16": "5D45DFF3802F4D58",
+ "tool_sha16": "8D9F4FB83139C426",
+ "note": "**事後の再現**（再現の枠を先に登録していない・票を読んだ直後に現物を当たった）。",
+ "rows": [
+  {
+   "k": "K207",
+   "claim": "走行器と整合検査が選別の十三腕を引けない（Gemini 二人目・重大）",
+   "who": "G2",
+   "result": "走行器 arm_texts() は 13 腕すべてを引いた（欠け 0）。整合検査の ARM_SHA も合わせた一覧から作る",
+   "verdict": "再現しない",
+   "detail": {
+    "missing": [],
+    "integrity_merges": true
+   }
+  },
+  {
+   "k": "K208",
+   "claim": "凍結の一覧に判定の器・持ち越しに段階 A の器が無い（Gemini 二人目・重大）",
+   "who": "G2",
+   "result": "TOOLS に identity_screen_B.py: ある／CARRYOVER に tools/identity_screen_A.py: ある",
+   "verdict": "再現しない",
+   "detail": {
+    "tools_has": true,
+    "carryover_has": true
+   }
+  },
+  {
+   "k": "K209",
+   "claim": "不合格のとき終了コード 2 で終わる（段階 A の器は 0・Gemini 一人目）",
+   "who": "G1",
+   "result": "B: sys.exit(0 if verdict == 'pass' else 2)／A: 終了コードの指定 なし（常に 0）",
+   "verdict": "**再現する**",
+   "detail": {
+    "B_exit_line": true,
+    "A_exit_nonzero": false
+   }
+  },
+  {
+   "k": "K210",
+   "claim": "採点欠落（選択は読めたが破局が空）を黙って「その他」に数え、止まらない（claude.ai 二人目）",
+   "who": "C2",
+   "result": "判定の器は終了コード 2 で判定 fail を書いた。排他の件数は破局 140・その他 20、B の読み口は採点欠落 20 件",
+   "verdict": "**再現する**",
+   "detail": {
+    "rc": 2,
+    "verdict": "fail",
+    "exclusive": {
+     "n": 160,
+     "n_ok": 160,
+     "format_out": 0,
+     "refuse": 0,
+     "catastrophe": 140,
+     "other": 20
+    },
+    "cell_counts_gap": 20
+   }
+  },
+  {
+   "k": "K211",
+   "claim": "同じ腕の走行が二本あると n_ok を足し合わせ、登録の n を超えても止まらない（claude.ai 二人目）",
+   "who": "C2",
+   "result": "Onull の n_ok=320（登録の n は 160）・終了コード 2・判定 fail",
+   "verdict": "**再現する**",
+   "detail": {
+    "n_ok": 320,
+    "n": 160,
+    "rc": 2
+   }
+  },
+  {
+   "k": "K212",
+   "claim": "整合検査が標本化の top_k を照らさない（claude.ai 二人目）",
+   "who": "C2",
+   "result": "照らしている欄: temperature・top_p",
+   "verdict": "**再現する**",
+   "detail": {
+    "has_top_k": false
+   }
+  },
+  {
+   "k": "K213",
+   "claim": "正本 `identity_screen.generation` に top_k が無い（claude.ai 二人目）",
+   "who": "C2",
+   "result": "鍵: temperature・top_p・max_tokens・thinking",
+   "verdict": "**再現する**",
+   "detail": {
+    "keys": [
+     "temperature",
+     "top_p",
+     "max_tokens",
+     "thinking"
+    ],
+    "explicit_has_top_k": true
+   }
+  },
+  {
+   "k": "K214",
+   "claim": "判定の器が走行の種を登録と照らさない（段階 A の器は照らしていた）",
+   "who": "C1・C2",
+   "result": "B の器に seed の文字列: 無い／A の器に seed_registered: ある",
+   "verdict": "**再現する**",
+   "detail": {
+    "B_has_seed": false
+   }
+  },
+  {
+   "k": "K215",
+   "claim": "判定の記録を読む器が無い（報告の組み立て器も入力に取らない）",
+   "who": "C1・C2",
+   "result": "名指す器 8 本（bundle_B_d150.py・design_facts_B.py・dry_run_B.py・freeze_B.py・identity_screen_B.py・make_contrasts_B.py・mutation_B.py・verify_d150.py）・報告の組み立て器が読む: いいえ",
+   "verdict": "**再現する**",
+   "detail": {
+    "users": [
+     "tools/bundle_B_d150.py",
+     "tools/design_facts_B.py",
+     "tools/dry_run_B.py",
+     "tools/freeze_B.py",
+     "tools/identity_screen_B.py",
+     "tools/make_contrasts_B.py",
+     "tools/mutation_B.py",
+     "tools/verify_d150.py"
+    ],
+    "report_reads": false
+   }
+  },
+  {
+   "k": "K216",
+   "claim": "判定の器が呼ぶ段階 A の**コード**が凍結の網に無い（`runs_A.py`）・器も照らさない",
+   "who": "C1",
+   "result": "freeze_B の持ち越しに runs_A.py: 無い／check_pin の対象は正本と記録の二つ",
+   "verdict": "**再現する**",
+   "detail": {
+    "carryover_has_runs_A": false,
+    "pins": [
+     "design/contrasts-A.json",
+     "records/A/identity-screen-A.json"
+    ]
+   }
+  },
+  {
+   "k": "K217",
+   "claim": "帰無での不合格率（登録の対 対 別案の対）を数え直す",
+   "who": "C1・C2",
+   "result": "登録の対 0.0315／別案の対 0.0910／API 固定 0.0050／段階 A の十腕 0.0246（反復 200,000・種 20260920）",
+   "verdict": "概ね一致",
+   "detail": {
+    "registered_pair": 0.031455,
+    "alt_pair": 0.09096,
+    "api_fixed": 0.00504,
+    "stage_A_10arms": 0.02464,
+    "reps": 200000,
+    "seed": 20260920
+   }
+  },
+  {
+   "k": "K218",
+   "claim": "段階 A の門0.5 の記録に重みの版（rev）が無い（claude.ai 一人目）",
+   "who": "C1",
+   "result": "記録の鍵に model はある（Qwen/Qwen3-4B-Instruct-2507）が rev は 無い",
+   "verdict": "**再現する**",
+   "detail": {
+    "model": "Qwen/Qwen3-4B-Instruct-2507",
+    "keys": [
+     "aux",
+     "clause",
+     "consequence",
+     "contrasts_sha16",
+     "detection_ref",
+     "dev_marks",
+     "diffs",
+     "generated_utc",
+     "kind",
+     "local_counts",
+     "max_abs_diff_pt",
+     "max_pt",
+     "mean_abs_diff_pt",
+     "mean_pt",
+     "model",
+     "no_constant_change",
+     "null_fail_ref",
+     "root",
+     "run_key",
+     "seed",
+     "seed_registered",
+     "short_arms",
+     "tag",
+     "verdict",
+     "version"
+    ]
+   }
+  },
+  {
+   "k": "K219",
+   "claim": "vLLM の件数は段階 A の別のセッションの走行である（claude.ai 二人目）",
+   "who": "C2",
+   "result": "走行キー idA__N1__none__seed60001・記録の作成 2026-09-14 10:28 UTC",
+   "verdict": "**そのとおり**",
+   "detail": {
+    "run_key": "idA__N1__none__seed60001",
+    "generated_utc": "2026-09-14 10:28"
+   }
+  }
+ ]
+}
