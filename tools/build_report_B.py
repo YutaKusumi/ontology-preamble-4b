@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""build_report_B.py v6 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
+"""build_report_B.py v7 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
+v7（2026-09-20・四票の採否 P424・裁定 D150）: **区画 M——同一性選別の判定**（`tools/identity_screen_B.py` の出力・`--identity` は必須）。判定・三スタックの距離・番人の件数・記録の SHA16 を機械で貼る。前は判定を読む器が一つも無く、選別を走らせなくても、判定の器を走らせなくても、どの検査も落ちなかった（今回の発端と同じ型）。
 v6（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: **区画 L——登録者とコーディネータの予想の照合**（`tools/compare_predictions_B.py` の出力・`--predictions-check` は必須・正本 `predictions.compare_rules.output`「要約を報告に機械で転記する」・裁定 D148）。照合の記録が、渡された集計と門の記録から作られたかを SHA16 で照らし、違えば止まる。
 v5（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: **集計が読んだ門の記録と、渡された門の記録が同じか**を SHA で照らし、違えば止まる（採否表 P403）／**管理図の要約**の区画 K（全点と三つの判定・`--chart` は必須・裁定 D110・採否表 P410）／S4 の区画に門・封印の照合・相対の大きさ・観測した相手の率での動作特性（裁定 D134〜D136）／td の特異性の区画を族ごとの規則の札に（裁定 D133）／副位置の読みの区画に参照の行と合わせる前の比（裁定 D139・D133）。
 
@@ -8,7 +9,8 @@ v5（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
   F 記述の族／G S4 の反証（**同等性の規則・区間は Newcombe**・v4）／H 利益相反と情報状態／
   I td の特異性とランダム方向の等質性（裁定 D133・D127・v5）／J 副位置の読み（`tools/layers_B.py` の出力・**必須**・裁定 D132・参照の行は D139・v5）／
   K 管理図の要約（`tools/control_chart_B.py` の出力・**必須**・裁定 D110・採否表 P410・v5）／
-  L 登録者とコーディネータの予想の照合（`tools/compare_predictions_B.py` の出力・**必須**・裁定 D148・v6）
+  L 登録者とコーディネータの予想の照合（`tools/compare_predictions_B.py` の出力・**必須**・裁定 D148・v6）／
+  M 同一性選別の判定（`tools/identity_screen_B.py` の出力・**必須**・採否表 P424・裁定 D150・v7）
 **散文に手計算の数を残さない**（正本 `report_rules.typed_numbers`）。数はすべて集計の json から来る。
 組み立ての後に走査器（`tools/report_lint.py`）を走らせる口を持つ（--lint）。
 用法: python tools/build_report_B.py --analysis records/B/analysis-B-<日付>.json --gate records/B/gate-B-<日付>.json \
@@ -19,7 +21,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v6'
+VERSION = 'v7'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--analysis', required=True)
@@ -29,6 +31,7 @@ ap.add_argument('--sampling', required=True, help='抽出検査の封印 json（
 ap.add_argument('--layers', required=True, help='tools/layers_B.py の json（副位置の読み・必須・裁定 D132）')
 ap.add_argument('--chart', required=True, help='tools/control_chart_B.py の json（管理図の要約・必須・裁定 D110・採否表 P410）')
 ap.add_argument('--predictions-check', required=True, help='tools/compare_predictions_B.py の json（予想の照合・必須・裁定 D148）')
+ap.add_argument('--identity', required=True, help='tools/identity_screen_B.py の json（同一性選別の判定・必須・採否表 P424・裁定 D150）')
 ap.add_argument('--allow-dry', action='store_true', help='検査用の口（合成データから組む・区画ごとに印を差し込む）')
 ap.add_argument('--force-problems', action='store_true', help='整合検査に不整合があっても組む（理由を記録に残すこと）')
 ap.add_argument('--template', default=os.path.join(REPO, 'records', 'B', 'results-report-template-B.md'))
@@ -209,6 +212,24 @@ L_pred = block(['```'] + [_CMP.summary_line(who, R) for who, R in PC['results'].
                + [('予想の独立（封印の順の注）: %s' % PC['order_note']) if PC.get('order_note') else None,
                   '外れと照合不能の一覧は照合の記録 `%s` にある（予想のファイルと SHA-256 もそこに）。' % os.path.relpath(a.predictions_check, REPO).replace('\\', '/'),
                   T['predictions']['fence'], '```'])
+# ---- 区画 M: 同一性選別（三スタックの距離・採否表 P424・裁定 D150） ----
+IS = runs_B.read_json(a.identity)
+if IS.get('kind') != 'identity_screen_B':
+    sys.exit('--identity は tools/identity_screen_B.py の出力を渡す（kind が違う: %s）' % IS.get('kind'))
+if not DRY and (IS.get('dev_marks') or []):
+    sys.exit('同一性選別の記録に検査用の印がある（%s）。本番の報告には渡さない' % '・'.join(IS['dev_marks']))
+_ist = IS['tables']
+M_ident = block(['```',
+                 '主判定（%s 対 %s）: %s（%d 個の絶対差の平均 %.3f pt・閾値 %s 以下／最大 %.3f pt・閾値 %s 以下）'
+                 % (IS['main_pair'][0], IS['main_pair'][1], IS['verdict'], IS['n_differences'],
+                    IS['mean_abs_diff_pt'], IS['mean_pt'], IS['max_abs_diff_pt'], IS['max_pt'])]
+                + ['%s: 平均 %.3f pt・最大 %.3f pt（B の八腕: 平均 %.3f pt・最大 %.3f pt）'
+                   % (k_, t_['all']['mean_pt'], t_['all']['max_pt'], t_['b_panel']['mean_pt'], t_['b_panel']['max_pt'])
+                   for k_, t_ in _ist.items()]
+                + ['採点欠落 %d 件・trial_id の重複 %d 腕・種の不一致 %d 走行（番人・採否表 P418〜P421・P427）'
+                   % (sum((IS['guards']['scoring_gap'] or {}).values()), len(IS['guards']['duplicate_trial_ids'] or {}), len(IS['seeds']['mismatch'] or {})),
+                   '記録 `%s`（SHA16 %s）・%s' % (os.path.relpath(a.identity, REPO).replace('\\', '/'), runs_B.sha16_file(a.identity), IS['aux_note']),
+                   IS['fail_reading'], '```'])
 H_coi = block(['```', T['selection']['coi_note'], T['publication']['dual_use'],
                '率盲検の外の経路: 同一性選別の距離／調整走行の率（選定に要る）／品質床の得点。本走行の率は整合検査まで見ない。',
                '起草者は段階 A の公開結果を見ている（封印予想の情報状態の欄に記す）。', '```'])
@@ -218,7 +239,7 @@ if len(_state) == 1:
     tpl = tpl.replace(_state[0], '- 状態: **報告**（雛形から組み立て器が機械で組んだ・結果の欄は機械の区画）。%s'
                       % ('**合成データから組んだ検査用の報告であり、本番ではない。**' if DRY else ''))
 for ph, txt in (('A', A_sum), ('B', B_run), ('C', C_gate), ('D', D_conf), ('E', E_sign), ('F', block(F_desc)), ('G', G_s4), ('H', H_coi),
-                ('I', I_td), ('J', J_ly), ('K', K_chart), ('L', L_pred)):
+                ('I', I_td), ('J', J_ly), ('K', K_chart), ('L', L_pred), ('M', M_ident)):
     key = '〔結果 %s〕' % ph
     if key not in tpl:
         sys.exit('雛形に %s が無い' % key)
@@ -230,6 +251,8 @@ tpl += '\n\n## 11. 組み立ての記録（機械）\n\n- 器 `tools/build_repor
     os.path.relpath(a.layers, REPO).replace('\\', '/'), runs_B.sha16_file(a.layers),
     os.path.relpath(a.chart, REPO).replace('\\', '/'), runs_B.sha16_file(a.chart),
     os.path.relpath(a.predictions_check, REPO).replace('\\', '/'), runs_B.sha16_file(a.predictions_check))
+tpl = tpl.replace('- 器 `tools/build_report_B.py`', '- 同一性選別 `%s`（SHA16 %s）。\n- 器 `tools/build_report_B.py`'
+                  % (os.path.relpath(a.identity, REPO).replace('\\', '/'), runs_B.sha16_file(a.identity)), 1)
 tpl += '\n'.join([MB['begin'], '- 組み立ての記録は機械が書いた（この区画の中身は区画の記録と突合する）。', MB['end']]) + '\n'
 open(out_md, 'w', encoding='utf-8', newline='\n').write(tpl)
 # **機械の区画の記録**（-machine.json・段階 A の型・報告の走査器が突合する・v4）

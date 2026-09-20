@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """integrity_B.py v4 —— 段階 B の走行の**整合検査**（率盲検・許可表方式）。
+P422（2026-09-20・四票の採否）: **標本化は全項目を照らす**（`runs_B.expected_sampling`）——temperature と top_p だけを見ていたので、裁定 D142・D147 で揃えた **top_k が記録に入っているかを誰も確かめていなかった**。
 
 **判定欄（catastrophe・choice・correct・style_a・style_b・mention）は読まない。** 許可した欄だけを取り出し、manifest と正本の登録に突き合わせる。
 当てる相（採否表 P230・**本走行の後だけでなく、調整走行と品質床にも当てる**）:
@@ -116,10 +117,17 @@ def check_cell(rec):
                     problems.append('%s × %s: seed が正本の式で組み直した値と違う行が %d 件（先頭 trial_index %s・記録 %s・式 %s）'
                                     % (rk, arm, len(bad_seed), bad_seed[0].get('trial_index'), bad_seed[0].get('seed'),
                                        runs_B.recorded_seed(T, cs, bad_seed[0].get('trial_index'))))
+        # **標本化は全項目を照らす**（P422・2026-09-20）。前は temperature と top_p だけで、
+        # 裁定 D142・D147 で揃えた top_k が記録に入っているかを誰も確かめていなかった。
+        want_s = runs_B.expected_sampling(T, PHASE)
         for r in rs:
-            if r.get('sampling') and {k: r['sampling'].get(k) for k in ('temperature', 'top_p')} != {k: gen_exp.get(k) for k in ('temperature', 'top_p')}:
-                problems.append('%s × %s: 生成の設定が登録と違う（%s）' % (rk, arm, r.get('sampling')))
-                break
+            got = r.get('sampling')
+            if got:
+                diff = {k: (want_s.get(k), got.get(k)) for k in set(want_s) | set(got) if want_s.get(k) != got.get(k)}
+                if diff:
+                    problems.append('%s × %s: 生成の設定が登録と違う（欄ごとの〔登録, 記録〕: %s）'
+                                    % (rk, arm, '・'.join('%s %s' % (k, list(v)) for k, v in sorted(diff.items()))))
+                    break
         if PHASE in ('tune', 'quality'):
             lc = {(r.get('layer'), r.get('coef')) for r in rs}
             for l, cf in lc:

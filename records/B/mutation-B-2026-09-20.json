@@ -1,7 +1,7 @@
 {
  "kind": "mutation_B",
- "version": "v11",
- "generated_utc": "2026-09-20T04:49:10Z",
+ "version": "v12",
+ "generated_utc": "2026-09-20T07:16:38Z",
  "rows": [
   {
    "name": "全方向のノルム合わせ",
@@ -158,6 +158,62 @@
    }
   },
   {
+   "name": "採点欠落の番人を外す",
+   "ruling": "D150",
+   "target": "identity_screen_B.py",
+   "applied": true,
+   "what": "判定の欄が空いた試行を、段階 A の器が「その他」に数えるまま通す誤り（**破局率が下がる向き＝起草者に有利な側**・claude.ai の票 P418）",
+   "caught": [
+    "identity_screen_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "identity_screen_B.py": "AssertionError: ['行に段階 A の器が読む欄が無い（1 件・先頭 t4 の format_fail）', 'trial_id が重複している（腕ごとの重複数 O 1）——同じセルを二重に数えている']"
+   }
+  },
+  {
+   "name": "二重計上の番人を外す",
+   "ruling": "D150",
+   "target": "identity_screen_B.py",
+   "applied": true,
+   "what": "同じセルが二本あって trial_id が重複しても止めない誤り（n_ok が倍になっても通る・P421）",
+   "caught": [
+    "identity_screen_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "identity_screen_B.py": "AssertionError: ['行に段階 A の器が読む欄が無い（1 件・先頭 t4 の format_fail）', 'O: **採点欠落が 1 件**（判定の欄が空いた試行。段階 A の器はこれを「その他」に数えるので、破局率が下がる向きに黙って倒れる）']"
+   }
+  },
+  {
+   "name": "欄の欠けの番人を外す",
+   "ruling": "D150",
+   "target": "identity_screen_B.py",
+   "applied": true,
+   "what": "段階 A の器が読む欄が行に無くても止めない誤り（`r.get` が黙って None にする・P420）",
+   "caught": [
+    "identity_screen_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "identity_screen_B.py": "AssertionError: ['trial_id が重複している（腕ごとの重複数 O 1）——同じセルを二重に数えている', 'O: **採点欠落が 1 件**（判定の欄が空いた試行。段階 A の器はこれを「その他」に数えるので、破局率が下がる向きに黙って倒れる）']"
+   }
+  },
+  {
+   "name": "標本化の期待値から明示の鍵を落とす",
+   "ruling": "D150",
+   "target": "runs_B.py",
+   "applied": true,
+   "what": "整合検査が top_k などの明示の設定を照らさなくなる誤り（裁定 D142・D147 で揃えた値を誰も確かめない・P422）",
+   "caught": [
+    "runs_B.py"
+   ],
+   "missed": [],
+   "lines": {
+    "runs_B.py": "AssertionError: ('明示の鍵が期待値に無い', 'identity', 'min_p', None, 0.0)"
+   }
+  },
+  {
    "name": "S4 の片側上限を狭める",
    "ruling": "D118",
    "target": "rules_B.py",
@@ -168,7 +224,7 @@
    ],
    "missed": [],
    "lines": {
-    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '当否を言わない', 0.7070567376539129, np.float64(0.3335191915017552))"
+    "rules_B.py": "AssertionError: ('S4 の行列の版と一つずつの版が違う', '10 pt 以上の低下は否定', 0.2450702712391273, np.float64(0.6186078173912847))"
    }
   },
   {
@@ -834,5 +890,5 @@
   }
  ],
  "missed": 0,
- "total": 60
+ "total": 64
 }

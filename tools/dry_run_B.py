@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""dry_run_B.py v7 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+"""dry_run_B.py v8 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+v8（2026-09-20・四票の採否 P418〜P424・裁定 D150）: 同一性選別の**番人の二経路**（採点欠落で止まる・二重計上で止まる）と、**報告の区画 M**（判定を報告に貼る）を足した。報告の組み立てには判定の記録を必ず渡す。
 v7（2026-09-20・凍結の前の見直し）: **同一性選別の判定**（`tools/identity_screen_B.py`）の経路を足した——見直しで、B の同一性選別には判定の器が無く、開示にも載っていないと分かったため（`records/B/pre-freeze-review-2026-09-20.md` (一)）。
 v6（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: **予想の照合**（`tools/compare_predictions_B.py`）を通す経路——門が開いた回は集計と門の記録で、門1 が閉じた回は門の記録だけで照らす——と、報告の区画 L の経路を足した。照らすのは**封印した実物の予想**（`records/predictions`）で、合成データの結果と照らした出力は合成データの置き場に置き、印を付ける。
 v5（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: S4 の札を結果だけの名にし（経路の名は正本の札から作る）、門で保留・封印の照合の三つを足した（裁定 D134・D135）。td の特異性の三つの札（裁定 D133）・様式門に当たった非有意（採否表 P401）・選定後の品質床の相手の重複（採否表 P403）・副位置の読みの参照の行（裁定 D139）・報告の管理図の要約と、門の記録の食い違いで報告の器が止まること（採否表 P410・P403）を足した。
@@ -18,7 +19,7 @@ import runs_B
 
 T = runs_B.load_T()
 
-VERSION = 'v7'
+VERSION = 'v8'
 REPO = runs_B.REPO
 PY = sys.executable
 ap = argparse.ArgumentParser()
@@ -50,7 +51,9 @@ PATHS = ['確証', '確証（登録された向きと逆）', '封印した符�
          # v6（2026-09-19 の夜・封印の後）
          '予想の照合（両者・向き・S4・全体）', '予想の照合: 門1 が閉じた回', '報告: 予想の照合の区画',
          # v7（2026-09-20・凍結の前の見直しで、判定の器が無いと分かった件）
-         '同一性選別の判定（三スタックの距離）']
+         '同一性選別の判定（三スタックの距離）',
+         # v8（2026-09-20・四票の採否 P418〜P424・裁定 D150）
+         '同一性選別: 採点欠落で止まる', '同一性選別: 二重計上で止まる', '報告: 同一性選別の区画']
 _s4_labels = T['descriptive_families']['B_desc_S4']['three_way']['labels']
 _s4_paths = [p for p in PATHS if p.startswith('S4: ')]
 assert _s4_paths == ['S4: %s' % l_ for l_ in _s4_labels] + ['S4: 余地の条項', 'S4: 門で保留'], (
@@ -86,6 +89,49 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
     if any('api_error' in str(r.get('note', '')) for r in (G.get('quality_floor_rows') or [])):
         fired['品質床の api_error の門（選定の段）'].append(case)
     rec = {'case': case, 'gate_verdict': G['verdict'], 'gate_rc': rc_g, 'labels': {}}
+    if os.path.isdir(os.path.join(REPO, root, T['tags']['identity'])):
+        fired['同一性選別の走行'].append(case)
+        # **同一性選別の判定**（`tools/identity_screen_B.py`・v7・2026-09-20）。合成の transformers の率は
+        # 段階 A の API 既測と揃わないので、**主判定は不合格（終了コード 2）になるのが正しい**——
+        # ここで見るのは、三スタックの表と 33 個の差が登録どおり組めることである（合否そのものは合成データでは意味を持たない）。
+        rc_i, out_i = run(['tools/identity_screen_B.py', '--root', root, '--allow-dry', '--allow-incomplete',
+                           '--out', os.path.join(root, 'identity-screen-B'), '--force'])
+        assert rc_i in (0, 2), ('同一性選別の判定の器が思わぬ終了コードで落ちた', rc_i, out_i[-400:])
+        IS = json.load(open(os.path.join(REPO, root, 'identity-screen-B.json'), encoding='utf-8'))
+        if (IS['n_differences'] == T['identity_screen']['n_differences'] and IS['verdict'] in ('pass', 'fail')
+                and len(IS['tables']) == 3 and all(t['b_panel']['n'] == 24 for t in IS['tables'].values())):
+            fired['同一性選別の判定（三スタックの距離）'].append(case)
+        rec['identity_screen'] = {'rc': rc_i, 'verdict': IS['verdict'], 'mean_pt': IS['mean_abs_diff_pt']}
+        # **番人の二経路**（採否表 P418・P421・裁定 D150）: 合成の記録を壊して、止まることを確かめる
+        import shutil as _sh
+        _idtag = T['tags']['identity']
+        _src_dir = os.path.join(REPO, root, _idtag)
+        if os.path.isdir(_src_dir):
+            for _kind in ('gap', 'dup'):
+                _rt = os.path.join(REPO, root, '_guard_%s' % _kind)
+                _sh.rmtree(_rt, ignore_errors=True)
+                _sh.copytree(_src_dir, os.path.join(_rt, _idtag))
+                # **transformers のセルを選ぶ**（判定の器は手元のスタックしか読まない）
+                _cells = [c for c in sorted(os.listdir(os.path.join(_rt, _idtag))) if '__transformers__' in c]
+                assert _cells, '合成データに transformers の選別のセルが無い'
+                _one = os.path.join(_rt, _idtag, _cells[0])
+                if _kind == 'gap':                      # 判定の欄を空にする（採点欠落）
+                    _tp = [f for f in os.listdir(_one) if f.startswith('trials-')][0]
+                    _rows = [json.loads(l) for l in open(os.path.join(_one, _tp), encoding='utf-8') if l.strip()]
+                    # **書式外でなく、選択が読めた行**に入れる（書式外の行は判定を持たないので欠落にならない）
+                    _i = next(i_ for i_, r_ in enumerate(_rows)
+                              if not r_.get('format_fail') and r_.get('choice') not in (None, 'refuse'))
+                    _rows[_i]['catastrophe'] = None
+                    with open(os.path.join(_one, _tp), 'w', encoding='utf-8', newline='\n') as _f:
+                        for _r in _rows:
+                            _f.write(json.dumps(_r, ensure_ascii=False) + '\n')
+                else:                                   # 同じセルをもう一本置く（二重計上）
+                    _sh.copytree(_one, _one + '__dup2')
+                _rc_g, _out_g = run(['tools/identity_screen_B.py', '--root', os.path.join(root, '_guard_%s' % _kind),
+                                     '--allow-dry', '--out', os.path.join(root, 'ident-%s' % _kind), '--force'])
+                if _rc_g != 0 and ('採点欠落' in _out_g if _kind == 'gap' else ('重複' in _out_g or 'n_ok' in _out_g)):
+                    fired['同一性選別: %s' % ('採点欠落で止まる' if _kind == 'gap' else '二重計上で止まる')].append(case)
+                _sh.rmtree(_rt, ignore_errors=True)
     if G['gate1']['open']:
         seal = os.path.join(root, 'seal-B.json')
         cmd = ['tools/analyze_B.py', '--gate', os.path.join(root, 'gate-B.json'), '--root', root, '--allow-dry',
@@ -186,12 +232,16 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
                         '--integrity', os.path.join(root, 'integrity-B.json'), '--sampling', os.path.join(root, 'sampling-B-seal.json'),
                         '--layers', os.path.join(root, 'layers-B.json'), '--chart', os.path.join(root, 'chart-B.json'),
                         '--predictions-check', os.path.join(root, 'predictions-check-B.json'), '--allow-dry', '--force-problems',
-                        '--out', os.path.join(root, 'report-B.md'), '--force', '--lint']
+                        '--out', os.path.join(root, 'report-B.md'), '--force', '--lint',
+                               '--identity', os.path.join(root, 'identity-screen-B.json')]
             rc_r, out_r = run(_rep_cmd)
             _rep = os.path.join(REPO, root, 'report-B.md')
             _txt = open(_rep, encoding='utf-8').read() if os.path.exists(_rep) else ''
             if rc_r == 0 and _txt and '〔結果' not in _txt and '{{' not in _txt:
                 fired['報告の組み立て（全区画・走査器）'].append(case)
+            # **区画 M**（採否表 P424・裁定 D150）: 同一性選別の判定が報告の本文に機械で貼られる
+            if rc_r == 0 and '主判定（transformers 対 API）' in _txt and 'identity-screen-B.json' in _txt:
+                fired['報告: 同一性選別の区画'].append(case)
             else:
                 rec['report_error'] = (out_r or '')[-600:]
             # **管理図の要約**（採否表 P410）: 報告の本文に要約の行と、全点の表が出ること
@@ -278,19 +328,6 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
                     fired['希釈が効く場面（書式外が分子を食う）'].append(case)
         if ff_cat == 0:
             fired['採点の規約（書式外と refuse に判定を付けない）'].append(case)
-    if os.path.isdir(os.path.join(REPO, root, T['tags']['identity'])):
-        fired['同一性選別の走行'].append(case)
-        # **同一性選別の判定**（`tools/identity_screen_B.py`・v7・2026-09-20）。合成の transformers の率は
-        # 段階 A の API 既測と揃わないので、**主判定は不合格（終了コード 2）になるのが正しい**——
-        # ここで見るのは、三スタックの表と 33 個の差が登録どおり組めることである（合否そのものは合成データでは意味を持たない）。
-        rc_i, out_i = run(['tools/identity_screen_B.py', '--root', root, '--allow-dry', '--allow-incomplete',
-                           '--out', os.path.join(root, 'identity-screen-B'), '--force'])
-        assert rc_i in (0, 2), ('同一性選別の判定の器が思わぬ終了コードで落ちた', rc_i, out_i[-400:])
-        IS = json.load(open(os.path.join(REPO, root, 'identity-screen-B.json'), encoding='utf-8'))
-        if (IS['n_differences'] == T['identity_screen']['n_differences'] and IS['verdict'] in ('pass', 'fail')
-                and len(IS['tables']) == 3 and all(t['b_panel']['n'] == 24 for t in IS['tables'].values())):
-            fired['同一性選別の判定（三スタックの距離）'].append(case)
-        rec['identity_screen'] = {'rc': rc_i, 'verdict': IS['verdict'], 'mean_pt': IS['mean_abs_diff_pt']}
     rows.append(rec)
 
 missing = [k for k, v in fired.items() if not v]

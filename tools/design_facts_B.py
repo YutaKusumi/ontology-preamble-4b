@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""design_facts_B.py v9 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+"""design_facts_B.py v10 —— 段階 B の設計事実（転記行 A〜I）を `design/contrasts-B.json`（正本）と門0 の実測・記録から機械生成する（2026-09-18）。
+v10（2026-09-20・四票の採否 P425・裁定 D150）: **転記行 J**（帰無での同一性選別の不合格率）を足した——段階 A には転記行 N があったが、B には対応する登録が無く、裁定 D143 の注が「少し増える」とだけ書いていた。
 v9（2026-09-20・凍結の前の見直しの (一) の甲）: 転記行 G の同一性の欄に**判定の器 `identity_screen_B.py`**を書き、実在の一覧に足した。
 v8（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: 転記行 D の S4 の文を**いまの規則**（門 → 三分岐・同等性・札は結果だけ・裁定 D118・D134〜D136）で組み、数は `rules_B.s4_oc` から出す（前は検出力の規則の文と Wald の区間の数が残り、正本の旧い鍵 `power_min` を読んでいた・採否表 P389）。転記行 E の帰無発火率・検出力・多重性を**正本の `measured.quality_floor_multiplicity` と同じ関数**（`rules_B.qf_null_rate`・`qf_power`・`qf_multiplicity`）から出し、下限 0.85 の値を足す（採否表 P390）。多重性の数は正本と同じ関数から出す（採否表 P391・裁定 D137）。「分母＝200」を「登録した問いの数」に改めた。注の古い数を消した（採否表 P405）。
 v6 からの変更（v7・2026-09-18〜19）: **版の名を v6 のまま上げていなかった**（裁定 D87〜D132 の直しが入っていた——品質床の相手を段ごとに走らせる規模の数え直し〔D88〕・品質床の相手のセッション〔D92〕・転記行 C を門と同じ模擬で出す〔D119・同値の帯の式は D98〕・転記行 E の対の見方〔採否表 P373・裁定 D130〕・転記行 G の器の一覧と転記行 I の数え方〔束の前の点検〕）。この版で v7 に上げた（前例は採否表 P239）。
@@ -14,7 +15,7 @@ v2 からの変更（段階 B 設計の検分の一段目・採否表 P190〜P21
 出力: records/B/design-facts-B.md と同 .json。
 """
 import os, sys, re, json, math, hashlib, datetime
-VERSION = 'v9'     # 出力に印字する版（v6 まで docstring と出力の版が食い違っていた・2026-09-19）
+VERSION = 'v10'     # 出力に印字する版（v6 まで docstring と出力の版が食い違っていた・2026-09-19）
 import numpy as np
 from scipy.stats import fisher_exact, binom
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -340,13 +341,67 @@ F['I'] = {'text': '活性保存（4B-2507・hidden %d・bf16・凍結 %d 層）:
              fmt(t_tune + t_main), fmt(t_tune), fmt(t_main), fmt(t_id), prompt_vecs, len(T['arms']['panel']), len(EXS), n_layers_saved, 2 * prompt_vecs * kb / 1024),
           'data': {'prompt_vectors': prompt_vecs, 'response_gib': round(resp_gib, 3), 'prompt_mb_twice': round(2 * prompt_vecs * kb / 1024, 2)}}
 
+# ---- J: 帰無での同一性選別の不合格率（採否表 P425・裁定 D150・2026-09-20） ----
+# 両スタックが**同じ分布**のとき、主判定（平均 mean_pt 以内かつ最大 max_pt 以内）に落ちる確率を数える。
+# 真の率は段階 A の正本の API 既測（排他の四区分）。段階 A の `null_fail_registered` と同じく **API も再標本**する。
+_IS = T['identity_screen']
+_TA = json.loads(rd('design', 'contrasts-A.json'))
+_BASE = _TA['bases_4B2507_api'][_IS['scenario']]
+_NF_REPS, _NF_SEED = 200000, 20260920
+
+
+def _null_fail(arms, n_local, reps=_NF_REPS, seed=_NF_SEED):
+    """(登録の対, 別案の対〔両側とも n_local〕, API を固定した場合) の不合格率。"""
+    rng = np.random.default_rng(seed)
+    P_, N_ = [], []
+    for a_ in arms:
+        b_ = _BASE[a_]
+        n_ = b_['n']
+        P_.append([b_['format_fail'] / n_, b_['refuse'] / n_, b_['k'] / n_, (n_ - b_['format_fail'] - b_['refuse'] - b_['k']) / n_])
+        N_.append(n_)
+    P_, N_ = np.array(P_), np.array(N_)
+    loc = np.full(len(arms), n_local)
+
+    def draw(np_arm, r):
+        out = np.empty((r, len(arms), 3))
+        for i_ in range(len(arms)):
+            c_ = rng.multinomial(np_arm[i_], P_[i_], size=r)
+            out[:, i_, :] = c_[:, :3] / np_arm[i_]
+        return out
+
+    def rate(nA, nB, fixed=False):
+        fails, done = 0, 0
+        while done < reps:
+            r_ = min(20000, reps - done)
+            a_ = draw(nA, r_)
+            b_ = P_[None, :, :3] if fixed else draw(nB, r_)
+            d_ = np.abs(a_ - b_) * 100.0
+            flat = d_.reshape(r_, -1)
+            fails += int(np.sum((flat.mean(1) > _IS['metric_mean_pt']) | (flat.max(1) > _IS['metric_max_pt'])))
+            done += r_
+        return fails / reps
+    return rate(loc, N_), rate(loc, loc), rate(loc, loc, fixed=True)
+
+
+_nf_reg, _nf_alt, _nf_fix = _null_fail(_IS['compared_arms'], _IS['n'])
+_nf_A = _null_fail(_TA['identity_screen']['compared_arms'], _TA['identity_screen']['n'])[0]
+F['J'] = {'text': '帰無での同一性選別の不合格率（両スタックが同じ分布でも主判定に落ちる確率・模擬 %s 回・種 %d・API 既測を真の率に置き、段階 A と同じく API も再標本）: '
+                  '**登録の対（transformers n=%d 対 API 既測）%.4f**／別案の対（両側とも n=%d・実装だけを比べる対）%.4f／API を固定した場合 %.4f。'
+                  '参考: 段階 A の %d 腕・%d 差では %.4f。**別案の対は、同じ閾値のままだと落ちる率がおよそ %.1f 倍になる**（採否表 P425・裁定 D150）。'
+                  '腕は独立に引く近似で、観測の率を真の率に置く。'
+                  % (fmt(_NF_REPS), _NF_SEED, _IS['n'], _nf_reg, _IS['n'], _nf_alt, _nf_fix,
+                     len(_TA['identity_screen']['compared_arms']), len(_TA['identity_screen']['compared_arms']) * len(_IS['indicators']), _nf_A,
+                     (_nf_alt / _nf_reg) if _nf_reg else 0),
+          'data': {'registered_pair': _nf_reg, 'alt_pair': _nf_alt, 'api_fixed': _nf_fix, 'stage_A': _nf_A,
+                   'reps': _NF_REPS, 'seed': _NF_SEED, 'n_local': _IS['n'], 'n_differences': _IS['n_differences']}}
+
 now = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M')
 os.makedirs(os.path.join(REPO, 'records', 'B'), exist_ok=True)
 csha = sha(rd('design', 'contrasts-B.json'))
 json.dump({'generated_utc': now, 'tool': 'tools/design_facts_B.py %s' % VERSION, 'contrasts_sha16': csha, 'facts': F},
           open(os.path.join(REPO, 'records', 'B', 'design-facts-B.json'), 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
 L = ['# 段階 B 設計事実（機械生成・`tools/design_facts_B.py` %s・%s UTC・正本 contrasts-B.json SHA16 %s）' % (VERSION, now, csha), '']
-for k in 'ABCDEFGHI':
+for k in 'ABCDEFGHIJ':
     L.append('- **転記行 %s** — %s' % (k, F[k]['text']))
     L.append('')
 L.append('本ファイルのいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。')

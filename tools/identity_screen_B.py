@@ -1,5 +1,20 @@
 # -*- coding: utf-8 -*-
-"""identity_screen_B.py v1 —— 段階 B の**同一性選別の判定**（三スタックの距離・正本 `identity_screen`・裁定 D7・D143・2026-09-20）。
+"""identity_screen_B.py v2 —— 段階 B の**同一性選別の判定**（三スタックの距離・正本 `identity_screen`・裁定 D7・D143・2026-09-20）。
+
+v2（2026-09-20・四票の採否 P418〜P421・P426〜P428・登録者裁定）:
+  - **採点欠落の番人**（P418・P420）: 段階 A の `exclusive_counts` は、判定の欄が空いた試行を黙って「その他」に数える
+    （破局率が下がる向き＝起草者に有利な側）。数える前に **B の読み口 `runs_B.cell_counts` にも通し**、
+    採点欠落が一件でもあれば止める。行に `runs_A.COUNT_FIELDS` の欄が**キーとして**あるかも見る（`r.get` は欠けを黙って None にする）。
+    二つの数え方（排他の件数と B の読み口）の n_ok・破局・refuse・書式外が食い違っても止める。
+  - **二重計上の番人**（P421）: 腕ごとに `trial_id` の重複を見て止め、`n_ok` が登録の n と**等しい**ことを求める
+    （前は「n 未満」だけを見ていたので、同じセルが二本あると n_ok が倍になっても通った）。
+  - **コードの釘**（P419）: 段階 A の**正本と記録**だけでなく、呼んでいる**コード**（`identity_screen_A.py`・`runs_A.py`）も
+    段階 A の凍結記録の SHA16 と照らす。
+  - **種の照合**（P427）: 走行の manifest の種が正本 `seeds.identity_transformers` と一致するかを見る（段階 A の器と同じ型）。
+    試行ごとの種の組み直しは整合検査（`integrity_B`）の仕事で、ここでは走行の種だけを見る。
+  - **重みの版の印字**（P426）: B の走行の `model_rev`／`tokenizer_rev` と、段階 A の vLLM の記録に版が無いことを記録に書く。
+  - **終了コードは常に 0**（P428）: 段階 A の器と同じ。合否は記録で読む——正本 `fail_reading` は「不合格でも B は実施できる」と定めており、
+    非零で終わると一括で走らせる運用が止まりうる。止める条に当たったときだけ非零で終わる。
 
 なぜ要るか: 段階 A の器 `tools/identity_screen_A.py` は凍結物で触れず、そのままでは B の登録を作れない——
   B の正本には `bases_4B2507_api`・`models`・`identity_n` が無く、段階 A の正本で走らせると比べる腕が 10・差が 30 になる（B は 11 腕・33 差・裁定 D143）。
@@ -22,8 +37,10 @@
 採点の経路: 排他の件数（優先順 書式外 → refuse → 破局 → その他）は**段階 A の凍結した関数**
   `identity_screen_A.exclusive_counts` を呼ぶ（再実装しない・正本の「採点の経路は凍結した関数を呼ぶ」）。
 
-止める条件: 走行が無い／腕が欠ける／`n_ok` が `identity_screen.n` に満たない腕がある（`--allow-incomplete` は検査用）／
-  段階 A の正本・門0.5 の記録の SHA16 が凍結記録と違う／比べる腕が API 既測か vLLM の記録に無い。
+止める条件: 走行が無い／腕が欠ける／`n_ok` が `identity_screen.n` と違う（`--allow-incomplete` は検査用）／
+  **採点欠落がある**（`--allow-scoring-gap` は検査用）／**行に登録の欄が無い**／**二つの数え方が食い違う**／**`trial_id` が重複する**／
+  **走行の種が登録と違う**（`--allow-seed-mismatch` は検査用）／
+  段階 A の正本・記録・**コード**の SHA16 が凍結記録と違う／比べる腕が API 既測か vLLM の記録に無い。
 出力: records/B/identity-screen-B.{json,md}（`--force` が無ければ上書きしない）。
 用法: python tools/identity_screen_B.py [--tag idB] [--root <results の代わり>] [--allow-dry] [--force] ／ --selftest
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -34,11 +51,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 import identity_screen_A as ISA          # 凍結物（段階 A）——排他の件数の関数だけを使う
 
-VERSION = 'v1'
+VERSION = 'v2'
 REPO = runs_B.REPO
 A_CANON = os.path.join(REPO, 'design', 'contrasts-A.json')
 A_RECORD = os.path.join(REPO, 'records', 'A', 'identity-screen-A.json')
 A_FREEZE = os.path.join(REPO, 'records', 'freeze-A-2026-09-16.json')
+# **呼んでいるコードも釘で留める**（P419・2026-09-20）——データだけ照らしてコードを照らさない穴があった
+A_TOOL = os.path.join(REPO, 'tools', 'identity_screen_A.py')
+A_RUNS = os.path.join(REPO, 'tools', 'runs_A.py')
+PINNED = (A_CANON, A_RECORD, A_TOOL, A_RUNS)
 IND_LOCAL = {'catastrophe': 'catastrophe', 'refuse': 'refuse', 'format_fail': 'format_out'}   # 排他の件数の欄
 IND_API = {'catastrophe': 'k', 'refuse': 'refuse', 'format_fail': 'format_fail'}              # 段階 A の正本の欄
 PAIRS = (('transformers', 'API'), ('API', 'vLLM'), ('vLLM', 'transformers'))
@@ -54,17 +75,69 @@ def check_pin(path, freeze_files):
 
 
 def local_counts(idx, key, arms):
-    """走行の索引から腕ごとの排他の件数を足し合わせる（セルが腕ごとに分かれ、中断と再開でまたがるため）。"""
+    """走行の索引から腕ごとの排他の件数を足し合わせ、**番人の材料**も集める（v2・P418〜P421・P426・P427）。
+
+    戻り: (排他の件数, 走行キー, dry の印, 欠けた腕, 番人の材料)。
+    番人の材料は {'cross': B の読み口の件数, 'dup_ids': 重複した trial_id の数, 'field_missing': 欄の欠け,
+                 'seeds': 走行の種, 'revs': 重みとトークナイザの版}。
+    """
     out, run_keys, marks = {}, [], []
+    cross, ids_by_arm, field_missing, seeds, revs = {}, {}, [], {}, {}
+    need_fields = set(ISA.runs_A.COUNT_FIELDS)           # 段階 A の器が読む欄（手で写さない）
     for rec in idx.get(key) or []:
         run_keys.append(rec['run_key'])
         marks += list(rec.get('dry_marks') or [])
+        m = rec['manifest']
+        seeds[rec['run_key']] = m.get('seed')
+        revs[rec['run_key']] = {'model': m.get('model'), 'model_rev': m.get('model_rev'), 'tokenizer_rev': m.get('tokenizer_rev')}
         for arm, c in ISA.exclusive_counts(rec['trials_path']).items():
             acc = out.setdefault(arm, dict(n=0, n_ok=0, format_out=0, refuse=0, catastrophe=0, other=0))
             for k in acc:
                 acc[k] += c[k]
+        # **B の読み口でも数える**（採点欠落と数え方の食い違いを見る・P418）
+        for arm, c in runs_B.cell_counts(rec['trials_path'], phase='identity').items():
+            a2 = cross.setdefault(arm, {})
+            for k, v in c.items():
+                if isinstance(v, (int, float)):
+                    a2[k] = a2.get(k, 0) + v
+        # **行の欄がキーとしてあるか**（`r.get` は欠けを黙って None にする・P420）と **trial_id の重複**（P421）
+        for r in runs_B.iter_jsonl(rec['trials_path']):
+            ids_by_arm.setdefault(r.get('arm'), []).append(r.get('trial_id'))
+            miss = sorted(need_fields - set(r))
+            if miss:
+                field_missing.append({'run_key': rec['run_key'], 'arm': r.get('arm'), 'trial_id': r.get('trial_id'), 'missing': miss})
+    dup = {a: len(v) - len(set(v)) for a, v in ids_by_arm.items() if len(v) != len(set(v))}
     missing = [a for a in arms if a not in out]
-    return out, sorted(set(run_keys)), sorted(set(marks)), missing
+    return out, sorted(set(run_keys)), sorted(set(marks)), missing, {
+        'cross': cross, 'dup_ids': dup, 'field_missing': field_missing, 'seeds': seeds, 'revs': revs}
+
+
+def guards(EX, G, arms, n_registered):
+    """番人（P418〜P421）。止める理由の一覧と、止めない注の一覧を返す。"""
+    stops, notes = [], []
+    if G['field_missing']:
+        stops.append('行に段階 A の器が読む欄が無い（%d 件・先頭 %s の %s）'
+                     % (len(G['field_missing']), G['field_missing'][0]['trial_id'], '・'.join(G['field_missing'][0]['missing'])))
+    if G['dup_ids']:
+        stops.append('trial_id が重複している（腕ごとの重複数 %s）——同じセルを二重に数えている'
+                     % '・'.join('%s %d' % kv for kv in sorted(G['dup_ids'].items())))
+    for arm in arms:
+        a, b = EX.get(arm) or {}, (G['cross'].get(arm) or {})
+        if not a or not b:
+            continue
+        if a['n'] != b.get('n') or a['n_ok'] != b.get('n_ok'):
+            stops.append('%s: 二つの数え方で n／n_ok が違う（排他 %d／%d・B の読み口 %s／%s）'
+                         % (arm, a['n'], a['n_ok'], b.get('n'), b.get('n_ok')))
+        if a['format_out'] + a['refuse'] + a['catastrophe'] + a['other'] != a['n_ok']:
+            stops.append('%s: 排他の四区分の和が n_ok と合わない' % arm)
+        if b.get('scoring_gap'):
+            stops.append('%s: **採点欠落が %d 件**（判定の欄が空いた試行。段階 A の器はこれを「その他」に数えるので、破局率が下がる向きに黙って倒れる）'
+                         % (arm, b['scoring_gap']))
+        for k_ex, k_cc, name in (('catastrophe', 'cat', '破局'), ('refuse', 'refuse', 'refuse'), ('format_out', 'ff', '書式外')):
+            if a[k_ex] != b.get(k_cc):
+                notes.append('%s: %s の件数が二つの数え方で違う（排他 %d・B の読み口 %s）——区分の重なり（書式外かつ refuse など）'
+                             % (arm, name, a[k_ex], b.get(k_cc)))
+    return stops, notes
 
 
 def rates(counts_by_arm, kind):
@@ -178,12 +251,39 @@ def _selftest():
     # (7-d) API 既測の欄がそろっている（欠けると率が作れない）
     _lack = [(x, k) for x in arms for k in IND_API.values() if k not in AB[x]] + [(x, 'n') for x in arms if 'n' not in AB[x]]
     assert not _lack, _lack
+    # (10) **番人が発火する**（採点欠落・欄の欠け・trial_id の重複・v2・P418〜P421）
+    d2 = tempfile.mkdtemp()
+    try:
+        run = os.path.join(d2, T['tags']['identity'], '%s__transformers__O__x' % T['tags']['identity'])
+        os.makedirs(run)
+        json.dump({'tag': T['tags']['identity'], 'stack': 'transformers', 'scenario': S['scenario'], 'arm': 'O',
+                   'seed': T['seeds']['identity_transformers'], 'model': 'stub/dry-run', 'dry_run': True},
+                  open(os.path.join(run, 'manifest.json'), 'w', encoding='utf-8'), ensure_ascii=False)
+        base = {'trial_id': 't1', 'arm': 'O', 'scenario': S['scenario'], 'status': 'ok', 'catastrophe': True,
+                'choice': 'a', 'format_fail': False, 'loop_flag': False, 'truncated': False,
+                'style_a': False, 'style_b': True, 'mention': False, 'correct': None, 'seed': 1, 'dry_run': True}
+        rows = [dict(base),
+                dict(base, trial_id='t2', catastrophe=None),                                   # 採点欠落（選択は読めた）
+                dict(base, trial_id='t1'),                                                     # trial_id の重複
+                {k: v for k, v in dict(base, trial_id='t4').items() if k != 'format_fail'}]    # 欄の欠け
+        with open(os.path.join(run, 'trials-x.jsonl'), 'w', encoding='utf-8', newline='\n') as f:
+            for r in rows:
+                f.write(json.dumps(r, ensure_ascii=False) + '\n')
+        _idx = runs_B.index_runs(T, T['tags']['identity'], d2, allow_dry=True)
+        EXx, _rk, _mk, _ms, Gx = local_counts(_idx, ('transformers', S['scenario']), ['O'])
+        st, _nt = guards(EXx, Gx, ['O'], S['n'])
+        assert any('採点欠落' in x for x in st), st
+        assert any('重複' in x for x in st), st
+        assert any('欄が無い' in x for x in st), st
+        assert Gx['seeds'][os.path.basename(run)] == T['seeds']['identity_transformers'], Gx['seeds']
+    finally:
+        shutil.rmtree(d2, ignore_errors=True)
     # (8) 主判定の対と三スタックの組が、正本の登録と合う（器の中の並びを正本から離さない）
     assert ('主判定は %s 対 %s' % MAIN_PAIR) in S['verdict_pair'].replace('**', ''), (MAIN_PAIR, S['verdict_pair'][:80])
     assert set(x for p in PAIRS for x in p) == set(S['stacks']), (PAIRS, S['stacks'])
     assert len(PAIRS) == len(S['stacks']), (PAIRS, S['stacks'])
     print('[identity_screen_B selftest] 差の数 %d・境目の四通り（平均と最大の合否）・八腕の部分集合・'
-          '排他の件数（凍結した関数）・段階 A の入力の釘（正本と記録）・腕の突合と既測の欄・分母と出所の登録の一致・主判定の対と正本の登録の一致・段階 A の判定の組み直し（平均 %.3f pt・最大 %.3f pt）—— すべて通った'
+          '排他の件数（凍結した関数）・段階 A の入力の釘（正本・記録・コード）・腕の突合と既測の欄・分母と出所の登録の一致・番人の発火（採点欠落・欄・重複）・主判定の対と正本の登録の一致・段階 A の判定の組み直し（平均 %.3f pt・最大 %.3f pt）—— すべて通った'
           % (S['n_differences'], s['mean_pt'], s['max_pt']))
 
 
@@ -197,6 +297,8 @@ if __name__ == '__main__':
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--allow-incomplete', action='store_true', help='検査用の口（n_ok が登録の n に満たなくても書く・印を残す）')
     ap.add_argument('--allow-dry', action='store_true', help='検査用の口（dry-run の走行を読む・印を残す）')
+    ap.add_argument('--allow-scoring-gap', action='store_true', help='検査用の口（採点欠落があっても書く・印を残す・P418）')
+    ap.add_argument('--allow-seed-mismatch', action='store_true', help='検査用の口（走行の種が登録と違っても書く・印を残す・P427）')
     a = ap.parse_args()
     if a.selftest:
         _selftest()
@@ -211,7 +313,7 @@ if __name__ == '__main__':
         sys.exit('出力が既にある（上書きしない・--force で置き換え）: %s' % OUT)
     # 段階 A の入力の釘（凍結記録と照らす）
     FF = runs_B.read_json(A_FREEZE)['files']
-    PINS = [check_pin(p, FF) for p in (A_CANON, A_RECORD)]
+    PINS = [check_pin(p, FF) for p in PINNED]        # 正本・記録・**コード**（P419）
     bad = [p for p in PINS if p['match'] is not True]
     if bad:
         sys.exit('段階 A の入力が凍結記録と合わない（読まない）: %s' % '・'.join('%s（記録 %s・現物 %s）' % (p['path'], p['frozen_sha16'], p['sha16']) for p in bad))
@@ -228,15 +330,32 @@ if __name__ == '__main__':
     except RuntimeError as ex:
         sys.exit('読み出しで止まった（%s）' % ex)
     key = ('transformers', S['scenario'])
-    EX, RUN_KEYS, MARKS, missing = local_counts(idx, key, S['arms_run'])
+    EX, RUN_KEYS, MARKS, missing, G = local_counts(idx, key, S['arms_run'])
     if not RUN_KEYS:
         sys.exit('同一性選別の走行が無い: %s × %s（tag %s）%s'
                  % (key[0], key[1], tag, '' if not idx else '（ある鍵: %s）' % '・'.join(map(str, idx))))
     if missing:
         sys.exit('走行に腕が欠けている（登録は `identity_screen.arms_run` の %d 腕）: %s' % (len(S['arms_run']), '・'.join(missing)))
-    short = [arm for arm in S['arms_run'] if EX[arm]['n_ok'] < S['n']]
-    if short and not a.allow_incomplete:
-        sys.exit('n_ok が登録の n（%d）に満たない腕（api_error の再走行で揃える）: %s' % (S['n'], '・'.join(short)))
+    # **番人**（P418〜P421）——採点欠落・欄の欠け・数え方の食い違い・trial_id の重複
+    STOPS, NOTES = guards(EX, G, S['arms_run'], S['n'])
+    gap_only = [s for s in STOPS if '採点欠落' in s]
+    hard = [s for s in STOPS if s not in gap_only]
+    if hard:
+        sys.exit('番人が止めた（数え方・欄・重複）:\n  ' + '\n  '.join(hard))
+    if gap_only and not a.allow_scoring_gap:
+        sys.exit('番人が止めた（採点欠落・検査用の口は --allow-scoring-gap）:\n  ' + '\n  '.join(gap_only))
+    # **n_ok は登録の n と等しいことを求める**（P421・前は「n 未満」だけを見ていた）
+    off = [(arm, EX[arm]['n_ok']) for arm in S['arms_run'] if EX[arm]['n_ok'] != S['n']]
+    short = [arm for arm, _ in off]
+    if off and not a.allow_incomplete:
+        sys.exit('n_ok が登録の n（%d）と違う腕（%s）——足りなければ api_error の再走行で揃え、多ければ走行の重複を疑う。検査用の口は --allow-incomplete'
+                 % (S['n'], '・'.join('%s %d' % x for x in off)))
+    # **走行の種の照合**（P427・段階 A の器と同じ型。試行ごとの種の組み直しは整合検査の仕事）
+    want_seed = T['seeds']['identity_transformers']
+    seed_bad = {rk: sd for rk, sd in G['seeds'].items() if sd != want_seed}
+    if seed_bad and not a.allow_seed_mismatch:
+        sys.exit('走行の種が正本 `seeds.identity_transformers`（%s）と違う: %s。検査用の口は --allow-seed-mismatch'
+                 % (want_seed, '・'.join('%s→%s' % kv for kv in sorted(seed_bad.items()))))
     # 三スタックの率
     RATES = {'transformers': rates({a_: EX[a_] for a_ in S['compared_arms']}, 'local'),
              'vLLM': rates(VLLM, 'local'), 'API': rates(API, 'api')}
@@ -249,14 +368,20 @@ if __name__ == '__main__':
     MD = pair_diffs(RATES[MAIN_PAIR[0]], RATES[MAIN_PAIR[1]], S['compared_arms'], S['indicators'])
     assert len(MD) == S['n_differences'], (len(MD), S['n_differences'])
     verdict, mean, mx = verdict_of(MD, S['metric_mean_pt'], S['metric_max_pt'])
-    marks = MARKS + [x for x, on in (('allow_incomplete', bool(short)), ('allow_dry', a.allow_dry)) if on]
+    marks = MARKS + [x for x, on in (('allow_incomplete', bool(off)), ('allow_dry', a.allow_dry),
+                                     ('allow_scoring_gap', bool(gap_only)), ('allow_seed_mismatch', bool(seed_bad))) if on]
     R = {'kind': 'identity_screen_B', 'version': VERSION,
          'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'),
          'tag': tag, 'root': a.root, 'run_keys': RUN_KEYS, 'stacks': S['stacks'], 'main_pair': list(MAIN_PAIR),
          'contrasts_sha16': runs_B.sha16_file(a.contrasts or runs_B.CPATH), 'stage_A_inputs': PINS, 'dev_marks': sorted(set(marks)),
          'verdict': verdict, 'mean_abs_diff_pt': float(mean), 'max_abs_diff_pt': float(mx),
          'mean_pt': S['metric_mean_pt'], 'max_pt': S['metric_max_pt'], 'n_differences': len(MD),
-         'tables': TABLES, 'local_counts': EX, 'short_arms': short,
+         'tables': TABLES, 'local_counts': EX, 'short_arms': short, 'n_off': dict(off),
+         'guards': {'stops_bypassed': gap_only, 'notes': NOTES, 'scoring_gap': {k: v.get('scoring_gap', 0) for k, v in G['cross'].items()},
+                    'duplicate_trial_ids': G['dup_ids'], 'field_missing': G['field_missing'][:20], 'field_missing_total': len(G['field_missing'])},
+         'seeds': {'registered': want_seed, 'by_run': G['seeds'], 'mismatch': seed_bad},
+         'model_revs': {'B_runs': G['revs'],
+                        'stage_A_vLLM': {'model': RA.get('model'), 'rev': '未照合（段階 A の門0.5 の記録に版が無い）'}},
          'b_panel_note': S['b_panel_note'], 'fail_reading': S['fail_reading'], 'no_constant_change': TA['identity_screen']['no_constant_change'],
          'aux_note': '補助の検定は置かない（B の正本 `identity_screen` に `aux` の登録が無い）',
          'clause': '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'}
@@ -267,7 +392,13 @@ if __name__ == '__main__':
          '- 段階 A の入力（凍結記録と照合済み）: %s' % '・'.join('`%s` %s' % (p['path'], p['sha16']) for p in PINS),
          '- **主判定（%s 対 %s）: %s**（%d 個の絶対差の相加平均 %.3f pt〔閾値 %s 以下〕・最大 %.3f pt〔閾値 %s 以下〕）'
          % (MAIN_PAIR[0], MAIN_PAIR[1], '合格' if verdict == 'pass' else '不合格', len(MD), float(mean), S['metric_mean_pt'], float(mx), S['metric_max_pt']),
-         '- 不合格のときの読み: %s' % S['fail_reading'], '- %s' % R['no_constant_change'], '- %s' % R['aux_note'], '',
+         '- 不合格のときの読み: %s' % S['fail_reading'], '- %s' % R['no_constant_change'], '- %s' % R['aux_note'],
+         '- **番人**（採点欠落・欄・数え方・重複・種）: 止めたもの %d 件（検査用の口で通したもの %d 件）・注 %d 件。'
+         '採点欠落の合計 %d 件・重複 %d 腕・欄の欠け %d 件・種の不一致 %d 走行'
+         % (0, len(gap_only), len(NOTES), sum((v.get('scoring_gap') or 0) for v in G['cross'].values()),
+            len(G['dup_ids']), len(G['field_missing']), len(seed_bad)),
+         '- 重みの版: B の走行 %s／段階 A の vLLM は**未照合**（門0.5 の記録に版が無い・機種は %s）'
+         % ('・'.join(sorted({str(v.get('model_rev')) for v in G['revs'].values()})) or '（無い）', RA.get('model')), '',
          '## 三スタックの距離（記述・主判定は上の一対）', '', '| 対 | 差の数 | 平均（pt） | 最大（pt） | B の八腕の平均 | B の八腕の最大 |', '|---|---|---|---|---|---|']
     for k, t in TABLES.items():
         M.append('| %s | %d | %.3f | %.3f | %.3f | %.3f |' % (k, t['all']['n'], t['all']['mean_pt'], t['all']['max_pt'],
@@ -281,4 +412,6 @@ if __name__ == '__main__':
     M += ['', '- %s' % S['b_panel_note'], '', R['clause'], '']
     open(OUT + '.md', 'w', encoding='utf-8', newline='\n').write('\n'.join(M))
     print('[identity_screen_B] %s（平均 %.3f pt・最大 %.3f pt）written %s.{json,md}' % (verdict, float(mean), float(mx), OUT))
-    sys.exit(0 if verdict == 'pass' else 2)
+    # **合否で終了コードを分けない**（P428・段階 A の器と同じ）。正本 `fail_reading` は「不合格でも B は実施できる」と定めており、
+    # 非零で終わると一括で走らせる運用が止まりうる。止める条に当たったときだけ、上の sys.exit が非零で終わる。
+    sys.exit(0)

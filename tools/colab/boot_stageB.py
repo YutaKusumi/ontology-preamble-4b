@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""boot_stageB.py v3 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
+"""boot_stageB.py v4 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
+v4（2026-09-20・四票の採否 P424・裁定 D150）: 調整走行の相は、**同一性選別の判定の記録**（`records/B/identity-screen-B.json`）が無ければ始めない（見るのは有無だけで、合否は見ない）。前は選別の相を飛ばしても、判定の器を走らせなくても、どの検査も落ちなかった。
 v3（2026-09-20・残りの相・独立の目を通っていない）: **データを作る相を全部書いた**——同一性選別（identity）・調整走行（tune）・品質床（quality・段は OP4B_STAGE で selection と post）・本走行（main）。
   いずれも走行キーを走らせる前に記帳し、書き終えたセルは飛ばす（再開）。介入のある相は**凍らせた v̂**（相 dir の出力）を読み、SHA-256 を凍結の値と照らす。
   本走行と選定後の品質床は、**門の記録が選んだ層 × 係数でしか走らせない**（正本 selection.binding）。DRY では試行と生成の長さを減らし、門の記録が無ければ先頭の候補を使う（印を残す）。
@@ -30,7 +31,7 @@ DRY（手元の検査・OP4B_DRY=1）: 小さな乱数の模型（登録機種�
 """
 import os, sys, re, json, time, glob, shutil, signal, hashlib, datetime, subprocess, urllib.request
 
-VERSION = 'v3'
+VERSION = 'v4'
 PHASES = ('qfcand', 'dir', 'identity', 'tune', 'quality', 'main')
 T0 = time.time(); LOG = []
 PHASE = os.environ.get('OP4B_PHASE', 'qfcand')
@@ -377,6 +378,13 @@ if PHASE in ('identity', 'tune', 'quality', 'main'):
                          'n': _IS['n'], 'seed': T['seeds']['identity_transformers'], 'layer': None, 'coef': None,
                          'key': (_IS['scenario'], arm), 'extra': {'stack': 'transformers', 'scenario': _IS['scenario'], 'arms': [arm]}})
     elif PHASE == 'tune':
+        # **同一性選別の判定の記録が無ければ始めない**（採否表 P424・裁定 D150・2026-09-20）。
+        # 見るのは**有無だけ**で、合否は見ない（正本 `identity_screen.fail_reading` のとおり不合格でも B は進む）。
+        # 前は、選別の相を飛ばしても判定の器を走らせなくても、どの検査も落ちなかった。
+        _isr = os.path.join(REPO, 'records', 'B', 'identity-screen-B.json')
+        if not os.path.exists(_isr) and not DRY:
+            sys.exit('[boot] 同一性選別の判定の記録が無い（%s）。相 identity を走らせ、手元で `tools/identity_screen_B.py` を通してから調整走行に進む'
+                     % os.path.relpath(_isr, REPO))
         _TU = T['selection']['tune']
         for sc in _TU['scenarios']:
             for _l in LAY:

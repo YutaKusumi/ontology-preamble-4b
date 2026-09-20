@@ -384,9 +384,68 @@ def sessions_by_run_key(sessions):
     return out
 
 
+def expected_sampling(T, phase):
+    """試行の記録の `sampling` に**あるべき値**を、正本から**独立の経路で**組む（P422・2026-09-20）。
+
+    走行器は `steer_B` の写しと `runner.generation_explicit` から組む。ここで同じ関数を呼ぶと恒真になるので、
+    正本の値から直に組み直す。整合検査はこの値と記録を照らし、違えば止める
+    （前は temperature と top_p しか見ておらず、**登録した top_k が記録に入っているかを誰も確かめていなかった**）。
+    """
+    q = (phase == 'quality')
+    g = T['quality_floor']['generation'] if q else T['runner']['generation']
+    out = {'max_new_tokens': g.get('max_tokens'), 'do_sample': (not q),
+           'temperature': g.get('temperature'), 'top_p': g.get('top_p')}
+    ge = T['runner'].get('generation_explicit') or {}
+    na = set(ge.get('not_applicable') or [])
+    for k in (ge.get('passed_keys') or []):
+        if k not in na:
+            out[k] = ge.get(k)
+    return {k: v for k, v in out.items() if v is not None}
+
+
 def rate(k, n):
     return (k / n) if n else None
 
 
 def pt(x):
     return None if x is None else 100.0 * x
+
+
+def _selftest():
+    """標本化の期待値（P422）とセルの番号・種の式の骨（自己検査・2026-09-20）。"""
+    T = load_T()
+    ge = T['runner']['generation_explicit']
+    na = set(ge.get('not_applicable') or [])
+    for phase, g in (('identity', T['runner']['generation']), ('main', T['runner']['generation']),
+                     ('tune', T['runner']['generation']), ('quality', T['quality_floor']['generation'])):
+        exp = expected_sampling(T, phase)
+        # (1) 正本の温度・top_p・最大トークン数が写る
+        assert exp['temperature'] == g['temperature'] and exp['top_p'] == g['top_p'], (phase, exp)
+        assert exp['max_new_tokens'] == g['max_tokens'], (phase, exp)
+        # (2) 貪欲かどうか
+        assert exp['do_sample'] == (phase != 'quality'), (phase, exp['do_sample'])
+        # (3) **明示で渡す鍵がすべて入る**（top_k を含む・裁定 D142・D147）
+        for k in ge['passed_keys']:
+            if k in na:
+                continue
+            assert k in exp and exp[k] == ge[k], ('明示の鍵が期待値に無い', phase, k, exp.get(k), ge.get(k))
+        # (4) 余計な鍵を作らない
+        extra = set(exp) - {'temperature', 'top_p', 'max_new_tokens', 'do_sample'} - (set(ge['passed_keys']) - na)
+        assert not extra, ('期待値に余計な鍵', phase, extra)
+    # (5) セルの番号と種の式が決まった値を返す（引数が同じなら同じ）
+    cs = cell_seed(T, T['seeds']['identity_transformers'], 'identity', (T['identity_screen']['scenario'], 'O'))
+    assert cs == cell_seed(T, T['seeds']['identity_transformers'], 'identity', (T['identity_screen']['scenario'], 'O'))
+    assert recorded_seed(T, cs, 0) == batch_seed(cs, 0), '記録の種はバッチの種（裁定 D127）'
+    print('[runs_B selftest] 標本化の期待値（四相・明示の鍵 %d 個・余計な鍵なし）・セルの種の決定性 —— すべて通った'
+          % len([k for k in ge['passed_keys'] if k not in na]))
+
+
+if __name__ == '__main__':
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--selftest', action='store_true')
+    a = ap.parse_args()
+    if a.selftest:
+        _selftest()
+    else:
+        print('runs_B は読み口の器（--selftest で自己検査）')

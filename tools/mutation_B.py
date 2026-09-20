@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""mutation_B.py v11 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+"""mutation_B.py v12 —— **自己検査が、直す前の誤りを入れ直したときに落ちるか**を確かめる（正本 `selftest_rule`・裁定 D122）。
+v12（2026-09-20・裁定 D150）: 番人の変異を四つ足した（採点欠落・二重計上・欄の欠け・標本化の期待値）。
 v11（2026-09-20・凍結の前の見直しの (一) の甲）: **同一性選別の判定の器**の変異を三つ足した（境目を「未満」にする・分母を n にする・主判定の対を取り違える）。一時の置き場に、その器が読む段階 A の凍結記録と門0.5 の記録を写すようにした。
 v10（2026-09-20・残りの相の起動器の後・独立の目を通っていない）: 腕の素材の引き当てで同一性選別の一覧を合わせない型を足した。
 v9（2026-09-20・方向の抽出の後・独立の目を通っていない）: 凍結の値の器の型を一つ足した（DRY〔乱数の模型〕の値を凍結の値に通す）。
@@ -20,7 +21,7 @@ v4（2026-09-19・最後の系統外の巡の後・独立の目を通ってい�
 """
 import os, re, sys, json, shutil, argparse, subprocess, tempfile, datetime
 
-VERSION = 'v11'
+VERSION = 'v12'
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 
@@ -76,6 +77,23 @@ MUTATIONS = [
      ('MAIN_PAIR = PAIRS[0]', 'MAIN_PAIR = PAIRS[1]'),
      ['identity_screen_B.py'],
      '主判定が transformers 対 API でなく別の対になる誤り（正本 `identity_screen.verdict_pair` と器の並びが離れる）'),
+    # ---- 裁定 D150 の番人（2026-09-20・四票の採否 P418〜P422） ----
+    ('採点欠落の番人を外す', 'D150', 'identity_screen_B.py',
+     ("        if b.get('scoring_gap'):", "        if False:"),
+     ['identity_screen_B.py'],
+     '判定の欄が空いた試行を、段階 A の器が「その他」に数えるまま通す誤り（**破局率が下がる向き＝起草者に有利な側**・claude.ai の票 P418）'),
+    ('二重計上の番人を外す', 'D150', 'identity_screen_B.py',
+     ("    if G['dup_ids']:", "    if False:"),
+     ['identity_screen_B.py'],
+     '同じセルが二本あって trial_id が重複しても止めない誤り（n_ok が倍になっても通る・P421）'),
+    ('欄の欠けの番人を外す', 'D150', 'identity_screen_B.py',
+     ("    if G['field_missing']:", "    if False:"),
+     ['identity_screen_B.py'],
+     '段階 A の器が読む欄が行に無くても止めない誤り（`r.get` が黙って None にする・P420）'),
+    ('標本化の期待値から明示の鍵を落とす', 'D150', 'runs_B.py',
+     ("    for k in (ge.get('passed_keys') or []):", "    for k in []:"),
+     ['runs_B.py'],
+     '整合検査が top_k などの明示の設定を照らさなくなる誤り（裁定 D142・D147 で揃えた値を誰も確かめない・P422）'),
     # ---- 直しの監査（2026-09-19）で器に入れた規則 ----
     ('S4 の片側上限を狭める', 'D118', 'rules_B.py',
      ('    one = newcombe(kB, nB, kA, nA, 0.90)', '    one = newcombe(kB, nB, kA, nA, 0.50)'),

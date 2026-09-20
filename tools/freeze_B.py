@@ -45,7 +45,9 @@ CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_prea
              '言及の語彙（段階 F の正本）': 'design/contrasts-F.json',
              'refuse の分類の規則（丙）': 'arms/materials-draft/hei/refuse-rules-v2.json',
              # 同一性選別の判定の器が、排他の件数を段階 A の凍結した関数で数える（2026-09-20・`identity_screen_B.py` が import する）
-             '同一性選別の排他の件数（段階 A）': 'tools/identity_screen_A.py'}
+             '同一性選別の排他の件数（段階 A）': 'tools/identity_screen_A.py',
+             # その関数が読み口に使う段階 A の器（P419・2026-09-20——データだけ釘で留めてコードを留めない穴があった）
+             '走行の読み口（段階 A・排他の件数が呼ぶ）': 'tools/runs_A.py'}
 TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 'build_draftB.py', 'numbers_lint.py', 'gate_B.py', 'analyze_B.py',
          'layers_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'synth_B.py',
          'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py',

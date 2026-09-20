@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """synth_B.py v4 —— 段階 B の**合成データ**の生成器（器材の検査用・実データを作らない）。
+v5（2026-09-20・四票の採否 P422）: 試行の記録の `sampling` を、走行器が実際に書く形（`runs_B.expected_sampling`）にそろえた——整合検査が標本化の全項目（top_k を含む）を照らすようになったので、合成データも同じ形でなければ意味を持たない。
 v4（2026-09-19・最後の系統外の巡の後）: ランダム方向の割り当てを交互にしたので、等質性の注の経路は「方向ごとに固める」置き方にした（裁定 D140）。S4 の門・封印の照合・td の特異性の三つの札の場合を足した（裁定 D133〜D135）。様式門に当たった非有意（採否表 P401）と、選定後の品質床の相手の重複（採否表 P403）の場合も足した。試行の記録にバッチの行数、走行の記録に加えた量の欄を書く（採否表 P406・P394）。合成の方向に要約統計（合わせる前の比）を添える（裁定 D133）。
 
 札の全経路を一度ずつ以上発火させるための走行の記録を作る（器材の整備の計画 `records/B/tooling-plan-B-2026-09-18.md` の表）。
@@ -16,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 import numpy as np
 
-VERSION = 'v4'
+VERSION = 'v5'
 REPO = runs_B.REPO
 T = runs_B.load_T()
 SC = T['scenarios']
@@ -57,7 +58,7 @@ def _trial(i, arm, scenario, tag, seed, run_key, cat, refuse, ff, style_a, style
             'mention': None if mention is None else bool(mention),
             'loop_flag': bool(loop), 'truncated': bool(trunc), 'correct': corr, 'resp_mean_path': None,
             'seed': seed, 'run_key': run_key, 'runner_sha': 'SYNTH', 'arms_spec': arm, 'preamble_sha': _arm_sha(arm),
-            'model': 'stub/dry-run', 'sampling': dict(sampling or T['runner']['generation']), 'layer': layer, 'coef': coef,
+            'model': 'stub/dry-run', 'sampling': dict(sampling or runs_B.expected_sampling(T, 'main')), 'layer': layer, 'coef': coef,
             'direction_id': direction_id or 'fixed',
             'batch_pos': i % T['runner']['batch'], 'batch_rows': batch_rows, 'proc_uuid': 'synth', 'dry_run': True}
 
@@ -505,7 +506,7 @@ def build(case, out_root):
     q = spec['quality']
     tag_q = T['tags']['quality']
     for base in QF_ARMS + ['O', 'Osec-Ncold']:
-        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'], sampling=T['quality_floor']['generation'],
+        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'], sampling=runs_B.expected_sampling(T, 'quality'),
                              run_key='%s__noop__%s' % (tag_q, base))
         write_run(out_root, tag_q, 'selection__%s__noop' % base, {'stage': 'selection', 'arm': base, 'layer': None, 'coef': None, 'n': N_Q,
                                                                   'seed': T['seeds']['quality']}, trials)
@@ -516,7 +517,7 @@ def build(case, out_root):
                 continue                      # 走行の記録を作らない（記録の不在）
             bad = (q['fail_selection'] == 'all') or (arm in (q['fail_selection'] or []))
             _ae = (q.get('api_error_selection') or {}).get((l, c), 0)       # api_error の門（裁定 D127）
-            trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2, 'api_error': _ae}, arm=arm, scenario='quality', tag=tag_q, sampling=T['quality_floor']['generation'],
+            trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2, 'api_error': _ae}, arm=arm, scenario='quality', tag=tag_q, sampling=runs_B.expected_sampling(T, 'quality'),
                                  seed=T['seeds']['quality'], layer=l, coef=c, run_key='%s__%s__L%sC%s' % (tag_q, arm, l, c))
             write_run(out_root, tag_q, 'selection__%s__L%sC%s' % (arm, l, c), {'stage': 'selection', 'arm': arm, 'layer': l, 'coef': c,
                                                                               'n': N_Q, 'seed': T['seeds']['quality']}, trials)
@@ -524,12 +525,12 @@ def build(case, out_root):
     for arm in INTERV:
         bad = arm in (q['fail_post'] or [])
         _ae = (q.get('api_error_post') or {}).get(arm, 0)                  # api_error の門（裁定 D127）
-        trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2, 'api_error': _ae}, arm=arm, scenario='quality', tag=tag_q, sampling=T['quality_floor']['generation'],
+        trials = cell_trials(N_Q, {'correct': 100 if bad else 148, 'ff': 2, 'api_error': _ae}, arm=arm, scenario='quality', tag=tag_q, sampling=runs_B.expected_sampling(T, 'quality'),
                              seed=T['seeds']['quality'], layer=pick[0], coef=pick[1], run_key='%s__post__%s' % (tag_q, arm))
         write_run(out_root, tag_q, 'post__%s' % arm, {'stage': 'post', 'arm': arm, 'layer': pick[0], 'coef': pick[1], 'n': N_Q,
                                                       'seed': T['seeds']['quality']}, trials)
     for base in sorted(set(NOOP_BASE.values())):
-        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'], sampling=T['quality_floor']['generation'],
+        trials = cell_trials(N_Q, {'correct': 150, 'ff': 2}, arm=base, scenario='quality', tag=tag_q, seed=T['seeds']['quality'], sampling=runs_B.expected_sampling(T, 'quality'),
                              run_key='%s__post__noop__%s' % (tag_q, base))
         write_run(out_root, tag_q, 'post__%s__noop' % base, {'stage': 'post', 'arm': base, 'layer': None, 'coef': None, 'n': N_Q,
                                                              'seed': T['seeds']['quality']}, trials)
