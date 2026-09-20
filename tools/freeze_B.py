@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""freeze_B.py v12 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+"""freeze_B.py v13 —— 段階 B の**凍結の記帳**（凍結物の SHA・封印予想・凍結時に記帳する値・逸脱台帳の口）。
+v13（2026-09-20・凍結前の二度目の掃き出し・登録者の裁定）: 持ち越しに **`report_lint.py`・`vprime_power.py`** を足した（import の閉包の残り）。凍結の記録の腕の表に、**同一性選別だけで使う五腕**（正本 `identity_screen.arms_sha16`）を出す。
 v12（2026-09-20・凍結の前の見直しの (一) の甲・登録者が承認）: 凍結する器に**同一性選別の判定の器 `identity_screen_B.py`** を足し、持ち越しの凍結物に、その器が排他の件数を数えるために呼ぶ**段階 A の `tools/identity_screen_A.py`** を足した。また、凍結する本文を組む器 **`make_frozen_B.py`**（見直しの (四)・段階 A と同じ型）も凍結する器に足した。見直しで、B の同一性選別には判定の器が無く、開示にも載っていないと分かった（`records/B/pre-freeze-review-2026-09-20.md` (一)）。
 v11（2026-09-20・方向の抽出の後・独立の目を通っていない）: **Colab の起動器に、データを作る相（正本 `tags` の相）がすべて書かれているか**を構文木から見て、欠けていたら止める。前は、残りの相（同一性選別・調整走行・品質床・本走行）を書いていなくても凍結の点検が「止めるもの 0 件」になった——凍結はデータを作る器を凍らせる手続きなので、書いていない相があるうちは凍らせない。
 v10（2026-09-20・方向の抽出の後・独立の目を通っていない）: 凍結する器に、凍結の値を組み立てる器 `freeze_values_B.py` を足した（値は手で打たず、走行の記録と正本から機械で写す）。
@@ -33,7 +34,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v12'
+VERSION = 'v13'
 REPO = runs_B.REPO
 CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_preamble_local.py',
              '凍結パーサ': 'arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py',
@@ -47,7 +48,10 @@ CARRYOVER = {'凍結走行器（組み立てと採点の型）': 'tools/run_prea
              # 同一性選別の判定の器が、排他の件数を段階 A の凍結した関数で数える（2026-09-20・`identity_screen_B.py` が import する）
              '同一性選別の排他の件数（段階 A）': 'tools/identity_screen_A.py',
              # その関数が読み口に使う段階 A の器（P419・2026-09-20——データだけ釘で留めてコードを留めない穴があった）
-             '走行の読み口（段階 A・排他の件数が呼ぶ）': 'tools/runs_A.py'}
+             '走行の読み口（段階 A・排他の件数が呼ぶ）': 'tools/runs_A.py',
+             # import の閉包の残り二つ（凍結前の見直しの (八)・2026-09-20）——段階 A・F の凍結記録で釘は打たれているが、B の記録だけで閉じるように足す
+             '報告の走査器（段階 A・組み立て器が呼ぶ）': 'tools/report_lint.py',
+             '検出力の器（V′・設計事実が呼ぶ）': 'tools/vprime_power.py'}
 TOOLS = ['runs_B.py', 'rules_B.py', 'make_contrasts_B.py', 'design_facts_B.py', 'build_draftB.py', 'numbers_lint.py', 'gate_B.py', 'analyze_B.py',
          'layers_B.py', 'integrity_B.py', 'sample_inspection_B.py', 'direction_B.py', 'steer_B.py', 'run_stageB_local.py', 'synth_B.py',
          'dry_run_B.py', 'mutation_B.py', 'endtoend_B.py', 'build_report_B.py', 'freeze_B.py', 'control_chart_B.py', 'citations_B.py',
@@ -88,6 +92,7 @@ frozen = {'canon': {'path': 'design/contrasts-B.json', 'sha16': runs_B.sha16_fil
           'report_template': {'path': 'records/B/results-report-template-B.md',
                               'sha16': runs_B.sha16_file(os.path.join(REPO, 'records', 'B', 'results-report-template-B.md'))},
           'arms': T['arms']['sha16'], 'arm_files': T['arms'].get('files'),
+          'identity_only_arms': {a_: v_ for a_, v_ in (T['identity_screen'].get('arms_sha16') or {}).items() if v_ and a_ not in T['arms']['sha16']},
           'tools': {}}
 for t in TOOLS:
     p = os.path.join(REPO, 'tools', t)
@@ -201,6 +206,10 @@ for name, v in sorted(frozen['carryover'].items()):
     L.append('| 持ち越しの凍結物 | `%s` | %s |' % (v['path'], v['sha16'] or '**無い**'))
 for arm, sha in sorted((frozen['arms'] or {}).items()):
     L.append('| 腕 | %s | %s |' % (arm, sha or '（前置きを持たない）'))
+# **同一性選別だけで使う腕**（正本 identity_screen.arms_sha16・B の盤に無い五腕・凍結前の見直しの (八)）
+for arm, sha in sorted((T['identity_screen'].get('arms_sha16') or {}).items()):
+    if arm not in (frozen['arms'] or {}) and sha:
+        L.append('| 腕（同一性選別のみ） | %s | %s |' % (arm, sha))
 L += ['', '## 凍結時に記帳する値', '']
 for k in NEED_VALUES:
     L.append('- %s: %s' % (k, json.dumps(VALUES[k], ensure_ascii=False) if k in VALUES else '**まだ無い**'))

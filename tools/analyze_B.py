@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """analyze_B.py v6 —— 段階 B の本走行の集計と札（確証の族・門・記述の族・印字）。
+v7（2026-09-20・凍結前の二度目の掃き出し・登録者の裁定）: **門の記録の正本 SHA16 を現在の正本と照らして止める**（段階 A の集計器と同じ型・逸脱 D-40）。登録の定型 `no_data`・`dilution_hold`・`label_confirmed` を注に配線した（前は正本にあって器が印字していなかった）。
 v6（2026-09-19・最後の系統外の巡の後・**独立の目を通っていない**）: td の特異性を族ごとの規則で決める（`rules_B.td_specificity_family`・裁定 D133）／S4 の三分岐の前に門を当て（`rules_B.s4_gates`・D134）、札は結果だけにし、封印との照合を別に出す（`rules_B.s4_seal_match`・D135）・相対の大きさと観測した相手の率での動作特性を記録に入れる（D136）／様式門に当たった非有意は非有意のまま（`rules_B.style_hold_label`・採否表 P401）／検査用の口 `--no-gate` を廃し、門の記録の SHA を記録に入れる・選定後の品質床の相手の重複の番人（採否表 P403）。
 
 正本 `design/contrasts-B.json` に従う。**札は一つだけ**付け、ほかに当たった門は注に出す（`gate_order`）。
@@ -23,7 +24,7 @@ from scipy.stats import fisher_exact, binom
 import runs_B
 import rules_B
 
-VERSION = 'v6'
+VERSION = 'v7'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--gate', required=True, help='tools/gate_B.py の json（選定の記録・必須——検査用の口 --no-gate は廃した・採否表 P403）')
@@ -38,6 +39,7 @@ ap.add_argument('--allow-not-open', action='store_true', help='検査用の口�
 ap.add_argument('--allow-unbound', action='store_true', help='検査用の口（門の選んだ層 × 係数と違っても集計する・裁定 D105）')
 ap.add_argument('--allow-no-sessions', action='store_true', help='検査用の口（セッション記録が無くても集計する・裁定 D108）')
 ap.add_argument('--chart', default=None, help='tools/control_chart_B.py の json（管理図・裁定 D110）')
+ap.add_argument('--allow-canon-mismatch', action='store_true', help='検査用の口（門の記録の正本 SHA16 が現在の正本と違っても集計する・印を残す）')
 a = ap.parse_args()
 T = runs_B.load_T(a.contrasts)
 CEN, DG, RG, SG, QF, GO = T['censor'], T['dilution_gate'], T['refuse_gate'], T['style_gate'], T['quality_floor'], T['gate_order']
@@ -48,6 +50,13 @@ G = runs_B.read_json(a.gate)
 GATE_SHA16 = runs_B.sha16_file(a.gate)          # 報告の組み立て器が、渡された門の記録と照らす（採否表 P403）
 if G.get('kind') != 'gate_B':
     sys.exit('門の記録の種類が違う: %s' % a.gate)
+# **門の記録の正本 SHA16 を現在の正本と照らす**（凍結前の見直しの (六の二)・2026-09-20・v7）。
+# 段階 A の集計器にはこの検査があり、実際に発火した（逸脱台帳 D-40）。B には無く、凍結の後に正本が動いても集計器は黙って進んだ。
+_canon_now = runs_B.sha16_file(a.contrasts or runs_B.CPATH)
+CANON_MISMATCH = bool(G.get('contrasts_sha16')) and G['contrasts_sha16'] != _canon_now
+if CANON_MISMATCH and not a.allow_canon_mismatch:
+    sys.exit('門の記録の正本 SHA16 %s が現在の正本 %s と違う（凍結の後に正本が動いたか、記録の取り違え——逸脱台帳 D-40 の型）。検査用は --allow-canon-mismatch'
+             % (G['contrasts_sha16'], _canon_now))
 SEAL = runs_B.read_json(a.seal) if a.seal else None
 SIGN_MAP = T['seal_format']['sign_map']          # 正本の語彙 → 集計器の記号（裁定 D121）
 SIGN_VALUES = set(T['seal_format']['sign_values'])
@@ -246,6 +255,7 @@ def analyse_contrast(fam, c, alpha_step):
                                if (A.get('style_gap') or B.get('style_gap')) else ''))
     if not na or not nb:
         row['gates'].append('判定不能（測れなかった）')  # n_ok が零（裁定 D96・採否表 P300）
+        row['notes'].append(PS['no_data'].format(cell=row['id']))          # 登録の定型（凍結前の見直しの (九)）
     both_low = ra is not None and rb is not None and ra < CEN['low'] and rb < CEN['low']
     both_high = ra is not None and rb is not None and ra > CEN['high'] and rb > CEN['high']
     if both_low or both_high:
@@ -256,8 +266,10 @@ def analyse_contrast(fam, c, alpha_step):
     row['refuse_diff_pt'] = None if rfd is None else round(rfd, 3)
     if ffd is not None and ffd > DG['threshold_pt']:
         row['gates'].append('判定保留（書式外転位）')
+        row['notes'].append(PS['dilution_hold'].format(A=row['A'], B=row['B'], metric='書式外率', diff=round(ffd, 3), thr=DG['threshold_pt'], label='書式外転位'))
     if rfd is not None and rfd > DG['threshold_pt']:
         row['gates'].append('判定保留（refuse 転位・差）')
+        row['notes'].append(PS['dilution_hold'].format(A=row['A'], B=row['B'], metric='refuse 率', diff=round(rfd, 3), thr=DG['threshold_pt'], label='refuse 転位・差'))
     nominal = p is not None and p < 0.05
     if nominal:
         # **答えた分母と読めた分母の両方で当て、向きは符号の積で見る**（`rules_B.refuse_gate`・裁定 D127・D130・採否表 P367・P368）
@@ -350,6 +362,8 @@ for famkey, F in T['families'].items():
             if want and want != r['sign']:
                 r['label'] = '確証（登録された向きと逆）'
                 r['notes'].append(PS['label_reverse'].format(A=r['A'], B=r['B'], sign=r['sign'], diff=r['diff_pt'], ci=r['ci']))
+        if r.get('label') == '確証':
+            r['notes'].append(PS['label_confirmed'].format(A=r['A'], B=r['B'], sign=r['sign'], diff=r['diff_pt'], ci=r['ci']))   # 登録の定型（(九)）
     RES[famkey] = rows
     FAMROWS += rows
 
@@ -480,7 +494,7 @@ first = PS['first_finding'].format(confirmed=counts['確証'], undecidable=count
                                    ff=counts['判定保留（書式外転位）'], refuse=counts['判定保留（refuse 転位）'] + counts['判定保留（refuse 転位・差）'],
                                    style=counts['判定保留（様式転位）'], ns=counts['非有意'])
 REC = {'kind': 'analyze_B', 'version': VERSION, 'generated_utc': now.strftime('%Y-%m-%dT%H:%M:%SZ'),
-       'contrasts_sha16': runs_B.sha16_file(a.contrasts or runs_B.CPATH), 'gate': G.get('verdict'), 'gate_sha16': GATE_SHA16,
+       'contrasts_sha16': runs_B.sha16_file(a.contrasts or runs_B.CPATH), 'gate': G.get('verdict'), 'gate_sha16': GATE_SHA16, 'canon_mismatch_allowed': CANON_MISMATCH,
        'selection': G.get('selection', {}).get('pick'), 'counts': counts, 'confirm': FAMROWS, 'descriptive': DESC,
        's4': s4, 'td_specificity': TD_SPEC, 'homogeneity': [dict(scenario=k_[0], arm=k_[1], **v_) for k_, v_ in sorted(HOMOG.items())],
        'interval': T['interval']['method'], 'stratified': STRAT, 'mention': MENTION, 'by_direction': [dict(scenario=k_[0], arm=k_[1], direction_id=k_[2], **c_) for k_, c_ in sorted(BYDIR.items(), key=str)], 'chart_anomalies': CHART_BAD, 'binding': BIND,

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""dry_run_B.py v8 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+"""dry_run_B.py v9 —— 段階 B の器材の**合成データによる検査**（札の全経路を一度ずつ以上発火させる）。
+v9（2026-09-20・凍結前の二度目の掃き出し (六の二)）: **正本の SHA16 の食い違いで止まる**二経路（集計器・報告の組み立て器）を足した。
 v8（2026-09-20・四票の採否 P418〜P424・裁定 D150）: 同一性選別の**番人の二経路**（採点欠落で止まる・二重計上で止まる）と、**報告の区画 M**（判定を報告に貼る）を足した。報告の組み立てには判定の記録を必ず渡す。
 v7（2026-09-20・凍結の前の見直し）: **同一性選別の判定**（`tools/identity_screen_B.py`）の経路を足した——見直しで、B の同一性選別には判定の器が無く、開示にも載っていないと分かったため（`records/B/pre-freeze-review-2026-09-20.md` (一)）。
 v6（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: **予想の照合**（`tools/compare_predictions_B.py`）を通す経路——門が開いた回は集計と門の記録で、門1 が閉じた回は門の記録だけで照らす——と、報告の区画 L の経路を足した。照らすのは**封印した実物の予想**（`records/predictions`）で、合成データの結果と照らした出力は合成データの置き場に置き、印を付ける。
@@ -19,7 +20,7 @@ import runs_B
 
 T = runs_B.load_T()
 
-VERSION = 'v8'
+VERSION = 'v9'
 REPO = runs_B.REPO
 PY = sys.executable
 ap = argparse.ArgumentParser()
@@ -53,7 +54,9 @@ PATHS = ['確証', '確証（登録された向きと逆）', '封印した符�
          # v7（2026-09-20・凍結の前の見直しで、判定の器が無いと分かった件）
          '同一性選別の判定（三スタックの距離）',
          # v8（2026-09-20・四票の採否 P418〜P424・裁定 D150）
-         '同一性選別: 採点欠落で止まる', '同一性選別: 二重計上で止まる', '報告: 同一性選別の区画']
+         '同一性選別: 採点欠落で止まる', '同一性選別: 二重計上で止まる', '報告: 同一性選別の区画',
+         # v9（2026-09-20・凍結前の二度目の掃き出し (六の二)）
+         '集計: 正本の SHA16 の食い違いで止まる', '報告: 入力の正本 SHA16 の食い違いで止まる']
 _s4_labels = T['descriptive_families']['B_desc_S4']['three_way']['labels']
 _s4_paths = [p for p in PATHS if p.startswith('S4: ')]
 assert _s4_paths == ['S4: %s' % l_ for l_ in _s4_labels] + ['S4: 余地の条項', 'S4: 門で保留'], (
@@ -242,6 +245,24 @@ for case in ('all', 'gate1_closed', 'nonpositive', 'tie', 'censor_candidates', '
             # **区画 M**（採否表 P424・裁定 D150）: 同一性選別の判定が報告の本文に機械で貼られる
             if rc_r == 0 and '主判定（transformers 対 API）' in _txt and 'identity-screen-B.json' in _txt:
                 fired['報告: 同一性選別の区画'].append(case)
+            # **正本の SHA16 の食い違いで止まる**（凍結前の見直しの (六の二)・v9）: 門の記録の正本 SHA16 を壊して集計器へ、
+            # 同一性選別の記録の正本 SHA16 を壊して組み立て器へ渡し、どちらも止まることを確かめる（段階 A の逸脱 D-40 の型）
+            _gb = json.load(open(os.path.join(REPO, root, 'gate-B.json'), encoding='utf-8'))
+            _gb['contrasts_sha16'] = '0000000000000000'
+            _gbp = os.path.join(root, 'gate-B-badcanon.json')
+            json.dump(_gb, open(os.path.join(REPO, _gbp), 'w', encoding='utf-8'), ensure_ascii=False)
+            _rc_c, _out_c = run(['tools/analyze_B.py', '--gate', _gbp, '--root', root, '--allow-dry', '--allow-not-open', '--allow-unbound',
+                                 '--out', os.path.join(root, 'analysis-badcanon.md'), '--force'])
+            if _rc_c != 0 and '正本 SHA16' in _out_c:
+                fired['集計: 正本の SHA16 の食い違いで止まる'].append(case)
+            _isb = json.load(open(os.path.join(REPO, root, 'identity-screen-B.json'), encoding='utf-8'))
+            _isb['contrasts_sha16'] = '0000000000000000'
+            _isbp = os.path.join(root, 'identity-badcanon.json')
+            json.dump(_isb, open(os.path.join(REPO, _isbp), 'w', encoding='utf-8'), ensure_ascii=False)
+            _rc_c2, _out_c2 = run([x_ if x_ != os.path.join(root, 'identity-screen-B.json') else _isbp for x_ in _rep_cmd
+                                   if x_ != '--lint'] + ['--out', os.path.join(root, 'report-badcanon.md')])
+            if _rc_c2 != 0 and '正本 SHA16' in _out_c2:
+                fired['報告: 入力の正本 SHA16 の食い違いで止まる'].append(case)
             else:
                 rec['report_error'] = (out_r or '')[-600:]
             # **管理図の要約**（採否表 P410）: 報告の本文に要約の行と、全点の表が出ること

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""build_report_B.py v7 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
+"""build_report_B.py v8 —— 段階 B の結果報告を、**雛形**（`records/B/results-report-template-B.md`）と集計の出力から組み立てる。
+v8（2026-09-20・凍結前の二度目の掃き出し・登録者の裁定）: **入力の記録の正本 SHA16 を現在の正本と照らして止める**（(六の二)）／区画 B に整合検査が読んだ**全走行キー**、区画 C に**見出し**（段階 A の申し送り 6）／**漢数字の件数の一覧** `<報告>-kanji.md`（申し送り 8・裁定 D63・止めない）。
 v7（2026-09-20・四票の採否 P424・裁定 D150）: **区画 M——同一性選別の判定**（`tools/identity_screen_B.py` の出力・`--identity` は必須）。判定・三スタックの距離・番人の件数・記録の SHA16 を機械で貼る。前は判定を読む器が一つも無く、選別を走らせなくても、判定の器を走らせなくても、どの検査も落ちなかった（今回の発端と同じ型）。
 v6（2026-09-19 の夜・封印の後・結果の前・独立の目を通っていない）: **区画 L——登録者とコーディネータの予想の照合**（`tools/compare_predictions_B.py` の出力・`--predictions-check` は必須・正本 `predictions.compare_rules.output`「要約を報告に機械で転記する」・裁定 D148）。照合の記録が、渡された集計と門の記録から作られたかを SHA16 で照らし、違えば止まる。
 v5（2026-09-19・最後の系統外の巡の後・独立の目を通っていない）: **集計が読んだ門の記録と、渡された門の記録が同じか**を SHA で照らし、違えば止まる（採否表 P403）／**管理図の要約**の区画 K（全点と三つの判定・`--chart` は必須・裁定 D110・採否表 P410）／S4 の区画に門・封印の照合・相対の大きさ・観測した相手の率での動作特性（裁定 D134〜D136）／td の特異性の区画を族ごとの規則の札に（裁定 D133）／副位置の読みの区画に参照の行と合わせる前の比（裁定 D139・D133）。
@@ -21,7 +22,7 @@ import os, sys, json, argparse, datetime
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import runs_B
 
-VERSION = 'v7'
+VERSION = 'v8'
 REPO = runs_B.REPO
 ap = argparse.ArgumentParser()
 ap.add_argument('--analysis', required=True)
@@ -32,6 +33,7 @@ ap.add_argument('--layers', required=True, help='tools/layers_B.py の json（�
 ap.add_argument('--chart', required=True, help='tools/control_chart_B.py の json（管理図の要約・必須・裁定 D110・採否表 P410）')
 ap.add_argument('--predictions-check', required=True, help='tools/compare_predictions_B.py の json（予想の照合・必須・裁定 D148）')
 ap.add_argument('--identity', required=True, help='tools/identity_screen_B.py の json（同一性選別の判定・必須・採否表 P424・裁定 D150）')
+ap.add_argument('--allow-canon-mismatch', action='store_true', help='検査用の口（入力の記録の正本 SHA16 が現在の正本と違っても組む・印を残す）')
 ap.add_argument('--allow-dry', action='store_true', help='検査用の口（合成データから組む・区画ごとに印を差し込む）')
 ap.add_argument('--force-problems', action='store_true', help='整合検査に不整合があっても組む（理由を記録に残すこと）')
 ap.add_argument('--template', default=os.path.join(REPO, 'records', 'B', 'results-report-template-B.md'))
@@ -95,13 +97,15 @@ A_sum = block([
     PS['scope'],
     'S4 の反証: %s' % A['s4'].get('verdict'),
     '```'])
+_rks = sorted({c_.get('run_key') for c_ in (INT.get('cells') or []) if c_.get('run_key')})   # 申し送り 6（段階 A の反映メモ）
 B_run = block(['```',
                '整合検査: 不整合 %d 件・注 %d 件（%s）' % (len(INT['problems']), len(INT['notes']), INT['tag']),
+               '走行キー（整合検査が読んだ %d 本）: %s' % (len(_rks), '・'.join(_rks) or '（無い）'),
                '抽出検査: 標本 %d 件・対応表の封印あり（並べ替え %s）' % (SMP.get('n_items', 0), SMP.get('shuffled')),
                '正本 SHA16 %s・集計 %s UTC' % (A['contrasts_sha16'], A['generated_utc']),
                '```'])
 sel = G['selection']['pick'] or {}
-C_gate = block(['```',
+C_gate = block(['```', '【門1 と選定】',
                 (PS['gate1_open'].format(k=G['gate1']['quality_pass_candidates'], layer=sel.get('layer'), coef=sel.get('coef'),
                                          eff=sel.get('eff_pt'), tied=len(G['selection']['tied']))
                  if G['gate1']['open'] else PS['gate1_closed']),
@@ -234,6 +238,18 @@ H_coi = block(['```', T['selection']['coi_note'], T['publication']['dual_use'],
                '率盲検の外の経路: 同一性選別の距離／調整走行の率（選定に要る）／品質床の得点。本走行の率は整合検査まで見ない。',
                '起草者は段階 A の公開結果を見ている（封印予想の情報状態の欄に記す）。', '```'])
 
+# **入力の記録の正本 SHA16 が現在の正本とそろっているか**（凍結前の見直しの (六の二)・2026-09-20・v8）。
+# 前は、集計が読んだ門の記録との一致しか照らさず、正本が動いた後の記録が黙って報告に入りえた（段階 A の逸脱 D-40 の型）。
+_shas = {}
+for _nm, _var in (('集計', 'A'), ('門', 'G'), ('整合検査', 'INT'), ('抽出検査', 'SMP'), ('副位置', 'LY'), ('管理図', 'CH'), ('予想の照合', 'PC'), ('同一性選別', 'IS')):
+    _ob = globals().get(_var)
+    if isinstance(_ob, dict) and _ob.get('contrasts_sha16'):
+        _shas[_nm] = _ob['contrasts_sha16']
+_now = runs_B.sha16_file(runs_B.CPATH)
+_off = {k_: v_ for k_, v_ in _shas.items() if v_ != _now}
+if _off and not a.allow_canon_mismatch:
+    sys.exit('入力の記録の正本 SHA16 が現在の正本（%s）と違う: %s。検査用は --allow-canon-mismatch'
+             % (_now, '・'.join('%s %s' % kv for kv in sorted(_off.items()))))
 _state = [l for l in tpl.split('\n') if l.startswith('- 状態: **雛形**')]
 if len(_state) == 1:
     tpl = tpl.replace(_state[0], '- 状態: **報告**（雛形から組み立て器が機械で組んだ・結果の欄は機械の区画）。%s'
@@ -255,6 +271,25 @@ tpl = tpl.replace('- 器 `tools/build_report_B.py`', '- 同一性選別 `%s`（S
                   % (os.path.relpath(a.identity, REPO).replace('\\', '/'), runs_B.sha16_file(a.identity)), 1)
 tpl += '\n'.join([MB['begin'], '- 組み立ての記録は機械が書いた（この区画の中身は区画の記録と突合する）。', MB['end']]) + '\n'
 open(out_md, 'w', encoding='utf-8', newline='\n').write(tpl)
+# **漢数字の件数の一覧**（正本 report_rules.kanji_counts・裁定 D63・申し送り 8・v8）。走査器（段階 A の凍結物）は算用数字しか拾わないので、
+# 機械の区画の外の行にある漢数字の件数をここで一覧にし、読み手が機械の値と照らせるようにする。**違反としては止めない**。
+import re as _re
+_kn = _re.compile(r'[一二三四五六七八九十百千万]+(?:件|本|対比|規模|巡|票|腕|場面|層|候補|問|条|行|つ|人|回|名|段|相)')
+_in_block, _rows_k = False, []
+for _i, _l in enumerate(tpl.split('\n'), 1):
+    if MB['begin'] in _l:
+        _in_block = True
+    if MB['end'] in _l:
+        _in_block = False
+        continue
+    if not _in_block:
+        for _m in _kn.finditer(_l):
+            _rows_k.append((_i, _m.group(0), _l.strip()[:80]))
+_kp = os.path.splitext(out_md)[0] + '-kanji.md'
+open(_kp, 'w', encoding='utf-8', newline='\n').write('\n'.join(
+    ['# 起草者の文の漢数字の件数（機械生成・`tools/build_report_B.py` %s・正本 report_rules.kanji_counts・止めない）' % VERSION, '',
+     '- 機械の区画の外の行から %d 件を拾った。**機械の値と照らすのは読み手**（走査器は算用数字しか拾わない・裁定 D63・逸脱台帳 D-45 の後始末）。' % len(_rows_k), '',
+     '| 行 | 漢数字 | 文（先頭） |', '|---|---|---|'] + ['| %d | %s | %s |' % r_ for r_ in _rows_k] + ['']))
 # **機械の区画の記録**（-machine.json・段階 A の型・報告の走査器が突合する・v4）
 import report_lint as _RL
 _RL.write_sidecar(out_md, tpl, T, 'tools/build_report_B.py %s' % VERSION)

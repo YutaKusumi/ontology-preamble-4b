@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-"""boot_stageB.py v4 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
+"""boot_stageB.py v5 —— 段階 B の Colab 起動スクリプト（2026-09-19 作・登録者裁定 D142・D145・D146・段階 A の boot_stageA.py v2 の型）。
+v5（2026-09-20・凍結前の見直しの (六の二)・登録者の裁定）: **凍結の記録との照合**——記録があれば正本と器材と持ち越しの SHA16 を現物と照らし、違えば止める（DRY は印字だけ）。データを作る相は、凍結の記録が無ければ始めない。
 v4（2026-09-20・四票の採否 P424・裁定 D150）: 調整走行の相は、**同一性選別の判定の記録**（`records/B/identity-screen-B.json`）が無ければ始めない（見るのは有無だけで、合否は見ない）。前は選別の相を飛ばしても、判定の器を走らせなくても、どの検査も落ちなかった。
 v3（2026-09-20・残りの相・独立の目を通っていない）: **データを作る相を全部書いた**——同一性選別（identity）・調整走行（tune）・品質床（quality・段は OP4B_STAGE で selection と post）・本走行（main）。
   いずれも走行キーを走らせる前に記帳し、書き終えたセルは飛ばす（再開）。介入のある相は**凍らせた v̂**（相 dir の出力）を読み、SHA-256 を凍結の値と照らす。
@@ -31,7 +32,7 @@ DRY（手元の検査・OP4B_DRY=1）: 小さな乱数の模型（登録機種�
 """
 import os, sys, re, json, time, glob, shutil, signal, hashlib, datetime, subprocess, urllib.request
 
-VERSION = 'v4'
+VERSION = 'v5'
 PHASES = ('qfcand', 'dir', 'identity', 'tune', 'quality', 'main')
 T0 = time.time(); LOG = []
 PHASE = os.environ.get('OP4B_PHASE', 'qfcand')
@@ -112,6 +113,33 @@ if not DRY and HEAD != COMMIT:
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 import runs_B, runs_A
 T = runs_B.load_T()
+# ---- **凍結の記録との照合**（凍結前の見直しの (六の二)・2026-09-20・v5） ----
+# 前は、凍結の記録を読む器が一つも無かった——コミットを固定しても、そのコミットの正本・器材が凍結の記録と同じかは誰も照らさなかった。
+# 段階 A では集計器の同じ型の検査が実際に発火した（逸脱台帳 D-40）。
+_frz = os.path.join(REPO, 'records', 'B', 'FREEZE-RECORD-B.json')
+if os.path.exists(_frz):
+    _FR = runs_B.read_json(_frz)
+    _bad = []
+    _now = runs_B.sha16_file(runs_B.CPATH)
+    if _FR['frozen']['canon']['sha16'] != _now:
+        _bad.append('正本 %s（凍結）≠ %s（現物）' % (_FR['frozen']['canon']['sha16'], _now))
+    for _t, _s in (_FR['frozen'].get('tools') or {}).items():
+        _p = os.path.join(REPO, 'tools', *_t.split('/'))
+        if _s and (not os.path.exists(_p) or runs_B.sha16_file(_p) != _s):
+            _bad.append('tools/%s' % _t)
+    for _n, _v in (_FR['frozen'].get('carryover') or {}).items():
+        _p = os.path.join(REPO, *_v['path'].split('/'))
+        if _v.get('sha16') and (not os.path.exists(_p) or runs_B.sha16_file(_p) != _v['sha16']):
+            _bad.append(_v['path'])
+    if _bad:
+        _msg = '[boot] **凍結の記録と現物が違う**（凍結の後の変更は逸脱として記帳する・正本 deviation.rule）: %s' % '・'.join(_bad[:8])
+        if DRY:
+            print(_msg + '（DRY なので止めない）')
+        else:
+            sys.exit(_msg)
+    mark('freeze-record', ok=(not _bad), frozen_jst=_FR.get('frozen_jst'), canon=_FR['frozen']['canon']['sha16'])
+elif not DRY and PHASE not in ('qfcand', 'dir'):
+    sys.exit('[boot] 凍結の記録が無い（records/B/FREEZE-RECORD-B.json）。データを作る相（%s）は凍結の後に走らせる（正本 publication.record_first）' % PHASE)
 TA = runs_A.load_T(os.path.join(REPO, 'design', 'contrasts-A.json'))
 HF = runs_A.read_json(os.path.join(REPO, 'records', 'A', 'hf-models-A.json'))
 if PHASE == 'qfcand':
