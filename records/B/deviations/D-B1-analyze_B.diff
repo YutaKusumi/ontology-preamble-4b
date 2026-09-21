@@ -1,0 +1,67 @@
+--- tools/analyze_B.py
++++ tools/analyze_B_devB1.py
+@@ -1,3 +1,6 @@
+ # -*- coding: utf-8 -*-
++# **逸脱 D-B1 の下の集計器**（登録者裁定 D151・2026-09-22）。凍結した `tools/analyze_B.py` から `tools/make_analyze_B_devB1.py` が機械で作った——手で直さない。
++# 違いは、選定後の段の走行が無い確証族の土台の腕の品質床を、門の記録の・選定の段の・選ばれた層 × 係数の行で読むことと、その印だけである。
++# 凍結した器の出力（`records/B/analysis-B-2026-09-22.*`）は変えずに残し、報告は二つの出力を並べる。
+ """analyze_B.py v6 —— 段階 B の本走行の集計と札（確証の族・門・記述の族・印字）。
+ v7（2026-09-20・凍結前の二度目の掃き出し・登録者の裁定）: **門の記録の正本 SHA16 を現在の正本と照らして止める**（段階 A の集計器と同じ型・逸脱 D-40）。登録の定型 `no_data`・`dilution_hold`・`label_confirmed` を注に配線した（前は正本にあって器が印字していなかった）。
+@@ -25,5 +28,5 @@
+ import rules_B
+ 
+-VERSION = 'v7'
++VERSION = 'v7+devB1'
+ REPO = runs_B.REPO
+ ap = argparse.ArgumentParser()
+@@ -148,6 +151,24 @@
+ QF_FAIL, QF_ROWS, QF_MISSING = set(), [], []
+ _post = {k: v for k, v in CQ.items() if k[0] == 'post'}
++# ==== 逸脱 D-B1（登録者裁定 D151・2026-09-22）: 確証族の土台の腕の選定後の床を、門の記録の選定の段の行で読む ====
++DEVB1_SOURCE = '門の記録の・選定の段の・選ばれた層 × 係数の行（逸脱 D-B1・登録者裁定 D151）'
++DEVB1_NOTE = '逸脱 D-B1 の下（土台の腕の選定後の品質床を門の記録の選定の段の行で読んだ・凍結した集計器の札は「判定不能（品質床）」）'
++_OPS_DEVB1 = {'O-Ncold': '-v', 'Onull': '+v'}           # 起動器と同じ対応（正本 quality_floor.operations）
++DEVB1_BASE_ARMS = {b + _OPS_DEVB1[b] for b in T['quality_floor']['arms']}
++DEVB1_ARMS, DEVB1_GATE_ROWS = set(), {}
++for _r in (G.get('quality_floor_rows') or []):
++    if (_r.get('arm') in DEVB1_BASE_ARMS and PICK.get('layer') is not None and not _r.get('missing')
++            and float(_r.get('layer')) == float(PICK['layer']) and float(_r.get('coef')) == float(PICK['coef'])):
++        DEVB1_GATE_ROWS[_r['arm']] = {k: _r.get(k) for k in ('arm', 'layer', 'coef', 'correct', 'noop_correct', 'n_ok', 'noop_n_ok',
++                                                          'api_error', 'noop_api_error', 'diff_pt', 'pass', 'boundary')}
+ for arm in INTERV:                                  # **介入の腕の一覧から数え上げる**（記録が無ければ合格にしない・採否表 P262）
+     cells = {k: v for k, v in _post.items() if k[1] == arm}
++    if not cells and arm in DEVB1_GATE_ROWS:             # 逸脱 D-B1: 走行が無い土台の腕は、門の記録の選定の段の行で読む
++        _g = DEVB1_GATE_ROWS[arm]
++        QF_ROWS.append(dict(_g, source=DEVB1_SOURCE))
++        DEVB1_ARMS.add(arm)
++        if not _g.get('pass'):
++            QF_FAIL.add(arm)
++        continue
+     if not cells:
+         QF_MISSING.append(arm)
+@@ -368,4 +389,12 @@
+     FAMROWS += rows
+ 
++# ---- 逸脱 D-B1 の印: 床を門の記録で読んだ腕を含む対比に欄と注を足し、確証の札に印を足す（札の頭は「確証」のまま） ----
++for r in FAMROWS:
++    if r.get('A') in DEVB1_ARMS or r.get('B') in DEVB1_ARMS:
++        r['deviation'] = 'D-B1'
++        r.setdefault('notes', []).append(DEVB1_NOTE)
++        _lab = str(r.get('label') or '')
++        if _lab.startswith('確証'):
++            r['label'] = (_lab[:-1] + '・逸脱 D-B1 の下）') if _lab.endswith('）') else (_lab + '（逸脱 D-B1 の下）')
+ counts = {k: 0 for k in ('確証', '判定不能（検閲）', '判定不能（品質床）', '判定不能（採点欠落）', '判定不能（測れなかった）',
+                          '判定保留（書式外転位）', '判定保留（refuse 転位・差）', '判定保留（refuse 転位）', '判定保留（様式転位）', '非有意')}
+@@ -499,9 +528,10 @@
+        's4': s4, 'td_specificity': TD_SPEC, 'homogeneity': [dict(scenario=k_[0], arm=k_[1], **v_) for k_, v_ in sorted(HOMOG.items())],
+        'interval': T['interval']['method'], 'stratified': STRAT, 'mention': MENTION, 'by_direction': [dict(scenario=k_[0], arm=k_[1], direction_id=k_[2], **c_) for k_, c_ in sorted(BYDIR.items(), key=str)], 'chart_anomalies': CHART_BAD, 'binding': BIND,
+-       'sessions_checked': len(_sess), 'direction_ids': sorted(str(x) for x in POOL_IDS if x is not None), 'quality_post': QF_ROWS, 'orphan_arms': orphans, 'missing_cells': missing,
++       'sessions_checked': len(_sess), 'direction_ids': sorted(str(x) for x in POOL_IDS if x is not None), 'quality_post': QF_ROWS, 'deviation_D_B1': {'ruling': 'D151', 'arms': sorted(DEVB1_ARMS), 'source': DEVB1_SOURCE, 'gate_rows': DEVB1_GATE_ROWS}, 'orphan_arms': orphans, 'missing_cells': missing,
+        'sign_agreement': {'agree': agree, 'checked': n_conf, 'unchecked': unchecked, 'seal_missing': SEAL_MISSING, 'sealed': bool(SEAL)}, 'dry_marks': DRY}
+ json.dump(REC, open(out_json, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+ 
+-L = ['# 段階 B 本走行の集計（機械生成・`tools/analyze_B.py` %s・%s UTC）' % (VERSION, now.strftime('%Y-%m-%d %H:%M')), '',
++L = ['# 段階 B 本走行の集計——**逸脱 D-B1 の下**（機械生成・`tools/analyze_B_devB1.py` %s・%s UTC）' % (VERSION, now.strftime('%Y-%m-%d %H:%M')), '',
++     '- **これは逸脱 D-B1 の下の出力である**（登録者裁定 D151・2026-09-22）。凍結した集計器の出力は `records/B/analysis-B-2026-09-22.md` にある。違いは、床を ' + DEVB1_SOURCE + ' で読んだ腕（' + '・'.join(sorted(DEVB1_ARMS)) + '）を含む対比の札と、その族の Holm だけである。直すという決定は率と p を見た後になされた。',
+      '- 正本 SHA16 %s。選定: %s。門の判定: %s。' % (REC['contrasts_sha16'], REC['selection'], REC['gate']), '',
+      '- **%s**' % first]
