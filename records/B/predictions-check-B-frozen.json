@@ -1,0 +1,400 @@
+{
+ "kind": "compare_predictions_B",
+ "version": "v1.1",
+ "gate": {
+  "path": "records/B/gate-B-2026-09-21.json",
+  "sha16": "D56684A9A2914B2E",
+  "verdict": "open",
+  "gate1_open": true
+ },
+ "analysis": {
+  "path": "records/B/analysis-B-2026-09-22.json",
+  "sha16": "04B69DCA950523BE"
+ },
+ "seal": {
+  "path": "records/B/seal-B.json",
+  "sha256": "2EFFFDF0CFB6A629A2E52369196B6785D39F58FEE16A32A875914051026B3E42"
+ },
+ "sealing_record": [
+  "records/predictions/sealing-record-B-2026-09-19.md"
+ ],
+ "order_note": "裁定 D148 の順は「コーディネータの封印 → 登録者の封印」だった。登録者が先に封印して JSON を送り（2026-09-19 19:53）、コーディネータはそれを見た後に封印した。登録者の予想はコーディネータの予想を見ずに封印されたので独立である。コーディネータの予想（とそこから作った起草者の封印）は、登録者の予想から独立でない。",
+ "n_confirmed": 2,
+ "results": {
+  "登録者": {
+   "rows": [
+    {
+     "kind": "向き",
+     "key": "sub:N1:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "上昇",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "sub:S1:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "上昇",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "sub:SK:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "上昇",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "sub:S4:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "上昇",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:N1:Onull+v~Onull+vrand",
+     "predicted": "低下",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:S1:Onull+v~Onull+vrand",
+     "predicted": "低下",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:SK:Onull+v~Onull+vrand",
+     "predicted": "低下",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:S4:Onull+v~Onull+vrand",
+     "predicted": "低下",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:N1:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:N1:Onull+vNk~Onull+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S1:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S1:Onull+vNk~Onull+vrand",
+     "predicted": "低下",
+     "observed": "低下",
+     "basis": "確証（登録された向きと逆）",
+     "verdict": "的中"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:SK:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:SK:Onull+vNk~Onull+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S4:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "低下",
+     "observed": null,
+     "basis": "判定保留（様式転位）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S4:Onull+vNk~Onull+vrand",
+     "predicted": "低下",
+     "observed": "低下",
+     "basis": "確証（登録された向きと逆）",
+     "verdict": "的中"
+    },
+    {
+     "kind": "S4",
+     "key": "b.s4",
+     "predicted": "上昇",
+     "observed": "当否を言わない",
+     "basis": "S4 の札・対応表で「言えない」",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "全体",
+     "key": "b.all.confirmed_band",
+     "predicted": "9〜16 本",
+     "observed": "1〜3 本",
+     "basis": "確証の札 2 本（逆向きを含む）",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "全体",
+     "key": "b.all.gate1",
+     "predicted": "開く",
+     "observed": "開く",
+     "basis": "門の記録（gate1.open）",
+     "verdict": "的中"
+    }
+   ],
+   "counts": {
+    "向き": {
+     "的中": 2,
+     "外れ": 5,
+     "照合不能": 9,
+     "予想しない": 0
+    },
+    "S4": {
+     "的中": 0,
+     "外れ": 0,
+     "照合不能": 1,
+     "予想しない": 0
+    },
+    "全体": {
+     "的中": 1,
+     "外れ": 1,
+     "照合不能": 0,
+     "予想しない": 0
+    }
+   },
+   "file": {
+    "path": "records/predictions/predictions-registrant-B-2026-09-19.json",
+    "sha256": "7326F237F482A1FF5169AE87FA95E1237C560C439278E8C589206A360B1A322D",
+    "bytes": 1400,
+    "form": "predictions-form v0.9 (B)",
+    "contrasts": "draft13-2026-09-19",
+    "contrasts_matches_canon": true,
+    "date": "2026-09-19",
+    "not_predicted": 0
+   }
+  },
+  "コーディネータ": {
+   "rows": [
+    {
+     "kind": "向き",
+     "key": "sub:N1:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "sub:S1:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "sub:SK:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "sub:S4:O-Ncold-v~O-Ncold-vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:N1:Onull+v~Onull+vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:S1:Onull+v~Onull+vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:SK:Onull+v~Onull+vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "add:S4:Onull+v~Onull+vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定不能（品質床）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:N1:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "どちらでもない",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "的中"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:N1:Onull+vNk~Onull+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S1:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "どちらでもない",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "的中"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S1:Onull+vNk~Onull+vrand",
+     "predicted": "どちらでもない",
+     "observed": "低下",
+     "basis": "確証（登録された向きと逆）",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:SK:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:SK:Onull+vNk~Onull+vrand",
+     "predicted": "低下",
+     "observed": "どちらでもない",
+     "basis": "非有意",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S4:O-Ncold+vNk~O-Ncold+vrand",
+     "predicted": "どちらでもない",
+     "observed": null,
+     "basis": "判定保留（様式転位）",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "向き",
+     "key": "cross:S4:Onull+vNk~Onull+vrand",
+     "predicted": "どちらでもない",
+     "observed": "低下",
+     "basis": "確証（登録された向きと逆）",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "S4",
+     "key": "b.s4",
+     "predicted": "どちらでもない",
+     "observed": "当否を言わない",
+     "basis": "S4 の札・対応表で「言えない」",
+     "verdict": "照合不能"
+    },
+    {
+     "kind": "全体",
+     "key": "b.all.confirmed_band",
+     "predicted": "4〜8 本",
+     "observed": "1〜3 本",
+     "basis": "確証の札 2 本（逆向きを含む）",
+     "verdict": "外れ"
+    },
+    {
+     "kind": "全体",
+     "key": "b.all.gate1",
+     "predicted": "開く",
+     "observed": "開く",
+     "basis": "門の記録（gate1.open）",
+     "verdict": "的中"
+    }
+   ],
+   "counts": {
+    "向き": {
+     "的中": 2,
+     "外れ": 5,
+     "照合不能": 9,
+     "予想しない": 0
+    },
+    "S4": {
+     "的中": 0,
+     "外れ": 0,
+     "照合不能": 1,
+     "予想しない": 0
+    },
+    "全体": {
+     "的中": 1,
+     "外れ": 1,
+     "照合不能": 0,
+     "予想しない": 0
+    }
+   },
+   "file": {
+    "path": "records/predictions/predictions-coordinator-B-2026-09-19.json",
+    "sha256": "00B690CAF81D20A4E2211825EB1638A265CE6AE4A3809C3DDC0A15DBCD336D86",
+    "bytes": 2670,
+    "form": "predictions-form v0.9 (B)",
+    "contrasts": "draft13-2026-09-19",
+    "contrasts_matches_canon": true,
+    "date": "2026-09-19",
+    "not_predicted": 0
+   }
+  }
+ },
+ "dry_marks": [],
+ "fence": "的中は独立の確認ではなく、誰の判断の重みも変えない。照合は記録であり評価ではない。封印予想を事後の向きや読みの根拠に引かない",
+ "generated_utc": "2026-09-21T21:04:19Z"
+}
