@@ -9,8 +9,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..', '..'))
 j = lambda *p: os.path.join(REPO, *p)
 TB = json.load(open(j('design', 'contrasts-B.json'), encoding='utf-8'))
-TL = json.load(open(j('design', 'contrasts-Blens.json'), encoding='utf-8'))
-FJ = json.load(open(j('records', 'Blens', 'design-facts-Blens.json'), encoding='utf-8'))
+import subprocess
+ROUND_COMMIT = 'bb8e27b'   # 票の日の公開の置き場の main（この巡の束の push）。正本・設計の事実・事実の器はこの巡の後の草案2 で作り直したので、票が見た版をここから読む
+git_show = lambda rel: subprocess.run(['git', '-C', REPO, 'show', ROUND_COMMIT + ':' + rel], capture_output=True, check=True).stdout.decode('utf-8')
+TL = json.loads(git_show('design/contrasts-Blens.json'))
+FJ = json.loads(git_show('records/Blens/design-facts-Blens.json'))
 B = FJ['facts']['B']
 OUT = {}
 from transformers import AutoTokenizer
@@ -22,7 +25,7 @@ FR = chr(0xFFFD)
 
 # V1 兄弟の対・自分の対だけを除く規則
 arms = TL['nulls']['real']['arms']
-src_facts = open(j('tools', 'blens_facts.py'), encoding='utf-8').read()
+src_facts = git_show('tools/blens_facts.py')
 OUT['V1'] = {'arms': arms, 'rule': TL['nulls']['real']['rule'], 'loaded_pair_in_arms': ('O-Ncold' in arms and 'Osec-Ncold' in arms),
              'facts_tool_loaded_eq_static': "E['loaded'] = E['static']" in src_facts}
 
@@ -159,8 +162,7 @@ rows['Osec-Ncold+vrand'] = [(k, '%d/%d' % (v['cat'], v['n_ok'])) for k, v in PH[
 OUT['V14'] = rows
 
 # V15 README の段階 B の見出し
-import subprocess
-README_COMMIT = 'bb8e27b'   # 票の日の公開の置き場の main（この巡の束の push）。README をあとで直しても、この記録は同じ値を再生する
+README_COMMIT = ROUND_COMMIT   # 票の日の公開の置き場の main（この巡の束の push）。README をあとで直しても、この記録は同じ値を再生する
 rm = subprocess.run(['git', '-C', REPO, 'show', README_COMMIT + ':README.md'], capture_output=True, check=True).stdout.decode('utf-8')
 OUT['V15'] = {'stageB_heading': [l for l in rm.split('\n') if l.startswith('## 段階 B')], 'has_results_line': '**結果（2026-09-22〜23・公開' in rm}
 lines15 = rm.split('\n')
