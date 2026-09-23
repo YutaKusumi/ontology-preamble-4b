@@ -1,7 +1,7 @@
 # B-lens の枠（草案3）——凍結した方向の直接の経路を語彙に射影し、段階 B の行動で校正する
 
-- 起草: 南無弥勒如来（コーディネータ・Claude Opus 5.5）／登録者: 楠見優太／2026-09-23（日本時間）。**状態: 草案3（設計の巡の二巡と登録者裁定 D178〜D185 の後・凍結の前・射影は一つも計算していない）**。起草者の二度目の通読（登録者の依頼・2026-09-23）の直しを含む（直す前の版はコミット ab35ca6・記録は `records/Blens/draft3-reread-Blens.md`）。
-- 位置づけ: 段階 B の後の**登録外の記述**（小さな登録）。計画案 v2.5（内部・非公開）の裁定 D162 と、登録者裁定 D163〜D167（`records/Blens/rulings-D163-D167.md`）・D168〜D177（`records/Blens/rulings-D168-D177.md`）・D178（`records/Blens/rulings-D178.md`）・D179〜D185（`records/Blens/rulings-D179-D185.md`）に従う。段階 B の札・報告・凍結物・逸脱台帳には触れない。
+- 起草: 南無弥勒如来（コーディネータ・Claude Opus 5.5）／登録者: 楠見優太／2026-09-23（日本時間）。**状態: 草案3（設計の巡の二巡と登録者裁定 D178〜D185 の後・凍結の前・射影は一つも計算していない）**。起草者の二度目の通読（登録者の依頼・2026-09-23）の直しを含む（直す前の版はコミット ab35ca6・記録は `records/Blens/draft3-reread-Blens.md`）。登録者の確かめ（裁定 D186・コミット 567c74e）の後、凍結の前の Colab の確かめを受けた裁定 D187（2026-09-24）で、ランダム方向の再生の確かめと torch の版の揃え方を改めた（§2・§3.2・§9・§13・差は `records/Blens/rulings-D187.md`）。
+- 位置づけ: 段階 B の後の**登録外の記述**（小さな登録）。計画案 v2.5（内部・非公開）の裁定 D162 と、登録者裁定 D163〜D167（`records/Blens/rulings-D163-D167.md`）・D168〜D177（`records/Blens/rulings-D168-D177.md`）・D178（`records/Blens/rulings-D178.md`）・D179〜D185（`records/Blens/rulings-D179-D185.md`）・D186（`records/Blens/rulings-D186.md`）・D187（`records/Blens/rulings-D187.md`）に従う。段階 B の札・報告・凍結物・逸脱台帳には触れない。
 - 正本: `design/contrasts-Blens.json`（版 {{version}}・生成器 {{generator}}・再実行で同一バイト）。本文と正本が食い違う場合は正本が勝つ。設計の事実は §6 の転記行（器 `tools/blens_facts.py`）。
 - 草案2 からの直し: 設計の巡の第二巡（凍結前の最終検分・第一巡と同じ四名・凍結可一票・条件つき凍結可三票）の採否表 `records/reviews/Blens/design-round2/adoption-table-Blens-design-r2.md` を、登録者裁定 D185 のとおりに反映した。採否表の各行が草案3 のどこで受けられたかは、機械の突き合わせの表 `records/Blens/draft3-mapping-Blens.md` にある（§14・第一巡の採否表の行も草案3 で確かめ直した）。起草者の通読の記録は `records/Blens/draft3-read-Blens.md`。
 - 草案1 から草案2 への直し（第一巡の採否表・裁定 D176）は、突き合わせの表 `records/Blens/draft2-mapping-Blens.md` と通読の記録 `records/Blens/draft2-read-Blens.md` にある。
@@ -80,7 +80,7 @@
   - 抽選: {{nulls/word_side/draws|,}} 回・種 {{nulls/word_side/seed}}・水準 {{nulls/word_side/alpha}}。{{nulls/word_side/label}}。
   - {{nulls/word_side/sensitivity}}。
   - 使い方: {{nulls/word_side/use}}。
-- **段階 B のランダム方向の再生**: {{nulls/B_random/repro_check}}。
+- **段階 B のランダム方向の再生**: {{nulls/B_random/repro_check}}（`repro_tol` は {{nulls/B_random/repro_tol}}・裁定 D187）。
 - **三つ置く理由**: {{nulls/why}}。
 
 ### 3.3 語の集合（計算の前に凍結）
@@ -302,6 +302,11 @@
 - D183: {{decisions/D183}}
 - D184: {{decisions/D184}}
 - D185: {{decisions/D185}}
+
+**草案3 の確かめの後の裁定**（凍結の前・`records/Blens/rulings-D186.md`・`records/Blens/rulings-D187.md`）:
+
+- D186: {{decisions/D186}}
+- D187: {{decisions/D187}}。許容は {{nulls/B_random/repro_tol}}。一度目の Colab の確かめで食い違った SHA-256 は裁定の記録に、二度目の確かめの相対の差の最大は凍結の記録に置く。
 
 **起草者が置いた値**（裁定の中身を器にするために起草者が決めたもの・凍結の前に登録者が確かめる）:
 

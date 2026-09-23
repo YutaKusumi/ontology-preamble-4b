@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
-"""dry_run_Blens.py v1 —— B-lens の合成データの器（合成の語彙の行列と方向で、器の全ての経路を発火させる・2026-09-23・正本 `synthetic`・§9）。
+"""dry_run_Blens.py v2 —— B-lens の合成データの器（合成の語彙の行列と方向で、器の全ての経路を発火させる・2026-09-23・正本 `synthetic`・§9）。
 
 正本 `synthetic` の形ごとに、合成の入力を作り、器（`blens_core`・`blens_lens.layer1`・`blens_calib`・`build_report_Blens`・`boot_Blens` の関数）を回して、
 経路が発火したことと、期待したふるまい（止まるべきところで止まる・札が付くべきところで付く）を確かめる。実データは読まない（組み立ての中と単独の割り方の違いと、
 JSON 直答の最初のトークンの経路は、凍結の語の集合の器が実データで確かめる）。Colab の起動器は DRY（乱数の小さな模型）で二つの相を通す（--with-boot）。
+v2（2026-09-24・裁定 D187）: ランダム方向の再生の突き合わせ（最後の桁の違いは許容の内で通り、乱数の列・大きさ・方向の数の違いで止まる）と、
+  Colab の起動器 DRY が置いた方向の npz の手元の再生との突き合わせと、凍結の器の Colab の確かめの経路を足した。
 出力: records/Blens/dry-run-Blens-<日付>.md（--force が無ければ上書きしない）。
 用法: python tools/dry_run_Blens.py [--with-boot] [--force]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -22,7 +24,7 @@ import blens_sets as BS
 import build_report_Blens as BR
 import boot_Blens as BOOT
 
-VERSION = 'v1'
+VERSION = 'v2'
 NL = chr(10)
 TL0 = json.load(open(os.path.join(REPO, 'design', 'contrasts-Blens.json'), encoding='utf-8'))
 RESULTS = []
@@ -314,6 +316,20 @@ def main():
             types_seen |= set(t for t, m, w in BR.reading_types(T, rl, cl)[0])
     want = set(r['type'] for r in T['reading_rules'])
     check('読みの表の全ての型が器で当たる', types_seen == want, '当たらなかった型 %s' % sorted(want - types_seen))
+    # ---- ランダム方向の再生の突き合わせ（裁定 D187・正本 `nulls.B_random.repro_check`）
+    tol = T['nulls']['B_random']['repro_tol']
+    loc = {'main@0.5': np.array(b_rand['main']['0.5'])}
+    loc.update({'tune@%s' % r: np.array(v) for r, v in b_rand['tune'].items()})
+    eps32 = float(np.finfo(np.float32).eps)
+    c_last = BL.compare_random_dirs(loc, {k: v * (1.0 + eps32) for k, v in loc.items()}, tol)
+    check('ランダム方向の再生の最後の桁の違い（許容の内で通り、SHA-256 は違う）',
+          c_last['ok'] and not any(r['bitwise_equal'] for r in c_last['keys'].values()) and all(r['sha256_local'] != r['sha256_colab'] for r in c_last['keys'].values()),
+          '相対の差の最大 %.3g・許容 %g' % (c_last['rel_max'], tol))
+    c_seed = BL.compare_random_dirs(loc, dict(loc, **{'main@0.5': np.array(C.iso_directions(dirs['static']['0.5'], 71003, 0.5, 3, 1000))}), tol)
+    c_scale = BL.compare_random_dirs(loc, dict(loc, **{'tune@0.75': loc['tune@0.75'] * (1 + 10 * tol)}), tol)
+    c_shape = BL.compare_random_dirs(loc, dict(loc, **{'tune@0.25': loc['tune@0.25'][:2]}), tol)
+    check('ランダム方向の再生の乱数の列の違い・許容の十倍の大きさの違い・方向の数の違い（どれも止まる）', not (c_seed['ok'] or c_scale['ok'] or c_shape['ok']),
+          '乱数の列 %.3g・大きさ %.3g・方向の数 %s' % (c_seed['keys']['main@0.5']['rel_max'], c_scale['keys']['tune@0.75']['rel_max'], c_shape['problems'][:1]))
     # ---- Colab の起動器（DRY・乱数の小さな模型）
     if a.with_boot:
         with tempfile.TemporaryDirectory() as td:
@@ -322,6 +338,24 @@ def main():
                 p = subprocess.run([sys.executable, os.path.join(HERE, 'colab', 'boot_Blens.py')], env=env, capture_output=True, text=True, encoding='utf-8', errors='replace')
                 done = [l for l in p.stdout.splitlines() if ' done ' in l]
                 check('Colab の起動器 DRY（相 %s）' % phase, p.returncode == 0 and bool(done), (done[-1][:120] if done else p.stderr[-200:]))
+                if phase == 'check' and p.returncode == 0:
+                    import steer_B
+                    import freeze_Blens as FZ
+                    od_ = sorted(x for x in os.listdir(td) if x.startswith('check-') and os.path.isdir(os.path.join(td, x)))[-1]
+                    cj = os.path.join(td, od_, 'check.json')
+                    CKd = json.load(open(cj, encoding='utf-8'))
+                    Dd = np.load(os.path.join(REPO, 'results', 'dirB', 'dirB__s1', 'directions.npz'))
+                    sel_ = BL.rkey(T['primary']['ratio'])
+                    vecs = {'main@%s' % sel_: np.array(steer_B.random_directions(Dd['static__%s' % sel_], 'main', float(sel_)))}
+                    for r in [BL.rkey(x) for x in T['layers']['ratios']]:
+                        vecs['tune@%s' % r] = np.array(steer_B.random_directions(Dd['static__%s' % r], 'tune', float(r)))
+                    cd = BL.compare_random_dirs(vecs, BL.load_colab_dirs(os.path.join(td, od_, CKd['random_dirs_npz']['file']), CKd), tol)
+                    check('Colab の起動器 DRY が置いた方向の npz を手元の再生と突き合わせる（同じ機械ではビットで一致）', cd['ok'] and all(r['bitwise_equal'] for r in cd['keys'].values()),
+                          '相対の差の最大 %s・鍵 %s' % (cd['rel_max'], sorted(cd['keys'])))
+                    fres, fbad = FZ.checks(cj)
+                    cc = fres['colab_check']
+                    check('凍結の器の Colab の確かめの経路（DRY の出力は DRY と版で外れ、方向は許容の内で合う）', cc['random_dirs'] and not cc['not_dry'] and not cc['versions'],
+                          str({k: v for k, v in cc.items() if isinstance(v, bool)}))
     # ---- 書き出し
     ng = [r for r in RESULTS if not r[1]]
     L = ['# B-lens の合成データの確かめ（機械生成・`tools/dry_run_Blens.py` %s・%s）' % (VERSION, datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M UTC')), '',
@@ -330,7 +364,8 @@ def main():
          '- 結果: %d 経路・外れ %d。' % (len(RESULTS), len(ng)), '', '| 経路 | 結果 | 中身 |', '|---|---|---|']
     L += ['| %s | %s | %s |' % (n, '発火・期待どおり' if ok else '**外れ**', d_.replace('|', '｜')) for n, ok, d_ in RESULTS]
     L += ['', '## 検分票', '', '- 対象: 凍結の前の器の全ての経路（合成データ）。', '- 段階: 凍結の前（射影は一つも計算していない）。',
-          '- 本検分が確認していないこと: 実重みでの層一の計算（封印の後）・Colab の実機の相 check（別に走らせる）・合成の形が実データの難しさを代表するか。', '',
+          '- 本検分が確認していないこと: 実重みでの層一の計算（封印の後）・Colab の実機の相 check（別に走らせる）・合成の形が実データの難しさを代表するか。'
+          'torch を B の組みに入れ直す起動器の経路（DRY は版を見ないので通らない・Colab の実機で確かめる）。', '',
           '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。', '']
     open(out, 'w', encoding='utf-8', newline=NL).write(NL.join(L))
     print('[dry_run_Blens] wrote %s（%d 経路・外れ %d）' % (os.path.relpath(out, REPO), len(RESULTS), len(ng)))

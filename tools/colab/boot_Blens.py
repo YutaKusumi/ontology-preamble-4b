@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-"""boot_Blens.py v1 —— B-lens の Colab 起動スクリプト（層二の大きさの目盛りの教師強制の順伝播・2026-09-23・正本 `magnitude`・§9）。
+"""boot_Blens.py v2 —— B-lens の Colab 起動スクリプト（層二の大きさの目盛りの教師強制の順伝播・2026-09-23・正本 `magnitude`・§9）。
 
 相（OP4B_PHASE）:
   check   凍結の前の確かめ（**射影を一つも計算しない・残差のベクトルを置かない**）: 版（正本 `inputs.versions_B`）・GPU・重みの断片の SHA-256（転記行 F）・
-          段階 B のランダム方向を B の版の NumPy で再生した SHA-256・各層の最初の一件の教師強制で、主位置（凍結の `steer_B.main_position`）・
+          段階 B のランダム方向を B の版の NumPy で再生した方向そのもの（`random_dirs.npz`）と SHA-256・各層の最初の一件の教師強制で、主位置（凍結の `steer_B.main_position`）・
           答えの文字の位置（加減の帯の中）・前置きの SHA（`preamble_sha`）・logits の突き合わせ（`magnitude.logit_check`）・較正の検査（`magnitude.calibration_check`）。
   extract 封印の後: 凍結の記録と封印の記録がそろったコミットで、選んだ試行の全件（`design-facts-Blens.json` の `E.selected`・起動器は選び直さない）の、
           正規化の前の最終の残差を、主位置と答えの文字の位置で取り（`model.norm` の入力への前の hook）、最初の一件の全語彙の logits を置く。
           **方向はここでは掛けない**（直接の経路は手元の器 `tools/blens_calib.py` が計算する）。check の確かめもすべてもう一度行う。
 止める条件（外れたら止める・登録者に相談・裁定 D184）: 版の不一致（入れ直した後にランタイムの再起動を求める）・GPU・重みの SHA-256・選んだ試行の SHA16・
   前置きの SHA・主位置・答えの文字の位置・選択の値を読めない出力・logits の突き合わせ・較正の検査。
+v2（2026-09-24・裁定 D187）: 再生したランダム方向そのものを出力に置く（手元の器が方向ごとの相対の差の許容で突き合わせる・ビットの一致は求めない）。
+  版は三つとも文字列の完全な一致で確かめる（torch は CUDA の組み `+cu…` まで）。torch が違えば、B の組みの torch を PyTorch の置き場から入れ直し、
+  入っている torchvision・torchaudio も同じ組みに揃える（版の番号は入っているものの `+` の前・組みの違う拡張が import で止まるのを避ける）。
 運用: コーディネータが登録者の Chrome 越しに Colab を操作する（ランタイムの選択と結果の zip のダウンロードもコーディネータ）。登録者の手に残すのは同意と支払い。
   資格情報は入力しない（HF_TOKEN のポップアップはキャンセル・公開の重み）。Drive は使わない（出力は小さく、終わりに zip を落とす）。
 セルに打つ一行（先頭の下線は type の事故の緩衝・<commit> は 40 桁）:
@@ -21,7 +24,7 @@ DRY（手元の検査・OP4B_DRY=1）: 登録機種の設定を小さくした�
 """
 import os, sys, re, json, time, glob, shutil, hashlib, datetime, subprocess, zipfile
 
-VERSION = 'v1'
+VERSION = 'v2'
 T0 = time.time()
 REPO_URL = 'https://github.com/YutaKusumi/ontology-preamble-4b.git'
 LOG = []
@@ -138,14 +141,16 @@ def run():
         except Exception:
             return None
     PIN = TL['inputs']['versions_B']
-    VER = {k: ver(k) for k in ('numpy', 'torch', 'transformers', 'tokenizers', 'huggingface_hub', 'accelerate', 'safetensors')}
-    want = {'numpy': PIN['numpy'], 'torch': PIN['torch'].split('+')[0], 'transformers': PIN['transformers']}
-    bad = {k: VER[k] for k, v in want.items() if not (VER[k] or '').startswith(v)}
+    VER = {k: ver(k) for k in ('numpy', 'torch', 'transformers', 'torchvision', 'torchaudio', 'tokenizers', 'huggingface_hub', 'accelerate', 'safetensors')}
+    want = {'numpy': PIN['numpy'], 'torch': PIN['torch'], 'transformers': PIN['transformers']}
+    bad = {k: VER[k] for k, v in want.items() if VER[k] != v}          # 文字列の完全な一致（torch は CUDA の組みまで・裁定 D187）
     if bad and not DRY:
         mark('pin', installing=bad)
         os.environ['HF_HUB_DISABLE_XET'] = '1'
         if 'torch' in bad:
-            sh([sys.executable, '-m', 'pip', 'install', '-q', 'torch==%s' % want['torch'], '--index-url', 'https://download.pytorch.org/whl/%s' % PIN['torch'].split('+')[1]])
+            cuda = PIN['torch'].split('+')[1]
+            pk = ['torch==%s' % PIN['torch']] + ['%s==%s+%s' % (c, VER[c].split('+')[0], cuda) for c in ('torchvision', 'torchaudio') if VER.get(c)]
+            sh([sys.executable, '-m', 'pip', 'install', '-q'] + pk + ['--index-url', 'https://download.pytorch.org/whl/%s' % cuda])
         sh([sys.executable, '-m', 'pip', 'install', '-q', 'numpy==%s' % want['numpy'], 'transformers==%s' % want['transformers'], 'accelerate', 'huggingface_hub', 'safetensors'])
         print('[boot_Blens] 版を入れ直した。**ランタイムを再起動して（「ランタイム」→「セッションを再起動」）、同じ一行をもう一度走らせる**', flush=True)
         sys.exit(0)
@@ -185,14 +190,15 @@ def run():
             stop('重みの SHA-256 が転記行 F と違う: %s' % badw)
     mark('weights', snapshot=os.path.basename(SNAPDIR), checked=len(W_SHA))
 
-    # ---- 4. 段階 B のランダム方向（B の版の NumPy で再生した SHA-256・層一の器が手元の値と突き合わせる）
+    # ---- 4. 段階 B のランダム方向（B の版の NumPy で再生した方向そのものと SHA-256・層一の器が手元の再生と許容の内で突き合わせる・裁定 D187）
     D = np.load(os.path.join(REPO, 'results', 'dirB', 'dirB__s1', 'directions.npz'))
     rk = BL.rkey
     ratios = [rk(r) for r in TL['layers']['ratios']]
     sel = rk(TL['primary']['ratio'])
-    RSHA = {'main@%s' % sel: BL.dirs_sha256(steer_B.random_directions(D['static__%s' % sel], 'main', float(sel)))}
+    RDIR = {'main@%s' % sel: np.array(steer_B.random_directions(D['static__%s' % sel], 'main', float(sel)))}
     for r in ratios:
-        RSHA['tune@%s' % r] = BL.dirs_sha256(steer_B.random_directions(D['static__%s' % r], 'tune', float(r)))
+        RDIR['tune@%s' % r] = np.array(steer_B.random_directions(D['static__%s' % r], 'tune', float(r)))
+    RSHA = {k: BL.dirs_sha256(v) for k, v in RDIR.items()}
     mark('random', numpy=np.__version__, sha=RSHA)
 
     # ---- 5. 模型とトークナイザ
@@ -291,8 +297,11 @@ def run():
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
     od = os.path.join(OUTROOT, '%s-%s' % (PHASE, stamp))
     os.makedirs(od, exist_ok=True)
+    np.savez(os.path.join(od, 'random_dirs.npz'), **RDIR)
+    RNPZ = {'file': 'random_dirs.npz', 'sha256': hashlib.sha256(open(os.path.join(od, 'random_dirs.npz'), 'rb').read()).hexdigest().upper(),
+            'keys': sorted(RDIR), 'dtype': 'float64', 'shape': {k: list(v.shape) for k, v in RDIR.items()}}
     REC = {'kind': 'blens_colab_%s' % PHASE, 'boot': VERSION, 'commit': COMMIT, 'dry': DRY, 'gpu': GPU, 'versions': VER, 'weights_sha256': W_SHA,
-           'random_dirs_sha256': RSHA, 'selected_sha16': E['selected_sha16'], 'rms_norm_eps': EPS, 'logit_check': first, 'calibration': calib,
+           'random_dirs_sha256': RSHA, 'random_dirs_npz': RNPZ, 'selected_sha16': E['selected_sha16'], 'rms_norm_eps': EPS, 'logit_check': first, 'calibration': calib,
            'contexts': ctx_rec, 'observed': observed, 'log': LOG, 'finished': now(),
            'clause': '本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'}
     json.dump(REC, open(os.path.join(od, 'check.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

@@ -1,6 +1,6 @@
 # 数の機械検査（機械生成・`tools/numbers_lint.py` v2.1）
 
-- 正本: `design/contrasts-Blens.json`（説明文 450 件・設計定数の種類 73）
+- 正本: `design/contrasts-Blens.json`（説明文 454 件・設計定数の種類 72）
 - 束縛検査（原稿 `design/design-Blens-draft3.src.md（一覧を展開した後）`）: 違反 0
 - 登録検査（文書 `design/design-Blens-draft3.md`・§6 と §6-補 を除く）: 未登録 0
 - 登録検査（正本の説明文）: 未登録 0

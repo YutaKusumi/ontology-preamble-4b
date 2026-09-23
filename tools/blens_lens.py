@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""blens_lens.py v1 —— B-lens の層一（凍結した方向の直接の経路を語彙に射影し、凍結した語の集合で読む・2026-09-23・正本 §3・裁定 D163・D165・D171・D173・D179）。
+"""blens_lens.py v2 —— B-lens の層一（凍結した方向の直接の経路を語彙に射影し、凍結した語の集合で読む・2026-09-23・正本 §3・裁定 D163・D165・D171・D173・D179）。
 
 計算（正本の規則のとおり・芯は `tools/blens_core.py`）:
   - Δℓ(u)＝W_E·(g⊙u) を含める語彙の平均で中心化（物差しは係数のベクトル a で M(u) = a·u）。重みは bf16 を float32 に上げ、語彙の行の平均は float64 で足して float32 に戻す。
@@ -10,11 +10,14 @@
     封印の後の記述（‖g⊙u‖／‖u‖・上位の次元の割合・狙いの度合い・上位の次元を零にした感度・一覧の語のノルムの偏り）。
 自己検査（外れたら止める・登録者に相談・裁定 D184）:
   - 等方の帰無の標準偏差を解析の値と突き合わせる（相対の差 `nulls.isotropic.analytic_tol` の内）。
-  - 写した等方の器が、段階 B の種で凍結の関数とビットで一致する。段階 B のランダム方向を手元で再生した SHA-256 が、Colab の起動器が B の版の NumPy で再生した値と一致する（合わなければ層一の計算に進まない）。
+  - 写した等方の器が、段階 B の種で凍結の関数とビットで一致する。段階 B のランダム方向を手元で再生した方向が、Colab の起動器が B の版の NumPy で再生して置いた方向と、
+    方向ごとの相対の差 `nulls.B_random.repro_tol` の内で一致する（`compare_random_dirs`・両方の SHA-256 を記録に並べる・合わなければ層一の計算に進まない・裁定 D187）。
   - 活性から作り直した方向が凍結の npz と一致する・凍結の語の集合と正本の SHA が凍結の記録と一致する。
 封印の前には走らない: 凍結の記録と封印の記録（両方の予想の JSON の SHA-256）が無ければ止まる（正本 `predictions.order`「封印は射影を一つも計算する前」）。
 出力: results/Blens/lens-Blens.json（--force が無ければ上書きしない）。
-用法: python tools/blens_lens.py --colab-check <Colab の確かめの JSON> [--force] ／ --selftest（合成の小さな入力で計算の経路を回す）
+用法: python tools/blens_lens.py --colab-check <Colab の確かめの JSON> --colab-dirs <同じ確かめの方向の npz> [--force] ／ --selftest（合成の小さな入力で計算の経路を回す）
+v2（2026-09-24・裁定 D187）: Colab の再生との突き合わせを、SHA-256 のビットの一致から、方向ごとの相対の差の許容に改めた（一度目の凍結の前の Colab の確かめで、
+  方向の大きさを揃えるノルムの計算の最後の桁が機械の違いで変わり、SHA-256 が合わなかった）。層一は手元で再生した方向で計算する（前と同じ）。
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, sys, json, math, hashlib, argparse, datetime, unicodedata, collections
@@ -25,7 +28,7 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import blens_core as C
 
-VERSION = 'v1'
+VERSION = 'v2'
 NL = chr(10)
 SNAP = os.path.expanduser('~/.cache/huggingface/hub/models--Qwen--Qwen3-4B-Instruct-2507/snapshots/cdbee75f17c01a7cc42f958dc650907174af0554')
 ACT = os.path.expanduser('~/.cache/op4b-dir/dirB__s1/main_position_activations.npz')
@@ -47,6 +50,45 @@ def dirs_sha256(vecs):
     for v in vecs:
         h.update(np.asarray(v, dtype=np.float64).tobytes())
     return h.hexdigest().upper()
+
+
+def compare_random_dirs(local, colab, tol):
+    """段階 B のランダム方向の、手元の再生と Colab の再生の突き合わせ（裁定 D187・正本 `nulls.B_random.repro_check`）。
+    local・colab は {'main@0.5': 方向の並び, ...}。方向ごとの相対の差＝要素ごとの差の絶対値の最大 ÷ 手元の方向の要素の絶対値の最大。
+    鍵・方向の数・次元が違うか、相対の差が tol を超える（または有限でない）方向が一つでもあれば ok は False。両方の SHA-256・相対の差・ビットの一致を返す。"""
+    out = {'tol': tol, 'ok': True, 'problems': [], 'keys': {}}
+    if sorted(local) != sorted(colab):
+        out['ok'] = False
+        out['problems'].append('鍵が違う（手元 %s・Colab %s）' % (sorted(local), sorted(colab)))
+    for k in sorted(set(local) & set(colab)):
+        lv, cv = np.asarray(local[k], dtype=np.float64), np.asarray(colab[k], dtype=np.float64)
+        row = {'sha256_local': dirs_sha256(lv), 'sha256_colab': dirs_sha256(cv), 'shape_local': list(lv.shape), 'shape_colab': list(cv.shape), 'rel_max': None}
+        if lv.ndim != 2 or lv.shape != cv.shape:
+            out['ok'] = False
+            out['problems'].append('%s: 方向の数か次元が違う' % k)
+        else:
+            with np.errstate(divide='ignore', invalid='ignore'):
+                rel = [float(np.max(np.abs(c - l)) / np.max(np.abs(l))) for l, c in zip(lv, cv)]
+            row.update({'rel_per_direction': rel, 'rel_max': max(rel), 'bitwise_equal': bool(np.array_equal(lv, cv))})
+            if not all(math.isfinite(x) for x in rel) or max(rel) > tol:
+                out['ok'] = False
+                out['problems'].append('%s: 相対の差の最大 %.3g が許容 %g の外' % (k, max(rel), tol))
+        out['keys'][k] = row
+    fin = [r['rel_max'] for r in out['keys'].values() if r['rel_max'] is not None]
+    out['rel_max'] = max(fin) if fin else None
+    return out
+
+
+def load_colab_dirs(npz_path, CC):
+    """Colab の起動器が置いた方向の npz を読む（ファイルの SHA-256 が確かめの JSON の記録と同じことと、JSON の SHA-256 の欄と方向が同じことを先に確かめる）。"""
+    want = (CC.get('random_dirs_npz') or {}).get('sha256')
+    if not want or sha256f(npz_path) != want:
+        raise SystemExit('方向の npz の SHA-256 が Colab の確かめの JSON の記録と違う（組み合わせが違う・止める）: %s' % npz_path)
+    Z = np.load(npz_path)
+    out = {k: Z[k] for k in Z.files}
+    if any((CC.get('random_dirs_sha256') or {}).get(k) != dirs_sha256(v) for k, v in out.items()) or sorted(out) != sorted(CC.get('random_dirs_sha256') or {}):
+        raise SystemExit('方向の npz と、確かめの JSON の SHA-256 の欄が食い違う（止める）')
+    return out
 
 
 def primary_metric_names(TL):
@@ -292,7 +334,8 @@ def require_sealed(TL):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--colab-check', help='Colab の起動器の確かめの JSON（B の版の NumPy で再生したランダム方向の SHA-256 を含む）')
+    ap.add_argument('--colab-check', help='Colab の起動器の確かめの JSON（B の版の NumPy で再生したランダム方向の SHA-256 と、方向の npz の SHA-256 を含む）')
+    ap.add_argument('--colab-dirs', help='同じ確かめで起動器が置いた方向の npz（裁定 D187）')
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--selftest', action='store_true')
     a = ap.parse_args()
@@ -324,7 +367,7 @@ def main():
             ref = dirs[k][r].astype(np.float64)
             if np.max(np.abs(u - ref)) / np.linalg.norm(ref) > 1e-6:
                 raise SystemExit('活性から作り直した方向が凍結の npz と違う（止める）: %s %s' % (k, r))
-    # 段階 B のランダム方向（凍結の関数で再生）と、写した器のビットの一致・Colab の B の版の NumPy との一致
+    # 段階 B のランダム方向（凍結の関数で再生）と、写した器のビットの一致・Colab の B の版の NumPy の再生との許容の内の一致（裁定 D187）
     sel = rkey(TL['primary']['ratio'])
     b_rand = {'main': {sel: steer_B.random_directions(dirs['static'][sel], 'main', float(sel))}, 'tune': {r: steer_B.random_directions(dirs['static'][r], 'tune', float(r)) for r in ratios}}
     BRn = TL['nulls']['B_random']
@@ -334,11 +377,12 @@ def main():
             if not np.array_equal(mine, np.array(vs_)):
                 raise SystemExit('写した器が凍結の関数の再生とビットで一致しない（止める）: %s %s' % (phase, r))
     local_sha = {'%s@%s' % (ph, r): dirs_sha256(v) for ph in b_rand for r, v in b_rand[ph].items()}
-    if not a.colab_check:
-        raise SystemExit('Colab の起動器の確かめの JSON が要る（B の版の NumPy で再生したランダム方向の SHA-256 と突き合わせる・--colab-check）')
+    if not (a.colab_check and a.colab_dirs):
+        raise SystemExit('Colab の起動器の確かめの JSON と方向の npz が要る（B の版の NumPy で再生したランダム方向と突き合わせる・--colab-check・--colab-dirs・裁定 D187）')
     CC = json.load(open(a.colab_check, encoding='utf-8'))
-    if CC.get('random_dirs_sha256') != local_sha:
-        raise SystemExit('Colab の B の版の NumPy で再生したランダム方向が手元と違う（層一の計算に進まない・止める）')
+    cmp_ = compare_random_dirs({'%s@%s' % (ph, r): v for ph in b_rand for r, v in b_rand[ph].items()}, load_colab_dirs(a.colab_dirs, CC), TL['nulls']['B_random']['repro_tol'])
+    if not cmp_['ok']:
+        raise SystemExit('Colab の B の版の NumPy で再生したランダム方向が、手元の再生と許容の内で一致しない（層一の計算に進まない・止める）: %s' % cmp_['problems'])
     from transformers import AutoTokenizer
     tok = AutoTokenizer.from_pretrained(SNAP)
     base_vocab = TL['inputs']['model']['base_vocab']
@@ -352,8 +396,11 @@ def main():
     res = layer1(TL, SJ, W.rows_of, W.mu, W.g, dirs, arm_means, b_rand, W.delta_full, decode, W.norms(), base_vocab)
     res.update({'kind': 'blens_lens', 'version': VERSION, 'generated_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'),
                 'inputs': {'contrasts_sha16': sha16f(os.path.join(REPO, 'design', 'contrasts-Blens.json')), 'sets_sha16': sha16f(SETS),
-                           'freeze_record_sha16': sha16f(FREEZE), 'sealing_record_sha16': sha16f(SEAL), 'colab_check_sha16': sha16f(a.colab_check)},
-                'checks': {'iso_analytic': 'ok', 'directions_rebuilt': 'ok', 'random_copy_bits': 'ok', 'random_colab_numpy': 'ok', 'random_dirs_sha256': local_sha},
+                           'freeze_record_sha16': sha16f(FREEZE), 'sealing_record_sha16': sha16f(SEAL), 'colab_check_sha16': sha16f(a.colab_check),
+                           'colab_dirs_sha256': sha256f(a.colab_dirs)},
+                'checks': {'iso_analytic': 'ok', 'directions_rebuilt': 'ok', 'random_copy_bits': 'ok', 'random_dirs_sha256': local_sha,
+                           'random_colab_numpy': {'ok': True, 'tol': cmp_['tol'], 'rel_max': cmp_['rel_max'],
+                                                  'keys': {k: {x: r[x] for x in ('sha256_local', 'sha256_colab', 'rel_max', 'bitwise_equal')} for k, r in cmp_['keys'].items()}}},
                 'clause': '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'})
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(res, open(OUT, 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)
@@ -433,7 +480,42 @@ def _selftest():
     assert abs(res['layers']['0.5']['directions']['static']['M_F']['value'] - mf) < 1e-3 * max(1, abs(mf))
     assert set(res['primary']['metrics']) == set(TL['primary']['metrics']) and len(res['lists']) == 12
     assert res['layers']['0.5']['directions']['rand:0'] and 'tune_rand:2' in res['layers']['0.25']['directions']
-    print('[blens_lens] 自己検査 OK（%s）' % VERSION)
+    # ランダム方向の突き合わせ（裁定 D187）: 同じ・最後の桁の違い・許容の十倍の大きさの違い・乱数の列の違い・形の違い・鍵の欠け・有限でない値
+    loc = {'main@0.5': np.array(b_rand['main']['0.5'])}
+    loc.update({'tune@%s' % r: np.array(v) for r, v in b_rand['tune'].items()})
+    tol = TL['nulls']['B_random']['repro_tol']
+    c0 = compare_random_dirs(loc, {k: v.copy() for k, v in loc.items()}, tol)
+    assert c0['ok'] and c0['rel_max'] == 0 and all(r['bitwise_equal'] for r in c0['keys'].values())
+    ulp = {k: v * (1.0 + float(np.finfo(np.float32).eps)) for k, v in loc.items()}
+    c1 = compare_random_dirs(loc, ulp, tol)
+    assert c1['ok'] and 0 < c1['rel_max'] < tol and not any(r['bitwise_equal'] for r in c1['keys'].values())
+    assert c1['keys']['main@0.5']['sha256_local'] != c1['keys']['main@0.5']['sha256_colab']
+    big = dict(loc, **{'tune@0.75': loc['tune@0.75'] * (1 + 10 * tol)})
+    assert not compare_random_dirs(loc, big, tol)['ok']
+    other = dict(loc, **{'main@0.5': np.array(C.iso_directions(dirs['static']['0.5'], 71003, 0.5, 3, 1000))})
+    c3 = compare_random_dirs(loc, other, tol)
+    assert not c3['ok'] and c3['keys']['main@0.5']['rel_max'] > 0.1
+    assert not compare_random_dirs(loc, dict(loc, **{'main@0.5': loc['main@0.5'][:2]}), tol)['ok']
+    assert not compare_random_dirs(loc, {k: v for k, v in loc.items() if k != 'tune@0.25'}, tol)['ok']
+    bad = loc['tune@0.5'].copy()
+    bad[1, 5] = np.nan
+    assert not compare_random_dirs(loc, dict(loc, **{'tune@0.5': bad}), tol)['ok']
+    # 方向の npz の読み（JSON の SHA-256 の欄との食い違いで止まる）
+    import tempfile
+    with tempfile.TemporaryDirectory() as td:
+        npz = os.path.join(td, 'random_dirs.npz')
+        np.savez(npz, **loc)
+        CCx = {'random_dirs_npz': {'sha256': sha256f(npz)}, 'random_dirs_sha256': {k: dirs_sha256(v) for k, v in loc.items()}}
+        back = load_colab_dirs(npz, CCx)
+        assert sorted(back) == sorted(loc) and all(np.array_equal(back[k], loc[k]) for k in loc)
+        for broken in ({'random_dirs_npz': {'sha256': '0' * 64}, 'random_dirs_sha256': CCx['random_dirs_sha256']},
+                       {'random_dirs_npz': CCx['random_dirs_npz'], 'random_dirs_sha256': dict(CCx['random_dirs_sha256'], **{'main@0.5': 'X'})}):
+            try:
+                load_colab_dirs(npz, broken)
+                raise AssertionError('止まるべき読みが通った')
+            except SystemExit:
+                pass
+    print('[blens_lens] 自己検査 OK（%s・ランダム方向の突き合わせの七つの形と方向の npz の読みを含む）' % VERSION)
 
 
 if __name__ == '__main__':

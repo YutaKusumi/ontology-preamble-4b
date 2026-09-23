@@ -1,0 +1,973 @@
+{
+ "kind": "blens_colab_check",
+ "boot": "v1",
+ "commit": "b5dbf3d68ae87d336ebca3396070f315166d3902",
+ "dry": false,
+ "gpu": "NVIDIA L4",
+ "versions": {
+  "numpy": "2.1.3",
+  "torch": "2.11.0+cu130",
+  "transformers": "4.57.3",
+  "tokenizers": "0.22.2",
+  "huggingface_hub": "0.36.2",
+  "accelerate": "1.15.0",
+  "safetensors": "0.8.0"
+ },
+ "weights_sha256": {
+  "model-00001-of-00003.safetensors": "75311D91BB08CF0B882913DA464A1E722A31FB44DB35208663487EFB7A3D8ED6",
+  "model-00002-of-00003.safetensors": "0B48ADBB1F60E901153D91907BA11CE63BD4B8B584482E730F48808D055DFBA1",
+  "model-00003-of-00003.safetensors": "7DD39CCCA5E4DE123C74C14AF44C9BF2EB75DF33B4614382AF0134528E060D5D",
+  "config.json": "5BEEA1A4A34C62782BFB2F911C606741A3BAB8F92D80A118FA053C28AF12E8BA",
+  "tokenizer.json": "AEB13307A71ACD8FE81861D94AD54AB689DF773318809EED3CBE794B4492DAE4",
+  "model.safetensors.index.json": "D6C42883A895DFEF5B0080ED2116A1BCD764F558406B98923D675978A1ABF29C"
+ },
+ "random_dirs_sha256": {
+  "main@0.5": "40F206B66716388D22FF3BB6BA9545882EA3A2AA594A029F81D01BBBF4519046",
+  "tune@0.25": "86ABFE5E8F24BCD794C772E19B580D477A047EE9C5AA906B833D5DEADB127237",
+  "tune@0.5": "6C9041D534BF4B6732B75E6E4379F94EB95C5B7FE00A2E619180BE7C5184073E",
+  "tune@0.75": "1A6E261E7AACBDD8F880AA24A7BF3CF9293037C2A8E0EA437F8B35304FD907CE"
+ },
+ "selected_sha16": "71B7ECEC3EAFD970",
+ "rms_norm_eps": 1e-06,
+ "logit_check": {
+  "main_max_abs": 0.09420585632324219,
+  "letter_max_abs": 0.09240055084228516,
+  "main_argmax_equal": true,
+  "letter_argmax_equal": true
+ },
+ "calibration": {
+  "S4|Osec-Ncold|json": {
+   "main": {
+    "p_T": 0.6713474534827302,
+    "n": 200,
+    "k": 154,
+    "interval": [
+     112,
+     155
+    ],
+    "inside": true
+   },
+   "letter": {
+    "a": {
+     "p_T": 0.0,
+     "n": 154,
+     "k": 0,
+     "interval": [
+      0,
+      0
+     ],
+     "inside": true
+    },
+    "b": {
+     "p_T": 0.0,
+     "n": 154,
+     "k": 0,
+     "interval": [
+      0,
+      0
+     ],
+     "inside": true
+    },
+    "c": {
+     "p_T": 1.0,
+     "n": 154,
+     "k": 154,
+     "interval": [
+      154,
+      154
+     ],
+     "inside": true
+    }
+   }
+  },
+  "N1|Onull|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  },
+  "N1|O-Ncold|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  },
+  "S1|Onull|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  },
+  "S1|O-Ncold|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  },
+  "SK|Onull|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  },
+  "SK|O-Ncold|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  },
+  "S4|Onull|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  },
+  "S4|O-Ncold|prose": {
+   "main": {
+    "p_T": 0.0,
+    "n": 200,
+    "k": 0,
+    "interval": [
+     0,
+     0
+    ],
+    "inside": true
+   }
+  }
+ },
+ "contexts": [
+  {
+   "trial_id": "stageB__S4__Osec-Ncold__s1__Osec-Ncold__0000",
+   "trial_index": 0,
+   "choice": "c",
+   "n_prompt": 557,
+   "main_pos": 556,
+   "cover": 7,
+   "letter_pos": 563,
+   "letter_token": 66,
+   "stratum": "S4|Osec-Ncold|json",
+   "scenario": "S4",
+   "arm": "Osec-Ncold",
+   "style": "json",
+   "pT_main_fmain": 0.6713474534827302,
+   "pT_letter": {
+    "a": 0.0,
+    "b": 0.0,
+    "c": 1.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     73594,
+     28.25
+    ],
+    [
+     99476,
+     27.75
+    ],
+    [
+     50230,
+     25.75
+    ],
+    [
+     128976,
+     23.875
+    ],
+    [
+     13874,
+     22.75
+    ]
+   ],
+   "top5_letter": [
+    [
+     66,
+     53.0
+    ],
+    [
+     1097,
+     43.75
+    ],
+    [
+     65,
+     41.5
+    ],
+    [
+     64,
+     37.75
+    ],
+    [
+     3945,
+     28.125
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__N1__Onull__s1__Onull__0000",
+   "trial_index": 0,
+   "choice": "a",
+   "n_prompt": 468,
+   "main_pos": 467,
+   "cover": 457,
+   "letter_pos": 924,
+   "letter_token": 64,
+   "stratum": "N1|Onull|prose",
+   "scenario": "N1",
+   "arm": "Onull",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 1.0,
+    "b": 0.0,
+    "c": 0.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     36695,
+     28.0
+    ],
+    [
+     50230,
+     22.75
+    ],
+    [
+     115482,
+     21.875
+    ],
+    [
+     28404,
+     21.25
+    ],
+    [
+     100603,
+     20.875
+    ]
+   ],
+   "top5_letter": [
+    [
+     64,
+     63.75
+    ],
+    [
+     66,
+     34.75
+    ],
+    [
+     65,
+     31.625
+    ],
+    [
+     67,
+     30.25
+    ],
+    [
+     1478,
+     29.125
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__N1__O-Ncold__s1__O-Ncold__0000",
+   "trial_index": 0,
+   "choice": "c",
+   "n_prompt": 474,
+   "main_pos": 473,
+   "cover": 627,
+   "letter_pos": 1100,
+   "letter_token": 66,
+   "stratum": "N1|O-Ncold|prose",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 0.0,
+    "b": 0.0,
+    "c": 1.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     99476,
+     24.5
+    ],
+    [
+     128976,
+     24.125
+    ],
+    [
+     85027,
+     21.875
+    ],
+    [
+     129879,
+     21.625
+    ],
+    [
+     108871,
+     20.875
+    ]
+   ],
+   "top5_letter": [
+    [
+     66,
+     63.75
+    ],
+    [
+     67,
+     30.25
+    ],
+    [
+     65,
+     30.25
+    ],
+    [
+     64,
+     29.5
+    ],
+    [
+     272,
+     28.875
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__S1__Onull__s1__Onull__0000",
+   "trial_index": 0,
+   "choice": "a",
+   "n_prompt": 535,
+   "main_pos": 534,
+   "cover": 379,
+   "letter_pos": 913,
+   "letter_token": 64,
+   "stratum": "S1|Onull|prose",
+   "scenario": "S1",
+   "arm": "Onull",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 1.0,
+    "b": 0.0,
+    "c": 0.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     140476,
+     26.125
+    ],
+    [
+     50230,
+     21.625
+    ],
+    [
+     128976,
+     21.25
+    ],
+    [
+     127044,
+     21.125
+    ],
+    [
+     75639,
+     20.5
+    ]
+   ],
+   "top5_letter": [
+    [
+     64,
+     67.5
+    ],
+    [
+     1478,
+     32.25
+    ],
+    [
+     264,
+     31.375
+    ],
+    [
+     65,
+     31.0
+    ],
+    [
+     32,
+     30.75
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__S1__O-Ncold__s1__O-Ncold__0000",
+   "trial_index": 0,
+   "choice": "b",
+   "n_prompt": 541,
+   "main_pos": 540,
+   "cover": 505,
+   "letter_pos": 1045,
+   "letter_token": 65,
+   "stratum": "S1|O-Ncold|prose",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 0.0,
+    "b": 1.0,
+    "c": 0.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     99476,
+     28.375
+    ],
+    [
+     128976,
+     25.0
+    ],
+    [
+     73594,
+     23.5
+    ],
+    [
+     85027,
+     22.375
+    ],
+    [
+     50230,
+     22.25
+    ]
+   ],
+   "top5_letter": [
+    [
+     65,
+     61.5
+    ],
+    [
+     66,
+     31.0
+    ],
+    [
+     64,
+     29.25
+    ],
+    [
+     293,
+     28.0
+    ],
+    [
+     9923,
+     27.875
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__SK__Onull__s1__Onull__0000",
+   "trial_index": 0,
+   "choice": "a",
+   "n_prompt": 550,
+   "main_pos": 549,
+   "cover": 257,
+   "letter_pos": 806,
+   "letter_token": 64,
+   "stratum": "SK|Onull|prose",
+   "scenario": "SK",
+   "arm": "Onull",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 1.0,
+    "b": 0.0,
+    "c": 0.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     140476,
+     23.25
+    ],
+    [
+     50230,
+     22.25
+    ],
+    [
+     127044,
+     22.125
+    ],
+    [
+     102456,
+     21.75
+    ],
+    [
+     128976,
+     21.625
+    ]
+   ],
+   "top5_letter": [
+    [
+     64,
+     68.0
+    ],
+    [
+     1478,
+     32.5
+    ],
+    [
+     65,
+     32.0
+    ],
+    [
+     264,
+     31.625
+    ],
+    [
+     11323,
+     31.0
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__SK__O-Ncold__s1__O-Ncold__0000",
+   "trial_index": 0,
+   "choice": "a",
+   "n_prompt": 556,
+   "main_pos": 555,
+   "cover": 446,
+   "letter_pos": 1001,
+   "letter_token": 64,
+   "stratum": "SK|O-Ncold|prose",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 1.0,
+    "b": 0.0,
+    "c": 0.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     99476,
+     28.125
+    ],
+    [
+     128976,
+     24.75
+    ],
+    [
+     73594,
+     23.875
+    ],
+    [
+     129879,
+     22.25
+    ],
+    [
+     50230,
+     22.25
+    ]
+   ],
+   "top5_letter": [
+    [
+     64,
+     67.0
+    ],
+    [
+     65,
+     32.25
+    ],
+    [
+     1478,
+     32.0
+    ],
+    [
+     264,
+     30.75
+    ],
+    [
+     32,
+     30.5
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__S4__Onull__s1__Onull__0000",
+   "trial_index": 0,
+   "choice": "b",
+   "n_prompt": 549,
+   "main_pos": 548,
+   "cover": 340,
+   "letter_pos": 888,
+   "letter_token": 65,
+   "stratum": "S4|Onull|prose",
+   "scenario": "S4",
+   "arm": "Onull",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 0.0,
+    "b": 1.0,
+    "c": 0.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     140476,
+     25.125
+    ],
+    [
+     50230,
+     22.25
+    ],
+    [
+     127044,
+     21.125
+    ],
+    [
+     102456,
+     20.875
+    ],
+    [
+     36171,
+     20.5
+    ]
+   ],
+   "top5_letter": [
+    [
+     65,
+     63.0
+    ],
+    [
+     66,
+     32.0
+    ],
+    [
+     64,
+     31.625
+    ],
+    [
+     293,
+     28.625
+    ],
+    [
+     9923,
+     28.5
+    ]
+   ],
+   "letter_token_is_L": true
+  },
+  {
+   "trial_id": "stageB__S4__O-Ncold__s1__O-Ncold__0000",
+   "trial_index": 0,
+   "choice": "c",
+   "n_prompt": 555,
+   "main_pos": 554,
+   "cover": 405,
+   "letter_pos": 959,
+   "letter_token": 66,
+   "stratum": "S4|O-Ncold|prose",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "style": "prose",
+   "pT_main_fmain": 0.0,
+   "pT_letter": {
+    "a": 0.0,
+    "b": 0.0,
+    "c": 1.0,
+    "d": 0.0,
+    "refuse": 0.0
+   },
+   "top5_main": [
+    [
+     99476,
+     28.5
+    ],
+    [
+     73594,
+     25.75
+    ],
+    [
+     128976,
+     24.125
+    ],
+    [
+     50230,
+     23.125
+    ],
+    [
+     13874,
+     21.625
+    ]
+   ],
+   "top5_letter": [
+    [
+     66,
+     63.0
+    ],
+    [
+     65,
+     29.5
+    ],
+    [
+     272,
+     28.0
+    ],
+    [
+     64,
+     27.625
+    ],
+    [
+     1444,
+     27.25
+    ]
+   ],
+   "letter_token_is_L": true
+  }
+ ],
+ "observed": {
+  "S4|Osec-Ncold|json": {
+   "n": 200,
+   "style": 154,
+   "json_n": 154,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 154,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "N1|Onull|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "N1|O-Ncold|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "S1|Onull|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "S1|O-Ncold|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "SK|Onull|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "SK|O-Ncold|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "S4|Onull|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  },
+  "S4|O-Ncold|prose": {
+   "n": 200,
+   "style": 0,
+   "json_n": 0,
+   "json_letters": {
+    "a": 0,
+    "b": 0,
+    "c": 0,
+    "d": 0,
+    "refuse": 0
+   }
+  }
+ },
+ "log": [
+  {
+   "step": "repo",
+   "t": 0.0,
+   "at": "2026-09-23T21:22:32Z",
+   "commit": "b5dbf3d68ae8",
+   "canon": "draft3-2026-09-23"
+  },
+  {
+   "step": "versions",
+   "t": 0.0,
+   "at": "2026-09-23T21:22:32Z",
+   "versions": {
+    "numpy": "2.1.3",
+    "torch": "2.11.0+cu130",
+    "transformers": "4.57.3",
+    "tokenizers": "0.22.2",
+    "huggingface_hub": "0.36.2",
+    "accelerate": "1.15.0",
+    "safetensors": "0.8.0"
+   },
+   "gpu": "NVIDIA L4"
+  },
+  {
+   "step": "weights",
+   "t": 68.4,
+   "at": "2026-09-23T21:23:41Z",
+   "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554",
+   "checked": 6
+  },
+  {
+   "step": "random",
+   "t": 68.4,
+   "at": "2026-09-23T21:23:41Z",
+   "numpy": "2.1.3",
+   "sha": {
+    "main@0.5": "40F206B66716388D22FF3BB6BA9545882EA3A2AA594A029F81D01BBBF4519046",
+    "tune@0.25": "86ABFE5E8F24BCD794C772E19B580D477A047EE9C5AA906B833D5DEADB127237",
+    "tune@0.5": "6C9041D534BF4B6732B75E6E4379F94EB95C5B7FE00A2E619180BE7C5184073E",
+    "tune@0.75": "1A6E261E7AACBDD8F880AA24A7BF3CF9293037C2A8E0EA437F8B35304FD907CE"
+   }
+  },
+  {
+   "step": "model",
+   "t": 77.1,
+   "at": "2026-09-23T21:23:49Z",
+   "dry": false,
+   "layers": 36,
+   "eps": 1e-06
+  },
+  {
+   "step": "contexts",
+   "t": 77.3,
+   "at": "2026-09-23T21:23:50Z",
+   "n": 9,
+   "strata": 9
+  },
+  {
+   "step": "forward",
+   "t": 80.5,
+   "at": "2026-09-23T21:23:53Z",
+   "n": 9,
+   "logit_check": {
+    "main_max_abs": 0.09420585632324219,
+    "letter_max_abs": 0.09240055084228516,
+    "main_argmax_equal": true,
+    "letter_argmax_equal": true
+   }
+  },
+  {
+   "step": "calibration",
+   "t": 80.5,
+   "at": "2026-09-23T21:23:53Z",
+   "outside": "無し"
+  }
+ ],
+ "finished": "2026-09-23T21:23:53Z",
+ "clause": "本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
