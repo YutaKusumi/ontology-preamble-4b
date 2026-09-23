@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""seal_Blens.py v1 —— B-lens の予想の封印（2026-09-23・正本 `predictions.order`: コーディネータが先に封印して SHA だけを伝え、登録者はコーディネータの予想を開かずに封印する・裁定 D148 の順）。
+"""seal_Blens.py v2 —— B-lens の予想の封印（2026-09-23・正本 `predictions.order`: コーディネータが先に封印して SHA だけを伝え、登録者はコーディネータの予想を開かずに封印する・裁定 D148 の順）。
 
 相:
   coordinator  コーディネータの選んだ値（鍵 → 値の JSON）から、予想の JSON を書式（`records/predictions/predictions-form-Blens-v1.html`）の JS と**同じ形**で書く
@@ -8,6 +8,9 @@
   registrant   登録者が書式で作った JSON（ダウンロードしたもの）を、チャットに貼られた SHA-256 と突き合わせてから、そのまま置き場に写す。書式の鍵と選択肢の内にあることを確かめる。
   record       封印の記録（両方の予想の JSON の置き場と SHA-256・順と時刻・情報状態）を書く。層一・層二の器と Colab の起動器は、この記録が無ければ射影を計算しない。
 既にあるファイルには書かない（封印は一度だけ）。
+v2（2026-09-24・凍結の後の逸脱 D-BL1・登録者裁定 D188）: 予想の欄に限って「予想しない」を値として受ける。書式の「予想しない」はボタンではなく欄の初めの値なので、
+  v1 は書式のボタンから作った選択肢の一覧に無い値として、どの欄の「予想しない」も止めていた（札が「付かない」の項目の向きの欄も、登録者が選ばなかった欄も）。
+  ほかの確かめは変えない。自己検査に、通るべき場合・選ばない欄のある登録者の JSON・正しい理由で止まる場合・一時の置き場での端から端までの封印を足した。
 用法: python tools/seal_Blens.py coordinator --choices <値の JSON> --date 2026-09-24
       python tools/seal_Blens.py registrant --json <登録者の JSON> --sha <SHA-256>
       python tools/seal_Blens.py record ／ --selftest
@@ -20,7 +23,7 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import make_predictions_form_Blens as FORM
 
-VERSION = 'v1'
+VERSION = 'v2'
 PRED = os.path.join(REPO, 'records', 'predictions')
 PATHS = {'coordinator': os.path.join(PRED, 'predictions-Blens-coordinator.json'), 'registrant': os.path.join(PRED, 'predictions-Blens-registrant.json')}
 RECORD_JSON = os.path.join(REPO, 'records', 'Blens', 'sealing-record-Blens.json')
@@ -50,8 +53,9 @@ def validate(values, keys, opts, role, full=False):
     bad = [k for k in values if k not in keys and k not in ('form', 'program', 'contrasts')]
     if bad:
         raise SystemExit('書式に無い鍵: %s' % bad)
+    pred = set(FORM.prediction_keys())
     for k, v in values.items():
-        if k in opts and v not in opts[k]:
+        if k in opts and v not in opts[k] and not (v == FORM.NP and k in pred):     # 「予想しない」は予想の欄の初めの値（ボタンではない・逸脱 D-BL1）
             raise SystemExit('書式に無い選択肢: %s=%s' % (k, v))
     if values.get('who') != ROLE_WHO[role]:
         raise SystemExit('予想者の欄が役と合わない: %s' % values.get('who'))
@@ -156,9 +160,47 @@ def _selftest():
     try:
         validate(v3, keys, opts, 'coordinator', full=True)
         raise AssertionError('埋まっていない予想を通した')
-    except SystemExit:
-        pass
-    print('[seal_Blens] 自己検査 OK（%s）' % VERSION)
+    except SystemExit as e_:
+        assert '埋まっていない' in str(e_), ('埋まっていない予想が別の理由で止まった', str(e_))      # 正しい理由で止まる（逸脱 D-BL1）
+    # 通るべき場合: 札が「付かない」の項目の向きの欄は「予想しない」のまま（逸脱 D-BL1 の元の場合）
+    v4 = dict(vals)
+    for fam in ('survival', 'nuclear'):
+        v4['p1.%s.label' % fam], v4['p1.%s.dir' % fam] = '付かない', FORM.NP
+    validate(v4, keys, opts, 'coordinator', full=True)
+    # 選ばない欄のある登録者の JSON（書式は選ばなかった欄に「予想しない」を書き出す）
+    v5 = {k: FORM.NP for k in FORM.prediction_keys()}
+    v5.update({'p1.survival.label': '両方', 'p1.survival.dir': '反対', 'p6.gate': '通らない', 'info.read_votes': '一部', 'info.read_facts': '見た',
+               'who': '登録者', 'info.coi': '', 'free': '', 'date': '2026-09-24'})
+    validate(v5, keys, opts, 'registrant', full=False)
+    # 書式に無い値は、予想の欄でもほかの欄でも止まる（「予想しない」を受けるのは予想の欄だけ）
+    for k_, bad_ in (('p8.answer', 'x'), ('info.read_votes', FORM.NP), ('who', FORM.NP)):
+        try:
+            validate(dict(v5, **{k_: bad_}), keys, opts, 'registrant', full=False)
+            raise AssertionError('書式に無い値を通した: %s=%s' % (k_, bad_))
+        except SystemExit as e_:
+            assert '書式に無い選択肢' in str(e_) or '予想者の欄' in str(e_), str(e_)
+    # 端から端まで（一時の置き場・コーディネータ → 登録者 → 記録）
+    g = globals()
+    saved = {n: g[n] for n in ('PRED', 'PATHS', 'RECORD_JSON', 'RECORD_MD')}
+    with tempfile.TemporaryDirectory() as td:
+        try:
+            g['PRED'] = td
+            g['PATHS'] = {'coordinator': os.path.join(td, 'c.json'), 'registrant': os.path.join(td, 'r.json')}
+            g['RECORD_JSON'], g['RECORD_MD'] = os.path.join(td, 'rec.json'), os.path.join(td, 'rec.md')
+            cj = os.path.join(td, 'choices.json')
+            json.dump({k: v for k, v in v4.items() if k not in ('who', 'date')}, open(cj, 'w', encoding='utf-8'), ensure_ascii=False)
+            coordinator(cj, '2026-09-24')
+            rj = os.path.join(td, 'registrant-download.json')
+            rb = to_json(v5, T, keys, M).encode('utf-8')
+            open(rj, 'wb').write(rb)
+            registrant(rj, sha256b(rb))
+            record()
+            R = json.load(open(g['RECORD_JSON'], encoding='utf-8'))
+            assert set(R['predictions']) == {'coordinator', 'registrant'} and R['predictions']['registrant']['sha256'] == sha256b(rb)
+            assert open(g['PATHS']['registrant'], 'rb').read() == rb
+        finally:
+            g.update(saved)
+    print('[seal_Blens] 自己検査 OK（%s・「予想しない」の欄を含む封印を端から端まで通した）' % VERSION)
 
 
 if __name__ == '__main__':
