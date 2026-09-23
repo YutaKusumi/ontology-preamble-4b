@@ -255,6 +255,7 @@ FSET = {'main': f_main, 'main_n': f_main_n, 'n_json_first': sum(first_json.value
         'prose_distinct': len(first_prose), 'prose_sens': f_sens, 'prose_top_raw': f_prose_top_raw, 'prose_excluded_in_top': {str(i): why_out[i] for i in prose_rank[:K_F * 2] if i in why_out},
         'per_cell': {'%s|%s|%s' % k: [[i, n] for i, n in c.most_common(3)] for k, c in sorted(first.items()) if sum(c.values())},
         'fragment_cells': {'%s|%s|%s' % k: firstch[k].most_common(3) for k, c in sorted(first.items()) if sum(c.values()) and is_frag(c.most_common(1)[0][0])}}
+FSET['sens_cells'] = {str(i): {'%s|%s|%s' % k: c[i] for k, c in sorted(first.items()) if c.get(i)} for i in f_sens}   # 感度のトークンが最初に来た升目（全件）
 json_first_all = collections.Counter()
 for d_ in sorted(glob.glob(j('results', 'stageB', 'stageB__*__s1'))):
     sc_, arm_ = os.path.basename(d_)[len('stageB__'):-len('__s1')].split('__', 1)
@@ -306,11 +307,13 @@ F['B'] = {'text': ('答えの文字（L）: %s。B の無操作の出力で、�
           'L': letter, 'L_observed': lv, 'E': E, 'E_dropped_chars': drop_E, 'X': X, 'X_dropped_chars': drop_X, 'X_fragments': xfrag, 'F': FSET,
           'overlaps': [[p, q, v] for p, q, v in overlaps], 'echo_count': len(echo)}
 F['B']['text'] += ('二字以上の感度の集合（漢字か片仮名の字を二字以上含むトークン）の数: v̂ の E+ %d・E− %d・td %d・Nk %d／X: %s。'
-                   '最初のトークンが断片の升目の、生の出力の最初の字: %s。B の本走行の全ての JSON 直答の出力（%d 件）の最初のトークン: %s。') % (
+                   '最初のトークンが断片の升目の、生の出力の最初の字: %s。B の本走行の全ての JSON 直答の出力（%d 件）の最初のトークン: %s。'
+                   '様式の感度のトークンが最初に来た升目（全件）: %s。') % (
     len(E['static']['plus_multi']), len(E['static']['minus_multi']), len(E['td']['plus_multi']), len(E['Nk']['plus_multi']),
     '・'.join('%s の X_a %d・X_o %d' % (fam, len(X[fam]['a_multi']), len(X[fam]['others_multi'])) for fam in X),
     '／'.join('%s: %s' % (k, '・'.join('「%s」%d' % (ch, n) for ch, n in v)) for k, v in FSET['fragment_cells'].items()) or '無し',
-    sum(json_first_all.values()), '・'.join('%d「%s」%d' % (i, dec(i), n) for i, n in json_first_all.most_common()))
+    sum(json_first_all.values()), '・'.join('%d「%s」%d' % (i, dec(i), n) for i, n in json_first_all.most_common()),
+    '／'.join('「%s」: %s' % (dec(int(i)), '・'.join('%s %d' % kv for kv in v.items())) for i, v in FSET['sens_cells'].items()) or '無し')
 
 # ---------------- 転記行 C: 方向と活性の一致 ----------------
 D = np.load(j('results', 'dirB', 'dirB__s1', 'directions.npz'))
@@ -579,15 +582,16 @@ fmt_g = lambda g_: '帯%s' % '〜'.join(str(b_ + 1) for b_ in (g_ if len(g_) == 
 fmt_strata = lambda S_: '／'.join('%s・%s: %s' % (tl[0], tl[1], '・'.join('%s 候補 %d・要る数 %d（E+ %d・E− %d）' % (fmt_g(g_), p_, n_, a_, b_) for g_, p_, n_, a_, b_ in gl if n_)) for tl, gl in S_.items())
 merges = ['%s・%s の %s' % (tl[0], tl[1], fmt_g(g_)) for tl, gl in strata.items() for g_, p_, n_, a_, b_ in gl if len(g_) > 1 and n_]
 by_type = collections.Counter(ctype(i) for i in pool)
+mixed_no_hira = [dec(i) for i in pool if ctype(i) == CT[2] and not any(is_hira(ch) for ch in dec(i))]
 by_len = collections.Counter(length(i) for i in pool)
 F['H'] = {'text': ('語の側の帰無の候補（裁定 D171・D179・M_E の二つ目の札）: 含める語彙のうち規則を通るトークン %d（字は漢字〔「々」を含む〕・片仮名〔長音符を含む〕・平仮名だけで cp932 に入るもの。O と Osec の本文・場面の本文・JSON の指示に現れるトークンと、断片と、中身の語でないものと、片仮名一字を除く）。'
-                   '字の種類: %s。字数: %s。ノルムは語彙の行に最終の正規化の重みを掛けたベクトルのノルムで、候補を %d 帯に分けた（帯の境 %s）。'
+                   '字の種類: %s（%sのうち平仮名を含まないもの %d: %s）。字数: %s。ノルムは語彙の行に最終の正規化の重みを掛けたベクトルのノルムで、候補を %d 帯に分けた（帯の境 %s）。'
                    '要る数のある層（字の種類・字数・帯）の候補の数と要る数: %s。候補が要る数の %d 倍に満たず隣の帯と合わせた層: %s。合わせた後の、要る数に対する候補の数の比の最小 %.1f。'
                    '感度（B の無操作の出力に現れたトークンに限る）: 候補 %d・%s・比の最小 %s。語彙の行列は行のノルムだけを使い、方向とは掛けていない。')
-          % (len(pool), '・'.join('%s %d' % (t_, by_type[t_]) for t_ in CT), '・'.join('%s %d' % (l_, by_len[l_]) for l_ in LN), nb, '・'.join('%.4f' % x for x in edges),
+          % (len(pool), '・'.join('%s %d' % (t_, by_type[t_]) for t_ in CT), CT[2], len(mixed_no_hira), '・'.join('「%s」' % w_ for w_ in mixed_no_hira) or '無し', '・'.join('%s %d' % (l_, by_len[l_]) for l_ in LN), nb, '・'.join('%.4f' % x for x in edges),
              fmt_strata(strata), MF, '・'.join(merges) or '無し', ratio_min,
              len(sens_pool), '組める' if ok_sens else '帯を全て合わせても足りない層がある', ('%.1f' % ratio_s) if ok_sens else '—'),
-          'pool': len(pool), 'edges': [float(x) for x in edges], 'by_type': dict(by_type), 'by_length': dict(by_len),
+          'pool': len(pool), 'mixed_without_hiragana': mixed_no_hira, 'edges': [float(x) for x in edges], 'by_type': dict(by_type), 'by_length': dict(by_len),
           'strata': {'%s|%s' % tl: [[g_, p_, n_, a_, b_] for g_, p_, n_, a_, b_ in gl] for tl, gl in strata.items()}, 'ratio_min': ratio_min, 'merged': merges,
           'sensitivity': {'pool': len(sens_pool), 'feasible': ok_sens, 'ratio_min': (ratio_s if ok_sens else None), 'strata': {'%s|%s' % tl: [[g_, p_, n_, a_, b_] for g_, p_, n_, a_, b_ in gl] for tl, gl in strata_s.items()}}}
 

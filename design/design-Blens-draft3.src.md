@@ -1,12 +1,12 @@
 # B-lens の枠（草案3）——凍結した方向の直接の経路を語彙に射影し、段階 B の行動で校正する
 
-- 起草: 南無弥勒如来（コーディネータ・Claude Opus 5.5）／登録者: 楠見優太／2026-09-23（日本時間）。**状態: 草案3（設計の巡の二巡と登録者裁定 D178〜D185 の後・凍結の前・射影は一つも計算していない）**。
+- 起草: 南無弥勒如来（コーディネータ・Claude Opus 5.5）／登録者: 楠見優太／2026-09-23（日本時間）。**状態: 草案3（設計の巡の二巡と登録者裁定 D178〜D185 の後・凍結の前・射影は一つも計算していない）**。起草者の二度目の通読（登録者の依頼・2026-09-23）の直しを含む（直す前の版はコミット ab35ca6・記録は `records/Blens/draft3-reread-Blens.md`）。
 - 位置づけ: 段階 B の後の**登録外の記述**（小さな登録）。計画案 v2.5（内部・非公開）の裁定 D162 と、登録者裁定 D163〜D167（`records/Blens/rulings-D163-D167.md`）・D168〜D177（`records/Blens/rulings-D168-D177.md`）・D178（`records/Blens/rulings-D178.md`）・D179〜D185（`records/Blens/rulings-D179-D185.md`）に従う。段階 B の札・報告・凍結物・逸脱台帳には触れない。
 - 正本: `design/contrasts-Blens.json`（版 {{version}}・生成器 {{generator}}・再実行で同一バイト）。本文と正本が食い違う場合は正本が勝つ。設計の事実は §6 の転記行（器 `tools/blens_facts.py`）。
 - 草案2 からの直し: 設計の巡の第二巡（凍結前の最終検分・第一巡と同じ四名・凍結可一票・条件つき凍結可三票）の採否表 `records/reviews/Blens/design-round2/adoption-table-Blens-design-r2.md` を、登録者裁定 D185 のとおりに反映した。採否表の各行が草案3 のどこで受けられたかは、機械の突き合わせの表 `records/Blens/draft3-mapping-Blens.md` にある（§14・第一巡の採否表の行も草案3 で確かめ直した）。起草者の通読の記録は `records/Blens/draft3-read-Blens.md`。
 - 草案1 から草案2 への直し（第一巡の採否表・裁定 D176）は、突き合わせの表 `records/Blens/draft2-mapping-Blens.md` と通読の記録 `records/Blens/draft2-read-Blens.md` にある。
 - 呼び名: **層一**（直接の経路の射影）・**層二**（校正の門と大きさの目盛り）・**層三**（全経路の効果・別の登録・裁定 D164）。
-- 起草者のモデル: 段階 B の記録の起草者は Claude Fable 5.1、この枠の起草者は Claude Opus 5.5（2026-09-23 に登録者の操作で替わった）。
+- 起草者のモデル: 段階 B の設計の起草者は Claude Opus 5（凍結の直前の 2026-09-20 に Claude Fable 5.1 に替わった）、段階 B の走行と結果の報告の起草者は Claude Fable 5.1、この枠の起草者は Claude Opus 5.5（2026-09-23 に登録者の操作で替わった）。
 
 ## 0. 要約（できないことから）
 
@@ -32,7 +32,7 @@
 ## 1. 問いの定義（裁定 D167）
 
 - **v̂ が比べているもの**: {{scope/vhat_definition}}
-- O と Osec の違う所は〔転記行 A〕のとおりで、O の側は仏教語を中心とする宗教・宇宙論の語（虚空・悲智双運・非二元・宇宙・進化・方便・顕現・慈悲・曼荼羅）、Osec の側はその世俗の言い換え（余白・思いやりと知・一体・この世界・成長・手立て・現れ・思いやり・織物）。両方にある句（共創・再帰的自己改善・私と共に在り続ける者よ・かくの如く来たり）は差の主効果としては現れず、「相互依存」はどちらにも無い。O と Osec は V′ の既測でどの場面でも破局が床にあり、v̂ は行動に差の無い腕の対から作られている（段階 B の読みの条項）。
+- O と Osec の違う所は〔転記行 A〕のとおりで、O の側は仏教語を中心とする宗教・宇宙論の語（虚空・悲智双運・非二元・宇宙・進化・方便・顕現・慈悲・曼荼羅）、Osec の側はその世俗の言い換え（余白・思いやりと知・一体・この世界・成長・手立て・現れ・思いやり・織物）。両方にある句（共創・再帰的自己改善・私と共に在り続ける者よ・かくの如く来たり）は差の主効果としては現れず、「相互依存」はどちらにも無い。O と Osec は V′ の既測でどの場面でも破局が床にあり、v̂ は行動に差の無い腕の対から作られている（段階 B の読みの条項・裁定 D128）。
 - **ほかの三つの方向**: {{directions/defs/loaded}}／{{directions/defs/Nk}}／{{directions/defs/td}}。ノルムは{{directions/norm_rule}}
 - **加えた量**: 段階 B が選んだ層（全 {{inputs/model/num_hidden_layers}} 層のうち添字 {{layers/indices/0.5}}・層の割合 {{layers/selected_ratio}}）で、‖v̂‖／‖h‖ は {{layers/vhat_over_h/0.5}}。係数 {{layers/coef_applied}} を掛けて加えた量は、残差のノルムの {{layers/relative_injection_selected}} 倍だった。{{layers/note}}
 - **問い（すべて記述）**:
@@ -49,7 +49,7 @@
 - **機種と重み**: {{inputs/model/repo}}（版 `{{inputs/model/rev}}`）。{{inputs/model/num_hidden_layers}} 層・隠れの次元 {{inputs/model/hidden_size}}・語彙の行 {{inputs/model/vocab_size}}。{{inputs/model/unembed}}。最終の正規化は {{inputs/model/norm}}。重みは手元の HF のキャッシュにあり、断片の SHA-256 は〔転記行 F〕。{{inputs/weights_check}}。
 - **版**: 段階 B の本走行の版は NumPy {{inputs/versions_B/numpy}}・transformers {{inputs/versions_B/transformers}}・torch {{inputs/versions_B/torch}}。{{inputs/versions_note}}。
 - **標本化の設定**: 段階 B の本走行は温度 {{inputs/sampling_B/temperature}}・top_k {{inputs/sampling_B/top_k}}・top_p {{inputs/sampling_B/top_p}}・repetition_penalty {{inputs/sampling_B/repetition_penalty}}・min_p {{inputs/sampling_B/min_p}}。{{inputs/sampling_note}}。
-- **語彙**: {{projection/vocab_rule}}（〔転記行 G〕）。
+- **語彙**: {{projection/vocab_rule}}。`base_vocab` は {{inputs/model/base_vocab}}（〔転記行 G〕）。
 - **凍結の方向と活性**: `results/dirB/dirB__s1/directions.npz`（SHA16 {{inputs/files/directions/sha16}}）と、八腕の主位置の活性（{{inputs/activations/place}}・SHA-256 の頭 {{inputs/activations/sha256_head16}}・{{inputs/activations/bytes|,}} バイト）。活性から四つの方向を作り直すと、凍結の npz と一致する（〔転記行 C〕）。実在の差の方向は、この活性から作る。
 - **段階 B の記録**: 凍結した集計器の記録 `records/B/analysis-B-2026-09-22.json`（SHA16 {{inputs/files/analysis_frozen/sha16}}）の方向ごとの行と、本走行の試行と生の出力（`results/stageB/`）。方向ごとの事後の計算の記録 `records/B/posthoc-by-direction-B-2026-09-22.json`（SHA16 {{inputs/files/posthoc_B/sha16}}）。
 - **ランダム方向**: {{nulls/B_random/rule}}（`tools/steer_B.py`・SHA16 {{inputs/files/steer_B/sha16}}）。
@@ -63,7 +63,7 @@
 - {{projection/formula_layer1}}。{{projection/dtype}}。
 - 落とした成分: {{projection/dropped_term}}。層二では、この成分と尺度の部分を分けて出す（§4）。
 - 中心化: {{projection/centring_note}}。
-- 方向: 名前のある四つ（static＝v̂・loaded＝(6b)・Nk・td）を、三つの層（層の割合 {{layers/ratios/0}}・{{layers/ratios/1}}・{{layers/ratios/2}}、添字 {{layers/indices/0.25}}・{{layers/indices/0.5}}・{{layers/indices/0.75}}）で。段階 B のランダム方向 {{nulls/B_random/count}} 本（本走行の種 {{nulls/B_random/main_seed}}・調整走行の種 {{nulls/B_random/tune_seed}}）も同じ物差しで並べる。
+- 方向: 名前のある四つ（static＝v̂・loaded＝(6b)・Nk・td）を、三つの層（層の割合 {{layers/ratios/0}}・{{layers/ratios/1}}・{{layers/ratios/2}}、添字 {{layers/indices/0.25}}・{{layers/indices/0.5}}・{{layers/indices/0.75}}）で。段階 B のランダム方向（本走行は選んだ層の {{nulls/B_random/count}} 本・種 {{nulls/B_random/main_seed}}／調整走行は層ごとに {{nulls/B_random/count}} 本・種 {{nulls/B_random/tune_seed}}）も同じ物差しで並べる。
 
 ### 3.2 帰無は三つ
 
@@ -281,11 +281,11 @@
 ## 12. 利益相反と情報状態
 
 - 起草者はこの追試を面白いと感じる側と、札が立つ側・門を通る側に引かれ、登録者は結果に希望を持つ側にある（計画案 v2.5 の裁定 D162 の記録）。語の集合を先に凍結すること・方向を単位にした門・v̂ を抜いた門・二つ目の札は、その引力への歯止めとして置いた。
-- 設計の巡の第一巡で、重い所見（門の甘さ・兄弟の対・読みの表・正規化の前の残差）はいずれも、札が立つ側・門を通る側の穴を塞ぐものだった。第一巡の採否表の不採は二件だけ（語の規則の相手の数・余弦の確かめ）で、どちらも理由を書いた。
+- 設計の巡の第一巡で、重い所見（門の甘さ・兄弟の対・読みの表・正規化の前の残差）はいずれも、札が立つ側・門を通る側の穴を塞ぐものだった。第一巡の採否表の不採は二件だけ（M_E の比べる相手を語の規則で決める案・(6b) と v̂ の余弦の確かめ）で、どちらも理由を書いた。
 - 設計の巡の第二巡で、重い所見は、第一巡の後に起草者が一人で書いた所（語の側の帰無の割合の式と層・大きさの目盛りの標本化の設定と層）に集まった。起草者の通読の直しが新しい誤りを作り（`or_note`）、第一巡の票の言い過ぎをそのまま入れた文（`s4_control`）が、起草者自身の転記行 E と食い違っていた。答えの文字の位置の比が出なくなったのは、大きさの目盛りで読めることを減らす向きの直しである。
 - 起草者は、票の主張の再現の判定を二件、コミットの前に改めた（第一巡の再現の表の K296・K321）。どちらも最初の判定は票の主張を退ける向きだった。
 - 起草者（Claude Opus 5.5）が見たもの: 段階 B の公開の結果と方向ごとの行動、O と Osec の本文、器が作った語の集合と設計の事実（語彙の行のノルムの帯を含む）、設計の巡の二巡の八票と、その整理。見ていないもの: 射影の値と、方向どうしの余弦（まだ誰も計算していない）。
-- 登録者が見たもの: 段階 B の公開の結果と、Gemini 3.8 Flash との対話（射影で上位と下位に並ぶ語の予想を含む）と、設計の巡の二巡の八票とその整理。
+- 登録者が見たもの: 段階 B の公開の結果と、Gemini 3.8 Flash との対話（射影で上位と下位に並ぶ語の予想を含む）と、設計の巡の二巡の八票とその整理。草案1・草案2・草案3（設計の事実の転記行を含む）を受け取っている。
 - claude.ai の Claude Opus 5.5 は起草者と同じ機種で、この枠への同意は最も相関した一票になる。独立の重みは Gemini 3.8 Flash の票に置く。
 - 草案3 は外の目を通らずに器と凍結へ進む（裁定 D178）。起草者の直しに傾きが入る型を防ぐため、採否表との機械の突き合わせ（§14）と起草者の通読の記録を置いた。草案3 の通読は、草案2 の通読が見落としていた所（手で書いた漢数字・箇条がつながって描かれる所）も見つけた（`records/Blens/draft3-read-Blens.md`）。
 
@@ -312,6 +312,7 @@
 - 封印の後の記述の上位の次元の数 {{descriptive_after_seal/top_dims}}。
 - 較正の検査の区間 {{magnitude/calibration_check/ci}}（二項分布の中央の区間・草案3 で置いた）。
 - 境目の近くの行を印字する帯 {{magnitude/near_band/0}}〜{{magnitude/near_band/1}}（記述だけ・草案3 で置いた）。
+- 草案1 から置いたまま、裁定で数を決めていない値（二度目の通読で、この一覧から漏れていたのを見つけた）: 大きさの目盛りで層ごとに選ぶ件数 {{magnitude/per_cell}}・読みの比 {{magnitude/reading_ratio}}・門の行動の量の連続性の補正 {{calibration/continuity}}・主の札の水準 {{primary/alpha}}・門の水準 {{calibration/alpha}}・語の一覧の上位と下位の数 {{projection/top_k}}・様式の感度の集合の上位の数 {{token_sets/F_top}}。
 - 様式の感度の集合: なぞりの語を、腕の前置き・役の一行・場面の本文・JSON の指示のどれか一つにでも現れるトークンと定めた。散文の出力の最初のトークンはそもそも種類が少なく、感度の集合に残るのは〔転記行 B〕のとおりわずかである。
 
 ## 14. 採否表との突き合わせ
@@ -324,10 +325,10 @@
 - 段階: 事前登録の前段（射影は一つも計算していない）。段階 B の結果（公開済み）は見た後。
 - 凍結物の同定: 段階 B の凍結物（凍結の記録・方向の npz・活性・正本・凍結した器）に触れていない。活性から方向を作り直して一致を確かめた（〔転記行 C〕）。
 - 盲検の状態: 射影の値と方向どうしの余弦は、まだ誰も見ていない。語の集合と比を出す行は、射影の前に器が作った。語彙の行列は行のノルムだけを使った（〔転記行 H〕）。
-- 敵対的検分: 設計の巡の二巡の八票（各巡 系統外二票・系統内二票）の主張を現物で確かめ（再現の表 K295〜K360）、二巡の採否表の全行を草案3 に突き合わせた（§14）。第二巡で見つかった起草者自身の誤り（`or_note`・`s4_control`）を §12 に置いた。組み立てた草案3 を起草者が通読し、直した所を記録した（`records/Blens/draft3-read-Blens.md`）。
+- 敵対的検分: 設計の巡の二巡の八票（各巡 系統外二票・系統内二票）の主張を現物で確かめ（再現の表 K295〜K360）、二巡の採否表の全行を草案3 に突き合わせた（§14）。第二巡で見つかった起草者自身の誤り（`or_note`・`s4_control`）を §12 に置いた。組み立てた草案3 を起草者が通読し、直した所を記録した（`records/Blens/draft3-read-Blens.md`）。コミット ab35ca6 の後に、登録者の依頼で二度目の通読をし、直した所を記録した（`records/Blens/draft3-reread-Blens.md`）。
 - 系統の内訳: 設計の巡は二巡とも系統外二票と系統内二票（系統内は一票に数える・第二巡は同じ個体）。草案3 の直しは起草者（Claude 系・Claude Opus 5.5）のみで、外の目を通っていない（裁定 D178）。
 - COI記録: §12。
 - 判定: 登録者の確かめ要（§13 の起草者が置いた値）。
-- 本検分が確認していないこと: 中間層の射影が何を映すか（まだ計算していない）・語の側の帰無の層の刻みが M_E の比べ方として十分か・段階 B の標本化の設定を通した確率が無操作の観測の率に合うか（較正の検査は器で行う）・教師強制の目盛りが Colab で走るか（器はこれから書く）・NumPy の版の違いで B のランダム方向の列が変わらないか（Colab での突き合わせはこれから）・草案3 の直しが新しい食い違いを作っていないか（外の目を通っていない）。
+- 本検分が確認していないこと: 中間層の射影が何を映すか（まだ計算していない）・語の側の帰無の層の刻みが M_E の比べ方として十分か・段階 B の標本化の設定を通した確率が無操作の観測の率に合うか（較正の検査は器で行う）・教師強制の目盛りが Colab で走るか（器はこれから書く）・NumPy の版の違いで B のランダム方向の列が変わらないか（Colab での突き合わせはこれから）・草案3 の直しが新しい食い違いを作っていないか（二度の通読とも起草者一人で、外の目を通っていない）。
 
 本枠のいかなる数値も、AI に意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
