@@ -11,7 +11,7 @@ d3 = open(j('records', 'B', 'drafts', 'results-B-draft3.md'), encoding='utf-8').
 c = {x['id'].split('~')[0]: x for x in PH['contrasts']}
 a = c['add:S1:Onull+v']
 floor_lt = [x['id'].split('~')[0] for x in PH['contrasts'] if x['p_t_floor_df2'] < 0.05]
-noop = {(r['scenario'], r['B']): (r['k_B'], r['n_B']) for r in DV['descriptive']['B_desc_rand_vs_noop']}
+noop = {(r['scenario'], r['A']): (r['k_B'], r['n_B']) for r in DV['descriptive']['B_desc_rand_vs_noop']}
 kb, nb = noop[('S1', 'Onull+vrand')]; cs1 = c['cross:S1:Onull+vNk']
 K = ['| 番号 | 主張 | 確かめ方 | 結果 |', '|---|---|---|---|',
      '| K288 | 数の一致（差分・不変性の記録・事後の計算の全行）は票が検算し一致と申告 | 申告（出力は受け取っていない） | **申告どおり**。数の食い違いの指摘は無し |',
