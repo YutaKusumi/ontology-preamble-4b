@@ -27,7 +27,7 @@ nc = V['V21']
 
 K = ['| 番号 | 誰の主張 | 主張 | 確かめ方 | 結果 |', '|---|---|---|---|---|']
 def k(no, who, claim, how, res):
-    K.append('| K%d | %s | %s | %s | %s |' % (no, who, claim, how, res))
+    K.append('| K%d | %s | %s | %s | %s |' % tuple([no] + [x.replace('|', '｜') for x in (who, claim, how, res)]))   # セルの中の縦棒は全角にする（表が崩れないように）
 
 k(326, 'G1（所見 1）・G2（所見 2-1）', 'v̂ を抜いた門の計算の対象の行（static の行を除いた五十六行か）が決まっていない', '正本 `calibration.gate_without_vhat`・転記行 D',
   '**再現**（文に行の定めが無い。方向の単位ごとの行は %s で、全ての行 %d・static を除くと %d）' % ('・'.join('%s %d' % kv for kv in V['V1']['eligible_by_direction'].items()), V['V1']['rows_all'], V['V1']['rows_without_static']))
@@ -120,7 +120,7 @@ open(os.path.join(HERE, 'verification-Blens-design-r2.md'), 'w', encoding='utf-8
 
 P = ['| 番号 | 出所 | 何を | 採否の案 | 凍結の前か | どこを直すか |', '|---|---|---|---|---|---|']
 def p(no, src, what, v, when, where):
-    P.append('| P%d | %s | %s | %s | %s | %s |' % (no, src, what, v, when, where))
+    P.append('| P%d | %s | %s | %s | %s | %s |' % tuple([no] + [x.replace('|', '｜') for x in (src, what, v, when, where)]))   # セルの中の縦棒は全角にする
 
 p(528, 'G1-1・G2-2-1（K326）', 'v̂ を抜いた門は、static の行を除いた五十六行で、六本の方向の間で入れ替える', '採（**裁定の候補（三）**）', '前', '正本 `calibration`・§4')
 p(529, 'G2-2-3（K329）', '門の統計量は、門の行の単位の順位相関で、並べ替えは方向の単位（行の値を方向ごとの組で入れ替える）と明記する', '採（候補（三））', '前', '正本 `calibration.unit`・§4')
