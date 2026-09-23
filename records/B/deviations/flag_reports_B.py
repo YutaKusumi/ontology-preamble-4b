@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""flag_reports_B.py v2 —— 二本の機械の報告の題の直後（機械の区画の外）に、旗の段を一つずつ置く（逸脱 D-B5 の改め＋逸脱 D-B6・登録者裁定 D159）。
+"""flag_reports_B.py v2.1（v2.1: 凍結側の旗に、凍結の出力が唯一の事前登録の結果であることと直しの決定の時期を対置——最終検分 P492）—— 二本の機械の報告の題の直後（機械の区画の外）に、旗の段を一つずつ置く（逸脱 D-B5 の改め＋逸脱 D-B6・登録者裁定 D159）。
 - 逸脱の下の報告 `results-report-B-devB1.md`: 頭の機械の区画の印の無い「確証」の本数が、事前登録の確証と逸脱の下の札の合算であること（内訳は漢数字で書く——
   走査器の決まりで機械の区画の外に数字を打てないため。SHA16・コミットも同じ理由で打てず、表紙 §8 の出所の表を指す）。
 - 凍結した集計器の報告 `results-report-B-frozen.md`: 「判定不能（品質床）」の八本が床に落ちたのではなく走行の記録の欠け（逸脱（一））であること。
@@ -28,11 +28,11 @@ FLAG = {
            'この報告の中で確証に依る数え上げ（特異性の欄・符号の一致・予想の照合）も同じ合算の上にある。**正本は表紙 `results-B.md` で、凍結した集計器の報告 `results-report-B-frozen.md` と並べて読むこと**——三本は公開の置き場（README の冒頭）の `records/B/` にあり、'
            '二本の機械の報告の組み立て器の出力の SHA16 は表紙 §8 の出所の表にある。この段は組み立て器の出力の後に器 `records/B/deviations/flag_reports_B.py` が足した（逸脱（五）・登録者裁定「旗の段」——表紙 §8 の番号の対応）。この段のほかは組み立て器の出力のままである。' % (kan(n_pre), kan(n_dev))),
  'frozen': ('> **【凍結した集計器の出力・単独で引かないこと】** この報告は、凍結した集計器の出力から凍結した組み立て器が組んだものである。**下の要約の「判定不能（品質床）」%s本は、品質床に落ちたのではない**——その二つの族の主の腕について、集計器が探した段の走行の記録が無かったためで、'
-            '凍結した二つの器の食い違いによる（逸脱（一）・凍結の記録の逸脱台帳）。二腕の床は別の段の走行で合格していた。**正本は表紙 `results-B.md` で、逸脱（一）の下の集計器の報告 `results-report-B-devB1.md` と並べて読むこと**——三本は公開の置き場（README の冒頭）の `records/B/` にあり、'
+            '凍結した二つの器の食い違いによる（逸脱（一）・凍結の記録の逸脱台帳）。二腕の床は別の段の走行で合格していた。**ただし、事前登録した凍結の集計器の出力としてはこれが唯一の結果であり、直すという決定そのものが結果を見た後になされた（表紙 §1）。逸脱の下の出力の札は事前登録の確証と同じ身分を持たない。** **正本は表紙 `results-B.md` で、逸脱（一）の下の集計器の報告 `results-report-B-devB1.md` と並べて読むこと**——三本は公開の置き場（README の冒頭）の `records/B/` にあり、'
             '二本の機械の報告の組み立て器の出力の SHA16 は表紙 §8 の出所の表にある。この段は組み立て器の出力の後に器 `records/B/deviations/flag_reports_B.py` が足した（逸脱（六）・登録者裁定「凍結側の旗」——表紙 §8 の番号の対応）。この段のほかは組み立て器の出力のままである。' % kan(n_qf)),
 }
 assert all('<!--' not in f for f in FLAG.values())
-REC = dict(kind='flag_reports_B', version='v2', rulings=['D156', 'D159'], deviations=['D-B5', 'D-B6'], generated_utc=datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M'), reports={})
+REC = dict(kind='flag_reports_B', version='v2.1', rulings=['D156', 'D159'], deviations=['D-B5', 'D-B6'], generated_utc=datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M'), reports={})
 rc_all = 0
 for which, fname in (('devB1', 'results-report-B-devB1.md'), ('frozen', 'results-report-B-frozen.md')):
     p = j('records', 'B', fname)
