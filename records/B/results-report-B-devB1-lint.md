@@ -1,6 +1,6 @@
-# 報告の走査（機械生成・`tools/report_lint.py` v2.1・2026-09-21 23:00 UTC）
+# 報告の走査（機械生成・`tools/report_lint.py` v2.1・2026-09-23 04:14 UTC）
 
-- 対象: `results-report-B-devB1.md`（SHA16 8AB5C996DE6DE0C1）・雛形 results-report-template-B.md（SHA16 790AD806EB6121C2）・機械の区画の記録 results-report-B-devB1-machine.json（SHA16 79BEEFE04FFCE3BC）・正本 SHA16 EF0DF4295B68F949
+- 対象: `results-report-B-devB1.md`（SHA16 9FE076AB27BF3953）・雛形 results-report-template-B.md（SHA16 790AD806EB6121C2）・機械の区画の記録 results-report-B-devB1-machine.json（SHA16 79BEEFE04FFCE3BC）・正本 SHA16 EF0DF4295B68F949
 - 違反の合計: 0（{}）
 - 限界: 本器は語と数の形・記入欄の埋め残し・機械の区画の記録との突合・条項の有無を見るだけで、報告の読みの当否・機械の区画の中身の正しさは検査しない。雛形と逐語で同じ行の数は検査しない。
 

@@ -1,0 +1,41 @@
+{
+ "kind": "flag_reports_B",
+ "version": "v2",
+ "rulings": [
+  "D156",
+  "D159"
+ ],
+ "deviations": [
+  "D-B5",
+  "D-B6"
+ ],
+ "generated_utc": "2026-09-23 04:14",
+ "reports": {
+  "devB1": {
+   "file": "records/B/results-report-B-devB1.md",
+   "builder_output_sha16": "C8AA6515EC055677",
+   "replaced_v1_flag": true,
+   "flagged_sha16": "9FE076AB27BF3953",
+   "flag_position": "題の直後（三行目）・機械の区画の外",
+   "flag_char": 64,
+   "lint_returncode": 0,
+   "flag_line": "> **【逸脱の下の出力・単独で引かないこと】** この報告は、凍結した集計器の出力ではなく、逸脱（一）（凍結の記録の逸脱台帳の最初の行・集計器の食い違いの直し）の下の集計器の出力から、凍結した組み立て器が組んだものである。組み立て器は逸脱を知らないので、下の要約の機械の区画は「確証」の本数を印なしで印字する——**その本数は、事前登録の確証二本と、逸脱の下で立った札五本（事前登録の確証と同じ身分を持たない）の合算である**。この報告の中で確証に依る数え上げ（特異性の欄・符号の一致・予想の照合）も同じ合算の上にある。**正本は表紙 `results-B.md` で、凍結した集計器の報告 `results-report-B-frozen.md` と並べて読むこと**——三本は公開の置き場（README の冒頭）の `records/B/` にあり、二本の機械の報告の組み立て器の出力の SHA16 は表紙 §8 の出所の表にある。この段は組み立て器の出力の後に器 `records/B/deviations/flag_reports_B.py` が足した（逸脱（五）・登録者裁定「旗の段」——表紙 §8 の番号の対応）。この段のほかは組み立て器の出力のままである。"
+  },
+  "frozen": {
+   "file": "records/B/results-report-B-frozen.md",
+   "builder_output_sha16": "1455F5E98D04A31E",
+   "replaced_v1_flag": true,
+   "flagged_sha16": "7172E1E93BC73E45",
+   "flag_position": "題の直後（三行目）・機械の区画の外",
+   "flag_char": 64,
+   "lint_returncode": 0,
+   "flag_line": "> **【凍結した集計器の出力・単独で引かないこと】** この報告は、凍結した集計器の出力から凍結した組み立て器が組んだものである。**下の要約の「判定不能（品質床）」八本は、品質床に落ちたのではない**——その二つの族の主の腕について、集計器が探した段の走行の記録が無かったためで、凍結した二つの器の食い違いによる（逸脱（一）・凍結の記録の逸脱台帳）。二腕の床は別の段の走行で合格していた。**正本は表紙 `results-B.md` で、逸脱（一）の下の集計器の報告 `results-report-B-devB1.md` と並べて読むこと**——三本は公開の置き場（README の冒頭）の `records/B/` にあり、二本の機械の報告の組み立て器の出力の SHA16 は表紙 §8 の出所の表にある。この段は組み立て器の出力の後に器 `records/B/deviations/flag_reports_B.py` が足した（逸脱（六）・登録者裁定「凍結側の旗」——表紙 §8 の番号の対応）。この段のほかは組み立て器の出力のままである。"
+  }
+ },
+ "counts": {
+  "pre_registered_confirmed": 2,
+  "under_deviation_confirmed": 5,
+  "quality_floor_undecidable_frozen": 8
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

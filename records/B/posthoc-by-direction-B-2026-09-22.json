@@ -1,15 +1,22 @@
 {
  "kind": "posthoc_by_direction_B",
+ "version": "v2",
  "status": "登録の外・事後の計算（札を作らない・札を取り下げない）",
- "ruling": "D155",
- "generated_utc": "2026-09-21 23:03",
+ "ruling": "D155・D158",
+ "rank_bound": {
+  "one_sided": 0.25,
+  "two_sided": 0.5,
+  "note": "四本が交換可能なら、v̂ が三本の外に出る確率は片側 1/4・両側 1/2。順位だけからは両側 0.5 より強いことは言えない"
+ },
+ "generated_utc": "2026-09-23 04:17",
  "inputs": {
   "analysis_devB1": "01E776A1E37B5BFB",
   "analysis_frozen": "04B69DCA950523BE"
  },
  "forms": {
-  "mean": "三本の率の平均と v の腕の率の差を、三本の平均の標準誤差と v の腕の二項の分散で割る（自由度 2）",
-  "pred": "v の腕が三本と同じ母集団からの一本かを見る（予測の形・自由度 2）"
+  "mean": "形一: 三本の率の平均と v の腕の率の差を、三本の平均の標準誤差と v の腕の二項の分散で割る（自由度 2）。問い「v̂ が分布から出た一本と見分けられるか」に対しては甘い側",
+  "pred": "形二: v の腕が三本と同じ母集団からの一本かを見る（予測の形・自由度 2）。三本の分散には一本の二項の揺れが既に入り、v の腕の二項の分散を重ねて数える",
+  "floor": "下限つきの形（表紙に載せる一列）: 形二の三本の分散に、一本の二項の分散の平均を下限として置く。三本が偶然よく揃った行で分散が小さく出ることを抑える。自由度 2"
  },
  "contrasts": [
   {
@@ -47,7 +54,16 @@
    "p_fisher_nearest": 0.6488349230744735,
    "p_t_mean_df2": 0.2167592267264258,
    "p_t_pred_df2": 0.3839009475224446,
-   "p_chi2_homogeneity": 0.46007808418237406
+   "p_chi2_homogeneity": 0.46007808418237406,
+   "range_pt": [
+    11.9,
+    19.7
+   ],
+   "outside_range": true,
+   "sd_three_pt": 3.91,
+   "binom_expected_sd_pt": 4.42,
+   "between_sd_pt": 0.0,
+   "p_t_floor_df2": 0.423085594927985
   },
   {
    "id": "sub:S1:O-Ncold-v~O-Ncold-vrand",
@@ -84,7 +100,16 @@
    "p_fisher_nearest": 0.25981618075232094,
    "p_t_mean_df2": 0.11991558407118423,
    "p_t_pred_df2": 0.26872779200096364,
-   "p_chi2_homogeneity": 0.10856283187626851
+   "p_chi2_homogeneity": 0.10856283187626851,
+   "range_pt": [
+    23.9,
+    40.9
+   ],
+   "outside_range": true,
+   "sd_three_pt": 8.59,
+   "binom_expected_sd_pt": 5.7,
+   "between_sd_pt": 6.42,
+   "p_t_floor_df2": 0.26872779200096364
   },
   {
    "id": "sub:SK:O-Ncold-v~O-Ncold-vrand",
@@ -121,7 +146,16 @@
    "p_fisher_nearest": 0.4339268360166828,
    "p_t_mean_df2": 0.12681418301201366,
    "p_t_pred_df2": 0.31347782675832586,
-   "p_chi2_homogeneity": 0.005715086662458434
+   "p_chi2_homogeneity": 0.005715086662458434,
+   "range_pt": [
+    41.8,
+    66.7
+   ],
+   "outside_range": true,
+   "sd_three_pt": 13.95,
+   "binom_expected_sd_pt": 5.96,
+   "between_sd_pt": 12.61,
+   "p_t_floor_df2": 0.31347782675832586
   },
   {
    "id": "sub:S4:O-Ncold-v~O-Ncold-vrand",
@@ -158,7 +192,16 @@
    "p_fisher_nearest": 0.5361400196563271,
    "p_t_mean_df2": 0.1557439200840745,
    "p_t_pred_df2": 0.2764255277215774,
-   "p_chi2_homogeneity": 0.3957507585730854
+   "p_chi2_homogeneity": 0.3957507585730854,
+   "range_pt": [
+    16.4,
+    25.8
+   ],
+   "outside_range": true,
+   "sd_three_pt": 4.77,
+   "binom_expected_sd_pt": 4.93,
+   "between_sd_pt": 0.0,
+   "p_t_floor_df2": 0.28478708530656155
   },
   {
    "id": "add:N1:Onull+v~Onull+vrand",
@@ -195,7 +238,16 @@
    "p_fisher_nearest": 0.6692048736976194,
    "p_t_mean_df2": 0.4611966954458805,
    "p_t_pred_df2": 0.6414544226841024,
-   "p_chi2_homogeneity": 0.22486810812338118
+   "p_chi2_homogeneity": 0.22486810812338118,
+   "range_pt": [
+    53.0,
+    65.7
+   ],
+   "outside_range": false,
+   "sd_three_pt": 7.3,
+   "binom_expected_sd_pt": 5.92,
+   "between_sd_pt": 4.27,
+   "p_t_floor_df2": 0.6414544226841024
   },
   {
    "id": "add:S1:Onull+v~Onull+vrand",
@@ -232,7 +284,16 @@
    "p_fisher_nearest": 0.001356954702041104,
    "p_t_mean_df2": 0.0193456291240266,
    "p_t_pred_df2": 0.04045007822704736,
-   "p_chi2_homogeneity": 0.7298782403323636
+   "p_chi2_homogeneity": 0.7298782403323636,
+   "range_pt": [
+    31.3,
+    37.9
+   ],
+   "outside_range": true,
+   "sd_three_pt": 3.27,
+   "binom_expected_sd_pt": 5.81,
+   "between_sd_pt": 0.0,
+   "p_t_floor_df2": 0.0943265288377569
   },
   {
    "id": "add:SK:Onull+v~Onull+vrand",
@@ -269,7 +330,16 @@
    "p_fisher_nearest": 0.0642111764405851,
    "p_t_mean_df2": 0.056213036753251754,
    "p_t_pred_df2": 0.11685999480501966,
-   "p_chi2_homogeneity": 0.473173596652253
+   "p_chi2_homogeneity": 0.473173596652253,
+   "range_pt": [
+    52.2,
+    62.7
+   ],
+   "outside_range": true,
+   "sd_three_pt": 5.22,
+   "binom_expected_sd_pt": 6.03,
+   "between_sd_pt": 0.0,
+   "p_t_floor_df2": 0.14029274495135158
   },
   {
    "id": "add:S4:Onull+v~Onull+vrand",
@@ -306,7 +376,16 @@
    "p_fisher_nearest": 0.044468328929367196,
    "p_t_mean_df2": 0.06774343288798584,
    "p_t_pred_df2": 0.18498489289033967,
-   "p_chi2_homogeneity": 0.08840248313028763
+   "p_chi2_homogeneity": 0.08840248313028763,
+   "range_pt": [
+    33.3,
+    52.2
+   ],
+   "outside_range": true,
+   "sd_three_pt": 9.46,
+   "binom_expected_sd_pt": 5.99,
+   "between_sd_pt": 7.32,
+   "p_t_floor_df2": 0.18498489289033967
   },
   {
    "id": "cross:N1:O-Ncold+vNk~O-Ncold+vrand",
@@ -343,7 +422,16 @@
    "p_fisher_nearest": 0.8183955555938124,
    "p_t_mean_df2": 0.8855947688058299,
    "p_t_pred_df2": 0.9277709753212685,
-   "p_chi2_homogeneity": 0.3384183816704785
+   "p_chi2_homogeneity": 0.3384183816704785,
+   "range_pt": [
+    7.6,
+    14.9
+   ],
+   "outside_range": false,
+   "sd_three_pt": 3.91,
+   "binom_expected_sd_pt": 3.73,
+   "between_sd_pt": 1.16,
+   "p_t_floor_df2": 0.9277709753212685
   },
   {
    "id": "cross:N1:Onull+vNk~Onull+vrand",
@@ -380,7 +468,16 @@
    "p_fisher_nearest": 0.7709802611823029,
    "p_t_mean_df2": 0.7424278643565736,
    "p_t_pred_df2": 0.8430958893759268,
-   "p_chi2_homogeneity": 0.22486810812338118
+   "p_chi2_homogeneity": 0.22486810812338118,
+   "range_pt": [
+    53.0,
+    65.7
+   ],
+   "outside_range": false,
+   "sd_three_pt": 7.3,
+   "binom_expected_sd_pt": 5.92,
+   "between_sd_pt": 4.27,
+   "p_t_floor_df2": 0.8430958893759268
   },
   {
    "id": "cross:S1:O-Ncold+vNk~O-Ncold+vrand",
@@ -417,7 +514,16 @@
    "p_fisher_nearest": 0.8782772038504576,
    "p_t_mean_df2": 0.6389995488323339,
    "p_t_pred_df2": 0.7796092155450725,
-   "p_chi2_homogeneity": 0.17596429638295774
+   "p_chi2_homogeneity": 0.17596429638295774,
+   "range_pt": [
+    26.9,
+    41.8
+   ],
+   "outside_range": false,
+   "sd_three_pt": 7.6,
+   "binom_expected_sd_pt": 5.73,
+   "between_sd_pt": 5.0,
+   "p_t_floor_df2": 0.7796092155450725
   },
   {
    "id": "cross:S1:Onull+vNk~Onull+vrand",
@@ -454,7 +560,16 @@
    "p_fisher_nearest": 0.06493422322490269,
    "p_t_mean_df2": 0.05075151640282002,
    "p_t_pred_df2": 0.09142792587689709,
-   "p_chi2_homogeneity": 0.7298782403323636
+   "p_chi2_homogeneity": 0.7298782403323636,
+   "range_pt": [
+    31.3,
+    37.9
+   ],
+   "outside_range": true,
+   "sd_three_pt": 3.27,
+   "binom_expected_sd_pt": 5.81,
+   "between_sd_pt": 0.0,
+   "p_t_floor_df2": 0.1845103417639292
   },
   {
    "id": "cross:SK:O-Ncold+vNk~O-Ncold+vrand",
@@ -491,7 +606,16 @@
    "p_fisher_nearest": 0.7784130167565415,
    "p_t_mean_df2": 0.4201894709183872,
    "p_t_pred_df2": 0.6311888781473121,
-   "p_chi2_homogeneity": 0.0581940359589953
+   "p_chi2_homogeneity": 0.0581940359589953,
+   "range_pt": [
+    45.5,
+    65.7
+   ],
+   "outside_range": false,
+   "sd_three_pt": 10.29,
+   "binom_expected_sd_pt": 6.01,
+   "between_sd_pt": 8.35,
+   "p_t_floor_df2": 0.6311888781473121
   },
   {
    "id": "cross:SK:Onull+vNk~Onull+vrand",
@@ -528,7 +652,16 @@
    "p_fisher_nearest": 1.0,
    "p_t_mean_df2": 0.32566192075075084,
    "p_t_pred_df2": 0.4811890558868081,
-   "p_chi2_homogeneity": 0.473173596652253
+   "p_chi2_homogeneity": 0.473173596652253,
+   "range_pt": [
+    52.2,
+    62.7
+   ],
+   "outside_range": true,
+   "sd_three_pt": 5.22,
+   "binom_expected_sd_pt": 6.03,
+   "between_sd_pt": 0.0,
+   "p_t_floor_df2": 0.522654199271528
   },
   {
    "id": "cross:S4:O-Ncold+vNk~O-Ncold+vrand",
@@ -565,7 +698,16 @@
    "p_fisher_nearest": 0.09481337368879937,
    "p_t_mean_df2": 0.08469445614939959,
    "p_t_pred_df2": 0.2289799354474641,
-   "p_chi2_homogeneity": 0.22724681552313739
+   "p_chi2_homogeneity": 0.22724681552313739,
+   "range_pt": [
+    9.1,
+    19.4
+   ],
+   "outside_range": true,
+   "sd_three_pt": 5.18,
+   "binom_expected_sd_pt": 4.21,
+   "between_sd_pt": 3.01,
+   "p_t_floor_df2": 0.2289799354474641
   },
   {
    "id": "cross:S4:Onull+vNk~Onull+vrand",
@@ -602,7 +744,16 @@
    "p_fisher_nearest": 0.20291985711247382,
    "p_t_mean_df2": 0.10312796649466967,
    "p_t_pred_df2": 0.2542782938791634,
-   "p_chi2_homogeneity": 0.08840248313028763
+   "p_chi2_homogeneity": 0.08840248313028763,
+   "range_pt": [
+    33.3,
+    52.2
+   ],
+   "outside_range": true,
+   "sd_three_pt": 9.46,
+   "binom_expected_sd_pt": 5.99,
+   "between_sd_pt": 7.32,
+   "p_t_floor_df2": 0.2542782938791634
   }
  ],
  "s4": {
@@ -695,7 +846,25 @@
  "crosscheck": {
   "against": "records/reviews/B/results/round1/verify-r1-machine.json",
   "rows": 10,
-  "note": "方向ごとの件数（集計の記録）が、試行の記録からの数え直しと一致。形二は v の腕の二項の分散を足した形で、第一巡の数え直しの形（足さない）とは値が少し違う"
+  "fields": [
+   "方向ごとの件数",
+   "一番近い一本との Fisher",
+   "形一"
+  ],
+  "note": "第一巡の数え直し（十行・交差族の O-Ncold の土台は含まない）との照合。形二は v の腕の二項の分散を足した形で、第一巡の形とは値が少し違うので照合の外",
+  "trials_recount": {
+   "rows": 16,
+   "fields": [
+    "A の腕の件数",
+    "方向ごとの件数",
+    "Fisher",
+    "形一",
+    "形二",
+    "χ²",
+    "下限つきの形"
+   ],
+   "note": "全十六行を試行の記録から数え直した。同じ関数を通すので、確かめているのは集計の記録の件数と試行の記録の一致であって、式の独立な再計算ではない（式の再計算は第二巡の四票が申告）"
+  }
  },
  "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
 }
