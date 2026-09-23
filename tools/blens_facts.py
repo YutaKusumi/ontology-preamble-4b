@@ -3,6 +3,7 @@
 v2（2026-09-23・草案2・裁定 D168〜D176）: 片仮名一字を主から外し、感度の集合を並べる／落ちた字を元の語ごとに印字する／X の断片を異なる選択肢の文ごとに数える／
 X の幹と指示の印／集合の重なり／様式の主（一つのトークン）と感度（なぞりを除いた散文の書き出し）／校正の方向の単位と崩れの行／
 大きさの目盛りの層・下限を超えた行・選んだ試行（転記行 E）／語の側の帰無の候補（転記行 H・語彙の行のノルムだけを使い、方向とは掛けない）。
+v3（2026-09-23・草案3・裁定 D179〜D185）: 語の側の帰無の候補を日本の字（cp932）に限り、層を字の種類 × 字数 × ノルムの帯にし、薄い層を合わせる／二字以上の感度の集合／X の印に腕の前置き／平仮名にかかる断片の印と、断片で始まる升目の生の最初の字／B の全ての JSON 直答の最初のトークン／答えの文字の位置を JSON 直答の出力の中で数える／境目の近くの行と v̂ の行の z の最大／文字の前の並びの数／B の標本化の設定の突き合わせ／門の行の数の突き合わせ。
 出力: records/Blens/design-facts-Blens.json・records/Blens/design-facts-Blens.md
 語の集合はここでは下書きで、凍結は器 `tools/blens_sets.py` が同じ規則で作り直して行い、バイトで一致することを確かめる。
 用法: python tools/blens_facts.py [--tokenizer 置き場] [--skip-weights-hash]
@@ -13,7 +14,7 @@ import numpy as np
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-VERSION = 'v2'
+VERSION = 'v3'
 SNAP = os.path.expanduser('~/.cache/huggingface/hub/models--Qwen--Qwen3-4B-Instruct-2507/snapshots/cdbee75f17c01a7cc42f958dc650907174af0554')
 ACT = os.path.expanduser('~/.cache/op4b-dir/dirB__s1/main_position_activations.npz')
 ap = argparse.ArgumentParser()
@@ -82,7 +83,8 @@ is_main = lambda i: content_any(i) and not single_kata(i)
 def split(raw):
     raw = sorted(raw)
     nf = [i for i in raw if not is_frag(i)]
-    return {'main': [i for i in nf if is_main(i)], 'kata1': [i for i in nf if content_any(i)], 'all': nf, 'fragments': [i for i in raw if is_frag(i)]}
+    return {'main': [i for i in nf if is_main(i)], 'kata1': [i for i in nf if content_any(i)], 'all': nf, 'fragments': [i for i in raw if is_frag(i)],
+            'multi': [i for i in nf if n_kanji(dec(i)) + n_kata(dec(i)) >= 2]}
 
 
 def frag_chars(text, raw_ids):
@@ -102,6 +104,7 @@ E = {}
 for k, (p, m) in E_raw.items():
     sp, sm_ = split(p), split(m)
     E[k] = {'plus': sp['main'], 'minus': sm_['main'], 'plus_kata1': sp['kata1'], 'minus_kata1': sm_['kata1'], 'plus_all': sp['all'], 'minus_all': sm_['all'],
+            'plus_multi': sp['multi'], 'minus_multi': sm_['multi'],
             'fragments': sp['fragments'] + sm_['fragments'], 'single_kata_removed': sorted(set(sp['kata1']) - set(sp['main'])) + sorted(set(sm_['kata1']) - set(sm_['main']))}
 E['loaded'] = E['static']                              # (6b) の二腕は Ncold の一行を共有するので、違う語は O と Osec の差と同じ
 
@@ -117,6 +120,8 @@ drop_E = collections.OrderedDict()
 for side, text, raw, spans in (('O', O, E_raw['static'][0], [(p[0], p[1]) for p in ops_pos]), ('Osec', S, E_raw['static'][1], [(p[2], p[3]) for p in ops_pos]),
                                ('Onull', TXT['Onull'], E_raw['td'][0], []), ('Nk', TXT['Nk'], E_raw['Nk'][0], [])):
     for s0, s1, ch in frag_chars(text, raw):
+        if any(0x3041 <= ord(c_) <= 0x3096 for c_ in ch):
+            ch = ch + '〔平仮名にかかる断片〕'
         w = word_at(s0, spans, text) or ('…%s…' % text[max(0, s0 - 2):s1 + 2])
         drop_E.setdefault('%s「%s」' % (side, w), [])
         if ch not in drop_E['%s「%s」' % (side, w)]:
@@ -148,8 +153,9 @@ for fam, scs in fam_scenes.items():
     sa, so = split(ra), split(ro)
     stem = SCN[sc]['text'][:SCN[sc]['text'].index('(a)')]
     stem_ids, instr_ids = set(ids(stem)), set(ids(instr[fam]))
-    mark = lambda i: [m for m, S_ in (('stem', stem_ids), ('instr', instr_ids)) if i in S_]
-    X[fam] = {'scenes': scs, 'options': op, 'a': sa['main'], 'others': so['main'], 'a_kata1': sa['kata1'], 'others_kata1': so['kata1'], 'a_all': sa['all'], 'others_all': so['all'],
+    arm_ids = set().union(*[set(ids(t_)) for t_ in (TXT['O'], TXT['Osec'], TXT['Onull'], TXT['Nk'], NCOLD)])
+    mark = lambda i: [m for m, S_ in (('stem', stem_ids), ('instr', instr_ids), ('arm', arm_ids)) if i in S_]
+    X[fam] = {'scenes': scs, 'options': op, 'a': sa['main'], 'others': so['main'], 'a_kata1': sa['kata1'], 'others_kata1': so['kata1'], 'a_all': sa['all'], 'others_all': so['all'], 'a_multi': sa['multi'], 'others_multi': so['multi'],
               'marks': {str(i): mark(i) for i in sa['main'] + so['main'] if mark(i)},
               'a_unmarked': [i for i in sa['main'] if not mark(i)], 'others_unmarked': [i for i in so['main'] if not mark(i)],
               'single_kata_removed': sorted(set(sa['kata1']) - set(sa['main'])) + sorted(set(so['kata1']) - set(so['main']))}
@@ -188,12 +194,17 @@ def row_counts(sc, arm):
         C[did][t['choice']] += 1
         C[did]['_n'] += 1
         C[did]['_style'] += 1 if t['style_b'] else 0
+        if t['style_b']:
+            C[did]['_json'] += 1
+            C[did]['json:' + t['choice']] += 1
     return C
 
 
 # ---------------- 様式 F と、大きさの目盛りの候補 ----------------
 CH = re.compile(r'"choice"\s*:\s*"(a|b|c|d|refuse)"')
 first = collections.defaultdict(collections.Counter)
+firstch = collections.defaultdict(collections.Counter)
+noop_tokens = set()
 letter_cov = collections.defaultdict(collections.Counter)
 cands = collections.defaultdict(list)
 noop = TL['token_sets']['noop_arms']
@@ -207,13 +218,16 @@ for sc in SCENES:
             style = 'json' if t['style_b'] else 'prose'
             if e['input_ids']:
                 first[(sc, arm, style)][e['input_ids'][0]] += 1
+                firstch[(sc, arm, style)][txt[:1]] += 1
+                noop_tokens |= set(e['input_ids'])
             ms = list(CH.finditer(txt))
             if ms and ms[-1].group(1) == t['choice']:
                 pos = ms[-1].start(1)
-                cover = [i for i, (s0, s1) in zip(e['input_ids'], e['offset_mapping']) if s0 <= pos < s1]
+                cover = [q for q, (s0, s1) in enumerate(e['offset_mapping']) if s0 <= pos < s1]
                 if cover:
-                    letter_cov[t['choice']][cover[0]] += 1
-                    cands[(sc, arm, style)].append((t['trial_index'], t['trial_id'], t['preamble_sha']))
+                    letter_cov[t['choice']][e['input_ids'][cover[0]]] += 1
+                    pre = hashlib.sha256(json.dumps(e['input_ids'][:cover[0]]).encode('utf-8')).hexdigest()[:16]
+                    cands[(sc, arm, style)].append((t['trial_index'], t['trial_id'], t['preamble_sha'], pre))
 first_json, first_prose = collections.Counter(), collections.Counter()
 for (sc, arm, style), c in first.items():
     (first_json if style == 'json' else first_prose).update(c)
@@ -239,7 +253,17 @@ f_sens = [i for i in prose_rank if i not in why_out][:K_F]
 f_prose_top_raw = [i for i in prose_rank if not is_frag(i)][:K_F]
 FSET = {'main': f_main, 'main_n': f_main_n, 'n_json_first': sum(first_json.values()), 'n_prose_first': sum(first_prose.values()), 'json_cells': json_cells,
         'prose_distinct': len(first_prose), 'prose_sens': f_sens, 'prose_top_raw': f_prose_top_raw, 'prose_excluded_in_top': {str(i): why_out[i] for i in prose_rank[:K_F * 2] if i in why_out},
-        'per_cell': {'%s|%s|%s' % k: [[i, n] for i, n in c.most_common(3)] for k, c in sorted(first.items()) if sum(c.values())}}
+        'per_cell': {'%s|%s|%s' % k: [[i, n] for i, n in c.most_common(3)] for k, c in sorted(first.items()) if sum(c.values())},
+        'fragment_cells': {'%s|%s|%s' % k: firstch[k].most_common(3) for k, c in sorted(first.items()) if sum(c.values()) and is_frag(c.most_common(1)[0][0])}}
+json_first_all = collections.Counter()
+for d_ in sorted(glob.glob(j('results', 'stageB', 'stageB__*__s1'))):
+    sc_, arm_ = os.path.basename(d_)[len('stageB__'):-len('__s1')].split('__', 1)
+    for t, r in trials_raw(sc_, arm_):
+        if t['status'] == 'ok' and t['style_b']:
+            e_ = ids(r['final'])
+            if e_:
+                json_first_all[e_[0]] += 1
+FSET['json_first_all'] = {str(i): n for i, n in json_first_all.most_common()}
 lv = {x: {'canonical': letter[x], 'observed': dict(letter_cov[x].most_common())} for x in ('a', 'b', 'c', 'd', 'refuse')}
 
 # ---------------- 集合の重なり ----------------
@@ -281,6 +305,12 @@ F['B'] = {'text': ('答えの文字（L）: %s。B の無操作の出力で、�
              '／'.join('%s と %s: %s' % (p, q, showw(v)) for p, q, v in overlaps) or '無し'),
           'L': letter, 'L_observed': lv, 'E': E, 'E_dropped_chars': drop_E, 'X': X, 'X_dropped_chars': drop_X, 'X_fragments': xfrag, 'F': FSET,
           'overlaps': [[p, q, v] for p, q, v in overlaps], 'echo_count': len(echo)}
+F['B']['text'] += ('二字以上の感度の集合（漢字か片仮名の字を二字以上含むトークン）の数: v̂ の E+ %d・E− %d・td %d・Nk %d／X: %s。'
+                   '最初のトークンが断片の升目の、生の出力の最初の字: %s。B の本走行の全ての JSON 直答の出力（%d 件）の最初のトークン: %s。') % (
+    len(E['static']['plus_multi']), len(E['static']['minus_multi']), len(E['td']['plus_multi']), len(E['Nk']['plus_multi']),
+    '・'.join('%s の X_a %d・X_o %d' % (fam, len(X[fam]['a_multi']), len(X[fam]['others_multi'])) for fam in X),
+    '／'.join('%s: %s' % (k, '・'.join('「%s」%d' % (ch, n) for ch, n in v)) for k, v in FSET['fragment_cells'].items()) or '無し',
+    sum(json_first_all.values()), '・'.join('%d「%s」%d' % (i, dec(i), n) for i, n in json_first_all.most_common()))
 
 # ---------------- 転記行 C: 方向と活性の一致 ----------------
 D = np.load(j('results', 'dirB', 'dirB__s1', 'directions.npz'))
@@ -336,6 +366,10 @@ for r in BD:
         excl['%s（土台 %s・%s）' % (k, m.group(1), r['scenario'])] += 1
 gate_dirs = TL['calibration']['directions']
 assert sorted(cnt_dir) == sorted(gate_dirs), (sorted(cnt_dir), gate_dirs)
+CAL = TL['calibration']
+n_all_, n_wo_v_ = sum(cnt_dir.values()), sum(cnt_dir.values()) - cnt_dir['static']
+n_wo_v6_ = n_wo_v_ - cnt_dir['loaded']
+assert (n_all_, n_wo_v_, n_wo_v6_) == (CAL['rows_gate'], CAL['rows_without_vhat'], CAL['rows_without_vhat_loaded']), (n_all_, n_wo_v_, n_wo_v6_)
 TU = collections.defaultdict(set)
 tune_dirs = set()
 for d in glob.glob(j('results', 'tuneB', '*')):
@@ -347,9 +381,10 @@ for d in glob.glob(j('results', 'tuneB', '*')):
                 tune_dirs.add((t['layer'], t['direction_id']))
 quads = sum(1 for v in TU.values() if len(v) == 4)
 F['D'] = {'text': 'B の本走行の方向ごとの行（凍結した集計器の記録 `by_direction`）のうち、土台の無操作の腕の破局が零でも全部でもない行: %s（計 %d）。方向の単位（門の並べ替えの単位）ごとの行の数: %s（%d 本）。床か天井の土台で外す行: %s。'
+                  '門の行の数: 本の門 %d・v̂ を抜いた門（static の行を除く）%d・v̂ と (6b) を抜いた門 %d（正本の値と一致）。'
                   '出力が一つの選択にそろった行（崩れの行）: %s。調整走行の層ごとの方向（層 × 方向）: %d 本。調整走行の組（場面 × 層 × 係数）で、v̂ と三本のランダム方向が揃う組: %d／%d。'
           % ('・'.join('%s %d' % kv for kv in sorted(cnt.items())), sum(cnt.values()), '・'.join('%s %d' % (d_, cnt_dir[d_]) for d_ in gate_dirs), len(gate_dirs),
-             '・'.join('%s %d' % kv for kv in sorted(excl.items())) or '無し', '／'.join(collapse) or '無し', len(tune_dirs), quads, len(TU)),
+             '・'.join('%s %d' % kv for kv in sorted(excl.items())) or '無し', n_all_, n_wo_v_, n_wo_v6_, '／'.join(collapse) or '無し', len(tune_dirs), quads, len(TU)),
           'eligible': dict(cnt), 'eligible_by_direction': dict(cnt_dir), 'excluded': dict(excl), 'collapse_rows': collapse, 'tune_directions': sorted('%s|%s' % x for x in tune_dirs), 'tune_quads': quads}
 
 # ---------------- 転記行 E: 大きさの目盛り（層・選んだ試行・下限を超えた行） ----------------
@@ -393,19 +428,52 @@ for r in BD:
         for x in ('a', 'c'):
             dlt, z = z2(c0[x], c0['_n'], c1[x], c1['_n'])
             letter_rows.append({'row': name, 'letter': x, 'p0': c0[x] / c0['_n'], 'p1': c1[x] / c1['_n'], 'diff': dlt, 'z': z, 'pass': abs(z) >= zmin})
+letter_json = []
+c0j = RC[('S4', 'Osec-Ncold')]['fixed']
+for key_, cc_ in sorted(RC.items()):
+    if key_[0] != 'S4' or not key_[1].startswith('Osec-Ncold') or key_[1] == 'Osec-Ncold':
+        continue
+    for did_, c1j in sorted(cc_.items()):
+        for x in ('a', 'c'):
+            dlt, z = z2(c0j['json:' + x], c0j['_json'], c1j['json:' + x], c1j['_json'])
+            letter_json.append({'row': 'S4|%s|%s' % (key_[1], did_), 'letter': x, 'k0': c0j['json:' + x], 'n0': c0j['_json'], 'k1': c1j['json:' + x], 'n1': c1j['_json'], 'diff': dlt, 'z': z, 'pass': abs(z) >= zmin})
+assert letter_json and not any(x['pass'] for x in letter_json), ('JSON 直答の出力の中で答えの文字の位置の下限を超える行がある——正本の letter_ratio の文が成り立たない', letter_json)
+NB_ = MG['near_band']
+near = ([(x['row'], '様式', '', x['z']) for x in main_rows if NB_[0] <= abs(x['z']) <= NB_[1]]
+        + [(x['row'], x['letter'], '', x['z']) for x in letter_json if NB_[0] <= abs(x['z']) <= NB_[1]]
+        + [(x['row'], x['letter'], '全ての出力で数えて・記述・', x['z']) for x in letter_rows if NB_[0] <= abs(x['z']) <= NB_[1]])
+vz = max(abs(x['z']) for x in main_rows if x['kind'] == 'static')
+pre_all = collections.Counter(x[3] for x in cands[json_key])
+pre_sel = collections.Counter(x[3] for x in sel['S4|Osec-Ncold|json'])
+samp_ = collections.Counter()
+for f_ in glob.glob(j('results', 'stageB', '*', 'trials-*.jsonl')):
+    for l_ in open(f_, encoding='utf-8'):
+        samp_[json.dumps(json.loads(l_).get('sampling'), sort_keys=True)] += 1
+assert len(samp_) == 1, samp_
+SAMP = json.loads(list(samp_)[0])
+assert all(SAMP[k_] == v_ for k_, v_ in TL['inputs']['sampling_B'].items()), (SAMP, TL['inputs']['sampling_B'])
 vhat_pass = [x['row'] for x in main_rows if x['kind'] == 'static' and x['pass']]
 assert not vhat_pass, ('v̂ の行に様式の変化が下限を超える行がある——「v̂ の行では比が出ない」は成り立たない', vhat_pass)
 pt = lambda v: '%+.1f' % (100 * v)
-F['E'] = {'text': ('層二の大きさの目盛り（裁定 D170）。候補（B の本走行の無操作の腕の出力のうち、JSON の選択を読めて、選択の値の文字を覆うトークンが見つかった出力の数）: JSON 直答の層 %s／散文の層 %s。'
+F['E'] = {'text': ('層二の大きさの目盛り（裁定 D170・D180）。B の本走行の標本化の設定は、試行の記録（%d 件）ですべて同じで、正本の値と一致する（%s）。'
+                   '候補（B の本走行の無操作の腕の出力のうち、JSON の選択を読めて、選択の値の文字を覆うトークンが見つかった出力の数）: JSON 直答の層 %s／散文の層 %s。'
                    '各層で試行の番号の小さい順に %d 件ずつ選んだ（選んだ試行の番号の一覧の SHA16 %s・一覧は記録の JSON・各層の前置きの SHA は一つにそろう）。'
-                   '答えの文字の位置の比（S4 の Osec-Ncold の行・文字 a と c）で下限（二標本の z の絶対値 %s 以上）を超えるもの: %s。超えないもの: %s。'
-                   '主位置の比（様式の変化・全ての行 %d）で下限を超えるもの: %s。v̂ の行で様式の変化が下限を超えるもの: 無し（v̂ の行では比が出ない）。')
-          % ('%d' % n_cand['S4|Osec-Ncold|json'], '・'.join('%s %d' % (k.rsplit('|', 1)[0], n_cand[k]) for k in sel if k.endswith('prose')), per_cell, sel_sha, '%g' % zmin,
+                   'JSON 直答の層の、文字の前の並びの種類: 候補 %d 件で %d・選んだ %d 件で %d（文脈は一つ）。'
+                   '答えの文字の位置（JSON 直答の出力の中で数える）: 無操作は a %d・b %d・c %d／%d。行: %s。下限（二標本の z の絶対値 %s 以上）を超える行: 無し——答えの文字の位置の比は出ない。'
+                   '（全ての出力で数えると下限を超えていた行: %s——この差は散文の出力が消えた様式の移りから来る。記述だけ）。'
+                   '主位置の比（様式の変化・全ての行 %d）で下限を超えるもの: %s。v̂ の行の様式の z の絶対値の最大 %s（下限をどこに置いても比は出ない）。'
+                   '下限の境目の近くの行（z の絶対値が %s〜%s）: %s。')
+          % (sum(samp_.values()), '・'.join('%s %s' % kv for kv in sorted(TL['inputs']['sampling_B'].items())),
+             '%d' % n_cand['S4|Osec-Ncold|json'], '・'.join('%s %d' % (k.rsplit('|', 1)[0], n_cand[k]) for k in sel if k.endswith('prose')), per_cell, sel_sha,
+             sum(pre_all.values()), len(pre_all), sum(pre_sel.values()), len(pre_sel),
+             c0j['json:a'], c0j['json:b'], c0j['json:c'], c0j['_json'],
+             '・'.join('%s の %s（%d/%d → %d/%d・z %.2f）' % (x['row'], x['letter'], x['k0'], x['n0'], x['k1'], x['n1'], x['z']) for x in letter_json), '%g' % zmin,
              '・'.join('%s の %s（%s pt・z %.2f）' % (x['row'], x['letter'], pt(x['diff']), x['z']) for x in letter_rows if x['pass']) or '無し',
-             '・'.join('%s の %s（%s pt・z %.2f）' % (x['row'], x['letter'], pt(x['diff']), x['z']) for x in letter_rows if not x['pass']) or '無し',
-             len(main_rows), '・'.join('%s（%s pt・z %.2f）' % (x['row'], pt(x['diff']), x['z']) for x in main_rows if x['pass']) or '無し'),
+             len(main_rows), '・'.join('%s（%s pt・z %.2f）' % (x['row'], pt(x['diff']), x['z']) for x in main_rows if x['pass']) or '無し', '%g' % vz,
+             '%g' % NB_[0], '%g' % NB_[1], '・'.join('%s の %s（%sz %.2f）' % t_ for t_ in near) or '無し'),
           'candidates': n_cand, 'selected': sel_ids, 'selected_sha16': sel_sha, 'selected_preamble_sha': {k: v[0][2] for k, v in sel.items()},
-          'letter_rows': letter_rows, 'main_rows': main_rows}
+          'prefixes_candidates': len(pre_all), 'prefixes_selected': len(pre_sel), 'sampling_B_trials': SAMP,
+          'letter_rows_json': letter_json, 'letter_rows_all_outputs': letter_rows, 'main_rows': main_rows, 'near': near, 'vhat_max_abs_z_style': vz}
 
 # ---------------- 転記行 F: 重みとトークナイザ ----------------
 sh = {}
@@ -443,35 +511,85 @@ for s0 in range(0, base_vocab, STEP):
     s1 = min(base_vocab, s0 + STEP)
     nrm[s0:s1] = np.linalg.norm(read_rows('model.embed_tokens.weight', s0, s1) * g[None, :], axis=1)
 WS = TL['nulls']['word_side']
-CT = WS['char_types']
+CT, LN = WS['char_types'], WS['lengths']
+ITER, HIRA = 0x3005, (0x3041, 0x3096)                         # 「々」・平仮名
+is_kanji = lambda ch: KANJI[0] <= ord(ch) <= KANJI[1] or ord(ch) == ITER
+is_kata = lambda ch: KATA[0] <= ord(ch) <= KATA[1] or ord(ch) == CHOON
+is_hira = lambda ch: HIRA[0] <= ord(ch) <= HIRA[1]
+
+
+def cp932_ok(s_):
+    try:
+        s_.encode('cp932')
+        return True
+    except UnicodeEncodeError:
+        return False
 
 
 def ctype(i):
-    s = dec(i)
-    if s and all(KANJI[0] <= ord(ch) <= KANJI[1] for ch in s):
+    s_ = dec(i)
+    if not s_ or not cp932_ok(s_) or not all(is_kanji(ch) or is_kata(ch) or is_hira(ch) for ch in s_):
+        return None
+    if all(is_kanji(ch) for ch in s_):
         return CT[0]
-    if s and all(KATA[0] <= ord(ch) <= KATA[1] or ord(ch) == CHOON for ch in s):
+    if all(is_kata(ch) for ch in s_):
         return CT[1]
     return CT[2]
 
 
+length = lambda i: LN[0] if len(dec(i)) == 1 else LN[1]
 excl_ids = tO | tS | ctx_ids
-pool = [i for i in range(base_vocab) if i not in excl_ids and not is_frag(i) and is_main(i)]
+pool = [i for i in range(base_vocab) if i not in excl_ids and not is_frag(i) and is_main(i) and ctype(i)]
 nb = WS['norm_bands']
 edges = np.quantile(nrm[pool], [k / nb for k in range(1, nb)])
 band = lambda i: int(np.searchsorted(edges, nrm[i], side='right'))
-strat = lambda L: collections.Counter((ctype(i), band(i)) for i in L)
-P_ = strat(pool)
-need_p, need_m = strat(E['static']['plus']), strat(E['static']['minus'])
-need = need_p + need_m
-ratio_min = min(P_[k] / v for k, v in need.items())
-fmt_st = lambda C: '・'.join('%s 帯%d %d' % (t_, b_ + 1, C[(t_, b_)]) for t_ in CT for b_ in range(nb) if C[(t_, b_)])
-F['H'] = {'text': ('語の側の帰無の候補（裁定 D171・M_E の二つ目の札）: 含める語彙のうち規則を通るトークン %d（O と Osec の本文・場面の本文・JSON の指示に現れるトークンと、断片と、中身の語でないものと、片仮名一字を除く）。'
-                   'ノルムは語彙の行に最終の正規化の重みを掛けたベクトルのノルムで、候補を %d 帯に分けた（帯の境 %s）。字の種類 × 帯の候補の数: %s。'
-                   'v̂ の E+（%d）の組み立て: %s／E−（%d）の組み立て: %s。要る数に対する候補の数の比の最小 %.1f。語彙の行列は行のノルムだけを使い、方向とは掛けていない。')
-          % (len(pool), nb, '・'.join('%.4f' % x for x in edges), fmt_st(P_), len(E['static']['plus']), fmt_st(need_p), len(E['static']['minus']), fmt_st(need_m), ratio_min),
-          'pool': len(pool), 'edges': [float(x) for x in edges], 'strata_pool': {'%s|%d' % k: v for k, v in sorted(P_.items())},
-          'strata_plus': {'%s|%d' % k: v for k, v in sorted(need_p.items())}, 'strata_minus': {'%s|%d' % k: v for k, v in sorted(need_m.items())}, 'ratio_min': ratio_min}
+cell = lambda i: (ctype(i), length(i), band(i))
+EP, EM = E['static']['plus'], E['static']['minus']
+assert all(ctype(i) for i in EP + EM), 'E の語が字の決まりを満たさない'
+MF, MID = WS['merge_factor'], (WS['norm_bands'] - 1) // 2
+
+
+def merged(pool_ids):
+    P_ = collections.Counter(cell(i) for i in pool_ids)
+    need = collections.Counter(cell(i) for i in EP + EM)
+    out, ok = {}, True
+    for tl in sorted(set((t_, l_) for t_, l_, b_ in need)):
+        gs = [[b_] for b_ in range(nb)]
+        while True:
+            short = [g_ for g_ in gs if sum(need[tl + (b_,)] for b_ in g_) and sum(P_[tl + (b_,)] for b_ in g_) < MF * sum(need[tl + (b_,)] for b_ in g_)]
+            if not short or len(gs) == 1:
+                ok = ok and not short
+                break
+            k_ = gs.index(short[0])
+            centre = sum(short[0]) / len(short[0])
+            to = k_ + 1 if centre < MID else (k_ - 1 if centre > MID else (k_ - 1 if k_ > 0 else k_ + 1))
+            lo, hi = sorted((k_, to))
+            gs = gs[:lo] + [gs[lo] + gs[hi]] + gs[hi + 1:]
+        out[tl] = [(g_, sum(P_[tl + (b_,)] for b_ in g_), sum(need[tl + (b_,)] for b_ in g_),
+                    sum(1 for i in EP if cell(i)[:2] == tl and cell(i)[2] in g_), sum(1 for i in EM if cell(i)[:2] == tl and cell(i)[2] in g_)) for g_ in gs]
+    ratios = [p_ / n_ for tl, gl in out.items() for g_, p_, n_, a_, b_ in gl if n_]
+    return out, ok, (min(ratios) if ratios else float('nan')), P_
+
+
+strata, ok_main, ratio_min, P_ = merged(pool)
+assert ok_main, ('語の側の帰無の層が、帯を全て合わせても足りない', strata)
+sens_pool = [i for i in pool if i in noop_tokens]
+strata_s, ok_sens, ratio_s, P_s = merged(sens_pool)
+fmt_g = lambda g_: '帯%s' % '〜'.join(str(b_ + 1) for b_ in (g_ if len(g_) == 1 else (g_[0], g_[-1])))
+fmt_strata = lambda S_: '／'.join('%s・%s: %s' % (tl[0], tl[1], '・'.join('%s 候補 %d・要る数 %d（E+ %d・E− %d）' % (fmt_g(g_), p_, n_, a_, b_) for g_, p_, n_, a_, b_ in gl if n_)) for tl, gl in S_.items())
+merges = ['%s・%s の %s' % (tl[0], tl[1], fmt_g(g_)) for tl, gl in strata.items() for g_, p_, n_, a_, b_ in gl if len(g_) > 1 and n_]
+by_type = collections.Counter(ctype(i) for i in pool)
+by_len = collections.Counter(length(i) for i in pool)
+F['H'] = {'text': ('語の側の帰無の候補（裁定 D171・D179・M_E の二つ目の札）: 含める語彙のうち規則を通るトークン %d（字は漢字〔「々」を含む〕・片仮名〔長音符を含む〕・平仮名だけで cp932 に入るもの。O と Osec の本文・場面の本文・JSON の指示に現れるトークンと、断片と、中身の語でないものと、片仮名一字を除く）。'
+                   '字の種類: %s。字数: %s。ノルムは語彙の行に最終の正規化の重みを掛けたベクトルのノルムで、候補を %d 帯に分けた（帯の境 %s）。'
+                   '要る数のある層（字の種類・字数・帯）の候補の数と要る数: %s。候補が要る数の %d 倍に満たず隣の帯と合わせた層: %s。合わせた後の、要る数に対する候補の数の比の最小 %.1f。'
+                   '感度（B の無操作の出力に現れたトークンに限る）: 候補 %d・%s・比の最小 %s。語彙の行列は行のノルムだけを使い、方向とは掛けていない。')
+          % (len(pool), '・'.join('%s %d' % (t_, by_type[t_]) for t_ in CT), '・'.join('%s %d' % (l_, by_len[l_]) for l_ in LN), nb, '・'.join('%.4f' % x for x in edges),
+             fmt_strata(strata), MF, '・'.join(merges) or '無し', ratio_min,
+             len(sens_pool), '組める' if ok_sens else '帯を全て合わせても足りない層がある', ('%.1f' % ratio_s) if ok_sens else '—'),
+          'pool': len(pool), 'edges': [float(x) for x in edges], 'by_type': dict(by_type), 'by_length': dict(by_len),
+          'strata': {'%s|%s' % tl: [[g_, p_, n_, a_, b_] for g_, p_, n_, a_, b_ in gl] for tl, gl in strata.items()}, 'ratio_min': ratio_min, 'merged': merges,
+          'sensitivity': {'pool': len(sens_pool), 'feasible': ok_sens, 'ratio_min': (ratio_s if ok_sens else None), 'strata': {'%s|%s' % tl: [[g_, p_, n_, a_, b_] for g_, p_, n_, a_, b_ in gl] for tl, gl in strata_s.items()}}}
 
 T = {'kind': 'blens_design_facts', 'version': VERSION, 'contrasts_sha16': s16f(j('design', 'contrasts-Blens.json')), 'generated_utc': datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M'),
      'note': '射影は一つも計算していない（語彙の行列と方向を掛け合わせていない・転記行 H は語彙の行のノルムだけを使う）。語の集合は下書きで、凍結は器 `tools/blens_sets.py` が同じ規則で行い、バイトで一致することを確かめる。',
