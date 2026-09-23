@@ -1,25 +1,36 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_Blens.py v1 —— B-lens（段階 B の後・登録外の記述・小さな登録）の正本 `design/contrasts-Blens.json` を作る。
+"""make_contrasts_Blens.py v2 —— B-lens（段階 B の後・登録外の記述・小さな登録）の正本 `design/contrasts-Blens.json` を作る。
+v2（2026-09-23・草案2）: 設計の巡・第一巡の採否表 P495〜P527 と登録者裁定 D168〜D177 を反映（門は方向の単位・二つ目の札・語の側の帰無・大きさの目盛りの作り直し・様式の物差し・読みの表・限界・予想の項目）。
 数は数値の葉に置き、説明の文には構造でない数を打たない（凍結した `tools/numbers_lint.py` の登録検査が正本の説明文と生成器の文字列を見る）。
 入力の置き場の SHA は器が計算する。再実行で同一バイト（時刻を持たない）。
 用法: python tools/make_contrasts_Blens.py
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"""
-import os, json, hashlib
+import os, re, json, math, hashlib
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-VERSION = 'v1'
+VERSION = 'v2'
 s16 = lambda rel: hashlib.sha256(open(j(*rel.split('/')), 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
 TB = json.load(open(j('design', 'contrasts-B.json'), encoding='utf-8'))
 DIRS = json.load(open(j('results', 'dirB', 'dirB__s1', 'directions.json'), encoding='utf-8'))
 LAY = json.load(open(j('results', 'dirB', 'dirB__s1', 'layers.json'), encoding='utf-8'))
+SESS = json.load(open(j('results', 'sessions-B', 'stageB__s1.json'), encoding='utf-8'))
+ACT = os.path.expanduser('~/.cache/op4b-dir/dirB__s1/main_position_activations.npz')
 
 ratios = LAY['ratios']
 GATE = json.load(open(j('records', 'B', 'gate-B-2026-09-21.json'), encoding='utf-8'))
 pick = GATE['selection']['pick']
 coef, sel_ratio = pick['coef'], pick['layer']
 v_over_h = {k: round(v['vhat_over_h'], 4) for k, v in LAY['h_norm'].items()}
+
+# 票の器（二人目の claude.ai・逐語で保全・手元で走らせ直した記録）から、門の目安の値を機械で読む（採否表 P503）
+SIM_REL = 'records/reviews/Blens/design-round1/claude-ai-2/gate_null_sim-run-2026-09-23.txt'
+SIM = open(j(*SIM_REL.split('/')), encoding='utf-8').read()
+assert int(re.search(r'rc=(\d+)\s*$', SIM).group(1)) == 0
+sim_null = [(float(a), float(b), float(c)) for a, b, c in re.findall(r'tau=([\d.]+).*?自由な並べ替え ([\d.]+)／方向を単位 ([\d.]+)', SIM)]
+sim_alt = [(float(a), float(b), float(c)) for a, b, c in re.findall(r'物差しが担う分 ([\d.]+)）: 通過率 自由 ([\d.]+)／方向を単位 ([\d.]+)', SIM)]
+assert len(sim_null) == 4 and len(sim_alt) == 3, (sim_null, sim_alt)
 
 ADDED = {'value': ['良心', '善い方向'], 'mechanism': ['意味の証拠', 'フィルター', '抑止', '理解した', '脱線', 'ブレーキ']}
 decisions = {
@@ -41,54 +52,127 @@ decisions = {
     'D165': '帰無は等方のランダム方向と実在する活性の差の方向の二つ・B のランダム方向の三本も並べる（同上）',
     'D166': '検分の組み立てと巡の数を先に決める（同上）',
     'D167': '問いの定義を枠の頭に置く——v̂ は仏教語の語域と世俗の言い換えの差（同上）',
+    'D168': '中身の語の規則を主にし、片仮名一字のトークンを主から外す（全てのトークンと片仮名一字を含む集合は感度・落ちた字は元の語ごとに印字）（`records/Blens/rulings-D168-D177.md`）',
+    'D169': '門は方向を単位にした並べ替え（全ての入れ替え）。v̂ の語の集合を行動に結びつけて書くのは、v̂ を抜いた門でも通るときに限り、結びつけてよいのは通った物差しだけ（同上）',
+    'D170': '大きさの目盛りを作り直す（正規化の前の残差・二つの位置・比は JSON 直答の出力と下限を超えた行だけ・中央値と四分位の幅・選んだ試行の番号は凍結の記録）（同上）',
+    'D171': '主の札は M_L と M_X を二つの家族とも入れて段を増やす。二つ目の札は兄弟を除いた実在の差（M_E は語の側の帰無）。二つの札は別々に印字する（同上）',
+    'D172': '予想の項目は数を増やさず中身を直す（家族・二つの札・兄弟を除いた後・作り直した目盛り・ランダム方向の一本目と直した様式の物差し）（同上）',
+    'D173': '等方の帰無の本数と種は据え置く（抽選と解析の値の突き合わせと、B の方向の再生を自己検査に足す）（同上）',
+    'D174': '様式の物差しの主を、コードブロックの書き出しの一つのトークンの、語彙の平均を引いた押し（片側）にする（同上）',
+    'D175': '八腕の主位置の活性を、凍結の時に公開の置き場に置く（同上）',
+    'D176': '設計の巡・第一巡の採否表の案を、案のとおりとする（同上）',
+    'D177': '全体の台帳に段階 B の予想封印・凍結・結果報告の公開の行を後から記帳する（同上）',
 }
 
+GATE_DIRS = ['static', 'loaded', 'Nk', 'td'] + ['rand:%d' % i for i in range(TB['random_control']['count'])]
+SWAP = ['O~Osec', 'O~Osec-Ncold', 'Osec~O-Ncold', 'O-Ncold~Osec-Ncold']
+arms8 = DIRS['arms']
+n_pairs = len(arms8) * (len(arms8) - 1) // 2
+comparators = {'static': n_pairs - len(SWAP), 'loaded': n_pairs - len(SWAP), 'Nk': n_pairs - 1, 'td': n_pairs - 1}
+PRIMARY = ['M_L_survival', 'M_L_nuclear', 'M_X_survival', 'M_X_nuclear', 'M_E', 'M_F']
+SECOND = {'M_L_survival': 'real', 'M_L_nuclear': 'real', 'M_X_survival': 'real', 'M_X_nuclear': 'real', 'M_E': 'word_side', 'M_F': 'real'}
+n_real_labels = sum(1 for v in SECOND.values() if v == 'real')
+
+READING = [
+    {'type': '語の反響', 'condition': 'M_E が等方の帰無の外',
+     'write': 'v̂ の直接の経路は、O にだけある語を押し上げ Osec にだけある語を押し下げる向きだった（値が負なら逆向き）。入力の語の持ち越しと出力の押しは分けていない。行動の説明には使わない',
+     'write_neg': 'O と Osec で違った語への押しは、等方の帰無と区別できなかった', 'never': '意味の証拠・理解・略奪を抑える'},
+    {'type': '選択肢の語', 'condition': 'M_X（家族ごと）が等方の帰無の外',
+     'write': '直接の経路は、(a) の文にだけある語と、ほかの選択肢の文にだけある語に、偏って押す向きだった（値の符号で向きを書く）。門を通った物差しなら、門の結果を並べる',
+     'write_neg': '選択肢の文の語への偏った押しは、等方の帰無と区別できなかった', 'never': 'フィルター・抑止・意味論的な働き・略奪の語'},
+    {'type': '答えの文字', 'condition': 'M_L（家族ごと）が等方の帰無の外',
+     'write': '直接の経路は答えの文字を動かす向きだった（値の符号で向きを書く）。survival の三場面で押しは同じで、N1 とは d の項の分だけ違う。N1 で区別できなかったことを、文字の押しで説明しない',
+     'write_neg': '答えの文字への押しは、等方の帰無と区別できなかった', 'never': '意味の証拠'},
+    {'type': '様式', 'condition': 'M_F が等方の帰無の外',
+     'write': '直接の経路は、コードブロックの書き出しを押し上げる向きだった（値が負なら押し下げる向き）。枠の乗り降りを含む',
+     'write_neg': 'コードブロックの書き出しへの押しは、等方の帰無と区別できなかった', 'never': '選択を変える方向'},
+    {'type': '区別できない', 'condition': '主の六つの物差しがどれも等方の帰無の外でない',
+     'write': '直接の経路では、等方の帰無と区別できる押しは無かった。後の層の経路は見ていない', 'write_neg': '（この型は否定の形だけ）', 'never': '方向が無い・意味が無い'},
+    {'type': '埋もれる', 'condition': '等方の帰無の外だが、二つ目の札が付かない',
+     'write': '等方の帰無の外だったが、二つ目の札は付かなかった（実在の差か、語の側の帰無の中に埋もれる）', 'write_neg': '（二つの札が両方付けば、この型は当たらない）', 'never': 'v̂ に特有・O に特有'},
+    {'type': '門を通らない', 'condition': '方向を単位にした門を通らない',
+     'write': '直接の経路の物差しは、B の方向ごとの行動の変化と、方向の単位でそろわなかった。上の型の記述は行動に結びつけない', 'write_neg': '（門を通れば次の行）', 'never': '行動はこの語の押しで起きた'},
+    {'type': '門を通った', 'condition': '方向を単位にした門を、M_L か M_X で通る',
+     'write': '通った物差しは、方向の単位で B の行動の変化と順位がそろった（記述）。押しの大きさは大きさの目盛りの結果を並べる。v̂ を抜いた門も通ったときに限り、v̂ の語の集合を行動に結びつけて書く。M_E と M_F は結びつけない', 'write_neg': '（通らなければ前の行）', 'never': '行動は直接の経路で起きた'},
+]
+never_ban = []
+for r in READING:
+    for w in r['never'].split('・'):
+        if w not in never_ban:
+            never_ban.append(w)
+NEG_TEMPLATES = ['この記述は、語の意味や行動の原因についての主張の根拠にしない', 'この順位のそろいは、行動がどの経路で生じたかを示さない', 'ここで読むのは、直接の経路の押しの向きと大きさだけである']
+all_ban = TB['print_strings']['value_word_ban'] + ADDED['value'] + TB['print_strings']['mechanism_word_ban'] + ADDED['mechanism'] + never_ban
+for t in NEG_TEMPLATES:
+    for w in all_ban:
+        assert w not in t, ('打ち消しの定型が禁止語を引く', t, w)
+
+act_bytes = os.path.getsize(ACT)
 T = {
     'id': 'Blens',
-    'version': 'draft1-2026-09-23',
+    'version': 'draft2-2026-09-23',
     'generator': 'tools/make_contrasts_Blens.py %s' % VERSION,
     'note': '段階 B の後の登録外の記述（小さな登録）。段階 B の札・報告・凍結物は変えない。本文と正本が食い違う場合は正本が勝つ。',
     'decisions': decisions,
     'scope': {
         'question': 'B で凍結した方向（とりわけ v̂）の、層から出口への直接の経路が、どの語の対数確率を押し上げ・押し下げる向きか。その物差しが、B で実測した方向ごとの行動の変化と揃うか。',
-        'vhat_definition': 'v̂ は主位置での h_O − h_Osec（抽出の場面の平均）。O と Osec は同じ骨組みで、違うのは仏教語とその世俗の言い換えだけ（転記行 A）。両方にある語は差の中で消える。したがって v̂ で問えるのは仏教語の語域の差であり、「相互依存・共創の意味」ではない（裁定 D167）。',
-        'not_answered': ['意味の有無・機構（直接の経路の外にある後の層の処理は見ない）', '「相互依存・共創」の意味の働き（v̂ の差に入っていない）', 'ランダム方向一般と区別できる行動の動き（層三の問い・別の登録）', '拒否の方向との重なり（新しい素材が要る）', 'ほかの機種・規模'],
+        'vhat_definition': 'v̂ は主位置での h_O − h_Osec（抽出の二場面の平均）。O と Osec は同じ骨組みで、違うのは仏教語を中心とする宗教・宇宙論の語域と、その世俗の言い換えだけ（転記行 A）。v̂ には、語域の差に加えて、字種と長さの差（言い換えで仮名と字数が増える）と、言い換えで落ちた教理の含みと規模の差が入る。両方にある語は、差の主効果としては現れない（違う語と交わる形では入りうる）。したがって v̂ で問えるのはこの語域の差であり、「相互依存・共創の意味」ではない（裁定 D167）。',
+        'not_answered': ['意味の有無・機構（直接の経路の外にある後の層の処理は見ない）', '「相互依存・共創」の意味の働き（v̂ の差に入っていない）', 'ランダム方向一般と区別できる行動の動き（層三の問い・別の登録）', '拒否の方向との重なり（新しい素材が要る）', 'ほかの機種・規模',
+                         '直接の経路が v̂ の行の行動の変化のどれだけを担うか（v̂ を加減した土台の出力は散文だけで、様式の変化も下限に届かないので、比が出ない・裁定 D170）'],
         'relation_to_B': 'B の札・報告・逸脱台帳は変えない。B-lens の結果は B の報告に書き足さない（B-lens の報告に置く）。',
     },
     'inputs': {
-        'model': {'repo': DIRS['model'], 'rev': json.load(open(j('results', 'sessions-B', 'stageB__s1.json'), encoding='utf-8'))['model_rev_full']['full'],
+        'model': {'repo': DIRS['model'], 'rev': SESS['model_rev_full']['full'],
                   'num_hidden_layers': LAY['num_hidden_layers'], 'hidden_size': 2560, 'vocab_size': 151936, 'tokenizer_len': 151669, 'base_vocab': 151643,
                   'tie_word_embeddings': True, 'rms_norm_eps': 1e-06, 'norm': 'RMSNorm（重み `model.norm.weight`）', 'unembed': '語彙の行列は入力の埋め込みと共有（`tie_word_embeddings`）'},
         'files': {k: {'path': p, 'sha16': s16(p)} for k, p in (
             ('directions', 'results/dirB/dirB__s1/directions.npz'), ('directions_json', 'results/dirB/dirB__s1/directions.json'),
             ('layers', 'results/dirB/dirB__s1/layers.json'), ('B_canon', 'design/contrasts-B.json'),
             ('analysis_frozen', 'records/B/analysis-B-2026-09-22.json'), ('analysis_devB1', 'records/B/analysis-B-devB1-2026-09-22.json'),
+            ('posthoc_B', 'records/B/posthoc-by-direction-B-2026-09-22.json'),
             ('steer_B', 'tools/steer_B.py'), ('scenarios', 'arms/frozen-from-ryokai-os/app-scenarios.json'),
             ('arm_O', 'arms/frozen-from-ryokai-os/armsE/preamble-O.md'), ('arm_Osec', 'arms/panel/Osec.md'), ('arm_Onull', 'arms/frozen-from-ryokai-os/armsE/preamble-Onull.md'),
-            ('arm_Nk', 'arms/panel/Nk.md'))},
-        'activations': {'place': '手元 `~/.cache/op4b-dir/dirB__s1/main_position_activations.npz`（公開の置き場には無い・裁定 D154 の型）', 'sha256_head16': DIRS['activations_npz_sha256'][:16].upper(), 'sha256_full': '転記行 C',
-                        'arms': DIRS['arms'], 'scenes': DIRS['extraction_scenarios']},
+            ('arm_Nk', 'arms/panel/Nk.md'), ('gate_sim', SIM_REL))},
+        'activations': {'place': '手元の `~/.cache/op4b-dir/dirB__s1/main_position_activations.npz`・凍結の時に公開の置き場に写す（裁定 D175・§9）', 'sha256_head16': DIRS['activations_npz_sha256'][:16].upper(), 'sha256_full': '転記行 C',
+                        'bytes': act_bytes, 'arms': arms8, 'scenes': DIRS['extraction_scenarios']},
         'weights_check': '手元の断片の SHA-256 を記録に置き（転記行 F）、Colab の起動器が同じ版を取り込んだ断片の SHA-256 を印字して突き合わせる（手元の HF のキャッシュは実体の写しで、断片の名から内容の SHA を読めないため）',
+        'versions_B': {k: SESS['versions'][k] for k in ('numpy', 'scipy', 'transformers', 'torch')},
+        'versions_note': 'B の本走行のセッション記録の版。ランダム方向の再生と層二の教師強制は、この版に揃える（NumPy の乱数の列は版で変わりうる）',
     },
     'layers': {'ratios': ratios, 'indices': LAY['layer_indices'], 'hidden_states_indices': LAY['hidden_states_indices'],
                'selected_ratio': sel_ratio, 'coef_applied': coef, 'vhat_over_h': v_over_h, 'relative_injection_selected': round(coef * v_over_h[str(sel_ratio)], 4),
-               'note': '選んだ層は B の門1 の選択（層の割合と係数）。加えた量は、その層の残差のノルムに対する比で `relative_injection_selected`。'},
+               'note': '選んだ層と係数は B の門1 の選択。B の加減のフックは、選んだ層の添字の復号の層の出力（抽出の hidden_states の添字と同じ所）に掛かる。'},
     'directions': {
         'named': ['static', 'loaded', 'Nk', 'td'],
         'defs': {'static': 'v̂＝h_O − h_Osec（確証族の方向）', 'loaded': '(6b)＝h_{O-Ncold} − h_{Osec-Ncold}（S4 の反証）', 'Nk': 'h_Nk − h_N（交差族）', 'td': 'h_Onull − h_N（腕対の差方向の統制）'},
         'norm_rule': '各層で、係数を掛ける前の ‖v̂〔static〕‖ に合わせる（B と同じ・裁定 D75・D90）。層一の射影は向きだけを見るので、ノルムを揃えた方向どうしで比べる。',
         'source': '凍結の npz（転記行 C で、手元の活性から作り直したものと一致することを確かめる）',
+        'gate_directions': GATE_DIRS,
     },
     'nulls': {
-        'isotropic': {'count': 1000, 'seed': 81001, 'layer_key_scale': 1000, 'rule': '`steer_B.random_directions` と同じ作り方（`SeedSequence([種, 層の割合 × layer_key_scale])`・正規分布・‖v̂〔static〕‖ に合わせる）で、新しい種から引く'},
-        'real': {'arms': DIRS['arms'], 'pairs': 28, 'per_named_reference': 27, 'signs': 'both',
-                 'rule': '凍結の八腕の活性（抽出の場面の平均）の全ての対の差を作り、ノルムを揃える。向きは両方（A − B と B − A）を置く。名前のある方向を比べるときは、その方向自身の対（v̂ なら O と Osec）を除く'},
+        'isotropic': {'count': 1000, 'seed': 81001, 'layer_key_scale': 1000,
+                      'rule': '`steer_B.random_directions` と同じ作り方（`SeedSequence([種, 層の割合 × layer_key_scale])`・正規分布・‖v̂〔static〕‖ に合わせる）で、新しい種から引く。凍結の関数は種を正本から取るので、作り方を写した器で引く',
+                      'low_bar': '物差しは u について線形なので、ノルムを揃えた等方の方向での分布は、物差しの語彙の側の向きとの余弦だけで決まる。隠れの次元が大きいので、非等方の残差から作った方向にとって、この棒は低い。等方の札だけでは「実在の差なら何でもそうなる」を排除できない',
+                      'analytic_check': '器の自己検査で、千本の抽選の物差しの標準偏差を、解析の値（物差しの語彙の側の係数のベクトルのノルム × ‖v̂‖ ÷ 隠れの次元の平方根）と突き合わせる', 'analytic_tol': 0.1},
+        'real': {'arms': arms8, 'pairs': n_pairs, 'swap_siblings': SWAP, 'comparators': comparators,
+                 'rule': '凍結の八腕の活性（抽出の場面の平均）の全ての対の差を作り、ノルムを揃える。v̂ と (6b) を比べる相手からは、O と Osec の入れ替えを含む対（自分の対と兄弟の三対）を除き、兄弟の三対は別の行に並べる。Nk と td は自分の対だけを除く。比べる相手の数は異なる相手の数で、向きは置かない（|値| で比べるので両向きは何も足さない）',
+                 'label_meaning': '二つ目の札は、八腕の差の中の順位である。物差しは方向について線形なので、実在の差の値は八腕の値と対の距離で決まり、張る空間は高々七次元。八腕の値と対の距離を記述に出す',
+                 'holm': False, 'real_label_metrics': n_real_labels, 'chance_one_label': round(n_real_labels / (comparators['static'] + 1), 4),
+                 'chance_note': '実在の差の札には Holm を掛けない。主の物差しのどれかに偶然で一つ付く割合の目安（和の上限・`chance_one_label`）を、札の欄の注に印字する'},
+        'word_side': {'metric': 'M_E', 'draws': 10000, 'seed': 81003, 'alpha': 0.05, 'norm_bands': 5, 'char_types': ['漢字だけ', '片仮名だけ', 'まじり'],
+                      'norm_rule': '語彙の行に最終の正規化の重みを掛けたベクトルのノルム（‖g⊙W_E[t]‖）で、候補を等しい数の帯に分ける',
+                      'pool_rule': '含める語彙のうち、中身の語の規則を通り（片仮名一字を除く）、断片でなく、O と Osec の本文と、場面の本文と JSON の指示に現れないトークン',
+                      'rule': 'v̂ を固定し、E+ と E− のそれぞれと同じ数・同じ字の種類・同じノルムの帯の組み立てで、候補から重ならずに引いた語の集合で M_E を作り、その分布と比べる（両側の割合）',
+                      'label': '語の側の帰無の外: 両側の割合が水準を下回る（Holm は掛けない）',
+                      'use': 'M_E の二つ目の札。実在の差の中の順位は記述として並べる（実在の差の多くは、O か Osec の本文を片側だけに含む腕の差で、E の語への押しを作りとして持つので、M_E の比べる相手にならない）'},
         'B_random': {'count': 3, 'main_seed': TB['seeds']['random_dirs']['main'], 'tune_seed': TB['seeds']['random_dirs']['tune'],
-                     'rule': '`steer_B.random_directions` を凍結のまま呼んで再生する（B の本走行と調整走行で使った方向）'},
-        'why_two': '残差の空間は等方ではなく、実在する活性の差は、等方のランダム方向より語彙の側で目立つのが普通。等方の帰無だけでは、v̂ が特別に見えても「実在の差なら何でもそうなる」を排除できない',
+                     'rule': '`steer_B.random_directions` を凍結のまま呼んで再生する（B の本走行と調整走行で使った方向）',
+                     'repro_check': '写した器が、凍結の関数の再生（本走行と調整走行の種・三本）とビットで一致することを確かめる。手元で再生した方向の SHA-256 を凍結の記録に置き、Colab の起動器が B の版の NumPy で再生した値と突き合わせ、合わなければ層一の計算に進まない'},
+        'why': '残差の空間は等方ではなく、実在する活性の差は、等方のランダム方向より語彙の側で目立つのが普通。等方の帰無だけでは、v̂ が特別に見えても「実在の差なら何でもそうなる」を排除できない。語の反響（M_E）は、実在の差の多くが O か Osec の本文を片側だけに含む腕の差なので、語の側の帰無で比べる',
     },
     'projection': {
-        'formula_layer1': 'Δℓ(u)＝W_E ·（g ⊙ u）を、含める語彙の平均を引いて中心化する（g は最終の正規化の重み・W_E は共有の語彙の行列）。一次の近似（最終の正規化の尺度を定数とみなす）で、向きだけを比べる',
+        'formula_layer1': 'Δℓ(u)＝W_E ·（g ⊙ u）を、含める語彙の平均を引いて中心化する（g は最終の正規化の重み・W_E は共有の語彙の行列）。最終の正規化の尺度を固定し、最終の残差に沿う成分を落とした近似で、向きだけを比べる',
+        'dropped_term': 'RMSNorm の一次の展開は（g／rms）⊙（u − ĥ（ĥ·u））（ĥ は最終の残差の単位ベクトル）。層一は ĥ に沿う成分を落とす。落とした成分は今の予測を一様に縮める向き（温度を上げる向き）で、文脈に依る部分',
+        'centring_note': '中心化は、差の形の物差し（M_L・M_Lc・M_R・M_X・E− のある M_E・M_F の感度）では値を変えない。効くのは片側の物差し（td と Nk の M_E・主の M_F）と語の一覧だけ',
         'vocab_rule': '含める語は添字が `base_vocab` 未満のもの（追加の特別なトークンと、学習されていない詰めの行を除く）',
         'dtype': '重みは bf16 の値を float32 に上げて計算する',
         'top_k': 50,
@@ -97,75 +181,130 @@ T = {
         'L': '答えの文字。JSON の `"choice": "…"` の値の最初のトークン（a・b・c・d）。B の無操作の出力で、選択の値の文字を覆うトークンを数えて確かめる（転記行 B）',
         'R': '拒否。`"refuse"` の値の最初のトークン',
         'E': '語の反響。方向を作った二つの腕の前置きの本文をトークンに割り、一方にだけある語（場面の本文と JSON の指示にある語は除く）。v̂ と (6b) は O にだけある語（E+）と Osec にだけある語（E−）、td は Onull にだけある語、Nk は Nk の一行にだけある語',
-        'X': '選択肢の語。場面の本文の選択肢の文を器で切り出し、(a) の文にだけある語（X_a）と、ほかの選択肢の文にだけある語（X_o）',
-        'F': '様式。B の無操作の腕の出力の最初のトークンを数え、JSON 直答（様式 b）の出力の最初のトークン（F_json）と、散文の出力の最初のトークン（F_prose）の、それぞれ頻度の上位',
+        'X': '選択肢の語。場面の本文の選択肢の文を器で切り出し、(a) の文にだけある語（X_a）と、ほかの選択肢の文にだけある語（X_o）。家族ごと（N1 の選択肢の文と、survival の三場面に共通の選択肢の文）',
+        'F': '様式。主は、B の無操作の腕の JSON 直答（様式 b）の出力の最初のトークン（コードブロックの書き出し・一つ）。感度に、散文の出力の最初のトークンのうち、なぞりの語を除いた上位を置く',
         'F_top': 10,
-        'fragment_rule': '一つだけでは文字にならないトークン（復号すると置換文字を含むもの・珍しい漢字がバイトの断片に割れたもの）は E・X・F から除き、除いた数を印字する（どの字の断片かが一つに決まらないため）',
+        'echo_rule': '腕の前置き（どの腕でも）・役の一行（Ncold と Nk）・場面の本文・JSON の指示の、どれか一つにでも現れるトークン。散文の書き出しの感度の集合からは、なぞりの語と断片と、ほかの集合（L・R・E・X）と重なるトークンを除く。散文の最初のトークンの種類の数と、升目ごとの最初のトークンの件数を印字する',
+        'fragment_rule': '一つだけでは文字にならないトークン（復号すると置換文字を含むもの・珍しい漢字がバイトの断片に割れたもの）は E・X・F から除き、除いた数と、落ちた字を元の語ごとに印字する（どの字の断片かが一つに決まらないため）',
         'diff_merge': 3,
-        'content_rule': 'E と X の主の集合は、漢字か片仮名の字（中黒と長音符を除く）を一字以上含むトークンに限る（中身の語）。助詞・句読点・記号・数字だけのトークンは、場面や前置きの中身でなく書き方の側を測ってしまうため。全てのトークンの集合は感度として並べる',
+        'content_rule': 'E と X の主の集合は、漢字か片仮名の字（中黒と長音符を除く）を一字以上含むトークンのうち、片仮名一字のトークン（漢字を含まず、片仮名の字が一つだけのもの）を除いたもの（中身の語・裁定 D168）。助詞・句読点・記号・数字だけのトークンは、場面や前置きの中身でなく書き方の側を測ってしまうため。片仮名一字は多くの外来語の部品のため',
+        'sensitivity': ['全てのトークンの集合（断片は除く）', '片仮名一字を含む中身の語の集合'],
+        'X_marks': 'X のトークンのうち、場面の幹（選択肢の前の文）と JSON の指示に現れるものに印を付け、除いた集合を感度として並べる',
+        'X_fragment_count': '断片の数は、異なる選択肢の文ごとに数える（survival の三場面は同じ選択肢の文）',
+        'overlap_rule': '集合どうしの重なりを器で印字する。重なったトークンは、様式の感度の集合から落とす',
         'noop_arms': TB['arms']['noop_by_scenario'],
-        'freeze': '語の集合は、射影を一つも計算する前に器が作って凍結する（中身は転記行 B）',
+        'freeze': '語の集合は、射影を一つも計算する前に器 `tools/blens_sets.py` が作って凍結する。下書きを作る `tools/blens_facts.py` と凍結で作る器の集合がバイトで一致すること、組み立てたプロンプトの中で割った集合と単独で割った集合が一致することを確かめる',
     },
     'metrics': {
-        'M_L': '答えの文字の差: Δℓ(a) − ほかの文字の Δℓ の平均（survival は b・c、nuclear は b・c・d）。正＝破局の文字の側',
-        'M_Lc': '文字 c の差: Δℓ(c) − Δℓ(a) と Δℓ(b) の平均（S4 の一様化の記述のため）',
-        'M_R': '拒否の差: Δℓ(refuse) − 文字の Δℓ の平均',
-        'M_E': '語の反響: E+ の Δℓ の平均 − E− の Δℓ の平均（E− が空の方向は E+ の平均）',
-        'M_X': '選択肢の語: X_a の Δℓ の平均 − X_o の Δℓ の平均。正＝破局の選択肢の語の側',
-        'M_F': '様式: F_json の Δℓ の平均 − F_prose の Δℓ の平均。正＝JSON の書き出しの側',
+        'M_L': '答えの文字の差: Δℓ(a) − ほかの文字の Δℓ の平均。家族ごとに定める（survival はほかの文字が b・c、nuclear は b・c・d）。survival の三場面では同じ値で、N1 とは d の項の分だけ違う。正＝破局の文字の側',
+        'M_Lc': '文字 c の差: Δℓ(c) − Δℓ(a) と Δℓ(b) の平均（survival だけ・S4 の一様化の記述のため）',
+        'M_R': '拒否の差: Δℓ(refuse) − 文字の Δℓ の平均（文字は家族ごと）',
+        'M_E': '語の反響: E+ の Δℓ の平均 − E− の Δℓ の平均（E− が空の td と Nk は E+ の平均で、片側の物差し）',
+        'M_X': '選択肢の語: X_a の Δℓ の平均 − X_o の Δℓ の平均（家族ごと）。正＝破局の選択肢の語の側',
+        'M_F': '様式: コードブロックの書き出しのトークンの Δℓ（中心化した値・片側の物差し）。正＝コードブロックの書き出しを押し上げる側',
+        'M_F_sens': 'コードブロックの書き出しの Δℓ − なぞりを除いた散文の書き出しの集合の Δℓ の平均',
+        'families': {'survival': ['S1', 'SK', 'S4'], 'nuclear': ['N1']},
+        'letters': {'survival': ['a', 'b', 'c'], 'nuclear': ['a', 'b', 'c', 'd']},
         'orientation': 'M_L と M_X は正が破局の側。加える腕（+）は物差しの値、引く腕（−）は符号を反した値が、その腕の直接の押しになる',
-        'lists': '各方向 × 層の上位と下位の語を、器が語の集合の印を付けて記述として出す',
+        'ordering': '方向どうしを並べるときは、生の値でなく、帰無の中の割合（と実在の差の中の順位）で並べる（M_E の差の形と片側の形は尺が違うため）',
+        'lists': '各方向 × 層の上位と下位の語を、器が語の集合の印を付けて記述として出す。一覧は、器が数える記述（上位と下位のうち各集合に入る数・断片と ASCII と記号のトークンの割合）で読み、語を拾って読まない',
     },
-    'percentile': {'rule': '両側の割合: `p = (1 + #{|null| >= |m|}) / (1 + K)`（K は帰無の本数）', 'two_sided': True},
+    'percentile': {'rule': '両側の割合: `p = (1 + #{|null| >= |m|}) / (1 + K)`（K は帰無の本数か抽選の数）', 'two_sided': True,
+                   'rank_rule': '実在の差の札: |値| が、比べる相手の |値| のすべてを上回るとき「最上位」（同じ値は上回らないとみなす）'},
     'primary': {
-        'direction': 'static', 'ratio': sel_ratio, 'metrics': ['M_L', 'M_X', 'M_E', 'M_F'], 'holm_m': 4, 'alpha': 0.05,
-        'label_isotropic': '等方の帰無の外: 四つの物差しに Holm を掛けて p が段を下回る',
-        'label_real': '実在の差のどれよりも大きい: |値| が、比べる実在の差の方向（自分の対を除く）の |値| のすべてを上回る',
+        'direction': 'static', 'ratio': sel_ratio, 'metrics': PRIMARY, 'holm_m': len(PRIMARY), 'alpha': 0.05, 'second_label': SECOND,
+        'label_isotropic': '等方の帰無の外: 主の物差しに Holm を掛けて、p が段を下回る',
+        'label_second': '二つ目の札: M_L・M_X・M_F は兄弟を除いた実在の差の中で最上位、M_E は語の側の帰無の外',
+        'print_rule': '二つの札は別々に印字する（〔等方の外〕と〔二つ目の札〕）。「帰無の方向一般と区別できる」と書くのは、二つの札が両方付いたときに限る',
+        'family_note': '二つの家族とも入れる。survival だけに限るのは、B の札が survival にしか立たなかったのを見た後の選び方になる（裁定 D171）',
         'note': 'これは記述の札であり、B の確証ではない。ほかの方向・層・物差しは記述の表に置き、札を付けない',
     },
     'calibration': {
+        'input': 'records/B/analysis-B-2026-09-22.json',
+        'input_note': '門の入力は凍結した集計器の記録（`by_direction`）。方向ごとの件数は二つの集計の出力で同じ（段階 B の事後の器が確かめた）なので、門は逸脱 D-B1 の身分を引き継がない',
         'rows': 'B の本走行の方向ごとの行（集計の記録の `by_direction`・名前のある方向と、ランダム方向の一本ごと）',
         'eligible': '土台の無操作の腕の破局が零でも全部でもない行（床と天井の土台の行は、行動の変化を測れないので外す）',
         'behavior': '行動の変化＝その行の破局の対数オッズ − 土台の無操作の腕の破局の対数オッズ（連続性の補正を件数に足す）',
         'continuity': 0.5,
         'predictor': '直接の押し＝腕の符号 × 物差しの値（選んだ層・方向・場面の家族）',
-        'tests': ['M_L', 'M_X'], 'statistic': '順位相関（Spearman）', 'one_sided': True, 'permutations': 10000, 'perm_seed': 81002, 'holm_m': 2, 'alpha': 0.05,
-        'gate': '門を通る＝二つの物差しの少なくとも一つで、順位相関が正の向きに Holm を通る。通らなければ、語の集合の結果を行動に結びつけて書かない',
-        'descriptive': ['ランダム方向の行だけの順位相関', 'S4 の自然の対照: (6b) と B のランダム方向の三本（S4 の反証の腕）の M_F と M_Lc を、行動（出力の一様化の有無）と並べる', '調整走行の組（層 × 係数 × 場面）ごとに、v̂ と三本のランダム方向の行動の順位と、その層での物差しの順位を並べる'],
+        'tests': ['M_L', 'M_X'], 'statistic': '順位相関（Spearman）', 'one_sided': True,
+        'unit': '各方向の物差しの値の組（家族ごと）を、七本の方向の間で入れ替える。行の腕の符号と升目は固定する。全ての入れ替えを数える。同順位は平均順位',
+        'directions': GATE_DIRS, 'permutations': math.factorial(len(GATE_DIRS)), 'permutations_without_vhat': math.factorial(len(GATE_DIRS) - 1),
+        'holm_m': 2, 'alpha': 0.05,
+        'gate': '門を通る＝二つの物差しの少なくとも一つで、方向を単位にした順位相関が正の向きに Holm を通る。通らなければ、語の集合の結果を行動に結びつけて書かない',
+        'gate_without_vhat': 'v̂ を抜いた六本で同じ門を計算する（全ての入れ替えを数える）。v̂ の語の集合を行動に結びつけて書くのは、この門でも通るときに限る（検出力は低いが、低ければ既定の「結びつけない」の側に倒れる）',
+        'link_rule': '門を通ったときに行動に結びつけてよいのは、通った物差しだけ。M_E と M_F は門が無いので結びつけない',
+        'or_note': '二つの物差しのどちらかで通る条件の多重性は、Holm で抑える。M_L の値は survival の三場面で同じなので、門の順位の中で場面の間の違いを担うのは主に M_X である（ただし、同じ押しでも土台の余裕が場面で違えば、行動への効き方は場面で違いうる）',
+        'power_guide': {'source': SIM_REL, 'tau': [x[0] for x in sim_null], 'null_false_pass_free': [x[1] for x in sim_null], 'null_false_pass_direction': [x[2] for x in sim_null],
+                        'shares': [x[0] for x in sim_alt], 'pass_free': [x[1] for x in sim_alt], 'pass_direction_unit': [x[2] for x in sim_alt],
+                        'note': '合成の目安で、票の器によるもの（行の構造と効きの大きさは仮定で、実データの較正ではない）。行を自由に並べ替えると、方向ごとの効きがあるだけで偽の通過率が大きく上がり、方向を単位にすると名目の近くに戻る。方向を単位にした門は、物差しが効きの半分を担っても通るのはおよそ半分'},
+        'row_variance_note': '行動の量のばらつきは件数（名前のある方向の行と、ランダム方向の一本ずつの行）で違い、S4 の反証の (6b) の行は補正を入れても端の値。順位で読むので害は小さい',
+        'descriptive': ['行の単位の順位相関（行を交換可能とみなした並べ替えの割合は付けない）', 'ランダム方向の行だけの順位相関', '崩れの行（出力が一つの選択にそろった行・転記行 D・門の行の中では S4 の二行）を入れた門の値と、除いた門の値', '調整走行の層ごとの方向（v̂ と三本のランダム方向を三つの層で）の、方向を単位にした順位', 'S4 の自然の対照（次の項）'],
+        's4_uniform_rand_index': 0,
+        's4_control': 'S4 の反証の腕では、(6b) と B のランダム方向の一本目が出力を一様にした（全て c・JSON 直答）。同じ一本を別の土台（O-Ncold）に加えた行は一様にならなかった。層一の直接の押し（M_F・M_Lc）は土台に依らないので、直接の経路が効いたとしても、無操作で既に JSON 直答が多い Osec-Ncold の土台を「閾の近くから押し切った」形でしか説明できない。層一で、(6b) と一本目が、M_F と M_Lc のそれぞれで四本（(6b) と三本のランダム方向）の中の上の二本に来るかを記述する（偶然なら六分の一）',
     },
     'magnitude': {
+        'residual': '最終層の正規化の前の残差を、正規化（`model.norm`）の入力へのフックで取る（transformers の hidden_states の最後の要素は正規化の後の値のため）',
+        'logit_check': {'atol': 0.5, 'rule': '最初の一件で、フックで取った残差に正規化と語彙の行列を当てた値が、模型の logits と許容の内で一致し、最上位の語が同じことを確かめ、外れたら止める'},
+        'positions': ['主位置（組み立てたプロンプトの最後のトークン・その出口の値が最初の応答のトークンを予測する）', '答えの文字の位置（その出口の値が選択の値の文字を予測する位置）'],
+        'position_check': '主位置が凍結の `steer_B.main_position` と同じで、加減の帯（主位置から EOS まで）の中にあることを器で確かめる',
+        'quantity': '全語彙の softmax を通した確率の変化（pt と対数オッズ）。主位置ではコードブロックの書き出しの確率、答えの文字の位置では「a」と「c」の確率',
+        'formula': '正確な直接の経路: W_E ·（g ⊙ [(h ＋ α u)/rms(h ＋ α u) − h/rms(h)]）。h は教師強制で得た最終層の残差（正規化の前）、α u は B で加えた量（係数 × ‖v̂‖・腕の符号つき）。後の層の出力は変わらないとみなす',
+        'parts': '層一の近似の部分（(α／rms(h))·W_E·(g⊙u)）と、最終の残差に沿う部分と、尺度の部分（正確な値 − 一次の値）を分けて出す。各方向と最終の残差の余弦を二つの位置で記録する（語彙への射影ではない）。層一の M_L と正確な直接の経路の順位の一致を記述に並べる',
+        'strata': 'JSON 直答の出力（S4 の Osec-Ncold の無操作の腕だけにある）と散文の出力を分ける。答えの文字の位置で比を読むのは JSON 直答の出力だけ。散文の出力の答えの文字の位置は写しなので、値は記述だけ',
+        'cells': '記述の層は、場面 × 土台の無操作の腕（加算族は Onull、減算族は O-Ncold）の散文の出力',
         'per_cell': 20,
-        'cells': '場面 × 土台の無操作の腕（加算族は Onull、減算族は O-Ncold、S4 の反証は Osec-Ncold）',
-        'selection': 'B の本走行の、その土台の無操作の腕の出力のうち、JSON の選択を読める出力を、試行の番号の小さい順に取る',
-        'positions': ['選択の値の最初のトークンの直前（答えの文字）', '主位置（最初の応答のトークン・様式）'],
-        'formula': '正確な直接の経路: W_E ·（g ⊙ [(h ＋ α u)/rms(h ＋ α u) − h/rms(h)]）。h は教師強制で得た最終層の残差（正規化の前）、α u は B で加えた量（係数 × ‖v̂‖）。後の層の出力は変わらないとみなす',
+        'selection': 'B の本走行の無操作の腕の出力のうち、JSON の選択を読めて、選択の値の文字を覆うトークンが見つかった出力を、層ごとに試行の番号の小さい順に取る。選んだ試行の番号は凍結の記録に置き、起動器に選び直させない（転記行 E）',
+        'input_check': '教師強制の入力は、凍結した段階 B の組み立ての関数で作り、試行の記録の前置きの SHA（`preamble_sha`）と突き合わせる',
+        'rows_letter': '答えの文字の位置の比: S4 の Osec-Ncold に加えた (6b) と、B のランダム方向の三本の行',
+        'rows_main': '主位置の比: 観測の様式の変化が下限を超えた行（全ての方向と土台）',
+        'lower_bound': {'z_min': 2, 'continuity': 0.5,
+                        'rule': '比を出すのは、観測の変化（土台の無操作の腕との率の差）を、二標本の標準誤差（率に連続性の補正を入れる）で割った値の絶対値が `z_min` 以上の行だけ。ほかの行は「比を出さない」と印字する'},
+        'ratio': '比＝直接の経路の確率の変化（主位置は一つの値・答えの文字の位置は選んだ出力の中央値）÷ 観測の率の変化。符号が逆なら負の比のまま印字する',
+        'aggregate': '選んだ出力の中央値と四分位の幅',
         'reading_ratio': 0.2,
-        'reading': '直接の経路の押し（答えの文字の対数オッズ）が、B で観測した行動の対数オッズの変化に対して下の比に満たなければ、「直接の経路は行動の変化の一部しか担えない」と書く',
-        'environment': 'Colab L4・B と同じ版の transformers と torch（B の本走行のセッション記録の版）',
+        'reading': '比が読みの比に満たない行では「直接の経路は、この行の行動の変化の一部しか担えない」と書く。読みの比以上の行では「直接の経路の押しは、この行の行動の変化の読みの比以上に当たる（後の層の寄与は見ていない）」と書く。比を出した行の数と、読みの比以上の行の数を並べる',
+        'vhat_note': 'v̂ の行では比が出ない——v̂ を加減した土台の出力は散文だけで、様式の変化も下限に届かない（転記行 E）。問五の答えの限界として先に書く',
+        'environment': 'Colab L4・B と同じ版の transformers と torch と NumPy（B の本走行のセッション記録の版・`inputs.versions_B`）',
     },
-    'reading_rules': [
-        {'type': '語の反響が主', 'condition': 'M_E が等方の帰無の外で、M_L・M_X・M_F は外でない', 'write': 'v̂ の直接の経路は、O と Osec で違った語を押し上げる向き（語域の反響）。行動の説明には使わない', 'never': '意味の証拠・理解・略奪を抑える'},
-        {'type': '選択肢の語に偏る', 'condition': 'M_X が外', 'write': '直接の経路は、破局の選択肢の語と、ほかの選択肢の語に偏って押す（記述）。門の結果を並べる', 'never': 'フィルター・抑止・意味論的な働き'},
-        {'type': '答えの文字', 'condition': 'M_L が外', 'write': '直接の経路は答えの文字を動かす向き。文字の押しは場面に依らないので、N1 で区別できなかったことは説明しない', 'never': '意味の証拠'},
-        {'type': '様式', 'condition': 'M_F が外', 'write': 'JSON の書き出しと散文の書き出しへの押し（枠の乗り降りを含む）', 'never': '選択を変える方向'},
-        {'type': '区別できない', 'condition': '四つとも外でない', 'write': '直接の経路では、帰無の方向と区別できる押しは無かった。後の層の経路は見ていない', 'never': '方向が無い・意味が無い'},
-        {'type': '門', 'condition': '層二の門を通らない', 'write': '直接の経路の物差しは、B の方向ごとの行動の変化と揃わなかった。上の型の記述は、行動に結びつけない', 'never': '行動はこの語の押しで起きた'},
+    'reading_rules': READING,
+    'reading_notes': [
+        '型は重なりうる。重なったときは、当たった型の書くことをすべて並べ、書かないことはすべて守る（語の反響は、ほかの型と並んでも書く）',
+        '二つの札は別々に印字する。「帰無の方向一般と区別できる」と書くのは、二つの札が両方付いたときに限る',
+        '各型の文には、実在の差の中の順位（M_E は語の側の帰無の中の割合）を器で一行添える',
+        '門を通ったときに行動に結びつけてよいのは通った物差しだけ。v̂ を抜いた門も通らなければ、v̂ の語の集合を行動に結びつけない',
+        '走査の禁止語は、この表の「書かないこと」の欄から器で作り、段階 B の一覧と足した語に加える。凍結した走査器は打ち消しの文も止めるので、打ち消しは禁止語を引かない定型で書く',
+        'どの型でも段階 B の札に触れない。語の一覧の語を拾って物語を作らない',
     ],
+    'negation_templates': NEG_TEMPLATES,
     'limits': [
         '直接の経路だけを見る。後の層を通る経路は見ない',
-        '中間層の射影は、中間層の表現が出口の語彙の座標と揃っていないため、当てにならないことがある',
-        'v̂ は仏教語の語域の差であり、相互依存・共創の意味の差ではない',
-        '層一は最終の正規化を一次で扱う。層二の大きさは正確な形で計算するが、それも後の層が変わらないとした直接の経路だけ',
-        '語の集合はトークンの単位で、日本語の語はしばしば複数のトークンに割れる',
-        '実在の差の方向は互いに相関し、v̂ と近い対を含む',
+        '直接の経路の値は、加えた方向が残差の足し算で最終層まで運ばれる成分として正確だが、後の層を通る効果の一部でしかなく、選んだ層ではその割合が分からない。後の層がそれを打ち消すか上書きするかも見ない',
+        'v̂ は仏教語を中心とする宗教・宇宙論の語域と、その世俗の言い換えの差（字種と長さの差、言い換えで落ちた含みの差を含む）であり、相互依存・共創の意味の差ではない。v̂ は抽出の二場面の平均である',
+        '層一は、最終の正規化の尺度を固定し、最終の残差に沿う成分を落とした近似。層二の大きさは正確な形で計算するが、それも後の層が変わらないとした直接の経路だけ',
+        '語の集合はトークンの単位で、日本語の語はしばしば複数のトークンに割れる。一字の漢字（二・元・非・手・物・白 など）は多義',
+        '断片の規則は日本の字体に偏って効く——顕・観・戦・撃・渉・対・単・応・扱・綴 がバイトの断片に割れて除かれ、E+ から「顕現」が落ち、N1 の X_o は (b)(c)(d) の要の字（戦・撃・渉・観）を、X_a は「対」を欠く（落ちた字は転記行 B に元の語ごとに印字する）',
+        'X には場面の幹と JSON の指示の語が入る（印を付け、除いた集合を感度として並べる）',
+        'M_F の主はコードブロックの書き出しの一つのトークンで、JSON 直答の無操作の出力は S4 の Osec-Ncold の一升目にしかない',
+        '埋め込みの共有の下では、語の反響は入力の語の写しの押し戻しを含む。E+ は単漢字が多く（仏教語の珍しい字を含む）、E− は和語まじりのトークンを含む（転記行 H の字の種類の組み立て）ので、M_E の差には字種の差も入る。「a」は英語の冠詞でもあり、M_L の押しが選択肢の a か冠詞の a かは分けられない',
+        '実在の差の方向は八腕の差にすぎず（高々七次元）、二つ目の札は八腕の差の中の順位。O と Osec の入れ替えを含む兄弟の対は比べる相手から除き、別の行に並べる',
+        '等方の帰無は解析で書け、非等方の残差から作った方向には越える棒が低い',
+        '門の独立の単位は七本の方向で、検出力は低い（物差しが効きの半分を担っても、通るのはおよそ半分・票の器の目安）',
+        '大きさの目盛りの比は、JSON 直答の出力の答えの文字の位置と、主位置のコードブロックの書き出しでだけ読む。散文の出力の答えの文字の位置は写しなので値は記述だけ。理由の位置での押しは目盛りの外。v̂ の行では比が出ない',
         '校正に使う B の行動は公開済みで、起草者と登録者は見ている。射影の値はまだ誰も見ていない',
         '教師強制は無操作の出力の文を固定するので、自由に生成したときの決定の過程とは違う。出力を割り直したトークンの並びは、生成したときの並びと違うことがある',
         '拒否の方向（安全の訓練が作る既知の方向）との重なりは測らない',
         '機種は一つ。方向は B の抽出に依り、ほかの機種へ移植できない',
     ],
+    'descriptive_after_seal': {
+        'items': ['各方向と帰無の ‖g⊙u‖／‖u‖', '‖g⊙u‖² のうち上位の次元（`top_dims` 個）が占める割合', '狙いの度合い（物差し ÷ 語彙にわたる Δℓ の標準偏差）', '上位の次元（`top_dims` 個）を零にした感度（物差しの値）', '語の一覧の語の、埋め込みの行のノルムの偏り（語彙の中の割合）'],
+        'top_dims': 8,
+        'note': '封印の後に計算する記述。札を付けない（採否表 P517）',
+    },
     'print_strings': {
         'value_word_ban': TB['print_strings']['value_word_ban'] + ADDED['value'],
         'mechanism_word_ban': TB['print_strings']['mechanism_word_ban'] + ADDED['mechanism'],
+        'reading_never_ban': never_ban,
     },
     'print_strings_added': ADDED,
     'report_rules': {'machine_block': TB['report_rules']['machine_block']},
@@ -173,30 +312,45 @@ T = {
         'order': 'コーディネータが先に封印して SHA だけを伝え、登録者はコーディネータの予想を開かずに封印する（裁定 D148 の順・B では逆になった）。封印は射影を一つも計算する前',
         'confidence_levels': ['高', '中', '低'],
         'items': [
-            'v̂（選んだ層）の M_L は等方の帰無の外か。外なら向き（破局の文字の側／反対）',
-            'v̂ の M_X は等方の帰無の外か。外なら向き（破局の選択肢の語の側／反対）',
-            'v̂ の M_E は等方の帰無の外か。外なら向き（O の語の側／Osec の語の側）',
-            'v̂ の M_F は等方の帰無の外か。外なら向き（JSON の書き出し／散文の書き出し）',
-            'v̂ の M_E は、実在の差のどれよりも大きいか',
-            '層二の門を通るか（通るなら M_L か M_X か両方か）',
-            '直接の経路の押しは、行動の変化に対して §4 の読みの比以上を担えるか',
-            'S4 の自然の対照で、B のランダム方向のうち出力を一様にした一本は、(6b) と同じ向きに M_F で押しているか',
+            'v̂（選んだ層）の M_L は、家族ごと（survival・nuclear）に、どの札が付くか（付かない／等方の外だけ／二つ目の札だけ／両方）と、付くなら向き（破局の文字の側／反対）',
+            'v̂ の M_X は、家族ごとに、どの札が付くかと、付くなら向き（破局の選択肢の語の側／反対）',
+            'v̂ の M_E は、どの札が付くか（二つ目の札は語の側の帰無）と、付くなら向き（O の語の側／Osec の語の側）',
+            'v̂ の M_F は、どの札が付くかと、付くなら向き（コードブロックの書き出しを押し上げる／押し下げる）',
+            'v̂ の M_E の |値| は、兄弟を除いた実在の差のどれよりも大きいか（記述）',
+            '方向を単位にした門を通るか（通らない／M_L で通る／M_X で通る／両方）と、v̂ を抜いた門も通るか',
+            '作り直した大きさの目盛りで、比を出した行のうち、直接の経路の押しが読みの比以上に当たる行はどれだけか（無い／一部／全部）',
+            'S4 の自然の対照で、B のランダム方向の一本目は、(6b) と同じ向きに M_F で押しているか（同じ向き／逆向き）',
         ],
+        'information_state': '予想者（登録者とコーディネータ）は、封印の前に設計の巡の四票とその整理（再現の表・採否表）を読んだ。票は結果の見込みを書いていないが、構造の指摘は予想に触れうる',
     },
     'review_plan': {
         'design': {'gemini': 2, 'claude_ai': 2}, 'results': {'gemini': 2, 'claude_ai': 2}, 'final': {'external': 1},
+        'design_done': '設計の巡は一巡で済んだ（Gemini 3.8 Flash 二票・claude.ai の Claude Opus 5.5 二票・四票とも条件つき可・裁定 D168〜D176）',
         'counting': 'claude.ai の Claude Opus 5.5 はコーディネータと同じ機種。何票でも一票に数え、独立の重みは Gemini 3.8 Flash の票に置く（裁定 D59・D166）',
         'order': ['設計の巡', '裁定', '器と合成データの確かめ', '凍結と記録先行の公開', '封印', '計算（結果は登録者と一緒に開く）', '報告', '結果の巡', '最終の系統外の一票（「最終」と明記）', '公開'],
         'no_more': 'この順のほかに巡を置かない（裁定 D160 の型）',
     },
     'tools_plan': [
-        '`tools/blens_sets.py`（語の集合を作って凍結する）', '`tools/blens_lens.py`（層一の射影と二つの帰無）', '`tools/blens_calib.py`（層二の校正と門）',
-        '`tools/colab/boot_Blens.py`（教師強制の順伝播）', '`tools/build_report_Blens.py`（報告の組み立て）', '`tools/dry_run_Blens.py`（合成の語彙の行列と方向で全ての経路を発火させる）',
+        '`tools/blens_sets.py`（語の集合を作って凍結する）', '`tools/blens_lens.py`（層一の射影と三つの帰無・ランダム方向の写した器）', '`tools/blens_calib.py`（層二の校正と、方向を単位にした門）',
+        '`tools/colab/boot_Blens.py`（教師強制の順伝播・正規化の前の残差のフック）', '`tools/build_report_Blens.py`（報告の組み立て）', '`tools/dry_run_Blens.py`（合成の語彙の行列と方向で全ての経路を発火させる）',
     ],
+    'checks': [
+        '等方の帰無: 千本の抽選の物差しの標準偏差を解析の値と突き合わせる（`nulls.isotropic.analytic_tol` の相対の差の内）',
+        'ランダム方向: 写した器が凍結の関数の再生とビットで一致し、Colab の B の版の NumPy で再生した方向の SHA-256 が手元の値と一致する',
+        '語の集合: 二つの器の集合がバイトで一致し、組み立てたプロンプトの中で割った集合と単独で割った集合が一致する',
+        '主位置: 凍結の `steer_B.main_position` と同じで、加減の帯の中にある',
+        '大きさの目盛り: 最初の一件の logits の突き合わせ（`magnitude.logit_check`）と、教師強制の入力の前置きの SHA の突き合わせ',
+    ],
+    'synthetic': ['断片のトークン', '集合の重なり', '家族で M_L が割れる場合', '一本の方向が門を引っ張る場合（方向を単位にした門では通らないことを確かめる）', '方向ごとの効きを持つ帰無（自由な並べ替えと方向の単位の偽の通過率を並べる）',
+                  '門を通る場合と通らない場合', '外れ値の次元と g の外れ値', '行のノルムが不揃いな共有の語彙の行列', '行動の変化が零の行（比を出さない）', 'JSON 直答が零の升目', '選択を読めない出力を含む升目', 'ほぼ同じ向きの双子の方向', '同じ |値| を持つ両向き', '一つだけの F の主と空の E−', '零と全部の行'],
+    'publication': {'activations': '凍結の時に、転記行 C の SHA-256 のファイルを、公開の置き場の `results/dirB/dirB__s1/main_position_activations.npz` に写す（裁定 D175）。外から実在の差の帰無と方向の作り直しを再現できるようにするため。段階 B の裁定 D154 の副位置の活性とは別',
+                    'bytes': act_bytes},
     'cost': {'colab_units_low': 1, 'colab_units_high': 2, 'layer1': '手元の CPU（Colab は要らない）', 'layer2': 'Colab L4 で教師強制の順伝播'},
-    'numbering': {'rulings_next': 'D168', 'verification_next': 'K295', 'adoption_next': 'P495'},
+    'numbering': {'rulings_next': 'D178', 'verification_next': 'K326', 'adoption_next': 'P528'},
     'clause': '本正本のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。',
 }
+assert T['primary']['holm_m'] == len(PRIMARY) and set(SECOND) == set(PRIMARY)
+assert comparators['static'] == n_pairs - len(SWAP)
 out = j('design', 'contrasts-Blens.json')
 open(out, 'w', encoding='utf-8', newline=NL).write(json.dumps(T, ensure_ascii=False, indent=1) + NL)
 print('wrote', out, s16('design/contrasts-Blens.json'))
