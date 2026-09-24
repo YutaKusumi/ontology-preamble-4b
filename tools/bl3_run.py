@@ -310,16 +310,20 @@ def steered_cache_check(R, items, batch, tol):
     return {'max_abs': worst, 'tol': tol, 'shortcut': worst <= tol, 'per': per}
 
 
-def recompute_hook_path(R, rows, dirs_by_row):
+def recompute_hook_path(R, rows, dirs_by_row, log=None):
     """独立の再計算の本の器のフックの道（正本 `independent_recompute.new_paths` の一つ目・近道なし・バッチ一）。
-    rows: [(行の名, 升目, 符号)]・dirs_by_row: 行の名 → [(方向の名, 符号)]（比べる相手の逆の向きは符号を反転して流す）。戻り値: 行の名 → {'noop_lo', 'effects': {'方向の名|符号': 効き目}}。"""
+    rows: [(行の名, 升目, 符号)]・dirs_by_row: 行の名 → [(方向の名, 符号)]（比べる相手の逆の向きは符号を反転して流す）。戻り値: 行の名 → {'noop_lo', 'effects': {'方向の名|符号': 効き目}}。
+    log があれば、行ごとに行の名と順伝播の数と時間だけを渡す（値は渡さない）。"""
     out = {}
-    for name, cell, sign in rows:
+    t0 = time.time()
+    for i, (name, cell, sign) in enumerate(rows):
         base = float(R.forward(cell, [K.NOOP], sign, full=False)['lo'][0])
         eff = {}
         for did, sg in dirs_by_row[name]:
             eff['%s|%+d' % (did, sg)] = float(R.forward(cell, [did], sg, full=False)['lo'][0]) - base
         out[name] = {'noop_lo': base, 'effects': eff}
+        if log:
+            log('[bl3_run] 独立の再計算のフックの道 %s（%d/%d・順伝播 %d）・%.0f 秒' % (name, i + 1, len(rows), 1 + len(eff), time.time() - t0))
     return out
 
 
@@ -363,6 +367,106 @@ def load_dirs(npz_path, json_path):
         for n, v in zip(ns, A):
             d[n] = np.asarray(v, dtype=np.float64)
     return d, names
+
+
+def secondary_contexts(tok, T3, FJ, FB, repo):
+    """乙の文脈（正本 `readout.secondary`・裁定 D227）: B-lens の層二で選んだ出力（B-lens の設計事実の転記行 E の `selected`・一覧の SHA16 を確かめる）の、
+    プロンプトと出力の選択の文字を覆うトークンの前までの教師強制の入力（凍結の `boot_Blens.context_of`）。戻り値: [(層の鍵, 試行の番号, 升目の入力, 文脈の記録)]。"""
+    import hashlib, glob
+    import steer_B
+    import run_stageB_local as RB
+    sys.path.insert(0, os.path.join(HERE, 'colab'))
+    import boot_Blens as BOOT
+    E = FB['facts']['E']
+    sel = E['selected']
+    if hashlib.sha256(json.dumps(sel, sort_keys=True).encode('utf-8')).hexdigest().upper()[:16] != E['selected_sha16']:
+        raise ToolError('乙の文脈の一覧の SHA16 が B-lens の設計事実と違う')
+    AT = RB.arm_texts()
+    L = FJ['facts']['A']['letter_ids']
+    fam_letters = T3['readout']['primary']['letters']
+    out = []
+    for key, ids_ in sel.items():
+        sc, arm, style = key.split('|')
+        scen, inst = RB.scenario_and_instruction(sc)
+        prompt = steer_B.apply_chat(tok, RB.user_message(AT[arm]['text'], scen['text'], inst))
+        d = os.path.join(repo, 'results', 'stageB', 'stageB__%s__%s__s1' % (sc, arm))
+        tr = {json.loads(l)['trial_id']: json.loads(l) for l in open(glob.glob(os.path.join(d, 'trials-*.jsonl'))[0], encoding='utf-8')}
+        rw = {json.loads(l)['trial_id']: json.loads(l) for l in open(glob.glob(os.path.join(d, 'raw-*.jsonl'))[0], encoding='utf-8')}
+        fam = scen['family']
+        set_ids = [int(L[x]) for x in fam_letters[fam]] + [int(L['refuse'])]
+        for tid in ids_:
+            try:
+                cx = BOOT.context_of(tok, prompt, tr[tid], rw[tid], AT[arm]['sha16'], steer_B.main_position)
+            except BOOT.Stop as e_:
+                raise ToolError('乙の文脈を組めない: %s' % e_)
+            cell = Cell('%s|%s' % (sc, arm), sc, arm, fam, prompt, cx['ids'][len(prompt):], set_ids, steer_B.main_position(prompt))
+            rec = {'stratum': key, 'trial_id': tid, 'choice': cx['choice'], 'letter_token': cx['letter_token'],
+                   'letter_token_is_L': cx['letter_token'] == int(L.get(cx['choice'], -1)), 'n_ids': len(cx['ids'])}
+            out.append((key, tid, cell, rec))
+    return out
+
+
+def run_secondary(R, contexts, rows_by_cell, log=None):
+    """乙（正本 `descriptive.secondary_readout`・裁定 D227）: 文脈ごとに、その升目の門の行（名前のある方向と段階 B の三本）の方向を、行の符号で加える（近道なし）。
+    符号ごとに零のベクトルの無操作と同じバッチに流す。戻り値: 文脈ごとに、行の名 → 対数オッズの変化と、選択肢 a と c の文字の出口の値の変化。
+    log があれば、文脈ごとに層の鍵と試行の番号と時間だけを渡す（値は渡さない）。"""
+    out = []
+    t0 = time.time()
+    for ci, (key, tid, cell, rec) in enumerate(contexts):
+        if log:
+            log('[bl3_run] 乙 %s %s（%d/%d）・%.0f 秒' % (key, tid, ci + 1, len(contexts), time.time() - t0))
+        rows = rows_by_cell.get(cell.key, [])
+        by_sign = collections.OrderedDict()
+        for name, did, sg in rows:
+            by_sign.setdefault(sg, []).append((name, did))
+        i_c = 2                                                      # 読み取りの集合は族の選択の文字の順（a・b・c…）で、c は三つ目
+        res = {}
+        for sg, items in by_sign.items():
+            r = R.forward(cell, [K.NOOP] + [d for _, d in items], sg, full=False)
+            for k_, (name, did) in enumerate(items, start=1):
+                res[name] = {'dlo': float(r['lo'][k_] - r['lo'][0]), 'dz_a': float(r['Zset'][k_, 0] - r['Zset'][0, 0]), 'dz_c': float(r['Zset'][k_, i_c] - r['Zset'][0, i_c])}
+        out.append(dict(rec, rows=res, n_batches=len(by_sign)))
+    return out
+
+
+def run_main_phase(R, T3, FJ, cells, names, pilot, iso_n=None, log=print):
+    """本の計算の全体（正本 `computation`・`readout.primary.batching`）: 頭の自己検査（出口の値・最後の層）と近道の確かめ → 全ての升目と符号。
+    pilot: 本の凍結で凍結した下見の記録（バッチの大きさ・揺れの床・近道の許容・近道・外した升目）。names: {'named','B_random','iso','real'} の名の並び。
+    iso_n は合成データの確かめで等方の本数を減らすときだけ使う。戻り値: {'head': 頭の確かめ, 'cells': 升目と符号の鍵 → 出力}。
+    層ごとの差分は、名前のある方向と段階 B の三本の行と、等方の帰無の層ごとの中央値と中央の区間だけを残す（正本 `descriptive.layerwise.directions`）。"""
+    dropped = set((pilot.get('decision') or {}).get('dropped', []))
+    batch, tol = pilot['batch'], pilot['cache_tol']
+    main_keys = ['%s|%s|%+d' % (sc, b, int(sg)) for sc, b, sg in T3['cell_signs_main']]
+    items = [(cells['%s|%s' % (sc, b)], int(sg)) for sc, b, sg in T3['cell_signs_main'] if '%s|%s' % (sc, b) not in dropped]
+    head = collections.OrderedDict()
+    head['logit_check'] = R.logit_check(items[0][0], T3['computation']['logit_tol'])
+    if not head['logit_check']['pass']:
+        raise ToolError('出口の値の自己検査が落ちた（本の計算の頭）: %s' % head['logit_check'])
+    shortcut = bool(pilot['v']['shortcut'])
+    if shortcut:
+        head['steered_cache_check'] = steered_cache_check(R, items, batch, tol)
+        shortcut = head['steered_cache_check']['shortcut']
+    head['shortcut'] = shortcut
+    head['layer_check'] = R.layer_check(items[0][0], items[0][1], 'check', T3['computation']['layer_tol'])
+    if not head['layer_check']['pass']:
+        raise ToolError('最後の層の自己検査が落ちた（本の計算の頭）: %s' % head['layer_check'])
+    iso = names['iso'] if iso_n is None else names['iso'][:iso_n]
+    gate_only = [tuple(x) for x in FJ['facts']['C']['cell_signs_gate'] if x not in T3['cell_signs_main']]
+    sets = cell_sign_sets(T3, None, names['named'], names['B_random'], iso, names['real'], gate_only)
+    layer_dirs = list(names['named']) + list(names['B_random'])
+    band = T3['descriptive']['layerwise']['band']
+    out = collections.OrderedDict()
+    t0 = time.time()
+    for ki, (key, ck, sg, ds) in enumerate(sets):
+        if ck in dropped:
+            continue
+        main_cs = key in main_keys
+        pc = R.prefix_cache(cells[ck]) if shortcut else None
+        o = run_cell_sign(R, cells[ck], sg, ds, batch, T3['readout']['primary']['order_seed'], ki, pc=pc, layer_dirs=layer_dirs if main_cs else (), keep_iso_layers=main_cs)
+        o['layers'] = {'noop_lo': o['layers']['noop_lo'], 'rows': o['layers']['rows'], 'iso_summary': layer_summary(o['layers'], band) if main_cs else None}
+        out[key] = o
+        log('[bl3_run] 升目と符号 %s（%d/%d）・%.0f 秒' % (key, ki + 1, len(sets), time.time() - t0))
+    return {'head': head, 'cells': out, 'batch': batch, 'shortcut': shortcut, 'dropped': sorted(dropped)}
 
 
 def layer_summary(lay, band):

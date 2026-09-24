@@ -1,0 +1,114 @@
+{
+ "kind": "bl3_colab_check",
+ "boot": "v1",
+ "commit": "",
+ "dry": true,
+ "gpu": "dry",
+ "versions": {
+  "numpy": "2.4.2",
+  "scipy": "1.17.0",
+  "torch": "2.9.1",
+  "transformers": "4.57.3",
+  "torchvision": null,
+  "torchaudio": null,
+  "tokenizers": "0.22.2",
+  "huggingface_hub": "0.36.0",
+  "accelerate": "1.12.0",
+  "safetensors": "0.7.0"
+ },
+ "weights_sha256": {},
+ "canon_sha16": "6330B65A0AB503E7",
+ "directions_npz_sha256": "E660707BCD5E9C3DF39B8AD5754C11671B33596D0BF7ED9F66C6DD852A1AB40E",
+ "directions_group_sha256": {
+  "named": "69C1864181E70F2099680068A2FEBCA25557A0163CAED104B5DDC07855CD9304",
+  "B_random": "D8FB3A5967660C5FA81DC706B5154C16E2B36EB46801153F80A4FC8812DDEAF6",
+  "iso": "693B555622F88F502FB7C4A786A70B60B3DA26E7A19302397C0E32E6E9F361EE",
+  "real": "AA61FED01B9B7F2DFB6A5597FC0422B429E5012445AB726BF5B68E637AC92636",
+  "check": "EF11D73BE144C29D6E33688D4BFA91F86DB61A77B7F4394085A37AF29012C6AF"
+ },
+ "frozen_check": null,
+ "layer_idx": 1,
+ "coef": 2.0,
+ "log": [
+  {
+   "step": "repo",
+   "t": 0.0,
+   "at": "2026-09-24T22:03:54Z",
+   "commit": "dry",
+   "canon": "draft3-r1-2026-09-24",
+   "canon_sha16": "6330B65A0AB503E7",
+   "out": "C:\\Users\\PC\\AppData\\Local\\Temp\\claude\\C--Users-PC\\e815e703-8cfe-466b-b434-54ac55be02b1\\scratchpad\\boot-dry\\check-20260924T220354Z"
+  },
+  {
+   "step": "versions",
+   "t": 0.4,
+   "at": "2026-09-24T22:03:55Z",
+   "versions": {
+    "numpy": "2.4.2",
+    "scipy": "1.17.0",
+    "torch": "2.9.1",
+    "transformers": "4.57.3",
+    "torchvision": null,
+    "torchaudio": null,
+    "tokenizers": "0.22.2",
+    "huggingface_hub": "0.36.0",
+    "accelerate": "1.12.0",
+    "safetensors": "0.7.0"
+   },
+   "gpu": "dry"
+  },
+  {
+   "step": "weights",
+   "t": 36.6,
+   "at": "2026-09-24T22:04:31Z",
+   "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554",
+   "checked": 0
+  },
+  {
+   "step": "directions",
+   "t": 37.8,
+   "at": "2026-09-24T22:04:32Z",
+   "npz_sha256": "E660707BCD5E9C3D",
+   "groups": {
+    "named": "69C1864181E70F20",
+    "B_random": "D8FB3A5967660C5F",
+    "iso": "693B555622F88F50",
+    "real": "AA61FED01B9B7F2D",
+    "check": "EF11D73BE144C29D"
+   },
+   "n": 2035
+  },
+  {
+   "step": "model",
+   "t": 47.4,
+   "at": "2026-09-24T22:04:42Z",
+   "dry": true,
+   "layers": 4,
+   "layer_idx": 1,
+   "coef": 2.0,
+   "dtype": "torch.bfloat16",
+   "device": "cpu"
+  },
+  {
+   "step": "cells",
+   "t": 47.6,
+   "at": "2026-09-24T22:04:42Z",
+   "main": 8,
+   "gate_only": 1
+  },
+  {
+   "step": "check",
+   "t": 49.6,
+   "at": "2026-09-24T22:04:44Z",
+   "cell_signs": 17,
+   "passes": 24527,
+   "recompute_rows": 8,
+   "gate_rows": 64,
+   "secondary_contexts": 180,
+   "rewrite_importable": false
+  }
+ ],
+ "finished": "2026-09-24T22:04:44Z",
+ "seconds": 49.6,
+ "clause": "本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

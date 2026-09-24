@@ -180,6 +180,49 @@ def recompute_agreement(T3, main_rows, eff_main, pair_names, hook, rewrite, pilo
     return out
 
 
+# ---------------- 乙（裁定 D227） ----------------
+def secondary_rows(T3, rows_gate, FB):
+    """乙の行（裁定 D227）: 門の行のうち、方向が名前のある方向か段階 B の三本で、土台の升目が B-lens の層二の層にある行。符号は門の行の符号。
+    戻り値: 升目の鍵 → [(行の名〔場面|腕|単位〕, 方向の名, 符号)]（行の名は B-lens の層二の答えの文字の位置の行と同じ書き方）。"""
+    strata_cells = {'%s|%s' % tuple(k.split('|')[:2]) for k in FB['facts']['E']['selected']}
+    units = list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]
+    out = collections.OrderedDict()
+    for r in rows_gate:
+        if r['cell'] in strata_cells and r['unit'] in units:
+            out.setdefault(r['cell'], []).append(('%s|%s|%s' % (r['scenario'], r['arm'], r['unit']), r['unit'], r['sign']))
+    return out
+
+
+def secondary_counts(FB, rows_by_cell):
+    """乙の順伝播の数（文脈ごとの行の数の和・文脈ごとの符号の数の和〔無操作と同じバッチに流す〕）。"""
+    n_rows = n_batches = 0
+    for key, ids_ in FB['facts']['E']['selected'].items():
+        rows = rows_by_cell.get('%s|%s' % tuple(key.split('|')[:2]), [])
+        n_rows += len(ids_) * len(rows)
+        n_batches += len(ids_) * len({sg for _, _, sg in rows})
+    return {'row_passes': n_rows, 'sign_batches': n_batches, 'contexts': sum(len(v) for v in FB['facts']['E']['selected'].values())}
+
+
+def secondary_summary(sec_out, calib_letter=None):
+    """乙のまとめ（記述・読みは付けない）: 行ごとに、文脈の間の平均・中央値・四分位と、B-lens の層二の直接の経路の値（あれば）を並べる。"""
+    acc = collections.defaultdict(lambda: collections.defaultdict(list))
+    for c in sec_out:
+        for name, v in c['rows'].items():
+            for k, x in v.items():
+                acc[name][k].append(x)
+    out = collections.OrderedDict()
+    for name, d in acc.items():
+        s = {k: {'mean': float(np.mean(v)), 'median': float(np.median(v)), 'q1': float(np.percentile(v, 25)), 'q3': float(np.percentile(v, 75)), 'n': len(v)} for k, v in d.items()}
+        if calib_letter is not None:
+            sc = name.split('|')[0]
+            arm = name.split('|')[1]
+            base = re.split(r'[+\-]v', arm)[0]
+            bl = ((calib_letter.get('%s|%s' % (sc, base)) or {}).get('rows') or {}).get(name)
+            s['blens_direct'] = {k: bl[k] for k in ('dlogit_exact_a', 'dlogit_exact_c')} if bl else None
+        out[name] = s
+    return out
+
+
 # ---------------- 記述 ----------------
 def descriptive(T3, main_out):
     mm = T3['pilot']['mass_min']

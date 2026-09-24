@@ -167,6 +167,25 @@ def tiny_model(seed=0, layers=4):
     return model.to(torch.bfloat16).eval(), cfg
 
 
+def calibrate_readout_rows(model, R0, cell, FJ, seed=7):
+    """乱数の模型の出口の行列を、読み取りの集合の文字が強く出るように置く（正本の閾値は変えずに、下見を本の計算まで通すため・合成だけ）。
+    読み取りの集合の文字の行を、升目 cell の無操作の最終の正規化の出口の向きの三倍に小さな乱数を足したものにする。起動器の DRY も同じ関数を呼ぶ。"""
+    import torch
+    cap = {}
+    hh = model.model.norm.register_forward_pre_hook(lambda m, a: cap.__setitem__('h', a[0][:, -1, :].detach().clone()))
+    with torch.no_grad():
+        model(input_ids=torch.tensor([cell.ids]), logits_to_keep=1)
+    hh.remove()
+    m_ = R0.norm32(cap['h'])[0]
+    m_ = m_ / m_.norm()
+    set_all = sorted({int(x) for x in FJ['facts']['A']['letter_ids'].values()})
+    gcal = torch.Generator().manual_seed(seed)
+    with torch.no_grad():
+        for tkn in set_all:
+            model.lm_head.weight[tkn] = (3.0 * m_ + 0.3 * torch.randn(m_.shape, generator=gcal)).to(model.lm_head.weight.dtype)
+    return set_all
+
+
 def synth_dirs(dim, names, seed=5):
     rng = np.random.default_rng(seed)
     v = rng.normal(size=dim)
@@ -198,19 +217,7 @@ def part_model(sets, iso_n):
     cells = BR.build_cells(tok, T3, FJ, cell_keys + gate_only_cells)
     # 乱数の模型の出口の行列を、読み取りの集合の文字が強く出るように置く（正本の閾値は変えずに、下見を本の計算まで通すため・合成だけ）
     R0 = BR.Runner(model, T3, L, T3['layers']['coef_applied'], dirs)
-    c_cal = cells[cell_keys[0]]
-    cap = {}
-    hh = model.model.norm.register_forward_pre_hook(lambda m, a: cap.__setitem__('h', a[0][:, -1, :].detach().clone()))
-    with torch.no_grad():
-        model(input_ids=torch.tensor([c_cal.ids]), logits_to_keep=1)
-    hh.remove()
-    m_ = R0.norm32(cap['h'])[0]
-    m_ = m_ / m_.norm()
-    set_all = sorted({int(x) for x in FJ['facts']['A']['letter_ids'].values()})
-    gcal = torch.Generator().manual_seed(7)
-    with torch.no_grad():
-        for tkn in set_all:
-            model.lm_head.weight[tkn] = (3.0 * m_ + 0.3 * torch.randn(m_.shape, generator=gcal)).to(model.lm_head.weight.dtype)
+    calibrate_readout_rows(model, R0, cells[cell_keys[0]], FJ)
     R = BR.Runner(model, T3, L, T3['layers']['coef_applied'], dirs)
     check(G2, '升目の入力が転記行 B と一致する（実のトークナイザ）', True, '%d 升目' % len(cells))
     # 書き出しの割り方が変わる場合（器が止まるか）
@@ -230,28 +237,29 @@ def part_model(sets, iso_n):
         return {'pilot': pilot, 'n_forward': R.n_forward, 'seconds': round(time.time() - t0, 1), 'iso_n': iso_n, 'layers': cfg.num_hidden_layers, 'dim': cfg.hidden_size}
     batch, tol, floor = pilot['batch'], pilot['cache_tol'], pilot['floor']
     use_short = pilot['v']['shortcut']
-    # 本の計算の頭: 近道の確かめ・最後の層の自己検査
+    # 本の計算（起動器が呼ぶ `run_main_phase` をそのまま通す: 頭の自己検査〔出口の値・最後の層〕と近道の確かめ → 全ての升目と符号）
     items = [(cells['%s|%s' % (sc, b)], int(sg)) for sc, b, sg in T3['cell_signs_main']]
-    sc_chk = BR.steered_cache_check(R, items, batch, tol)
-    check(G2, '本の計算の頭の近道の確かめ（効き目で比べる）', sc_chk['shortcut'], '差の最大 %.2e（許容 %.4f）' % (sc_chk['max_abs'], tol))
-    lc = R.layer_check(items[0][0], items[0][1], 'check', T3['computation']['layer_tol'])
+    names_ = {'named': list(T3['directions']['named']), 'B_random': ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])],
+              'iso': ['iso:%d' % i for i in range(T3['nulls']['isotropic']['count'])], 'real': ['real:' + p for p in DJ['groups']['real']['names']]}
+    MP = BR.run_main_phase(R, T3, FJ, cells, names_, pilot, iso_n=iso_n, log=lambda s: None)
+    hd = MP['head']
+    check(G2, '本の計算の頭の出口の値の自己検査', hd['logit_check']['pass'], '差の最大 %.2e（許容 %s）' % (hd['logit_check']['max_abs'], hd['logit_check']['tol']))
+    sc_chk = hd.get('steered_cache_check') or {}
+    check(G2, '本の計算の頭の近道の確かめ（効き目で比べる）', use_short and sc_chk.get('shortcut') and MP['shortcut'], '差の最大 %.2e（許容 %.4f）' % (sc_chk.get('max_abs', float('nan')), tol))
+    lc = hd['layer_check']
     check(G2, '最後の層の自己検査', lc['pass'], '差 %.2e（許容 %s）' % (lc['diff'], lc['tol']))
-    # 本の計算（全ての升目と符号）
-    outs, want = {}, {}
-    main_keys = {'%s|%s|%+d' % (a_, b_, s_) for a_, b_, s_ in T3['cell_signs_main']}
-    for ki, (key, ck, sg, ds) in enumerate(sets):
-        ds_ = [d for d in ds if not d.startswith('iso:') or int(d.split(':')[1]) < iso_n]
-        if key == 'S1|O-Ncold|-1':
-            ds_ = ds_ + ['zero:test']
-        want[key] = set(ds_) | {K.NOOP}
-        main_cs = key in main_keys
-        pc = R.prefix_cache(cells[ck]) if use_short else None
-        outs[key] = BR.run_cell_sign(R, cells[ck], sg, ds_, batch, T3['readout']['primary']['order_seed'], ki, pc=pc,
-                                     layer_dirs=(list(T3['directions']['named']) + ['rand:0', 'rand:1', 'rand:2']) if main_cs else (), keep_iso_layers=main_cs)
-    ok_keys = all(set(o['lo']) == want[k] for k, o in outs.items())
-    check(G2, '本の計算: 全ての方向と無操作がそろい、埋めた零のベクトルの値は使わない', ok_keys, '升目と符号 %d' % len(outs))
-    zt = outs['S1|O-Ncold|-1']['effects']['zero:test']
-    check(G2, '零のベクトルの行は無操作と同じ値になる（別のバッチでも）', abs(zt) <= max(floor, 1e-6), '効き目 %.2e（揺れの床 %.2e）' % (zt, floor))
+    outs = MP['cells']
+    want = {key: {d for d in ds if not d.startswith('iso:') or int(d.split(':')[1]) < iso_n} | {K.NOOP} for key, ck, sg, ds in sets}
+    ok_keys = list(outs) == [s[0] for s in sets] and all(set(o['lo']) == want[k] for k, o in outs.items())
+    check(G2, '本の計算: 全ての升目と符号・全ての方向と無操作がそろい、埋めた零のベクトルの値は使わない', ok_keys, '升目と符号 %d（組み立て %d）' % (len(outs), len(sets)))
+    # 零のベクトルの行（同じ升目と符号をもう一度・零のベクトルを一本足して・近道の使い方は本の計算と同じ）
+    kz = [i for i, s in enumerate(sets) if s[0] == 'S1|O-Ncold|-1'][0]
+    key_z, ck_z, sg_z, ds_z = sets[kz]
+    ds_z = [d for d in ds_z if d in want[key_z]] + ['zero:test']
+    oz = BR.run_cell_sign(R, cells[ck_z], sg_z, ds_z, batch, T3['readout']['primary']['order_seed'], kz, pc=R.prefix_cache(cells[ck_z]) if MP['shortcut'] else None)
+    zt = oz['effects']['zero:test']
+    dmx = max(abs(oz['effects'][d] - outs[key_z]['effects'][d]) for d in outs[key_z]['effects'])
+    check(G2, '零のベクトルの行は無操作と同じ値になる（別のバッチでも）', abs(zt) <= max(floor, 1e-6), '効き目 %.2e（揺れの床 %.2e）・バッチの組を変えた同じ方向の効き目の差の最大 %.2e（記述）' % (zt, floor, dmx))
     # バッチの中の位置で方向を取り違えない
     c0, sg0 = items[0]
     r1 = R.forward(c0, [K.NOOP, 'static', 'Nk', 'td'], sg0, full=False)
@@ -266,18 +274,30 @@ def part_model(sets, iso_n):
     ds_ = max(abs(float((rs['lo'][i] - rs['lo'][0]) - (r1['lo'][i] - r1['lo'][0]))) for i in (1, 2, 3))
     check(G2, '近道ありと近道なしの効き目が許容の内で合う', ds_ <= tol, '差の最大 %.2e（許容 %.4f）' % (ds_, tol))
     # 層ごとの差分の記述
-    summ = BR.layer_summary(outs['S1|O-Ncold|-1']['layers'], T3['descriptive']['layerwise']['band'])
-    check(G2, '層ごとの差分（名前のある方向と段階 B の三本・等方の中央値と中央の区間）', summ is not None and summ['n'] == iso_n and len(outs['S1|O-Ncold|-1']['layers']['rows']) == 7,
-          '層 %d・等方 %d 本' % (len(R.after), summ['n'] if summ else 0))
+    main_keys = {'%s|%s|%+d' % (a_, b_, s_) for a_, b_, s_ in T3['cell_signs_main']}
+    lay_ok = all((o['layers']['iso_summary'] is not None and o['layers']['iso_summary']['n'] == iso_n and len(o['layers']['rows']) == 7 and
+                  all(len(v) == len(R.after) for v in o['layers']['rows'].values())) if k in main_keys else
+                 (o['layers']['iso_summary'] is None and not o['layers']['rows']) for k, o in outs.items())
+    summ = outs['S1|O-Ncold|-1']['layers']['iso_summary']
+    check(G2, '層ごとの差分（主の組だけ・名前のある方向と段階 B の三本の行・等方は層ごとの中央値と中央の区間だけ）', lay_ok,
+          '層 %d・等方 %d 本・主の組の升目と符号 %d' % (len(R.after), summ['n'] if summ else 0, sum(1 for k in outs if k in main_keys)))
     # 独立の再計算のフックの道（近道なし・バッチ一）と本の道（二段目の一致）
-    v_rows = [r for r in T3['main_rows'] if r['direction'] == 'static'][:2]
-    rows_rc, dirs_rc = [], {}
-    for r in v_rows:
-        key = '%s|%s|%+d' % (r['scenario'], r['base'], r['sign'])
-        comps = K.comparators_for('static', DJ['groups']['real']['names'], T3['nulls']['real']['swap_siblings'])
-        rows_rc.append((r['id'], cells['%s|%s' % (r['scenario'], r['base'])], r['sign']))
-        dirs_rc[r['id']] = [('static', r['sign'])] + [('iso:%d' % i, r['sign']) for i in range(iso_n)] + [('real:' + p, r['sign']) for p in comps] + [('real:' + p, -r['sign']) for p in comps]
-    hk = BR.recompute_hook_path(R, rows_rc, dirs_rc)
+    st_rows = [r for r in T3['main_rows'] if r['direction'] == 'static']
+    v_rows = [[r for r in st_rows if r['sign'] < 0][0], [r for r in st_rows if r['sign'] > 0][0]]      # 減算の行と加算の行を一つずつ
+    rows_all, dirs_all = K.recompute_set(T3['main_rows'], DJ['groups']['real']['names'], T3['nulls']['real']['swap_siblings'], iso_n, dec.get('dropped', []))
+    comps = K.comparators_for('static', DJ['groups']['real']['names'], T3['nulls']['real']['swap_siblings'])
+    hand = {r['id']: [('static', r['sign'])] + [('iso:%d' % i, r['sign']) for i in range(iso_n)] + [('real:' + p, r['sign']) for p in comps] + [('real:' + p, -r['sign']) for p in comps]
+            for r in T3['main_rows'] if r['direction'] == 'static' and '%s|%s' % (r['scenario'], r['base']) not in set(dec.get('dropped', []))}
+    n_pass_rc = sum(1 + len(v) for v in dirs_all.values())
+    E_ = FJ['facts']['E']
+    Kn_ = T3['nulls']['isotropic']['count']
+    per_ok = all(1 + len(v) == E_['per_row_recompute'] - (Kn_ - iso_n) for v in dirs_all.values())
+    rows_ok = dec.get('dropped') or 2 * len(rows_all) * E_['per_row_recompute'] == E_['passes_recompute']
+    check(G2, '独立の再計算の組（v̂ の行ごとに無操作・v̂・等方の帰無・比べる相手の両方の向き・転記行 E と）', [x[0] for x in rows_all] == list(hand) and dict(dirs_all) == hand and per_ok and rows_ok,
+          'v̂ の行 %d・行ごとの順伝播 %d（等方 %d 本のとき・転記行 E の行ごと %d は等方 %d 本）・一つの道の順伝播 %d' % (
+              len(rows_all), 1 + len(next(iter(dirs_all.values()))), iso_n, E_['per_row_recompute'], Kn_, n_pass_rc))
+    rows_rc = [(nm, cells[ck], s) for nm, ck, s in rows_all if nm in {r['id'] for r in v_rows}]
+    hk = BR.recompute_hook_path(R, rows_rc, dirs_all)
     worst = 0.0
     for r in v_rows:
         key = '%s|%s|%+d' % (r['scenario'], r['base'], r['sign'])
@@ -310,6 +330,21 @@ def part_model(sets, iso_n):
     check(G2, '集計の器の二段目の一致（合成・一段目は独立の再計算の器ができた後）', AZr['recompute']['second']['agree'] and AZr['recompute']['first'] is None and not AZr['recompute']['agree'],
           '二段目 %s（差の最大 %.2e・許容 %.4f）・一段目 まだ無い・全体の一致 %s' % (AZr['recompute']['second']['agree'], AZr['recompute']['second']['max_abs_diff'], AZr['recompute']['tol_second'], AZr['recompute']['agree']))
     check(G2, '二段目の許容を超える揺れを入れると一致しない', not ag_bad['agree'], '入れた差 %.4f' % (tol + floor + 0.01))
+    # 乙（裁定 D227）: B-lens の層二の文脈で、門の行の符号で流す
+    FB = json.load(open(os.path.join(REPO, 'records', 'Blens', 'design-facts-Blens.json'), encoding='utf-8'))
+    CB = json.load(open(os.path.join(REPO, 'results', 'Blens', 'calib-Blens.json'), encoding='utf-8'))['magnitude']['letter']
+    sec_rows = AZ.secondary_rows(T3, rows_gate, FB)
+    same_rows = all(sorted(n for n, _, _ in sec_rows.get(cell, [])) == sorted(CB[cell]['rows']) for cell in CB)
+    check(G2, '乙の行が B-lens の層二の答えの文字の位置の行と同じ（裁定 D227）', same_rows and set(sec_rows) == set(CB), '升目 %d・行 %d' % (len(sec_rows), sum(len(v) for v in sec_rows.values())))
+    ctx_all = BR.secondary_contexts(tok, T3, FJ, FB, REPO)
+    pick = [c for c in ctx_all if c[0] == 'S1|O-Ncold|prose'][:1] + [c for c in ctx_all if c[0] == 'S4|Osec-Ncold|json'][:1]
+    sec = BR.run_secondary(R, pick, sec_rows)
+    ok_sec = len(ctx_all) == sum(len(v) for v in FB['facts']['E']['selected'].values()) and all(set(s['rows']) == {n for n, _, _ in sec_rows[pick[i][2].key]} for i, s in enumerate(sec)) and \
+        sec[0]['n_batches'] == len({sg for _, _, sg in sec_rows[pick[0][2].key]})
+    cnt = AZ.secondary_counts(FB, sec_rows)
+    check(G2, '乙を流せる（文脈を組み・行の符号ごとに無操作と同じバッチ）', ok_sec, '文脈 %d（流したのは %d）・乙の行の順伝播 %d・符号のバッチ %d' % (len(ctx_all), len(pick), cnt['row_passes'], cnt['sign_batches']))
+    summ2 = AZ.secondary_summary(sec, CB)
+    check(G2, '乙のまとめに B-lens の直接の経路の値を並べる', all(v.get('blens_direct') is not None for v in summ2.values()), '行 %d' % len(summ2))
     # 三. 壊した読み取りと近道
     Rd = BR.Runner(model, T3, L, T3['layers']['coef_applied'], dirs, bug='double_norm')
     ld = Rd.logit_check(c0, T3['computation']['logit_tol'])

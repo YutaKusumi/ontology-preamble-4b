@@ -246,6 +246,22 @@ def score_q7(rows, floor):
     return 'すべて同じ' if all(same) else ('すべて逆' if not any(same) else '混ざる')
 
 
+# ---------------- 独立の再計算の組 ----------------
+def recompute_set(main_rows, pair_names, swap_siblings, n_iso, dropped_cells=()):
+    """独立の再計算で流す組（正本 `independent_recompute.what`）: v̂ の行ごとに、無操作・v̂・等方の帰無のすべて・比べる相手のすべて（両方の向き）。
+    下見で外した升目の行は除く。戻り値: rows [(行の名, 升目の鍵, 符号)]・dirs_by_row {行の名: [(方向の名, 符号)]}。"""
+    rows, dirs_by_row = [], collections.OrderedDict()
+    comps = comparators_for('static', pair_names, swap_siblings)
+    for r in main_rows:
+        cell = '%s|%s' % (r['scenario'], r['base'])
+        if r['direction'] != 'static' or cell in set(dropped_cells):
+            continue
+        s = int(r['sign'])
+        rows.append((r['id'], cell, s))
+        dirs_by_row[r['id']] = [('static', s)] + [('iso:%d' % i, s) for i in range(n_iso)] + [('real:' + p, s) for p in comps] + [('real:' + p, -s) for p in comps]
+    return rows, dirs_by_row
+
+
 # ---------------- バッチの組み方 ----------------
 def batch_plan(dir_ids, batch, seed, key):
     """升目と符号ごとのバッチ（正本 `readout.primary.batching`）。方向の並びを種（`order_seed`）と升目と符号の番号（key）で混ぜ、零のベクトルの無操作を一つ入れ、
