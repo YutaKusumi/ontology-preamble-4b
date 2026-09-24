@@ -18,7 +18,7 @@
 | （公開の置き場） | 語の一覧（語を拾って読まない） `records/Blens/lists-Blens.md` | 6C34FCA4D547E2B7 |
 | （公開の置き場） | 結果の巡・第一巡の六票 `records/reviews/Blens/results-round1/<名>/review.md` | — |
 
-- 一通版 `bundle-Blens-results-final-all-in-one.md`: 152295 字・SHA16 8428B11BEA1CB402（組んだ時点のコミット 0407a40）。
-- 分けた版 1／2 `bundle-Blens-results-final-part1.md`: 第一部 依頼文・第二部 報告の草案の二つ目（全文）・第三部 結果の巡・第一巡の後の記録・80952 字・SHA16 6DE3C32424B387A2。
+- 一通版 `bundle-Blens-results-final-all-in-one.md`: 152461 字・SHA16 50472B661C2DBA9C（組んだ時点のコミット 893b8ef）。
+- 分けた版 1／2 `bundle-Blens-results-final-part1.md`: 第一部 依頼文・第二部 報告の草案の二つ目（全文）・第三部 結果の巡・第一巡の後の記録・81118 字・SHA16 712469F34AE7FE98。
 - 分けた版 2／2 `bundle-Blens-results-final-part2.md`: 第四部 凍結の本文（全文）・第五部 正本（全文）・71425 字・SHA16 3B4774DBA73BA26F。
 - 本索引のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
