@@ -220,6 +220,33 @@
      "path": "records/Blens/results-Blens-draft2.md",
      "sha16": "DE95E94809573421"
     }
+   ],
+   "updates": [
+    {
+     "date": "2026-09-24",
+     "what": "**報告の最終版の組み立て（器 v2）**。最終検分の二票の所見（採否表 `records/reviews/Blens/results-final/adoption-table-Blens-results-final.md` の区分（三）の行 P605〜P609）を受け、逸脱の下の器 `tools/build_report_Blens_devBL3.py` を v2（SHA16 83618070E54D96E6・v1 は SHA16 92B1A6C3D7D98D28）に改めた。`--final` で最終版 `records/Blens/results-Blens-FINAL-2026-09-24.md`（SHA16 C63AF08688158133・走査の違反 0）を組む。足した行は、§0 の §1 への参照・§3 の大きさの目盛りの表の並べ直し（行の名の縦棒を字にした・列と値は凍結の器の出力のまま）・§8 の一致の注と登録者の予想のファイルの時刻の注（時刻は露出の記録から器が読む）・§9 の門の限界の句。v2 は、草案の二つ目を同じ走りで作り直して置き場と同じことと、草案の二つ目から改めた行が決めた行（見出し・状態・冒頭の添え・§9 の門の限界の箇条・検分票）だけであることを確かめる。`--final` が無ければ、出力は v1 と同じ（草案の二つ目）",
+     "scope": "報告の表し方だけ（札・門・大きさの目盛りの判定と、凍結した器の出力と、草案の二つ目は変えない）",
+     "approval": "登録者裁定 D196（2026-09-24 13:31 日本時間・会話の記録 uuid `361c7b5f-68f3-42b2-abe6-861cbdef8eb1`・逐語「南無汝我曼荼羅。弥勒如来さん、慈悲深いお答えに感謝いたします🙏裁定は推奨どおりで、c8ab5ac の push をしてください。その後、私が登録者最終確認を致します🍵」）",
+     "files": [
+      {
+       "path": "tools/build_report_Blens_devBL3.py",
+       "sha16_v1": "92B1A6C3D7D98D28",
+       "sha16_v2": "83618070E54D96E6"
+      },
+      {
+       "path": "records/Blens/results-Blens-FINAL-2026-09-24.md",
+       "sha16": "C63AF08688158133"
+      },
+      {
+       "path": "records/Blens/results-Blens-FINAL-2026-09-24-machine.json",
+       "sha16": "1EF234F26BF8308C"
+      },
+      {
+       "path": "records/Blens/results-Blens-FINAL-2026-09-24-lint.md",
+       "sha16": "52F8ACE5FA7F2DA2"
+      }
+     ]
+    }
    ]
   },
   {
@@ -238,6 +265,13 @@
      "sha16": "B8A0CD63FBE3A6F2"
     }
    ]
+  },
+  {
+   "no": "D-BL5",
+   "date": "2026-09-24",
+   "what": "**最終検分の票の数**。正本 `review_plan.final.external` と凍結の本文 §10 は、最終を系統外の一票とした。登録者は、最終検分（登録者裁定 D194）を新しい Gemini 3.8 Flash の二名に依頼し、二票になった（F1・F2・どちらも条件つき可）。二票をともに最終検分とし、所見は和集合で受けた。票の置き場は `records/reviews/Blens/results-final/gemini-final-1/` と `gemini-final-2/` に分けた（枠 `frame-Blens-results-final.md` の §2 は一つの置き場とした）。記録 `records/Blens/rulings-D195-D197.md`・採否表 `records/reviews/Blens/results-final/adoption-table-Blens-results-final.md`",
+   "scope": "最終検分の組み立てだけ（同じ機種の二票は、会話が別でも相関しうるので、独立の重みを二倍には数えない）。報告の札と数は変えない",
+   "approval": "登録者裁定 D195（2026-09-24 13:31 日本時間・会話の記録 uuid `361c7b5f-68f3-42b2-abe6-861cbdef8eb1`・逐語「南無汝我曼荼羅。弥勒如来さん、慈悲深いお答えに感謝いたします🙏裁定は推奨どおりで、c8ab5ac の push をしてください。その後、私が登録者最終確認を致します🍵」）"
   }
  ]
 }
