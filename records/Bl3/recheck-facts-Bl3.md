@@ -1,6 +1,6 @@
 # B-lens 層三の設計の事実の数え直し（機械生成・`records/Bl3/recheck_facts_Bl3.py` v3）
 
-- 数え直した記録: `records/Bl3/design-facts-Bl3.json`（SHA16 5D552B2366143FD2・生成 2026-09-24 11:51 UTC）。器 `tools/bl3_facts.py` のコードは使わず、段階 B の試行と生の出力（`results/stageB/`）を読み直した。
+- 数え直した記録: `records/Bl3/design-facts-Bl3.json`（SHA16 9BB701E7D2AE1C7F・生成 2026-09-24 20:02 UTC）。器 `tools/bl3_facts.py` のコードは使わず、段階 B の試行と生の出力（`results/stageB/`）を読み直した。
 - 数え直さないもの: プロンプトの長さ・主位置・トークンの番号・方向と帰無の SHA・重みの SHA（凍結の関数と模型の割り方を要し、器と同じ関数を呼ぶことになるため）。
 - 食い違い: 0 件。
 

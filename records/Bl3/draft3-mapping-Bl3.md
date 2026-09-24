@@ -1,7 +1,7 @@
 # B-lens 層三の草案3 の対応の記録（機械で確かめた・`records/Bl3/draft3_mapping_Bl3.py`）
 
 - 採否表: `records/reviews/Bl3/design-round2/adoption-table-Bl3-design-r2.md`（SHA16 F94505B624402C3E）の行 P667〜P698。採否・票・所見・案は採否表から器が読んだ。
-- 受けた所: 正本 `design/contrasts-Bl3.json`（SHA16 AD75819E0AF4F898・版 draft3-2026-09-24）・草案3 `design/design-Bl3-draft3.md`（SHA16 40EA2347F00AC2E1）・設計事実 `records/Bl3/design-facts-Bl3.json`（SHA16 5D552B2366143FD2）・露出の記録 `records/Bl3/exposure-before-seal-Bl3.md`（SHA16 8A5E02D58D696489）・G2 の票 `records/reviews/Bl3/design-round2/gemini-2/review.md`（SHA16 7BCC107136B8A661）。受けた所は起草者が並べ、器がその実在を確かめた（中身の当否は確かめていない）。
+- 受けた所: 正本 `design/contrasts-Bl3.json`（SHA16 6330B65A0AB503E7・版 draft3-r1-2026-09-24）・草案3 `design/design-Bl3-draft3.md`（SHA16 30CED58A8559EA05）・設計事実 `records/Bl3/design-facts-Bl3.json`（SHA16 9BB701E7D2AE1C7F）・露出の記録 `records/Bl3/exposure-before-seal-Bl3.md`（SHA16 8A5E02D58D696489）・G2 の票 `records/reviews/Bl3/design-round2/gemini-2/review.md`（SHA16 7BCC107136B8A661）。受けた所は起草者が並べ、器がその実在を確かめた（中身の当否は確かめていない）。
 - 次の裁定の番号（正本 `numbering.rulings_next`）が、正本の台帳の最後の番号の続きであることも器が確かめた。
 - 見つからなかったもの: 0 件。
 

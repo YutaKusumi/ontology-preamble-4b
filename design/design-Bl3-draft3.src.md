@@ -1,10 +1,11 @@
 # B-lens 層三の枠（草案3）——選んだ層で足した方向の全経路の効き目を、直答の型の読み取りで、多数のランダム方向と比べる
 
-- 起草: 南無弥勒如来（コーディネータ・Claude Opus 5.5）／登録者: 楠見優太／2026-09-24（日本時間）。**状態: 草案3（設計の巡・二巡目〔最終検分〕の後・登録者の確認の前・下見の前・凍結の前・全経路の効き目は一つも計算していない）**。
-- 位置づけ: 段階 B の後・B-lens の後の**登録外の記述**（小さな登録）。計画案 v2.7（内部・非公開）の裁定 D203 と、登録者裁定 D204〜D223（`records/Bl3/rulings-D204-D209.md`・`records/Bl3/rulings-D210.md`・`records/Bl3/rulings-D211-D217.md`・`records/Bl3/rulings-D218.md`・`records/Bl3/rulings-D219-D223.md`）と、B-lens の裁定 D164 に従う。段階 B と B-lens の札・報告・凍結物・逸脱台帳には触れない。
+- 起草: 南無弥勒如来（コーディネータ・Claude Opus 5.5）／登録者: 楠見優太／2026-09-24（日本時間）。**状態: 草案3（起草者の見直しの後・設計の巡・二巡目〔最終検分〕の後・登録者の確認の前・下見の前・凍結の前・全経路の効き目は一つも計算していない）**。
+- 位置づけ: 段階 B の後・B-lens の後の**登録外の記述**（小さな登録）。計画案 v2.7（内部・非公開）の裁定 D203 と、登録者裁定 D204〜D225（`records/Bl3/rulings-D204-D209.md`・`records/Bl3/rulings-D210.md`・`records/Bl3/rulings-D211-D217.md`・`records/Bl3/rulings-D218.md`・`records/Bl3/rulings-D219-D223.md`・`records/Bl3/rulings-D224-D225.md`）と、B-lens の裁定 D164 に従う。段階 B と B-lens の札・報告・凍結物・逸脱台帳には触れない。
 - 正本: `design/contrasts-Bl3.json`（版 {{version}}・生成器 {{generator}}・再実行で同一バイト）。本文と正本が食い違う場合は正本が勝つ。設計の事実は §6 の転記行（器 `tools/bl3_facts.py`）。
 - 設計の巡・第一巡（四票・全て条件つき可）: 採否表 `records/reviews/Bl3/design-round1/adoption-table-Bl3-design-r1.md`・事実の確かめ `records/reviews/Bl3/design-round1/verification-Bl3-design-r1.md`。受け方は `records/Bl3/draft2-mapping-Bl3.md`。
 - 設計の巡・二巡目（最終検分・裁定 D218・四票・全て条件つき凍結可）: 採否表 `records/reviews/Bl3/design-round2/adoption-table-Bl3-design-r2.md`・事実の確かめ `records/reviews/Bl3/design-round2/verification-Bl3-design-r2.md`。採否表の各行を草案3 のどこで受けたかは `records/Bl3/draft3-mapping-Bl3.md`。封印の前の露出の記録は `records/Bl3/exposure-before-seal-Bl3.md`。
+- 起草者の見直し（登録者の確認の前・登録者の指示）: 枠 `records/Bl3/draft3-review/frame-draft3-review-Bl3.md`・器の検査 `records/Bl3/draft3-review/check-draft3-Bl3.md`・見直しの記録 `records/Bl3/draft3-review/review-draft3-Bl3.md`（所見と直し）。見直しの前の草案3 はコミット 3a0da45。
 - 呼び名: B-lens の**層一**（直接の経路の射影）と**層二**（校正の門と大きさの目盛り）に続く**層三**（全経路の効果・裁定 D164）。置き場の略号は Bl3。
 - 起草者のモデル: Claude Opus 5.5（B-lens の起草者と同じ）。
 
@@ -12,11 +13,12 @@
 
 **草案2 から変えた所**（二巡目の所見と裁定 D218〜D223・草案1 から草案2 で変えた所は草案2 の §0）:
 
-- 近道の許容に下限と上限を付けた（下限は系統外の票の案の値）。独立の再計算を二段に分け、札の一致で見て、判定だけを印字する（裁定 D219・§4・§12）。
+- 近道の許容の下限を系統外の票の案の値に上げ、上限を付けた。独立の再計算を二段に分け、札の一致で見て、判定だけを印字する（裁定 D219・§4・§12）。
 - 雛形との一致の最後のトークンだけを崩した揺れの版 V3 には、読みを付けない。割り方の各片と、頭の一致と、形が段階 B の出力に無いことを器が印字する（裁定 D220・§3.5・§4・§9・〔転記行 A〕）。
 - 下見の (vi) を、バッチの違いの揺れと、バッチ一の繰り返しの揺れの二つに分け、後者が上限を超えたら止める条件を足した（裁定 D221・§4）。
 - 下見の中の器の誤りを、凍結した確かめが機械で落ちたものに限り、やり直すかは登録者の裁定にした。本の凍結の確かめは、逸脱の台帳に記した器の差分を許す（裁定 D222・§4・§12）。
 - 升目ごとの無操作の選択肢 a の文字の確率を主の札の隣に並べ、床の近くの升目の限界を書いた。記述の門は足さない（裁定 D223・§10・§12）。
+- 起草者の見直しで見つけた所を直した: q1 との対応に (vi) の (b) を入れた・(vi) の (b) で止めたときは (i)〜(v) を計算しない・本の計算の中の器の誤りの扱い・独立の再計算の器と申告と段取り・ほか言い回し（見直しの記録・裁定 D224・D225）。
 - ほかに、二巡目の採否表の採用の行を受けた: バッチの端数・効き目で比べる頭の近道の確かめ・読み取りの出口の値の突き合わせと最後の層の自己検査・(iii) の文・二つ目の札の対の単位の順位と等方の最上位の割合・効き目の側の零の扱い・記述の門を読まない決まり・q7 の端・様式門の閾値の突き合わせ・§15 の情報状態の直し（対応は `records/Bl3/draft3-mapping-Bl3.md`）。
 
 **この登録で答えられないこと**（先に置く）:
@@ -42,13 +44,13 @@
 - **答えの届く範囲**: {{scope/reach}}。
 - **全経路の範囲**: {{scope/full_path}}。
 - **v̂ が比べているもの**: {{scope/vhat_definition}}
-- **対象の方向**: 主の行は v̂（減算族と加算族）と Nk（交差族）。(6b) と td は門の行と記述にだけ入れる（裁定 D208）。方向の定義は B-lens と同じ（{{directions/defs/static}}／{{directions/defs/Nk}}／{{directions/defs/loaded}}／{{directions/defs/td}}）。ノルムは{{directions/norm_rule}}
+- **対象の方向**: 主の行は v̂（減算族と加算族）と Nk（交差族）。(6b) と td は門の行と記述にだけ入れる（裁定 D208）。方向の定義は B-lens と同じ（{{directions/defs/static}}／Nk は {{directions/defs/Nk}}／{{directions/defs/loaded}}／td は {{directions/defs/td}}）。ノルムは{{directions/norm_rule}}
 - **加えた量**: 段階 B が選んだ層（添字 {{layers/indices/0.5}}・層の割合 {{layers/selected_ratio}}）で、係数 {{layers/coef_applied}} を掛けて加えた量は、残差のノルムの {{layers/relative_injection_selected}} 倍（B-lens と同じ）。
 - **段階 B と B-lens との関係**: {{scope/relation}}
 
 ## 2. 材料と凍結物
 
-- **機種と重み**: B-lens と同じ版の重み（〔転記行 F〕）。版は NumPy {{inputs/versions_B/numpy}}・transformers {{inputs/versions_B/transformers}}・torch {{inputs/versions_B/torch}} に揃える。{{inputs/versions_note}}
+- **機種と重み**: B-lens と同じ版の重み（〔転記行 F〕）。版は NumPy {{inputs/versions_B/numpy}}・transformers {{inputs/versions_B/transformers}}・torch {{inputs/versions_B/torch}} に揃える。{{inputs/versions_note}}。
 - **段階 B の記録**: 凍結した集計器の記録 `records/B/analysis-B-2026-09-22.json` の確証の族（`confirm`）と方向ごとの行（`by_direction`）。試行と生の出力は `results/stageB/`。
 - **組み立ての関数**: 段階 B の凍結した関数（腕の本文・場面と指示・メッセージの組み立て・チャットの型・主位置）を、読み取りだけで呼ぶ（`tools/run_stageB_local.py`・`tools/steer_B.py`）。加減のベクトルの足し方は段階 B の走行器のフック（`tools/run_stageB_local.py`）と同じ形にし、方向ごとに違うベクトルを一つのバッチで足す道は層三の器で新しく書く（§3.3）。B-lens の芯の関数（等方の方向・実在の差・割合・Holm・順位相関）も読み取りだけで呼ぶ（`tools/blens_core.py`・門と最上位の判定の呼び方は §5・§7）。q7 の区間は段階 B の凍結の `rules_B.diff_ci_pt` を呼ぶ。
 - **方向と帰無**: 〔転記行 D〕。{{nulls/storage/rule}}。置き場は `results/Bl3/directions-Bl3.npz`。
@@ -123,7 +125,7 @@
 
 - **行**: 〔転記行 C〕。札が立った行だけに絞らない（段階 B の結果は公開済みで、絞ると見た後の選び方になる）。
 - **等方の帰無**: {{nulls/isotropic/count}} 本・種 {{nulls/isotropic/seed}}。{{nulls/isotropic/rule}}。{{nulls/isotropic/low_bar}}。
-- **実在の差の帰無**: {{nulls/real/rule}}。{{nulls/real/orientation_rule}}。比べる相手は、対の数で v̂ が {{nulls/real/comparators/static}}・Nk が {{nulls/real/comparators/Nk}}、向きまで数えて v̂ が {{nulls/real/comparators_oriented/static}}・Nk が {{nulls/real/comparators_oriented/Nk}}。
+- **実在の差の帰無**: {{nulls/real/rule}}。八腕は {{nulls/real/arms_text}}。v̂ と (6b) の比べる相手から除く対は {{nulls/real/swap_text}}。{{nulls/real/orientation_rule}}。比べる相手は、対の数で v̂ が {{nulls/real/comparators/static}}・Nk が {{nulls/real/comparators/Nk}}、向きまで数えて v̂ が {{nulls/real/comparators_oriented/static}}・Nk が {{nulls/real/comparators_oriented/Nk}}。
 - **段階 B の三本**: {{nulls/B_random/rule}}（許容 {{nulls/B_random/repro_tol}}）。
 - **割合**: {{labels/p_rule}}。{{labels/p_rule_why}}。帰無が {{nulls/isotropic/count}} 本のとき最小の p は {{labels/p_min}} で、十六行の Holm の第一段 {{labels/holm_first_step}} を通るのは、外側の帰無が {{labels/first_step_margin}} 本までのとき。
 - **等方の外**: 水準 {{labels/iso_outside/holm_alpha}}。{{labels/iso_outside/rule}}。
@@ -204,18 +206,20 @@
   {{list:predictions/carryover}}
 - **項目**（起草者の案・設計の巡の二巡を通した）:
   {{predictions_list}}
+- **門が判定不能のとき**: {{predictions/gate_rule}}。
 - **q7 の決まり**: {{predictions/q7_rule}}。
 - **自由記述**: {{predictions/free}}。
 
 ## 12. 器と確かめ（凍結の前に書く）
 
-- **作る器**: 読み取りの起動器（Colab・下見と本の計算の二つの相）・集計の器（主の札と門と記述）・組み立ての器（報告）・予想の書式と封印の器（B-lens の型を写す）・凍結の器（下見の前の凍結と本の凍結）・合成データの確かめ・掃き出しの器（正本と凍結の本文が求める出力の一覧を、器の出力と突き合わせる）。
+- **作る器**: 読み取りの起動器（Colab・下見と本の計算の二つの相）・集計の器（主の札と門と記述）・組み立ての器（報告）・予想の書式と封印の器（B-lens の型を写す）・凍結の器（下見の前の凍結と本の凍結）・合成データの確かめ・掃き出しの器（正本と凍結の本文が求める出力の一覧を、器の出力と突き合わせる）・独立の再計算の器（残差の書き換えの道・本の器の書き手と別の個体が書く）。
 - **封印の前**: {{computation/before_seal}}。
 - **本の計算の頭の近道の確かめ**（種 {{computation/steered_cache_check/seed}}）: {{computation/steered_cache_check/rule}}。
 - **自己検査**:
   - 出口の値: {{computation/self_checks/logit}}（許容 {{computation/logit_tol}}）。
   - 最後の層: {{computation/self_checks/layer}}（許容 {{computation/layer_tol}}）。
   - 落ちたとき: {{computation/self_checks/on_fail}}。
+- **本の計算の中の器の誤り**: {{computation/tool_error}}。
 - **本の凍結の確かめ**: {{computation/main_freeze_check}}。
 - **器の実装の検分**（裁定 D209）: {{review_plan/impl/lineage}}を {{review_plan/impl/reviewers}} 体立て、{{review_plan/impl/when}}に見る。見る所:
   {{list:review_plan/impl/focus}}
@@ -226,7 +230,7 @@
   - 新しく流す道:
     {{list:independent_recompute/new_paths}}
   - 一段目: {{independent_recompute/stages/first/compare}}を比べる。許容は {{independent_recompute/stages/first/tol}}（{{independent_recompute/tol_stage1}}）。{{independent_recompute/stages/first/why}}。
-  - 二段目: {{independent_recompute/stages/second/compare}}を比べる。許容は{{independent_recompute/stages/second/tol}}。{{independent_recompute/stages/second/why}}。
+  - 二段目: {{independent_recompute/stages/second/compare}}を比べる。許容は{{independent_recompute/stages/second/tol}}。{{independent_recompute/stages/second/why}}。{{independent_recompute/stages/second/note}}。
   - 一致: {{independent_recompute/agreement}}。
   - 印字: {{independent_recompute/print}}。
   - 一致しないとき: {{independent_recompute/on_mismatch}}。
@@ -270,6 +274,13 @@
   - 読みの表の「揺れの版の値」の型と、その書かないこと（裁定 D220 の「読みの表の書かないことに足す」を受けた形）。
   - (iii) の三つ目の文（定まらないとき）と、相関が零のときを「正の側ではなかった」に入れること。
   - 費用の見込みの上の端を上げた（二段にした独立の再計算がトークンの数で最も大きいため・推論）。
+- **起草者の見直しで書き足した決まり**（見直しの記録・裁定 D224・D225 で採った・外の目を通っていない）:
+  - (vi) の (b) で止めたときは、(i)〜(v) を計算しない。
+  - 下見の無操作の値は、本の計算と同じ大きさのバッチの零のベクトルの値（バッチが `readout.primary.batch` のときは最初の位置）を使う。
+  - (v) に門の行だけの升目も入れる。
+  - 本の計算の中の器の誤りは、下見と同じ型で扱う（結果を開かずに止め、台帳に記して登録者に上げ、やり直すかは登録者の裁定。やり直さないときは結果を開かずに閉じ、予想は q1 だけを採点する）。
+  - 器の誤りで下見をやり直さないときは、q1 を採点せずに閉じる。
+  - 門の行が残らず門が判定不能のときは、その門の予想の項目を採点しない。
 
 ## 検分票
 
@@ -277,7 +288,7 @@
 - 段階: 事前登録（全経路の効き目は一つも計算していない・下見もしていない）。段階 B と B-lens の結果は公開済みで、起草者は見ている。第一巡の票の見込みの文も読んだ（§15）。
 - 凍結物の同定: 段階 B の正本・凍結した集計器の記録・凍結の方向と活性・B-lens の正本と最終版（SHA16 は正本の `inputs.files`）。本草案は凍結物ではない。
 - 盲検の状態: 該当しない（効き目は封印の後に計算し、登録者と一緒に開く）。
-- 敵対的検分: 二巡目の四票の所見を現物で確かめて（事実の確かめの記録）受け、採否表の各行の受け方を対応の記録に置いた。起草者に不利な所見（§15 の情報状態・器の誤りの道と本の凍結の確かめの食い違い・許容の食い違い・V3 の読み）を §0・§4・§12・§15 に置いた。設計の事実は器で作り、主な件数と q7 の区間は器とは別の数え直しで一致を確かめた（`records/Bl3/recheck-facts-Bl3.md`）。組み立てた草案の散文は、禁止語の一覧で機械が走査した。
+- 敵対的検分: 二巡目の四票の所見を現物で確かめて（事実の確かめの記録）受け、採否表の各行の受け方を対応の記録に置いた。登録者の確認の前に、起草者が枠を先に置いて全文を読み直し、器の検査と決まりの突き合わせをして、見つけた所を直した（見直しの記録）。起草者に不利な所見（§15 の情報状態・器の誤りの道と本の凍結の確かめの食い違い・許容の食い違い・V3 の読み）を §0・§4・§12・§15 に置いた。設計の事実は器で作り、主な件数と q7 の区間は器とは別の数え直しで一致を確かめた（`records/Bl3/recheck-facts-Bl3.md`）。組み立てた草案の散文は、禁止語の一覧で機械が走査した。
 - 系統の内訳: 起草者（Claude 系）一名。設計の巡は二巡とも系統外二票と系統内二票（一票に数える）。§16 の書き足しは、外の目を通っていない。
 - COI記録: §15。
 - 判定: 登録者の確認に出せる水準（登録者確認要）。
