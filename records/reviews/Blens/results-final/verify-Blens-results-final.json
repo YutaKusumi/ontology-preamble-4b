@@ -1,0 +1,158 @@
+{
+ "rows": [
+  {
+   "K": "K398",
+   "src": "F1-1",
+   "claim": "§0 の足した区画に、M_L_nuclear の二つ目の札の文脈（§1 の添え）への参照が無い",
+   "evidence": "§0 の足した行 5・その中に「§1」: False",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K399",
+   "src": "F1-2",
+   "claim": "直した照合の表の数え直しで、登録者の一致 4 に p1.nuclear.dir（札の予想は外れ・等方の揺れの中の値の符号との一致）が入っていることが書かれていない",
+   "evidence": "数え直しの行の後に「一致 4 のうち」: False・p1.nuclear.dir の注に「一致 4」: False",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K400",
+   "src": "F2-1",
+   "claim": "大きさの目盛りの主の表（z・観測の変化・比・読み・印の列）を、縦棒を字にして再掲した表が無い（足した表は部分の表と生の確率の表だけ）",
+   "evidence": "主の表の見出しの数 1（凍結の出力）・足した区画の中 0",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K401",
+   "src": "F2-2",
+   "claim": "§8 の予想者の情報状態の行に、登録者の予想のファイルの保存（08:15）が露出（07:52）の後であることと、前の版の SHA が無く独立は申告に依ることが書かれていない（露出の記録にはある）",
+   "evidence": "§8 の行に「08:15」: False・「07:52」: False・「申告に依る」: False／露出の記録に「08:15」: True・「07:52」: True・「申告に依る」: True",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K402",
+   "src": "F2-3",
+   "claim": "§9 の足した限界の「門を通らなかったことは、そろわないことを示さない」の箇条に、段の近くの値を惜しいと読まない句と、M_X にそろいの兆しが無いこと（順位相関 −0.05282・割合 0.8732）が無い（§0 の添えにはある）",
+   "evidence": "§9 の箇条に「惜しい」: False・「M_X」: False／§0 の添えに「惜しい」: True",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K403",
+   "src": "F1-問1・F2-問1",
+   "claim": "採否表の区分（三）の行の数（F1 は 24・F2 は 31）",
+   "evidence": "区分の欄に（三）を含む行 31（P566・P567・P568・P572〜P586・P588〜P600）",
+   "verdict": "一部再現（F2 の数と合う・F1 の数は合わない）"
+  },
+  {
+   "K": "K404",
+   "src": "F2-問3",
+   "claim": "「該当なし」にした六升の物差しの等方の割合は 0.35〜0.996",
+   "evidence": "物差しの等方の割合: M_L_survival 0.3506・M_X_survival 0.7113・M_X_nuclear 0.996・M_E 0.1738・M_F 0.4765（最小 0.1738・最大 0.996）",
+   "verdict": "一部再現（最小は M_E の 0.1738）"
+  },
+  {
+   "K": "K405",
+   "src": "F1-問6・F2-問6",
+   "claim": "足した限界の数（F1 は 10・F2 は 11）",
+   "evidence": "「結果を開いた後に足す限界」の下の箇条 10（ほかに、凍結の時点の文を正す行が一つ）",
+   "verdict": "一部再現（F1 の数と合う・F2 の数は合わない）"
+  },
+  {
+   "K": "K406",
+   "src": "F2-問4",
+   "claim": "生の確率の各方向による変化は 0.001 程度",
+   "evidence": "比を出した 7 行の生の確率の変化: S4|O-Ncold+vNk|Nk 0.0007987・S4|O-Ncold+vrand|rand:0 0.001142・S4|O-Ncold+vrand|rand:1 0.003015・S4|O-Ncold-vrand|rand:2 0.002151・S4|Osec-Ncold+v6b|loaded 0.001994・S4|Osec-Ncold+vrand|rand:0 0.005174・S4|Osec-Ncold+vrand|rand:2 -0.009178",
+   "verdict": "一部再現（O-Ncold の四行は 0.0008〜0.003・Osec-Ncold の三行は |0.002〜0.009|）"
+  },
+  {
+   "K": "K407",
+   "src": "F2-問6",
+   "claim": "正本の限界の文は 22 項目",
+   "evidence": "§9 の凍結の区画の箇条 22",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K408",
+   "src": "F2-問3",
+   "claim": "符号だけで突き合わせると、札が付かなかった六升はすべて予想の向きと一致してしまう",
+   "evidence": "結果の巡・第一巡の再現 K364 の判定「再現した」",
+   "verdict": "再現した（K364 と同じ）"
+  },
+  {
+   "K": "K409",
+   "src": "F1-問2",
+   "claim": "M_L_nuclear は等方の標準偏差から見て z ≈ −0.71",
+   "evidence": "独立の再計算の記録の z: -0.713",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K410",
+   "src": "F1-問2・F2-問2",
+   "claim": "唯一の札の文脈の数（兄弟 −0.06414・最大の相手 0.05117 と差 2.2%・等方の標準偏差 0.07343・中央値の比 0.15・ランダム方向の最上位 12／108）は草案の添えの数と同じ",
+   "evidence": "草案の二つ目にある: -0.06414 True・0.05117 True・2.2% True・0.07343 True・M_L_nuclear 0.15 True・108 のうち 12 True",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K411",
+   "src": "F1-問3・F2-問6",
+   "claim": "較正の検査は 0.999 の区間の上端近くで通った（裾の割合 0.001471・z 2.97・上端 155 に対し 154）",
+   "evidence": "裾の割合 0.001471・区間 [112, 155]・観測 154",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K412",
+   "src": "F2-所見3",
+   "claim": "門の M_X は順位相関 −0.05282・割合 0.8732",
+   "evidence": "順位相関 -0.052823・割合 0.8732",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K413",
+   "src": "F1-問4・F2-問4",
+   "claim": "切り詰めで零の四行でも、生の確率は約 0.059 あり、直接の経路の変化は +0.0008〜+0.0030",
+   "evidence": "生の確率（前）[0.05909]・変化 0.0007987・0.001142・0.003015・0.002151",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K414",
+   "src": "F1-問5・F2-問5",
+   "claim": "凍結の後の逸脱は D-BL1〜D-BL4 の四つで、承認は裁定 D188・D189・D191・D192",
+   "evidence": "逸脱と承認: D-BL1 D188・D-BL2 D189・D-BL3 D191・D-BL4 D192",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K415",
+   "src": "F2-問5",
+   "claim": "露出の記録に 06:30（較正の確率）・07:52（予想の一部）・08:15（登録者のファイルの保存）・08:17（SHA の提示）がある",
+   "evidence": "露出の記録にある: 06:30 True・07:52 True・08:15 True・08:17 True",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K416",
+   "src": "F2-頭",
+   "claim": "検分した草案の二つ目・凍結の本文・正本の SHA16 は DE95E94809573421・A6281F419F059145・3864252EC540F93B",
+   "evidence": "置き場の値: records/Blens/results-Blens-draft2.md DE95E94809573421・design/design-Blens-FROZEN.md A6281F419F059145・design/contrasts-Blens.json 3864252EC540F93B",
+   "verdict": "再現した"
+  },
+  {
+   "K": "K417",
+   "src": "F1-頭",
+   "claim": "対象のコミットは 893b8ef",
+   "evidence": "束の索引の「組んだ時点のコミット」: 893b8ef",
+   "verdict": "再現した"
+  }
+ ],
+ "inputs": {
+  "records/Blens/results-Blens-draft2.md": "DE95E94809573421",
+  "records/reviews/Blens/results-round1/adoption-table-Blens-results-r1.md": "E31FCCDB1C0A824B",
+  "records/reviews/Blens/results-round1/verify-Blens-results-r1.json": "F19ACCC2B2D8916D",
+  "records/Blens/sealing-exposures-Blens.md": "B8B46F401DBE1CAA",
+  "records/Blens/indep-check-Blens.md": "4269AE3C4EBF8E44",
+  "results/Blens/lens-Blens.json": "2634B7941FC449AF",
+  "results/Blens/calib-Blens.json": "94D0ABBEDF58015F",
+  "results/Blens/posthoc-Blens.json": "B8A0CD63FBE3A6F2",
+  "records/Blens/FREEZE-RECORD-Blens.json": "C7D1601E7B11442D",
+  "records/reviews/Blens/results-final/bundle-results-final-index.md": "530261C9A1035EDF",
+  "design/design-Blens-FROZEN.md": "A6281F419F059145",
+  "design/contrasts-Blens.json": "3864252EC540F93B"
+ }
+}
