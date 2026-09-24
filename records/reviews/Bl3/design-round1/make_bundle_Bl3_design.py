@@ -13,19 +13,20 @@ REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..', '..'))
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-rd = lambda rel: open(j(*rel.split('/')), encoding='utf-8').read()
-s16 = lambda rel: hashlib.sha256(open(j(*rel.split('/')), 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
+ROUND = '7b2b323'                                             # 第一巡の束のコミット。入力はこの版から読む（草案2 で正本と設計事実が入れ替わった後も同じ結果を出すため・B-lens の d38a17a の型）
+at = lambda rel: subprocess.run(['git', 'show', '%s:%s' % (ROUND, rel)], cwd=REPO, capture_output=True, check=True).stdout
+rd = lambda rel: at(rel).decode('utf-8')
+s16 = lambda rel: hashlib.sha256(at(rel).replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
 git = lambda *a: subprocess.run(['git'] + list(a), cwd=REPO, capture_output=True, text=True).stdout.strip()
-head = git('rev-parse', '--short', 'HEAD')
-pushed = git('rev-parse', '--short', 'origin/main')
-TB = json.load(open(j('design', 'contrasts-B.json'), encoding='utf-8'))
-T3 = json.load(open(j('design', 'contrasts-Bl3.json'), encoding='utf-8'))
-FJ = json.load(open(j('records', 'Bl3', 'design-facts-Bl3.json'), encoding='utf-8'))
+head = pushed = '1323c82'                                     # 束を組んだ時点の HEAD と origin/main（組んだ時の値に固定する）
+TB = json.loads(rd('design/contrasts-B.json'))
+T3 = json.loads(rd('design/contrasts-Bl3.json'))
+FJ = json.loads(rd('records/Bl3/design-facts-Bl3.json'))
 assert FJ['contrasts_sha16'] == s16('design/contrasts-Bl3.json'), '設計の事実が今の正本から作られていない'
 assert T3['version'] == 'draft1-2026-09-24'
 draft_commit = git('log', '-1', '--format=%h', '--', 'design/design-Bl3-draft1.md')
 assert git('merge-base', '--is-ancestor', draft_commit, 'origin/main') == '' and subprocess.run(['git', 'merge-base', '--is-ancestor', draft_commit, 'origin/main'], cwd=REPO).returncode == 0, '草案1 のコミットが公開されていない'
-assert not git('status', '--porcelain', '--', 'design/design-Bl3-draft1.md', 'design/contrasts-Bl3.json', 'records/Bl3/design-facts-Bl3.json'), '草案1・正本・設計の事実に、公開後の手元の変更がある'
+assert draft_commit == head, ('草案1 のコミットが組んだ時点の HEAD と違う', draft_commit, head)
 
 REQ = ['# B-lens 層三の枠（草案1）の設計の検分のお願い（第一巡・全範囲）', '',
        '- 依頼者: 楠見優太（登録者）／起草: 南無弥勒如来（コーディネータ・Claude Opus 5.5）／2026-09-24。',
@@ -72,7 +73,7 @@ for arm, fv in TB['arms']['files'].items():
     p = fv.get('path')
     M += ['- **%s**: 前置きなし（場面の本文から始める）' % arm] if not p else ['- **%s**（`%s`・SHA16 %s）: %s' % (arm, p, s16(p), rd(p).strip().replace(NL, ' ⏎ '))]
 SCP = 'arms/frozen-from-ryokai-os/app-scenarios.json'
-SC = json.load(open(j(*SCP.split('/')), encoding='utf-8'))
+SC = json.loads(rd(SCP))
 scen_used = sorted({c[0] for c in T3['cells_main']} | {r['scenario'] for r in FJ['facts']['C']['gate_rows']})
 M += ['', '### 4-2 場面の本文と JSON の指示（`%s`・SHA16 %s）' % (SCP, s16(SCP)), '']
 for s in SC['scenarios']:

@@ -5,7 +5,7 @@
 出力: records/reviews/Bl3/design-round1/verify-Bl3-design-r1.json・verification-Bl3-design-r1.md
 用法: python records/reviews/Bl3/design-round1/verify_Bl3_design_r1.py <会話の記録 jsonl>
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"""
-import os, re, sys, json, glob, math, hashlib, datetime, collections, itertools
+import os, re, sys, json, glob, math, hashlib, datetime, subprocess, collections, itertools
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -13,17 +13,19 @@ REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..', '..'))
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-rd = lambda rel: open(j(*rel.split('/')), encoding='utf-8').read()
-s16 = lambda rel: hashlib.sha256(open(j(*rel.split('/')), 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
+ROUND = '7b2b323'                                             # 第一巡の束のコミット。入力はこの版から読む（草案2 で正本と設計事実が入れ替わった後も同じ結果を出すため・B-lens の d38a17a の型）
+at = lambda rel: subprocess.run(['git', 'show', '%s:%s' % (ROUND, rel)], cwd=REPO, capture_output=True, check=True).stdout
+rd = lambda rel: at(rel).decode('utf-8')
+s16 = lambda rel: hashlib.sha256(at(rel).replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
 jst = lambda ts: (datetime.datetime.fromisoformat(ts.replace('Z', '+00:00')) + datetime.timedelta(hours=9)).strftime('%Y-%m-%d %H:%M:%S')
 import blens_core as C                  # 凍結（読み取りだけ）
 import run_stageB_local as RB           # 凍結（読み取りだけ）
 import steer_B                          # 凍結（読み取りだけ）
-T3 = json.load(open(j('design', 'contrasts-Bl3.json'), encoding='utf-8'))
-TB = json.load(open(j('design', 'contrasts-B.json'), encoding='utf-8'))
-TL = json.load(open(j('design', 'contrasts-Blens.json'), encoding='utf-8'))
-FJ = json.load(open(j('records', 'Bl3', 'design-facts-Bl3.json'), encoding='utf-8'))
-AN = json.load(open(j('records', 'B', 'analysis-B-2026-09-22.json'), encoding='utf-8'))
+T3 = json.loads(rd('design/contrasts-Bl3.json'))
+TB = json.loads(rd('design/contrasts-B.json'))
+TL = json.loads(rd('design/contrasts-Blens.json'))
+FJ = json.loads(rd('records/Bl3/design-facts-Bl3.json'))
+AN = json.loads(rd('records/B/analysis-B-2026-09-22.json'))
 P2 = rd('records/reviews/Bl3/design-round1/bundle-Bl3-design-part2.md').split(NL)
 DRAFT = rd('design/design-Bl3-draft1.md')
 DL = DRAFT.split(NL)

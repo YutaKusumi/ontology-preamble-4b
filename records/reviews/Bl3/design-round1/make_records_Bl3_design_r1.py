@@ -5,16 +5,18 @@
 出力: records/reviews/Bl3/design-round1/adoption-table-Bl3-design-r1.md
 用法: python records/reviews/Bl3/design-round1/make_records_Bl3_design_r1.py
 柵: 本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"""
-import os, json, hashlib, collections
+import os, json, hashlib, subprocess, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..', '..', '..', '..'))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
 s16 = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
+ROUND = '7b2b323'                                             # 第一巡の束のコミット。正本と設計事実はこの版から読む（草案2 の後も同じ結果を出すため）
+at = lambda rel: subprocess.run(['git', 'show', '%s:%s' % (ROUND, rel)], cwd=REPO, capture_output=True, check=True).stdout
 V = json.load(open(os.path.join(HERE, 'verify-Bl3-design-r1.json'), encoding='utf-8'))
-T3 = json.load(open(j('design', 'contrasts-Bl3.json'), encoding='utf-8'))
-FJ = json.load(open(j('records', 'Bl3', 'design-facts-Bl3.json'), encoding='utf-8'))
+T3 = json.loads(at('design/contrasts-Bl3.json').decode('utf-8'))
+FJ = json.loads(at('records/Bl3/design-facts-Bl3.json').decode('utf-8'))
 kid = collections.defaultdict(list)
 for k in V['items']:
     for f in k['votes']:
