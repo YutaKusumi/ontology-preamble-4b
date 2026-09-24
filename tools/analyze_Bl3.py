@@ -247,5 +247,169 @@ def analyze(T3, FJ, main_out, pilot_attempts, pair_names, rows_gate, hook=None, 
     return out
 
 
+# ---------------- 段階 B のその行の注（報告の雛形） ----------------
+def stage_b_notes(T3, AN, rows_gate):
+    """段階 B のその行の注（正本 `report_rules.template`「主の表と門の行に、段階 B のその行の注（判定保留・ランダム方向の不均一）を写す」）。
+    主の行: 段階 B の確かめの行（凍結した集計器の記録の `confirm`・同じ名）の札と注と様式の保留。門の行: 名前のある方向の行は、その腕を比べの加えた腕に持つ確かめの行の札が
+    判定保留のときその札。ランダム方向の行は、その腕の不均一の記録（`homogeneity`）に注があるときその注。"""
+    conf = {r['id']: r for r in AN['confirm']}
+    conf_by_arm = {(r['scenario'], r['A']): r for r in AN['confirm']}
+    homo = {(h['scenario'], h['arm']): h for h in AN['homogeneity']}
+    main = collections.OrderedDict()
+    for r in T3['main_rows']:
+        c = conf.get(r['id'])
+        main[r['id']] = {'label': c['label'] if c else None, 'notes': list(c.get('notes') or []) if c else [], 'style_hold': bool(c and c.get('style_hold'))}
+    gate = collections.OrderedDict()
+    for g in rows_gate:
+        notes = []
+        if g['unit'].startswith('rand:'):
+            h = homo.get((g['scenario'], g['arm']))
+            if h and h.get('note'):
+                notes.append({'kind': 'ランダム方向の不均一', 'spread_pt': h['spread_pt'], 'threshold_pt': h['threshold_pt']})
+        else:
+            c = conf_by_arm.get((g['scenario'], g['arm']))
+            if c and str(c.get('label', '')).startswith('判定保留'):
+                notes.append({'kind': c['label']})
+        gate[g['name']] = notes
+    return {'main': main, 'gate': gate}
+
+
+# ---------------- 手元の二つの段（一致だけを見る・結果を開く・正本 `independent_recompute.print`・`on_mismatch`） ----------------
+PARTS = ('main', 'recompute', 'secondary')
+JUDGE = os.path.join(REPO, 'records', 'Bl3', 'judge-Bl3.json')
+OPENED = os.path.join(REPO, 'records', 'Bl3', 'analysis-Bl3.json')
+
+
+def load_outputs(dirs):
+    """起動器の相 main の出力（組ごとの JSON と、その置き場の session.json）を、一つ以上の置き場から読む。同じ組が二つあれば止める。"""
+    parts, sessions = collections.OrderedDict(), collections.OrderedDict()
+    for d in dirs:
+        S = json.load(open(os.path.join(d, 'session.json'), encoding='utf-8'))
+        for part in PARTS:
+            p = os.path.join(d, '%s.json' % part)
+            if os.path.exists(p):
+                if part in parts:
+                    raise SystemExit('同じ組が二つの置き場にある（止める）: %s' % part)
+                parts[part] = json.load(open(p, encoding='utf-8'))
+                sessions[part] = S
+    return parts, sessions
+
+
+def env_same(sessions):
+    """組の間で、コミット・GPU・版・正本・方向の npz・DRY が同じか（違えば記す・二段目の比べに環境の違いが入る）。"""
+    keys = ('commit', 'dry', 'gpu', 'versions', 'canon_sha16', 'directions_npz_sha256', 'layer_idx', 'coef')
+    ref = next(iter(sessions.values())) if sessions else {}
+    diff = {k: {p: s.get(k) for p, s in sessions.items()} for k in keys if any(s.get(k) != ref.get(k) for s in sessions.values())}
+    return {'same': not diff, 'diff': diff}
+
+
+def with_iso(T3, n_iso):
+    """独立の再計算の等方の本数に合わせた正本の写し（本の計算では正本と同じ本数・DRY で減らしたときだけ違う）。"""
+    if n_iso == T3['nulls']['isotropic']['count']:
+        return T3
+    T3x = json.loads(json.dumps(T3))
+    T3x['nulls']['isotropic']['count'] = n_iso
+    return T3x
+
+
+def judge(T3, parts, sessions, pilot_attempts, pair_names):
+    """一致だけを見る段: 器の誤りの有無・組の環境・二段の一致か不一致かだけを返す（効き目の値と差の最大は返さない）。"""
+    out = collections.OrderedDict(parts=list(parts), tool_error={p: bool(v.get('tool_error')) for p, v in parts.items()}, env=env_same(sessions))
+    dry = any(s.get('dry') for s in sessions.values())
+    out['dry'] = dry
+    if any(out['tool_error'].values()) or not {'main', 'recompute'} <= set(parts):
+        out.update(first=None, second=None, agree=None, reason='器の誤りか、組 main・recompute の欠け')
+        return out
+    pilot = pilot_attempts[-1]
+    rc = parts['recompute']
+    eff = {k: o['effects'] for k, o in parts['main']['cells'].items()}
+    ag = recompute_agreement(with_iso(T3, rc['n_iso']), T3['main_rows'], eff, pair_names, rc['hook'], rc.get('rewrite'), pilot,
+                             (pilot.get('decision') or {}).get('dropped', []), rows_subset=set(rc['hook']) if dry else None)
+    out.update(first=None if ag['first'] is None else bool(ag['first']['agree']), second=bool(ag['second']['agree']), agree=bool(ag['agree']),
+               reason=None if ag['agree'] else ('一段目の道が無い' if ag['first'] is None else '二段のどちらかが一致しない'))
+    return out
+
+
+def open_results(T3, FJ, parts, sessions, pilot_attempts, pair_names, AN, calib_letter, FB, repo=REPO):
+    """結果を開く段（登録者と一緒に・一致だけを見る段が一致したとき）: 集計の全体と、報告に並べるもの（下見の記録・頭の確かめ・層ごとの差分・乙・段階 B の注・環境）。"""
+    rc = parts['recompute']
+    dry = any(s.get('dry') for s in sessions.values())
+    T3x = with_iso(T3, rc['n_iso'])
+    rows_gate = stage_b_gate_rows(T3, AN, trials_reader(repo))
+    style_rows = [r['name'] for r in rows_gate if abs(r['style_pt']) >= T3['gate']['style_hold_pt']]
+    A = analyze(T3x, FJ, parts['main']['cells'], pilot_attempts, pair_names, rows_gate, hook=rc['hook'], rewrite=rc.get('rewrite'), style_rows=style_rows,
+                rows_subset=set(rc['hook']) if dry else None)
+    main_keys = {key3(sc, b, sg) for sc, b, sg in T3['cell_signs_main']}
+    A['dry'] = dry
+    A['pilot_attempts'] = pilot_attempts
+    A['head'] = parts['main']['head']
+    A['main_run'] = {k: parts['main'].get(k) for k in ('batch', 'shortcut', 'dropped')}
+    A['layerwise'] = {k: o['layers'] for k, o in parts['main']['cells'].items() if k in main_keys}
+    A['gate_rows'] = [{k: r[k] for k in ('name', 'scenario', 'arm', 'unit', 'sign', 'cell', 'fam', 'y', 'y_a', 'style_pt')} for r in rows_gate]
+    A['style_rows'] = style_rows
+    A['stage_b_notes'] = stage_b_notes(T3, AN, rows_gate)
+    if 'secondary' in parts:
+        S2 = parts['secondary']
+        A['secondary'] = {'counts': S2.get('counts'), 'contexts_run': len(S2.get('contexts') or []), 'summary': secondary_summary(S2.get('contexts') or [], calib_letter)}
+    A['sessions'] = {p: {k: s.get(k) for k in ('commit', 'dry', 'gpu', 'versions', 'canon_sha16', 'directions_npz_sha256', 'layer_idx', 'coef', 'finished')} for p, s in sessions.items()}
+    A['env'] = env_same(sessions)
+    A['clause'] = '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
+    return A
+
+
+def _pilot_attempts(args_pilot):
+    """下見の試みの並び: 本の計算では凍結の記録の本の凍結（`main_freeze.pilot_attempts`）から。DRY の出力を試すときだけ、相 pilot の出力の pilot.json を与える。"""
+    if args_pilot:
+        return [json.load(open(p, encoding='utf-8'))['pilot'] for p in args_pilot]
+    FR = json.load(open(os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.json'), encoding='utf-8'))
+    return FR['main_freeze']['pilot_attempts']
+
+
+def main():
+    import argparse
+    ap = argparse.ArgumentParser(description='B-lens 層三の手元の二つの段（judge: 一致だけを見る／open: 結果を開く）')
+    ap.add_argument('step', choices=['judge', 'open'])
+    ap.add_argument('dirs', nargs='+', help='起動器の相 main の出力の置き場（組ごとの JSON と session.json）')
+    ap.add_argument('--pilot', nargs='*', help='DRY の出力を試すときだけ: 相 pilot の出力の pilot.json（試みの順）')
+    ap.add_argument('--out', help='出力の置き場（既定は records/Bl3/judge-Bl3.json・analysis-Bl3.json）')
+    ap.add_argument('--judge-record', help='結果を開く段が読む、一致だけを見る段の記録（既定は records/Bl3/judge-Bl3.json）')
+    a = ap.parse_args()
+    T3 = json.load(open(os.path.join(REPO, 'design', 'contrasts-Bl3.json'), encoding='utf-8'))
+    FJ = json.load(open(os.path.join(REPO, 'records', 'Bl3', 'design-facts-Bl3.json'), encoding='utf-8'))
+    DJ = json.load(open(os.path.join(REPO, 'results', 'Bl3', 'directions-Bl3.json'), encoding='utf-8'))
+    parts, sessions = load_outputs(a.dirs)
+    dry = any(s.get('dry') for s in sessions.values())
+    if a.pilot and not dry:
+        raise SystemExit('--pilot は DRY の出力を試すときだけ（本の計算では凍結の記録の本の凍結を読む）')
+    attempts = _pilot_attempts(a.pilot)
+    pair_names = list(DJ['groups']['real']['names'])
+    if a.step == 'judge':
+        out = a.out or JUDGE
+        if os.path.exists(out):
+            raise SystemExit('既にある（一致だけを見る段は一度だけ）: %s' % out)
+        J = judge(T3, parts, sessions, attempts, pair_names)
+        J['written_utc'] = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+        J['clause'] = '本記録は一致か不一致かだけを持つ（値は開かない・正本 independent_recompute.print）。'
+        json.dump(J, open(out, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
+        say = lambda b: '無い' if b is None else ('一致' if b else '不一致')
+        print('[analyze_Bl3] 一致だけを見る段: 器の誤り %s・組の環境 %s・一段目 %s・二段目 %s・全体 %s（値は開いていない）' % (
+            'あり' if any(J['tool_error'].values()) else '無し', '同じ' if J['env']['same'] else '違う', say(J['first']), say(J['second']), say(J['agree'])))
+        if not J['agree']:
+            raise SystemExit('一致しない（結果を開く前に止め、逸脱の台帳に記して登録者に上げる・裁定 D219）')
+        return
+    jp = a.judge_record or JUDGE
+    if not os.path.exists(jp) or not json.load(open(jp, encoding='utf-8')).get('agree'):
+        raise SystemExit('一致だけを見る段の記録が無いか、一致していない（結果を開かない）: %s' % jp)
+    out = a.out or OPENED
+    if os.path.exists(out):
+        raise SystemExit('既にある: %s' % out)
+    AN = json.load(open(os.path.join(REPO, 'records', 'B', 'analysis-B-2026-09-22.json'), encoding='utf-8'))
+    CB = json.load(open(os.path.join(REPO, 'results', 'Blens', 'calib-Blens.json'), encoding='utf-8'))['magnitude']['letter']
+    FB = json.load(open(os.path.join(REPO, 'records', 'Blens', 'design-facts-Blens.json'), encoding='utf-8'))
+    A = open_results(T3, FJ, parts, sessions, attempts, pair_names, AN, CB, FB)
+    json.dump(A, open(out, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1, default=lambda o: o.item() if hasattr(o, 'item') else float(o))
+    print('[analyze_Bl3] 結果を開いた: %s' % os.path.relpath(out, REPO))
+
+
 if __name__ == '__main__':
-    print(__doc__)
+    main()

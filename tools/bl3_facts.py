@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-"""bl3_facts.py v4 —— B-lens 層三（Bl3）の枠に置く設計の事実（転記行 A〜F）を、記録と凍結物から機械で作る（草案2・v3 で雛形との重なり・揺れの版 V3・refuse の実物・様式の転位の行・余弦・費用の見込みを足した）。
+"""bl3_facts.py v5 —— B-lens 層三（Bl3）の枠に置く設計の事実（転記行 A〜F）を、記録と凍結物から機械で作る（草案2・v3 で雛形との重なり・揺れの版 V3・refuse の実物・様式の転位の行・余弦・費用の見込みを足した）。
 v4（草案3）: 揺れの版の割り方の各片と V3 の頭の一致と形の件数（裁定 D220）・様式門の閾値の段階 B の正本との突き合わせと門の行すべての差（採否表 P688）・q7 の区間と該当なしの行（P687）・種とバッチの大きさの確かめ（P689）・バッチの端数（P674）・頭の近道の確かめ・二段の独立の再計算・下見の (vi)・乙の無操作の順伝播の見込み（D219・D221・P675・P692）を足した。
+v5（器の段・裁定 D227）: 転記行 E の乙の見込みを、乙の行の決まり（門の行のうち方向が名前のある方向か段階 B の三本で、土台の升目が B-lens の層二の層にある行・符号は門の行の符号）で数え直した
+  （文脈ごとの行の数の和と、文脈ごとの符号の数の和〔行の符号ごとに零のベクトルの無操作と同じバッチ〕）。
 **効き目は一つも計算しない**（順伝播をしない・方向を模型に足さない）。方向と帰無は作って SHA を取るだけ。
 段階 B と B-lens の凍結した器（`tools/run_stageB_local.py`・`tools/steer_B.py`・`tools/blens_core.py`）は読み取りだけで呼び、変えない。
 出力: records/Bl3/design-facts-Bl3.json・records/Bl3/design-facts-Bl3.md
@@ -13,7 +15,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-VERSION = 'v4'
+VERSION = 'v5'
 SNAP = os.path.expanduser('~/.cache/huggingface/hub/models--Qwen--Qwen3-4B-Instruct-2507/snapshots/cdbee75f17c01a7cc42f958dc650907174af0554')
 ACT = os.path.expanduser('~/.cache/op4b-dir/dirB__s1/main_position_activations.npz')
 ap = argparse.ArgumentParser()
@@ -333,22 +335,24 @@ tokens_recompute = sum(n_paths_rc * per_row_rc * (Bcell['%s|%s' % (r['scenario']
 passes_noise_a = len(T3['cells_main']) * (BATCH + 1)
 passes_noise_b = len(T3['cells_main']) * T3['pilot']['repeat_n']
 passes_noise = passes_noise_a + passes_noise_b
-passes_sec = n_ctx * (len(named) + len(b3))
-passes_sec_noop = n_ctx
+sec_units = set(T3['directions']['named']) | {'rand:%d' % i for i in range(len(b3))}     # 乙の行（裁定 D227・正本 readout.secondary.rows）
+sec_rows_of = lambda key: [r for r in gate_rows if (r['scenario'], r['base']) == tuple(key.split('|')[:2]) and r['unit'] in sec_units]
+passes_sec = sum(len(ids_) * len(sec_rows_of(k_)) for k_, ids_ in sel_ctx.items())
+batches_sec = sum(len(ids_) * len({r['sign'] for r in sec_rows_of(k_)}) for k_, ids_ in sel_ctx.items())     # 行の符号ごとに無操作と同じバッチ（正本 readout.secondary.batching）
 F['E'] = {'text': ('主の計算の順伝播: 升目と符号の組 %d × 方向 %d（名前のある方向 %d・段階 B の三本 %d・等方 %d・実在の差 %d）＝ %d 回（ほかに組ごとの零のベクトル）。門の行だけの組の分（名前のある方向と段階 B の三本だけ）%d 回。比べる相手を両方の向きで数えるために足す分（逆の符号の組が主の行に無い組の、実在の差の方向）%d 回。'
                    'バッチ: 大きさ %d（段階 B の正本の `runner.batch` と同じ値であることを器が確かめた）。主の組ごとに方向 ＋ 零のベクトル ＝ %d を %d バッチに入れ、最後のバッチの %d を零のベクトルで埋める（門の行だけの組は %d を %d バッチ・埋める %d／両方の向きのために足す組は %d を %d バッチ・埋める %d）。'
                    '本の計算の頭の近道の確かめ %d 回（主の組 × 近道あり・なし × 加えた一本・零のベクトル）。独立の再計算の見込み %d 回（新しい道 %d〔%s〕× v̂ の行 %d × 〔無操作 ＋ v̂ ＋ 等方 %d ＋ 比べる相手 %d〕）・順伝播のトークン %s。'
-                   '下見の (vi) の見込み %d 回（(a) 主の升目 × 〔大きさ %d のバッチの全ての位置 ＋ 大きさ一〕＝ %d・(b) 主の升目 × 繰り返し %d ＝ %d）。乙の見込み %d 回以下（文脈 × 名前のある方向と段階 B の三本）と、無操作 %d 回（文脈ごと）。'
+                   '下見の (vi) の見込み %d 回（(a) 主の升目 × 〔大きさ %d のバッチの全ての位置 ＋ 大きさ一〕＝ %d・(b) 主の升目 × 繰り返し %d ＝ %d）。乙の見込み %d 回（文脈ごとに、その升目の門の行のうち方向が名前のある方向か段階 B の三本の行・符号は門の行の符号・裁定 D227）と、そのバッチ %d 回（文脈ごとに行の符号ごとに一つ・零のベクトルの無操作と同じバッチ）。'
                    '一回の順伝播の長さ: 近道（主位置より前の計算を使い回す）なら %d 位置、近道なしならプロンプトの長さ（%d〜%d）＋ 書き出し %d。乙の文脈（B-lens の層二で選んだ出力）%d 件。'
                    '参考: B-lens の Colab の相 extract は %.2f ユニット（登録者の表示から）。')
                   % (len(T3['cell_signs_main']), n_dirs, len(named), len(b3), len(iso), len(real), passes_main, passes_gate_extra, passes_orient_extra,
                      BATCH, per_cs, fill(per_cs)[0], fill(per_cs)[1], per_gate_cs, fill(per_gate_cs)[0], fill(per_gate_cs)[1], per_orient_cs, fill(per_orient_cs)[0], fill(per_orient_cs)[1],
                      passes_cache, passes_recompute, n_paths_rc, '／'.join(T3['independent_recompute']['new_paths']), n_v_rows, len(iso), comps_v, format(tokens_recompute, ','),
-                     passes_noise, BATCH, passes_noise_a, T3['pilot']['repeat_n'], passes_noise_b, passes_sec, passes_sec_noop,
+                     passes_noise, BATCH, passes_noise_a, T3['pilot']['repeat_n'], passes_noise_b, passes_sec, batches_sec,
                      len(ids0) + 1, min(lens), max(lens), len(ids0), n_ctx, ext[0]['used'] if ext else float('nan')),
           'passes_main': passes_main, 'passes_gate_extra': passes_gate_extra, 'passes_orient_extra': passes_orient_extra, 'n_dirs': n_dirs,
           'passes_cache': passes_cache, 'passes_recompute': passes_recompute, 'tokens_recompute': tokens_recompute, 'passes_noise': passes_noise, 'passes_noise_a': passes_noise_a, 'passes_noise_b': passes_noise_b,
-          'passes_secondary_max': passes_sec, 'passes_secondary_noop': passes_sec_noop, 'batch': BATCH, 'batch_fill_main': list(fill(per_cs)), 'per_row_recompute': per_row_rc}
+          'passes_secondary': passes_sec, 'batches_secondary': batches_sec, 'contexts_secondary': n_ctx, 'batch': BATCH, 'batch_fill_main': list(fill(per_cs)), 'per_row_recompute': per_row_rc}
 
 # ---------------- 転記行 F: 重みと版 ----------------
 wf = {}

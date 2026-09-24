@@ -7,6 +7,7 @@ v2（草案1 の読み直し）: 割合を両側に等しい裾に・比べる�
 v3（草案2）: 設計の巡・第一巡の採否表（`records/reviews/Bl3/design-round1/adoption-table-Bl3-design-r1.md`・P620〜P666）と登録者裁定 D210〜D217 を受ける。
 v4（草案3）: 設計の巡・二巡目（最終検分）の採否表（`records/reviews/Bl3/design-round2/adoption-table-Bl3-design-r2.md`・P667〜P698）と登録者裁定 D218〜D223 を受ける。
 v5（草案3 の起草者の見直しの後）: 見直しの記録（`records/Bl3/draft3-review/review-draft3-Bl3.md`）の所見を受ける（登録者裁定 D224・D225 で採った）。
+v6（器の段・下見の前の凍結の準備）: 器の段で見つけたこと T1〜T4（`records/Bl3/tools/tools-log-Bl3.md`）の登録者裁定 D226・D227 を受ける（`records/Bl3/rulings-D226-D227.md`）。
 用法: python tools/make_contrasts_Bl3.py
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"""
 import os, re, json, math, hashlib, collections
@@ -14,7 +15,7 @@ import os, re, json, math, hashlib, collections
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-VERSION = 'v5'
+VERSION = 'v6'
 s16 = lambda rel: hashlib.sha256(open(j(*rel.split('/')), 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
 TL = json.load(open(j('design', 'contrasts-Blens.json'), encoding='utf-8'))          # B-lens の正本（凍結・読むだけ）
 TB = json.load(open(j('design', 'contrasts-B.json'), encoding='utf-8'))              # 段階 B の正本（凍結・読むだけ）
@@ -117,6 +118,8 @@ decisions = {
     'D223': '床の近くの升目は、升目ごとの無操作の選択肢 a の文字の確率を主の札の隣に並べ、限界に書く。記述の門は足さない（同上）',
     'D224': '草案3 の起草者の見直しの直しをすべて採る。新しい小さな決まり: (vi) の (b) で止めたときは (i)〜(v) を計算しない・下見の無操作の値はバッチの最初の位置の値・判定不能の門の予想の項目は採点しない・(v) に門の行だけの升目を入れる・器の誤りで下見をやり直さないときは q1 を採点せずに閉じる（`records/Bl3/rulings-D224-D225.md`）',
     'D225': '本の計算の中の器の誤りは下見と同じ型で扱う（結果を開かずに止め、逸脱の台帳に記して登録者に上げる。やり直すかは登録者の裁定。やり直さないときは結果を開かずに閉じ、予想は q1 だけを採点する）（同上）',
+    'D226': '正本の文の直し（下見の前の凍結で入れる）: 段階 B の走行器のフックはもともと行ごとの方向の行列を受ける形を持ち、層三の器はそれをそのまま呼ぶ（言い方の直し・決まりは変えない）・近道の元が主位置の手前で切れていることを器が assert で確かめる・門が通るのは p が水準を下回るとき（`records/Bl3/rulings-D226-D227.md`）',
+    'D227': '乙の行は、門の行のうち、方向が名前のある方向か段階 B の三本で、土台の升目が B-lens の層二の層にある行とし、符号は門の行の符号にする。転記行 E の乙の見込みは器で数え直す（同上）',
 }
 
 READING = [
@@ -161,7 +164,7 @@ all_ban = sorted(set(value_ban + mech_ban + added_ban + reading_never))
 
 T = {
     'id': 'Bl3',
-    'version': 'draft3-r1-2026-09-24',
+    'version': 'draft3-r2-2026-09-25',
     'generator': 'tools/make_contrasts_Bl3.py %s' % VERSION,
     'note': '段階 B の後・B-lens の後の登録外の記述（小さな登録）。段階 B と B-lens の札・報告・凍結物は変えない。本文と正本が食い違う場合は正本が勝つ。',
     'decisions': decisions,
@@ -195,7 +198,8 @@ T = {
             ('design_r1_verification', 'records/reviews/Bl3/design-round1/verification-Bl3-design-r1.md'), ('rulings_D218', 'records/Bl3/rulings-D218.md'),
             ('rulings_D219_D223', 'records/Bl3/rulings-D219-D223.md'), ('design_r2_adoption', 'records/reviews/Bl3/design-round2/adoption-table-Bl3-design-r2.md'),
             ('design_r2_verification', 'records/reviews/Bl3/design-round2/verification-Bl3-design-r2.md'), ('rulings_D224_D225', 'records/Bl3/rulings-D224-D225.md'),
-            ('draft3_review', 'records/Bl3/draft3-review/review-draft3-Bl3.md'), ('exposure', 'records/Bl3/exposure-before-seal-Bl3.md'))},
+            ('draft3_review', 'records/Bl3/draft3-review/review-draft3-Bl3.md'), ('exposure', 'records/Bl3/exposure-before-seal-Bl3.md'),
+            ('rulings_D226_D227', 'records/Bl3/rulings-D226-D227.md'))},
         'activations': {'place': ACT_PLACE, 'sha256_head16': DIRS['activations_npz_sha256'][:16].upper(), 'arms': ARMS8, 'scenes': DIRS['extraction_scenarios']},
         'versions_B': TL['inputs']['versions_B'],
         'versions_note': 'これは B の本走行のセッション記録の版である。torch は CUDA の組みまで揃え、Colab の起動器が入れ直して文字列の完全な一致で確かめる（裁定 D187）',
@@ -223,7 +227,7 @@ T = {
             'precision': '順伝播と加減は段階 B と同じ bf16（加減のベクトルは層の出力の型に直して足す・段階 B の走行器のフックと同じ形・係数は一度だけ掛ける・裁定 D90）。最後の層の出口の残差を `float32` に上げ、最終の正規化と、語彙の行列の読み取りの集合の行を `float32` で当てて出口の値を作る。全語彙の softmax は、下見の (i) の質量と記述の質量にだけ `float32` で使う',
             'place': '加減は選んだ層の出力（`layers.indices` と `layers.hidden_states_indices` の選んだ層の添字）に足す（段階 B と同じ）',
             'batch': TB['runner']['batch'], 'order_seed': SEED_ORDER,
-            'batching': 'バッチの組み方を凍結する: 升目と符号ごとに、全ての方向（無操作は零のベクトル）を同じ形のバッチで同じフックの道に流す。方向の並びは `readout.primary.order_seed` の種で混ぜ、名前のある方向を一か所に集めない。バッチの大きさは `readout.primary.batch`（段階 B の走行器と同じ・下見の (vi) の (a) が上限を超えたときは一）。升目と符号ごとの方向の数（零のベクトルを含む）がバッチの大きさで割り切れないときは、最後のバッチを零のベクトルで埋めて同じ形にし、埋めた分の値は使わない（数は転記行 E・採否表 P674）。方向ごとに違うベクトルを一つのバッチで足すフックは段階 B に無い新しい道なので、独立の再計算の突き合わせと器の実装の検分の対象にする',
+            'batching': 'バッチの組み方を凍結する: 升目と符号ごとに、全ての方向（無操作は零のベクトル）を同じ形のバッチで同じフックの道に流す。方向の並びは `readout.primary.order_seed` の種で混ぜ、名前のある方向を一か所に集めない。バッチの大きさは `readout.primary.batch`（段階 B の走行器と同じ・下見の (vi) の (a) が上限を超えたときは一）。升目と符号ごとの方向の数（零のベクトルを含む）がバッチの大きさで割り切れないときは、最後のバッチを零のベクトルで埋めて同じ形にし、埋めた分の値は使わない（数は転記行 E・採否表 P674）。方向ごとに違うベクトルを一つのバッチで足す形は、段階 B の走行器のフックがもともと持つ形（行ごとの方向の行列を受け、段階 B のランダム方向の腕で使った）で、層三の器はこのフックをそのまま呼ぶ。層三では一つのバッチに入る方向の種類が段階 B より大きく増えるので、独立の再計算の突き合わせと器の実装の検分の対象にする（裁定 D226）',
             'band': '加減は主位置（組み立てたプロンプトの最後のトークン）から読み取りの位置まで（段階 B の帯と同じ起点・裁定 D124）',
             'band_why': '段階 B の帯は主位置から生成した全ての位置に掛かり、JSON 直答の出力では、この書き出しのトークンも加減の下で生成された。教師強制の書き出しの位置にも加減を掛けるのは、その形に合わせるため（主位置だけに掛ける形は採らない・裁定 D212）',
             'copy_cue': '主の書き出しは、どの升目でもプロンプトの中の JSON の指示の雛形の頭と同じトークンの並びで、雛形ではその次が a（破局の側の選択肢）。書き出しの最後のトークンの直後に ref が来る所もプロンプトにある（転記行 B）。読み取りの値には、プロンプトの中の同じ並びの続きを写す働きが入りうるが、どれだけかは分けられない。雛形との一致の最後のトークンだけを崩した揺れの版（V3）の無操作の値を、下見の (iv) で並べる（記述・読みを付けない・裁定 D212・D220）',
@@ -233,7 +237,9 @@ T = {
         },
         'secondary': {'name': '乙（無操作の出力の中の選択の文字の位置）', 'use': '名前のある方向と段階 B の三本のランダム方向だけの記述。B-lens の層二と同じ文脈（升目ごとに選んだ出力）で、全経路の値を B-lens の直接の経路の値と並べる',
                       'band': '帯は主位置から、教師強制で置いた無操作の出力の選択の文字の位置まで（段階 B の帯と同じ起点・推論の文にも掛ける）',
-                      'note': '散文の出力では推論の写しの位置で、決定の位置ではない（B-lens で分かった）'},
+                      'note': '散文の出力では推論の写しの位置で、決定の位置ではない（B-lens で分かった）',
+                      'rows': '乙の行は、門の行（`gate.rows_rule`）のうち、方向が名前のある方向か段階 B の三本で、土台の升目が B-lens の層二で選んだ出力の層（B-lens の設計事実の転記行 E の `selected` の升目）にある行とする。符号は門の行の符号（O-Ncold の升目では段階 B の三本が両方の符号で入る）。行は B-lens の層二の答えの文字の位置の行と同じになる（裁定 D227）',
+                      'batching': '文脈ごとに、行の符号ごとに、零のベクトルの無操作と同じバッチに流す（近道なし・順伝播の数は転記行 E）'},
         'rejected': {'name': '丙（無操作の出力の尤度の比の重み）', 'why': '長い出力では重みが大きく揺れ、段階 B の標本化の切り詰めで重みが定まらない語も出るため、採らない'},
         'variants': {'V1': '書き出しからコードブロックの行（最初の行）を除いたもの', 'V2': '書き出しの選択の鍵の前に改行と字下げを入れたもの（複数行の JSON）',
                      'V3': '書き出しの選択の鍵の後の空白を除いたもの（雛形との一致の最後のトークンだけを崩した版・頭の並びは雛形と同じ・形は段階 B の出力に無い・裁定 D212・D220）',
@@ -316,6 +322,7 @@ T = {
         'call': 'B-lens の芯の `gate_perm` は押しを「行の符号 × 家族の値」で作るので、層三の器は、行の符号をすべて +1 にし、家族の鍵を「升目|符号」にし、家族の値に「その升目で符号つきの方向を加えた効き目」を置いて呼ぶ（または同じ式の新しい関数を書く）。合成データに、奇でない押しと減算の行を入れて確かめる',
         'push_center': '門の押しからは中心を引かない。方向を単位にした入れ替えは行の升目と符号を保つので、升目と符号ごとの共通の動きは、観測の順位相関にも、入れ替えた順位相関にも同じように入る。検定の正しさは変わらず、変わりうるのは検出力だけ（合成の数で確かめた・`records/reviews/Bl3/design-round1/verification-Bl3-design-r1.md`・裁定 D213）',
         'test': '行の単位の順位相関（Spearman・片側・正の向き）を、方向を単位にした全ての入れ替えで数える（B-lens の門と同じ並べ替え）', 'alpha': 0.05,
+        'pass_rule': '門が通るのは、p が水準（`gate.alpha`）を下回るとき（p が水準と同じなら通らない）。段階 B と B-lens の決まりと同じ。全ての入れ替えで数えるので、p がちょうど水準になることがありうる（裁定 D226）',
         'without_vhat': 'static の行を除いた行で、v̂ を抜いた方向の間で同じ門を計算する（裁定 D181 の型）',
         'use': '二つの門は、v̂ の行の結果を段階 B の行動に結びつけるための条件（両方を通ったときだけ）。多重の補正は掛けない（二つとも通ることを求める）',
         'power_note': '門の独立の単位は方向で、検出力は低い。通らないことを「そろわないことを示した」とは読まない（B-lens の型）',
@@ -344,6 +351,7 @@ T = {
         'before_seal': '封印の前に、本物の模型で読み取りの値を出す走らせ方をしない。封印の前の本物の模型の確かめは、読み込みと版の確かめだけにし、値を印字しない',
         'steered_cache_check': {'seed': SEED_CACHE,
                                 'rule': '近道を使うときだけ、本の計算の頭で、帰無に入らない一本のランダム方向（等方の帰無と同じ作り方・この種・方向の npz に入れる）と零のベクトルを、主の組の全ての升目と符号で、近道ありと近道なしの両方の道に流す。効き目（加えた値 − 零のベクトルの値）を道ごとに作り、二つの道の効き目の差の絶対値の最大だけを印字する。近道の許容（`pilot.cache_tol_rule`）の外なら、本の計算は近道を使わない（採否表 P675）'},
+        'shortcut_assert': '近道を使うとき、器は、近道の元（主位置より前の計算）が主位置の手前で切れていること（主位置を加減の帯に残すこと）を、近道を使う順伝播のたびに assert で確かめる。落ちたら、凍結した確かめが機械で落ちたので器の誤りに当たる。効き目で比べる本の計算の頭の近道の確かめ（`computation.steered_cache_check`）は、主位置まで使い回す誤りに対して力が弱いことが合成データで分かったため（器の段の記録・裁定 D226）',
         'self_checks': {'logit': '読み取りの集合の出口の値（`float32`）を、同じ位置の模型そのものの出口の値（bf16）と突き合わせ、差の絶対値の最大が `computation.logit_tol` 以内であることを確かめる（二重の正規化を捕まえる・許容は B-lens の logits の突き合わせと同じ）。下見の頭と本の計算の頭で走らせる',
                         'layer': '層ごとの差分の最後の層の行（選択肢 a の文字の対数オッズの差）が、読み取りの効き目と `computation.layer_tol` 以内で一致することを、本の計算の頭で、近道の確かめの一本と零のベクトルで確かめる',
                         'on_fail': '落ちたら止める（凍結した確かめが機械で落ちたので器の誤りに当たる・下見の頭では `pilot.decision.tool_error`、本の計算の頭では `computation.tool_error`・採否表 P676）'},
@@ -439,7 +447,7 @@ T = {
                '機種は一つ'],
     'drafter_values': ['nulls.isotropic.seed', 'readout.primary.order_seed', 'computation.steered_cache_check.seed', 'readout.variants', 'pilot.variant_flag', 'pilot.noise_max', 'pilot.repeat_n',
                        'independent_recompute.tol_stage1', 'computation.layer_tol', 'labels.side_rule', 'labels.second.ranks', 'predictions.items', 'predictions.q7_rule', 'cost'],
-    'numbering': {'rulings_next': 'D226'},
+    'numbering': {'rulings_next': 'D228'},
     'clause': '本正本のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。',
 }
 assert T['pilot']['decision']['cells_min_pass'] <= T['pilot']['decision']['cells_total']

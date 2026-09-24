@@ -1,0 +1,52 @@
+bl3_recompute_rewrite v1 --selftest  torch 2.9.1+cpu・transformers 4.57.3・numpy 2.4.2・注意の実装 sdpa・config.use_cache True
+乱数の小さな模型: 次元 64・層 4・注意の頭 4・KV の頭 2・頭の次元 16・中間 128・選んだ層の添字 1・係数 2.0
+[ok] 升目の組み立てが転記行 B と一致（全 9 升目・長さ・主位置・読み取りの位置・族・前置きの SHA16・読み取りの集合のトークン）  | N1|O-Ncold 474/473/480・N1|Onull 468/467/474・S1|O-Ncold 541/540/547・S1|Onull 535/534/541・S4|O-Ncold 555/554/561・S4|Onull 549/548/555・S4|Osec-Ncold 557/556/563・SK|O-Ncold 556/555/562・SK|Onull 550/549/556
+[ok] 転記行 B と違えば止まる（S1|O-Ncold の prompt_len を +1 ずらした写し）
+[ok] 転記行 B と違えば止まる（S1|O-Ncold の main_position を +1 ずらした写し）
+[ok] 転記行 B と違えば止まる（S1|O-Ncold の readout_position を -1 ずらした写し）
+[ok] 主の書き出しの割り方が変われば止まる（最後のトークンを落とした写し）
+[ok] N1|Onull 既定（config.use_cache）: 手回しの道（零の書き換え）の最終の正規化の入力が模型の forward と一致（ビット単位）  | 差の絶対値の最大 0・形 (1, 475, 64)・型 torch.bfloat16
+[参考] N1|Onull 既定（config.use_cache）: 手回しの道が組んだ mask（full_attention）は None（SDPA は is_causal で走る）（判定に入れない）
+[ok] N1|Onull 既定（config.use_cache）: 読み取りの集合の出口の値（float32）と模型の出口の値（bf16）の差が computation.logit_tol 以内  | 差の絶対値の最大 0.00068（許容 0.5）
+[ok] N1|Onull: 歯の確かめ——hidden_states[-1] を正規化の入力と取り違えた読み取りの差が、正しい読み取りの差の 4 倍を超える  | 取り違え 0.0351・正しい 0.00068
+[ok] N1|Onull: hidden_states[-1] は正規化の後（last_hidden_state と同じ・最終の正規化の入力と違う）
+[ok] N1|Onull: 手回しの層 1 の出力（書き換えの前）が hidden_states[2]（layers.hidden_states_indices の対応）と一致（ビット単位）
+[ok] N1|Onull use_cache=False: 手回しの道（零の書き換え）の最終の正規化の入力が模型の forward と一致（ビット単位）  | 差の絶対値の最大 0・形 (1, 475, 64)・型 torch.bfloat16
+[参考] N1|Onull use_cache=False: 手回しの道が組んだ mask（full_attention）は 明示の mask（型 torch.bool・形 (1, 1, 475, 475)）（判定に入れない）
+[ok] N1|Onull use_cache=False: 読み取りの集合の出口の値（float32）と模型の出口の値（bf16）の差が computation.logit_tol 以内  | 差の絶対値の最大 0.00068（許容 0.5）
+[ok] S1|O-Ncold 既定（config.use_cache）: 手回しの道（零の書き換え）の最終の正規化の入力が模型の forward と一致（ビット単位）  | 差の絶対値の最大 0・形 (1, 548, 64)・型 torch.bfloat16
+[参考] S1|O-Ncold 既定（config.use_cache）: 手回しの道が組んだ mask（full_attention）は None（SDPA は is_causal で走る）（判定に入れない）
+[ok] S1|O-Ncold 既定（config.use_cache）: 読み取りの集合の出口の値（float32）と模型の出口の値（bf16）の差が computation.logit_tol 以内  | 差の絶対値の最大 0.00117（許容 0.5）
+[ok] S1|O-Ncold: 歯の確かめ——hidden_states[-1] を正規化の入力と取り違えた読み取りの差が、正しい読み取りの差の 4 倍を超える  | 取り違え 0.023・正しい 0.00117
+[ok] S1|O-Ncold: hidden_states[-1] は正規化の後（last_hidden_state と同じ・最終の正規化の入力と違う）
+[ok] S1|O-Ncold: 手回しの層 1 の出力（書き換えの前）が hidden_states[2]（layers.hidden_states_indices の対応）と一致（ビット単位）
+[ok] S1|O-Ncold use_cache=False: 手回しの道（零の書き換え）の最終の正規化の入力が模型の forward と一致（ビット単位）  | 差の絶対値の最大 0・形 (1, 548, 64)・型 torch.bfloat16
+[参考] S1|O-Ncold use_cache=False: 手回しの道が組んだ mask（full_attention）は 明示の mask（型 torch.bool・形 (1, 1, 548, 548)）（判定に入れない）
+[ok] S1|O-Ncold use_cache=False: 読み取りの集合の出口の値（float32）と模型の出口の値（bf16）の差が computation.logit_tol 以内  | 差の絶対値の最大 0.00117（許容 0.5）
+[ok] S1|O-Ncold 符号 -1: 層 1 より前の層の出力は無操作と同じ（ビット単位）
+[ok] S1|O-Ncold 符号 -1: 層 1 の出力（書き換えの前）は無操作と同じ（ビット単位）
+[ok] S1|O-Ncold 符号 -1: 書き換えは主位置（540）より前の位置を変えない（層 1 の出力・ビット単位）
+[ok] S1|O-Ncold 符号 -1: 主位置から列の最後まで（8 位置）に同じ量を足した（層 1 の出力・ビット単位）
+[ok] S1|O-Ncold 符号 -1: 足した量の向きと大きさが sign×coef×v（bf16 の丸めの内）  | 余弦の最小 0.999997・ノルムの相対の差の最大 0.000838
+[ok] S1|O-Ncold 符号 -1: 最終の正規化の入力は主位置より前で無操作と同じ（ビット単位）・主位置から後ろの全ての位置で違う
+[ok] N1|Onull 符号 +1: 層 1 より前の層の出力は無操作と同じ（ビット単位）
+[ok] N1|Onull 符号 +1: 層 1 の出力（書き換えの前）は無操作と同じ（ビット単位）
+[ok] N1|Onull 符号 +1: 書き換えは主位置（467）より前の位置を変えない（層 1 の出力・ビット単位）
+[ok] N1|Onull 符号 +1: 主位置から列の最後まで（8 位置）に同じ量を足した（層 1 の出力・ビット単位）
+[ok] N1|Onull 符号 +1: 足した量の向きと大きさが sign×coef×v（bf16 の丸めの内）  | 余弦の最小 0.999996・ノルムの相対の差の最大 0.000547
+[ok] N1|Onull 符号 +1: 最終の正規化の入力は主位置より前で無操作と同じ（ビット単位）・主位置から後ろの全ての位置で違う
+[参考] float32 を経た bf16 と float64 から直に直した bf16 が同じ合成の方向: 49/49（判定に入れない）
+[ok] 零のベクトルの効き目が零（両方の符号・2 行: sub:N1:O-Ncold-v~O-Ncold-vrand・add:S1:Onull+v~Onull+vrand）  | sub:N1:O-Ncold-v~O-Ncold-vrand 0.0/0.0・add:S1:Onull+v~Onull+vrand 0.0/0.0
+[ok] 歯の確かめ: static の効き目は零でない（乱数の小さな模型）  | sub:N1:O-Ncold-v~O-Ncold-vrand -0.0573・add:S1:Onull+v~Onull+vrand -0.0701
+[ok] 同じ呼び出しを二度走らせて同じ値（ビット単位）
+[ok] 出力の形 {行の名: {noop_lo, effects: {方向の名|符号: 効き目}}}（符号の書き方 %+d）  | 鍵の例 ['static|-1', 'zero|+1', 'zero|-1']
+[ok] 模型に forward の hook が掛かっていれば止まる
+[ok] 層の添字が正本の規則と違えば止まる
+[ok] 係数が正本 layers.coef_applied と違えば止まる
+[ok] 方向が float64 でなければ止まる
+[ok] 方向のノルムが ‖static‖ に揃っていなければ止まる
+[ok] 正本の行の符号と違えば止まる
+[ok] 正本の行の升目と違えば止まる
+[ok] 呼び出しの間に forward の hook を掛けようとしない（掛ける関数を差し替えて走らせた）
+selftest: 43/43 ok
+柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。

@@ -328,6 +328,8 @@ def run():
             stop(str(e_))
         if len(ctx) != cnt['contexts']:
             stop('乙の文脈の数が B-lens の選んだ出力の数と違う: %d' % len(ctx))
+        if (cnt['row_passes'], cnt['sign_batches'], cnt['contexts']) != (E['passes_secondary'], E['batches_secondary'], E['contexts_secondary']):
+            stop('乙の順伝播の数が転記行 E と違う: %s' % cnt)
         V0 = np.zeros((1, cfg.hidden_size), dtype=np.float32)
         try:
             h_ = RB.register_hook(model, L, RB.make_hook(V0, coef, 1, [0], meta={'bl3': 'check'}))
@@ -430,7 +432,8 @@ def run():
                     mark('recompute_rewrite', skipped='DRY で器が無い')
                 else:
                     t1 = time.time()
-                    out['rewrite'] = RW.recompute_rewrite(model, tok, T3, FJ, rows_rc, dbr, dirs, L, coef)
+                    # mask の組み方を、本の器のフックの道の近道なし（use_cache=False・明示の mask）にそろえる（個体の開発の記録 `records/Bl3/tools/recompute-rewrite-dev-Bl3.md`）
+                    out['rewrite'] = RW.recompute_rewrite(model, tok, T3, FJ, rows_rc, dbr, dirs, L, coef, use_cache=False)
                     mark('recompute_rewrite', rows=len(rows_rc), seconds=round(time.time() - t1, 1))
             elif part == 'secondary':
                 AN = json.load(open(os.path.join(REPO, 'records', 'B', 'analysis-B-2026-09-22.json'), encoding='utf-8'))

@@ -343,6 +343,10 @@ def part_model(sets, iso_n):
         sec[0]['n_batches'] == len({sg for _, _, sg in sec_rows[pick[0][2].key]})
     cnt = AZ.secondary_counts(FB, sec_rows)
     check(G2, '乙を流せる（文脈を組み・行の符号ごとに無操作と同じバッチ）', ok_sec, '文脈 %d（流したのは %d）・乙の行の順伝播 %d・符号のバッチ %d' % (len(ctx_all), len(pick), cnt['row_passes'], cnt['sign_batches']))
+    E2 = FJ['facts']['E']
+    check(G2, '乙の順伝播の数が転記行 E と同じ（集計の器の数え方と、設計事実の器の転記行 C の門の行からの数え方）',
+          (cnt['row_passes'], cnt['sign_batches'], cnt['contexts']) == (E2['passes_secondary'], E2['batches_secondary'], E2['contexts_secondary']),
+          '集計の器 %d・%d・%d／転記行 E %d・%d・%d' % (cnt['row_passes'], cnt['sign_batches'], cnt['contexts'], E2['passes_secondary'], E2['batches_secondary'], E2['contexts_secondary']))
     summ2 = AZ.secondary_summary(sec, CB)
     check(G2, '乙のまとめに B-lens の直接の経路の値を並べる', all(v.get('blens_direct') is not None for v in summ2.values()), '行 %d' % len(summ2))
     # 三. 壊した読み取りと近道
@@ -370,6 +374,44 @@ def part_model(sets, iso_n):
         ro = R.readout(cap['h'], c0, full=False)
         vals.append(float(ro['lo'][1] - ro['lo'][0]))
     check(G3, '（記述）主位置の一つ分の加減の寄与（効き目で比べる確かめの強さの目安）', True, '主位置から %.4f・主位置の次から %.4f・差 %.2e（近道の許容 %.4f）' % (vals[0], vals[1], vals[0] - vals[1], tol))
+    # （記述）本物の相対の加減の大きさに合わせた合成の方向で、突き合わせの力を測り直す（独立の再計算の個体の開発の記録の勧め）。
+    # 小さな模型では合成の方向のノルムが選んだ層の出力より二桁ほど大きく、効き目が飽和して、係数の二度掛けなどの誤りが一段目の許容の内に収まった。
+    # 方向を ‖v‖＝正本 `layers.vhat_over_h` の選んだ層の値 × 選んだ層の出力の主位置のノルム にそろえ、個体の器の変種（`bl3_recompute_rewrite._mutant_diffs`・中は変えない）と
+    # 主位置の一つ分の加減の寄与を測る。判定に入れない（合成の模型の上の目安）。
+    import bl3_recompute_rewrite as RW
+    rw_rows = [(r['id'], '%s|%s' % (r['scenario'], r['base']), int(r['sign'])) for r in v_rows]
+    capL = {}
+    hL = direction_B.decoder_layers(model)[L].register_forward_hook(lambda m, i, o: capL.__setitem__('h', (o[0] if isinstance(o, tuple) else o).detach().clone()))
+    with torch.no_grad():
+        model(input_ids=torch.tensor([cells[rw_rows[0][1]].ids]), logits_to_keep=1)
+    hL.remove()
+    RB.assert_no_hooks(model, L)
+    nh = float(capL['h'][0, cells[rw_rows[0][1]].mp].float().norm())
+    ratio = float(T3['layers']['vhat_over_h'][str(T3['layers']['selected_ratio'])])
+    first_real = 'real:' + DJ['groups']['real']['names'][0]
+    scale = ratio * nh / float(np.linalg.norm(dirs['static']))
+    dirs_s = collections.OrderedDict((k, v * scale) for k, v in dirs.items() if k in ('static', 'iso:0', 'iso:1', first_real))
+    Rs = BR.Runner(model, T3, L, T3['layers']['coef_applied'], dirs_s)
+    dbr_s = {nm: [('static', s), ('iso:0', s), ('iso:1', s), (first_real, 1), (first_real, -1)] for nm, _, s in rw_rows}
+    hk_s = BR.recompute_hook_path(Rs, [(nm, cells[ck], s) for nm, ck, s in rw_rows], dbr_s)
+    M_s = RW._mutant_diffs(model, tok, T3, FJ, rw_rows, dirs_s, first_real, L, T3['layers']['coef_applied'], hk_s)
+    emax = max(abs(e) for v in hk_s.values() for e in v['effects'].values())
+    tol1 = T3['independent_recompute']['tol_stage1']
+    check(G3, '（記述）本物の相対の加減の大きさの合成の方向での、書き換えの道の変種とフックの道の差（一段目の許容と比べる・判定に入れない）', True,
+          '‖v‖／‖選んだ層の出力‖ %.4f・効き目の絶対値の最大 %.2e・%s（許容 %s）' % (ratio, emax, '・'.join('%s %.2e%s' % (k, d, '（許容の外）' if d > tol1 else '') for k, _, d, _ in M_s), tol1))
+    V2 = np.stack([np.zeros(cfg.hidden_size, dtype=np.float32), dirs_s['static'].astype(np.float32)])
+    vals_s = []
+    for st in (c0.mp, c0.mp + 1):
+        h_ = RB.register_hook(model, L, RB.make_hook(V2, T3['layers']['coef_applied'], sg0, [st, st]))
+        cap = {}
+        hh = model.model.norm.register_forward_pre_hook(lambda m, a: cap.__setitem__('h', a[0][:, -1, :].detach().clone()))
+        with torch.no_grad():
+            model(input_ids=torch.tensor([c0.ids] * 2), logits_to_keep=1)
+        h_.remove(); hh.remove()
+        ro = R.readout(cap['h'], c0, full=False)
+        vals_s.append(float(ro['lo'][1] - ro['lo'][0]))
+    check(G3, '（記述）本物の相対の加減の大きさの合成の方向での、主位置の一つ分の加減の寄与（判定に入れない）', True,
+          '主位置から %.3e・主位置の次から %.3e・差 %.2e（近道の許容 %.4f・一段目の許容 %s）' % (vals_s[0], vals_s[1], vals_s[0] - vals_s[1], tol, tol1))
     return {'pilot': pilot, 'n_forward': R.n_forward, 'seconds': round(time.time() - t0, 1), 'iso_n': iso_n, 'layers': cfg.num_hidden_layers, 'dim': cfg.hidden_size}
 
 
