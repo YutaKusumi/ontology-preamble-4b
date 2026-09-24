@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""bl3_facts.py v2 —— B-lens 層三（Bl3）の枠に置く設計の事実（転記行 A〜F）を、記録と凍結物から機械で作る（草案1）。
+"""bl3_facts.py v3 —— B-lens 層三（Bl3）の枠に置く設計の事実（転記行 A〜F）を、記録と凍結物から機械で作る（草案2・v3 で雛形との重なり・揺れの版 V3・refuse の実物・様式の転位の行・余弦・費用の見込みを足した）。
 **効き目は一つも計算しない**（順伝播をしない・方向を模型に足さない）。方向と帰無は作って SHA を取るだけ。
 段階 B と B-lens の凍結した器（`tools/run_stageB_local.py`・`tools/steer_B.py`・`tools/blens_core.py`）は読み取りだけで呼び、変えない。
 出力: records/Bl3/design-facts-Bl3.json・records/Bl3/design-facts-Bl3.md
@@ -12,7 +12,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(REPO, 'tools'))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-VERSION = 'v2'
+VERSION = 'v3'
 SNAP = os.path.expanduser('~/.cache/huggingface/hub/models--Qwen--Qwen3-4B-Instruct-2507/snapshots/cdbee75f17c01a7cc42f958dc650907174af0554')
 ACT = os.path.expanduser('~/.cache/op4b-dir/dirB__s1/main_position_activations.npz')
 ap = argparse.ArgumentParser()
@@ -27,6 +27,7 @@ AN = json.load(open(j('records', 'B', 'analysis-B-2026-09-22.json'), encoding='u
 import run_stageB_local as RB          # 凍結（読み取りだけ）
 import steer_B                          # 凍結（読み取りだけ）
 import blens_core as C                  # 凍結（読み取りだけ）
+import rules_B                          # 凍結（読み取りだけ）
 from transformers import AutoTokenizer
 tok = AutoTokenizer.from_pretrained(a.tokenizer)
 enc = lambda s: tok.encode(s, add_special_tokens=False)
@@ -80,27 +81,40 @@ assert dec(letter_ids['refuse']) == T3['readout']['primary']['refuse_head'], dec
 assert all(dec(letter_ids[x]) == x for x in letters), {x: dec(letter_ids[x]) for x in letters}
 V1 = V0.split(NL, 1)[1]
 V2 = V0.replace('{' + KEY, '{' + NL + '  ' + KEY)
-variants = collections.OrderedDict([('V1', V1), ('V2', V2)])
+assert V0.count('": "') == 1
+V3 = V0.replace('": "', '":"')                                               # 雛形との一致を崩す版（鍵の後の空白を除く・裁定 D212）
+variants = collections.OrderedDict([('V1', V1), ('V2', V2), ('V3', V3)])
 var_ok = collections.OrderedDict()
 for name, v in variants.items():
     iv = enc(v)
     ok = all(enc(v + x)[:len(iv)] == iv and dec(enc(v + x)[len(iv)]) == (x if x != 'refuse' else 'ref') for x in letters + ['refuse'])
     var_ok[name] = {'string': v, 'ids': iv, 'pieces': [dec(i) for i in iv], 'boundary_ok': ok}
 first_letters = collections.Counter(dec(enc(tx)[len(ids0)]) for tx in json_texts)
+ref_next = collections.Counter()
+for cd in cells_all:
+    sc, arm = cd.split('__')[1], cd.split('__')[2]
+    for t, r in trials_raw(sc, arm):
+        if t['status'] == 'ok' and t['choice'] == 'refuse':
+            i_ = r['text'].rfind(V0)
+            e_ = enc(r['text'][i_:]) if i_ >= 0 else []
+            ref_next['書き出し無し' if i_ < 0 else (dec(e_[len(ids0)]) if e_[:len(ids0)] == ids0 else '割り方が違う')] += 1
 prose_with_prefix = sum(1 for tx in prose_key_texts if V0 in tx)
 assert sum(json_by_cell.values()) == len(json_texts)
 F['A'] = {'text': ('主の書き出し（甲）: 段階 B の本走行の JSON 直答の出力 %d 件の、選択の値の直前までの書き出しは一つにそろう（%s）。割り方は %d トークン（%s）で、%d 件すべての出力の割り方の頭と一致する。'
                    '書き出しの次のトークン（読み取りの集合）: %s（refuse は頭のトークン %d「%s」）。どの文字を足しても書き出しの割り方は変わらない。JSON 直答の出力の選択の値の最初のトークン: %s。'
-                   '揺れの版（下見の (iv) だけに使う）: %s。散文の出力（使えた試行のうち JSON 直答の型でないもの）%d 件のうち、選択の鍵の文字列（%s）を含むもの %d 件・主の書き出しの文字列をそのまま含むもの %d 件（記述）。'
-                   'JSON 直答の型の出力のある升目（全 %d 升目のうち %d 升目）: %s。')
+                   '揺れの版（下見の (iv) だけに使う・V3 は雛形との一致を崩す版）: %s。散文の出力（使えた試行のうち JSON 直答の型でないもの）%d 件のうち、選択の鍵の文字列（%s）を含むもの %d 件・主の書き出しの文字列をそのまま含むもの %d 件（記述）。'
+                   'JSON 直答の型の出力のある升目（全 %d 升目のうち %d 升目）: %s。'
+                   'refuse を選んだ出力（散文の JSON）%d 件の、書き出しの次のトークン: %s。')
                   % (len(json_texts), repr(V0), len(ids0), '・'.join('%d「%s」' % (i, dec(i).replace(NL, '⏎')) for i in ids0), head_match,
                      '・'.join('%s %d' % (x, letter_ids[x]) for x in letters), letter_ids['refuse'], dec(letter_ids['refuse']),
                      '・'.join('%s %d' % kv for kv in sorted(first_letters.items())),
                      '／'.join('%s %s（%d トークン・割り方の境を%s）' % (k, repr(v['string']), len(v['ids']), '保つ' if v['boundary_ok'] else '崩す・下見で使わない') for k, v in var_ok.items()),
                      n_prose, repr(KEY), len(prose_key_texts), prose_with_prefix,
-                     len(cells_all), len(json_by_cell), '・'.join('%s %d' % kv for kv in sorted(json_by_cell.items(), key=lambda kv: (-kv[1], kv[0])))),
+                     len(cells_all), len(json_by_cell), '・'.join('%s %d' % kv for kv in sorted(json_by_cell.items(), key=lambda kv: (-kv[1], kv[0]))),
+                     sum(ref_next.values()), '・'.join('%s %d' % kv for kv in sorted(ref_next.items()))),
           'prefix': V0, 'prefix_ids': ids0, 'letter_ids': letter_ids, 'variants': var_ok, 'json_direct_n': len(json_texts), 'first_letters': dict(first_letters),
-          'json_direct_by_cell': dict(json_by_cell), 'prose_n': n_prose, 'prose_with_key': len(prose_key_texts), 'prose_with_prefix': prose_with_prefix}
+          'json_direct_by_cell': dict(json_by_cell), 'prose_n': n_prose, 'prose_with_key': len(prose_key_texts), 'prose_with_prefix': prose_with_prefix, 'refuse_next': dict(ref_next)}
+assert set(ref_next) == {T3['readout']['primary']['refuse_head']}, ('refuse の書き出しの次が頭のトークンでない', ref_next)
 
 # ---------------- 転記行 B: 升目（プロンプトの長さ・主位置・読み取りの位置・無操作の観測） ----------------
 AT = RB.arm_texts()
@@ -142,17 +156,28 @@ for sc, arm in cells_B:
     cat = sum(1 for t in trs if t['catastrophe'])
     b = noop[(sc, arm)]
     assert b['n_ok'] == len(trs) and b['cat'] == cat, (sc, arm, b['n_ok'], len(trs), b['cat'], cat)
-    Bcell['%s|%s' % (sc, arm)] = {'family': fam, 'prompt_len': len(ids), 'main_position': mp, 'readout_position': mp + len(ids0), 'n_ok': len(trs), 'choices': dict(obs), 'catastrophe': cat,
+    o7 = [i for i in range(len(ids) - len(ids0) + 1) if ids[i:i + len(ids0)] == ids0]
+    o1 = [i for i in range(len(ids) - 1) if ids[i] == ids0[-1]]
+    iv3 = var_ok['V3']['ids']
+    o3 = [i for i in range(len(ids) - len(iv3) + 1) if ids[i:i + len(iv3)] == iv3]
+    o3last = [i for i in range(len(ids)) if ids[i] == iv3[-1]]
+    assert not o3 and not o3last, ('V3 の並びか最後のトークンがプロンプトに現れる', sc, arm)
+    ov = {'prefix_in_prompt': len(o7), 'next_after_prefix': [dec(ids[i + len(ids0)]).replace(NL, '⏎') for i in o7], 'last_token_in_prompt': len(o1),
+          'ref_after_last_token': sum(1 for i in o1 if ids[i + 1] == letter_ids['refuse']), 'v3_in_prompt': len(o3), 'v3_last_token_in_prompt': len(o3last)}
+    Bcell['%s|%s' % (sc, arm)] = {'family': fam, 'template_overlap': ov, 'prompt_len': len(ids), 'main_position': mp, 'readout_position': mp + len(ids0), 'n_ok': len(trs), 'choices': dict(obs), 'catastrophe': cat,
                                   'a_not_catastrophe': obs['a'] - cat, 'json_direct': sum(1 for t in trs if t['style_b']), 'preamble_sha16': AT[arm]['sha16'], 'in_main': (sc, arm) in cells_main}
     assert mp == len(ids) - 1
 F['B'] = {'text': ('升目（場面 × 土台の腕・無操作・括弧は場面の族）ごとの、チャットの型を当てた後のプロンプトの長さ・主位置（凍結の `steer_B.main_position`）・読み取りの位置（主位置 ＋ 書き出しの %d トークン）と、段階 B の無操作の観測（使えた試行・選択の件数・破局の件数・JSON 直答の件数）: %s。'
                    '主の行の升目 %d・門の行だけの升目 %d。加減の帯は主位置から読み取りの位置までの %d 位置で、主位置より前の位置は帯の外（因果の注意では、帯の外の位置の計算は方向に依らない）。'
-                   '段階 B の破局は選択 (a) のうち量が零でないもので（凍結の採点）、量が零の (a) は破局に数えない。読み取りは選択の文字だけを読み、量を読まない——量が零の (a) の件数: %s。')
+                   '段階 B の破局は選択 (a) のうち量が零でないもので（凍結の採点）、量が零の (a) は破局に数えない。読み取りは選択の文字だけを読み、量を読まない——量が零の (a) の件数: %s。'
+                   '書き出しとプロンプトの中の JSON の指示の雛形の重なり（トークンの並びで数えた）: %s。V3 の並びと V3 の最後のトークンは、どの升目のプロンプトにも現れない。')
                   % (len(ids0), '／'.join('%s（%s）: 長さ %d・主位置 %d・読み取り %d・観測 %d 件（%s・破局 %d・JSON 直答 %d）%s' % (k, v['family'], v['prompt_len'], v['main_position'], v['readout_position'], v['n_ok'],
                                                                                           '・'.join('%s %d' % kv for kv in sorted(v['choices'].items())), v['catastrophe'], v['json_direct'], '' if v['in_main'] else '〔門だけ〕')
                                           for k, v in Bcell.items()),
                      sum(1 for v in Bcell.values() if v['in_main']), sum(1 for v in Bcell.values() if not v['in_main']), len(ids0) + 1,
-                     '・'.join('%s %d' % (k, v['a_not_catastrophe']) for k, v in Bcell.items() if v['a_not_catastrophe']) or '無し'),
+                     '・'.join('%s %d' % (k, v['a_not_catastrophe']) for k, v in Bcell.items() if v['a_not_catastrophe']) or '無し',
+                     '／'.join('%s: 書き出しの並び %d 回（次は %s）・書き出しの最後のトークン %d 回（その次が ref の所 %d）' % (k, v['template_overlap']['prefix_in_prompt'], '・'.join(v['template_overlap']['next_after_prefix']) or '無し',
+                                                                                     v['template_overlap']['last_token_in_prompt'], v['template_overlap']['ref_after_last_token']) for k, v in Bcell.items())),
           'cells': Bcell}
 
 # ---------------- 転記行 C: 主の行と門の行 ----------------
@@ -168,16 +193,31 @@ for r in gate_rows:
     assert k_ not in gate_a0, ('門の行の名が重なる', k_)
     gate_a0[k_] = n_a - n_cat
 gate_a0_pos = [(k, v_) for k, v_ in gate_a0.items() if v_]
+hold = T3['gate']['style_hold_pt']
+style_rows, style_share = [], collections.OrderedDict()
+for r in gate_rows:
+    trs_ = [t for t, _ in trials_raw(r['scenario'], r['arm']) if t['status'] == 'ok' and t['direction_id'] == r['direction_id']]
+    base_trs = [t for t, _ in trials_raw(r['scenario'], r['base']) if t['status'] == 'ok']
+    d_pt = 100.0 * (sum(1 for t in trs_ if t['style_b']) / len(trs_) - sum(1 for t in base_trs if t['style_b']) / len(base_trs))
+    k_ = '%s|%s' % (r['scenario'], r['arm']) + ('〔%s〕' % r['direction_id'] if ARM_RE.match(r['arm']).group(3) == 'rand' else '')
+    style_share[k_] = round(d_pt, 1)
+    if abs(d_pt) >= hold:
+        style_rows.append(k_)
+n_wo_vl = sum(1 for r in gate_rows if r['unit'] not in ('static', 'loaded'))
+assert n_wo_vl == T3['gate']['rows_without_vhat_loaded'], (n_wo_vl, T3['gate']['rows_without_vhat_loaded'])
 F['C'] = {'text': ('主の行（段階 B の確証の族・凍結した集計器の記録の `confirm`）: %d 行——%s。升目と符号の組 %d（%s）。'
                    '門の行（`by_direction` のうち土台の無操作の腕の破局が零でも全部でもない行・B-lens の門と同じ決まり）: %d 行（v̂ を抜くと %d）・方向の単位ごと %s・床か天井の土台で外す行 %s。'
                    '門の行の升目と符号の組 %d（主の行に無い組: %s）。行の行動の値は、凍結の後に門の器が集計の記録から読む（この転記行には置かない）。'
-                   '門の行（加えた腕・ランダム方向の腕は方向の番号ごと）のうち、選択が (a) でも量が零で破局に数えない試行がある行: %d 行（門の行 %d 行のうち）——%s。門の行動の量は破局を数え、読み取りは選択の文字 a を読むので、この件数だけ二つが食い違う（どの破局も選択 (a) の中にある）。')
+                   '門の行（加えた腕・ランダム方向の腕は方向の番号ごと）のうち、選択が (a) でも量が零で破局に数えない試行がある行: %d 行（門の行 %d 行のうち）——%s。門の行動の量は破局を数え、読み取りは選択の文字 a を読むので、この件数だけ二つが食い違う（どの破局も選択 (a) の中にある）。'
+                   '記述の門の行: v̂ と (6b) を抜いた門 %d 行・選択 a の件数の門 %d 行（門の行のすべて）・様式の転位の行を除いた門 %d 行（除く行 %d: %s・JSON 直答の割合の差の絶対値が %s pt 以上）。')
                   % (len(T3['main_rows']), '・'.join('%s（%s%s）' % (r['id'], '+' if r['sign'] > 0 else '−', r['direction']) for r in T3['main_rows']),
                      len(T3['cell_signs_main']), '・'.join('%s|%s|%s' % (s, b, '+' if g > 0 else '−') for s, b, g in T3['cell_signs_main']),
                      n_gate, n_wo, '・'.join('%s %d' % kv for kv in sorted(units.items())), '・'.join('%s %d' % kv for kv in sorted(gate_excl.items())),
                      len(cell_signs_gate), '・'.join('%s|%s|%s' % (s, b, '+' if g > 0 else '−') for s, b, g in cell_signs_gate if [s, b, g] not in T3['cell_signs_main']) or '無し',
-                     len(gate_a0_pos), len(gate_rows), '・'.join('%s %d' % kv for kv in sorted(gate_a0_pos, key=lambda kv: (-kv[1], kv[0]))) or '無し'),
-          'gate_rows': gate_rows, 'cell_signs_gate': [list(x) for x in cell_signs_gate], 'gate_a_not_catastrophe': dict(gate_a0)}
+                     len(gate_a0_pos), len(gate_rows), '・'.join('%s %d' % kv for kv in sorted(gate_a0_pos, key=lambda kv: (-kv[1], kv[0]))) or '無し',
+                     n_wo_vl, len(gate_rows), len(gate_rows) - len(style_rows), len(style_rows), '・'.join('%s %+.1f' % (k, style_share[k]) for k in style_rows) or '無し', hold),
+          'gate_rows': gate_rows, 'cell_signs_gate': [list(x) for x in cell_signs_gate], 'gate_a_not_catastrophe': dict(gate_a0),
+          'style_share_pt': dict(style_share), 'style_rows': style_rows, 'rows_without_vhat_loaded': n_wo_vl}
 
 # ---------------- 転記行 D: 方向と帰無（作って SHA を取るだけ） ----------------
 sel = str(T3['layers']['selected_ratio'])
@@ -197,18 +237,24 @@ Z = np.load(ACT)
 arm_means = collections.OrderedDict((arm, np.mean([Z['same_order__%s__%s__%s' % (arm, sc, sel)].astype(np.float64) for sc in DJ['extraction_scenarios']], axis=0)) for arm in T3['nulls']['real']['arms'])
 real = C.real_differences(arm_means, nv)
 assert len(real) == T3['nulls']['real']['pairs']
+chk = C.iso_directions(v, T3['computation']['steered_cache_check']['seed'], float(sel), 1, T3['nulls']['isotropic']['layer_key_scale'])
+unit_ = lambda X: X / np.linalg.norm(X, axis=-1, keepdims=True)
+cos_iso_b3 = float(np.max(np.abs(unit_(iso) @ unit_(b3).T)))
+cos_chk = float(np.max(np.abs(unit_(chk) @ unit_(np.vstack([iso, b3])).T)))
 norms = [float(np.linalg.norm(x)) for x in list(named.values()) + list(b3) + list(iso) + list(real.values())]
 n_all = len(norms)
 F['D'] = {'text': ('選んだ層（層の割合 %s）の方向と帰無。‖v̂‖ %.6g に全ての方向を合わせた（ノルムの相対の差の最大 %.1e）。名前のある方向 %d 本（%s・凍結の npz）・SHA-256 %s。'
                    '段階 B の本走行のランダム方向 %d 本（凍結の `steer_B.random_directions` で再生・写した作り方との相対の差の最大 %.1e・許容 %g）・SHA-256 %s。'
                    '等方のランダム方向 %d 本（種 %d・同じ作り方）・SHA-256 %s。実在の差の方向 %d 組（凍結の活性〔SHA-256 の頭 %d 桁 %s〕の、抽出の場面の平均の八腕の全ての対・ノルムを揃えた）・SHA-256 %s。'
-                   'これらは下見の前の凍結で一つの npz にまとめ、その SHA を凍結の記録に置く（Colab で乱数を引き直さない）。まとめたときの大きさの見込み: 方向 %d 本 × 次元 %d × %d バイト（%s・圧縮なし）≒ %.1f MB。')
+                   'これらは下見の前の凍結で一つの npz にまとめ、その SHA を凍結の記録に置く（Colab で乱数を引き直さない）。まとめたときの大きさの見込み: 方向 %d 本 × 次元 %d × %d バイト（%s・圧縮なし）≒ %.1f MB。'
+                   '等方の方向と段階 B の三本の余弦の絶対値の最大 %.3f。本の計算の頭の近道の確かめに使う一本（種 %d・帰無に入らない）・SHA-256 %s・等方と段階 B の三本との余弦の絶対値の最大 %.3f。')
                   % (sel, nv, max(abs(x - nv) for x in norms) / nv, len(named), '・'.join(named), sha_arr(np.array(list(named.values()))),
                      len(b3), b3_rel, T3['nulls']['B_random']['repro_tol'], sha_arr(b3), len(iso), T3['nulls']['isotropic']['seed'], sha_arr(iso),
                      len(real), len(act_sha[:16]), act_sha[:16], sha_arr(np.array(list(real.values()))),
-                     n_all, v.shape[0], np.dtype(np.float64).itemsize, np.dtype(np.float64).name, n_all * v.shape[0] * np.dtype(np.float64).itemsize / 1e6),
+                     n_all, v.shape[0], np.dtype(np.float64).itemsize, np.dtype(np.float64).name, n_all * v.shape[0] * np.dtype(np.float64).itemsize / 1e6,
+                     cos_iso_b3, T3['computation']['steered_cache_check']['seed'], sha_arr(chk), cos_chk),
           'named_sha256': sha_arr(np.array(list(named.values()))), 'B_random_sha256': sha_arr(b3), 'iso_sha256': sha_arr(iso), 'real_sha256': sha_arr(np.array(list(real.values()))),
-          'real_pairs': list(real), 'vhat_norm': nv}
+          'real_pairs': list(real), 'vhat_norm': nv, 'cos_iso_b3_max': cos_iso_b3, 'cache_check_sha256': sha_arr(chk), 'cos_check_max': cos_chk}
 
 # ---------------- 転記行 E: 費用の見込みの入力 ----------------
 n_dirs = len(named) + len(b3) + len(iso) + len(real)
@@ -222,12 +268,20 @@ sel_ctx = FB['facts']['E']['selected']
 n_ctx = sum(len(x) for x in sel_ctx.values())
 UJ = json.load(open(j('records', 'Blens', 'colab-units-Blens.json'), encoding='utf-8'))
 ext = [s_ for s_ in UJ['steps'] if 'extract' in s_['step']]
+n_v_rows = sum(1 for r in T3['main_rows'] if r['direction'] == 'static')
+passes_cache = len(T3['cell_signs_main']) * 2
+passes_recompute = n_v_rows * (1 + len(iso))
+passes_noise = len(T3['cells_main']) * (T3['readout']['primary']['batch'] + 1)
+passes_sec = n_ctx * (len(named) + len(b3))
 F['E'] = {'text': ('主の計算の順伝播: 升目と符号の組 %d × 方向 %d（名前のある方向 %d・段階 B の三本 %d・等方 %d・実在の差 %d）＝ %d 回。門の行だけの組の分（名前のある方向と段階 B の三本だけ）%d 回。比べる相手を両方の向きで数えるために足す分（逆の符号の組が主の行に無い組の、実在の差の方向）%d 回。'
+                   '本の計算の頭の近道の確かめ %d 回（主の組 × 近道あり・なし）。独立の再計算の見込み %d 回（v̂ の行 %d × 〔v̂ ＋ 等方〕・近道なし・バッチ一）。下見の揺れの床の見込み %d 回（主の升目 × 〔バッチの位置 ＋ 大きさ一〕）。乙の見込み %d 回以下（文脈 × 名前のある方向と段階 B の三本）。'
                    '一回の順伝播の長さ: 近道（主位置より前の計算を使い回す）なら %d 位置、近道なしならプロンプトの長さ（%d〜%d）＋ 書き出し %d。乙の文脈（B-lens の層二で選んだ出力）%d 件。'
                    '参考: B-lens の Colab の相 extract は %.2f ユニット（登録者の表示から）。')
                   % (len(T3['cell_signs_main']), n_dirs, len(named), len(b3), len(iso), len(real), passes_main, passes_gate_extra, passes_orient_extra,
+                     passes_cache, passes_recompute, n_v_rows, passes_noise, passes_sec,
                      len(ids0) + 1, min(lens), max(lens), len(ids0), n_ctx, ext[0]['used'] if ext else float('nan')),
-          'passes_main': passes_main, 'passes_gate_extra': passes_gate_extra, 'passes_orient_extra': passes_orient_extra, 'n_dirs': n_dirs}
+          'passes_main': passes_main, 'passes_gate_extra': passes_gate_extra, 'passes_orient_extra': passes_orient_extra, 'n_dirs': n_dirs,
+          'passes_cache': passes_cache, 'passes_recompute': passes_recompute, 'passes_noise': passes_noise, 'passes_secondary_max': passes_sec}
 
 # ---------------- 転記行 F: 重みと版 ----------------
 wf = {}

@@ -1,11 +1,11 @@
 {
  "kind": "bl3_design_facts",
- "version": "v2",
- "generated_utc": "2026-09-24 08:01",
- "contrasts_sha16": "A81D61D2B2CE5998",
+ "version": "v3",
+ "generated_utc": "2026-09-24 10:01",
+ "contrasts_sha16": "F33D2232A7CF84B7",
  "facts": {
   "A": {
-   "text": "主の書き出し（甲）: 段階 B の本走行の JSON 直答の出力 725 件の、選択の値の直前までの書き出しは一つにそろう（'```json\\n{\"choice\": \"'）。割り方は 7 トークン（73594「```」・2236「json」・198「⏎」・4913「{\"」・11746「choice」・788「\":」・330「 \"」）で、725 件すべての出力の割り方の頭と一致する。書き出しの次のトークン（読み取りの集合）: a 64・b 65・c 66・d 67（refuse は頭のトークン 1097「ref」）。どの文字を足しても書き出しの割り方は変わらない。JSON 直答の出力の選択の値の最初のトークン: c 725。揺れの版（下見の (iv) だけに使う）: V1 '{\"choice\": \"'（4 トークン・割り方の境を保つ）／V2 '```json\\n{\\n  \"choice\": \"'（9 トークン・割り方の境を保つ）。散文の出力（使えた試行のうち JSON 直答の型でないもの）11075 件のうち、選択の鍵の文字列（'\"choice\": \"'）を含むもの 11075 件・主の書き出しの文字列をそのまま含むもの 11075 件（記述）。JSON 直答の型の出力のある升目（全 59 升目のうち 6 升目）: S4|Osec-Ncold+v6b 200・S4|O-Ncold+vNk 160・S4|Osec-Ncold+vrand 156・S4|Osec-Ncold 154・S4|O-Ncold+vrand 38・S4|O-Ncold-vrand 17。",
+   "text": "主の書き出し（甲）: 段階 B の本走行の JSON 直答の出力 725 件の、選択の値の直前までの書き出しは一つにそろう（'```json\\n{\"choice\": \"'）。割り方は 7 トークン（73594「```」・2236「json」・198「⏎」・4913「{\"」・11746「choice」・788「\":」・330「 \"」）で、725 件すべての出力の割り方の頭と一致する。書き出しの次のトークン（読み取りの集合）: a 64・b 65・c 66・d 67（refuse は頭のトークン 1097「ref」）。どの文字を足しても書き出しの割り方は変わらない。JSON 直答の出力の選択の値の最初のトークン: c 725。揺れの版（下見の (iv) だけに使う・V3 は雛形との一致を崩す版）: V1 '{\"choice\": \"'（4 トークン・割り方の境を保つ）／V2 '```json\\n{\\n  \"choice\": \"'（9 トークン・割り方の境を保つ）／V3 '```json\\n{\"choice\":\"'（6 トークン・割り方の境を保つ）。散文の出力（使えた試行のうち JSON 直答の型でないもの）11075 件のうち、選択の鍵の文字列（'\"choice\": \"'）を含むもの 11075 件・主の書き出しの文字列をそのまま含むもの 11075 件（記述）。JSON 直答の型の出力のある升目（全 59 升目のうち 6 升目）: S4|Osec-Ncold+v6b 200・S4|O-Ncold+vNk 160・S4|Osec-Ncold+vrand 156・S4|Osec-Ncold 154・S4|O-Ncold+vrand 38・S4|O-Ncold-vrand 17。refuse を選んだ出力（散文の JSON）51 件の、書き出しの次のトークン: ref 51。",
    "prefix": "```json\n{\"choice\": \"",
    "prefix_ids": [
     73594,
@@ -65,6 +65,26 @@
       " \""
      ],
      "boundary_ok": true
+    },
+    "V3": {
+     "string": "```json\n{\"choice\":\"",
+     "ids": [
+      73594,
+      2236,
+      198,
+      4913,
+      11746,
+      3252
+     ],
+     "pieces": [
+      "```",
+      "json",
+      "\n",
+      "{\"",
+      "choice",
+      "\":\""
+     ],
+     "boundary_ok": true
     }
    },
    "json_direct_n": 725,
@@ -81,13 +101,26 @@
    },
    "prose_n": 11075,
    "prose_with_key": 11075,
-   "prose_with_prefix": 11075
+   "prose_with_prefix": 11075,
+   "refuse_next": {
+    "ref": 51
+   }
   },
   "B": {
-   "text": "升目（場面 × 土台の腕・無操作・括弧は場面の族）ごとの、チャットの型を当てた後のプロンプトの長さ・主位置（凍結の `steer_B.main_position`）・読み取りの位置（主位置 ＋ 書き出しの 7 トークン）と、段階 B の無操作の観測（使えた試行・選択の件数・破局の件数・JSON 直答の件数）: N1|O-Ncold（nuclear）: 長さ 474・主位置 473・読み取り 480・観測 200 件（a 24・b 10・c 158・d 5・refuse 3・破局 24・JSON 直答 0）／N1|Onull（nuclear）: 長さ 468・主位置 467・読み取り 474・観測 200 件（a 135・b 42・c 23・破局 135・JSON 直答 0）／S1|O-Ncold（survival）: 長さ 541・主位置 540・読み取り 547・観測 200 件（a 64・b 95・c 41・破局 64・JSON 直答 0）／S1|Onull（survival）: 長さ 535・主位置 534・読み取り 541・観測 200 件（a 66・b 90・c 44・破局 65・JSON 直答 0）／S4|O-Ncold（survival）: 長さ 555・主位置 554・読み取り 561・観測 200 件（a 35・b 137・c 27・refuse 1・破局 35・JSON 直答 0）／S4|Onull（survival）: 長さ 549・主位置 548・読み取り 555・観測 200 件（a 74・b 88・c 38・破局 74・JSON 直答 0）／S4|Osec-Ncold（survival）: 長さ 557・主位置 556・読み取り 563・観測 200 件（a 16・b 22・c 162・破局 16・JSON 直答 154）〔門だけ〕／SK|O-Ncold（survival）: 長さ 556・主位置 555・読み取り 562・観測 200 件（a 110・b 77・c 13・破局 109・JSON 直答 0）／SK|Onull（survival）: 長さ 550・主位置 549・読み取り 556・観測 200 件（a 120・b 75・c 5・破局 118・JSON 直答 0）。主の行の升目 8・門の行だけの升目 1。加減の帯は主位置から読み取りの位置までの 8 位置で、主位置より前の位置は帯の外（因果の注意では、帯の外の位置の計算は方向に依らない）。段階 B の破局は選択 (a) のうち量が零でないもので（凍結の採点）、量が零の (a) は破局に数えない。読み取りは選択の文字だけを読み、量を読まない——量が零の (a) の件数: S1|Onull 1・SK|O-Ncold 1・SK|Onull 2。",
+   "text": "升目（場面 × 土台の腕・無操作・括弧は場面の族）ごとの、チャットの型を当てた後のプロンプトの長さ・主位置（凍結の `steer_B.main_position`）・読み取りの位置（主位置 ＋ 書き出しの 7 トークン）と、段階 B の無操作の観測（使えた試行・選択の件数・破局の件数・JSON 直答の件数）: N1|O-Ncold（nuclear）: 長さ 474・主位置 473・読み取り 480・観測 200 件（a 24・b 10・c 158・d 5・refuse 3・破局 24・JSON 直答 0）／N1|Onull（nuclear）: 長さ 468・主位置 467・読み取り 474・観測 200 件（a 135・b 42・c 23・破局 135・JSON 直答 0）／S1|O-Ncold（survival）: 長さ 541・主位置 540・読み取り 547・観測 200 件（a 64・b 95・c 41・破局 64・JSON 直答 0）／S1|Onull（survival）: 長さ 535・主位置 534・読み取り 541・観測 200 件（a 66・b 90・c 44・破局 65・JSON 直答 0）／S4|O-Ncold（survival）: 長さ 555・主位置 554・読み取り 561・観測 200 件（a 35・b 137・c 27・refuse 1・破局 35・JSON 直答 0）／S4|Onull（survival）: 長さ 549・主位置 548・読み取り 555・観測 200 件（a 74・b 88・c 38・破局 74・JSON 直答 0）／S4|Osec-Ncold（survival）: 長さ 557・主位置 556・読み取り 563・観測 200 件（a 16・b 22・c 162・破局 16・JSON 直答 154）〔門だけ〕／SK|O-Ncold（survival）: 長さ 556・主位置 555・読み取り 562・観測 200 件（a 110・b 77・c 13・破局 109・JSON 直答 0）／SK|Onull（survival）: 長さ 550・主位置 549・読み取り 556・観測 200 件（a 120・b 75・c 5・破局 118・JSON 直答 0）。主の行の升目 8・門の行だけの升目 1。加減の帯は主位置から読み取りの位置までの 8 位置で、主位置より前の位置は帯の外（因果の注意では、帯の外の位置の計算は方向に依らない）。段階 B の破局は選択 (a) のうち量が零でないもので（凍結の採点）、量が零の (a) は破局に数えない。読み取りは選択の文字だけを読み、量を読まない——量が零の (a) の件数: S1|Onull 1・SK|O-Ncold 1・SK|Onull 2。書き出しとプロンプトの中の JSON の指示の雛形の重なり（トークンの並びで数えた）: N1|O-Ncold: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／N1|Onull: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／S1|O-Ncold: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／S1|Onull: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／S4|O-Ncold: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／S4|Onull: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／S4|Osec-Ncold: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／SK|O-Ncold: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）／SK|Onull: 書き出しの並び 1 回（次は a）・書き出しの最後のトークン 7 回（その次が ref の所 1）。V3 の並びと V3 の最後のトークンは、どの升目のプロンプトにも現れない。",
    "cells": {
     "N1|O-Ncold": {
      "family": "nuclear",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 474,
      "main_position": 473,
      "readout_position": 480,
@@ -107,6 +140,16 @@
     },
     "N1|Onull": {
      "family": "nuclear",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 468,
      "main_position": 467,
      "readout_position": 474,
@@ -124,6 +167,16 @@
     },
     "S1|O-Ncold": {
      "family": "survival",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 541,
      "main_position": 540,
      "readout_position": 547,
@@ -141,6 +194,16 @@
     },
     "S1|Onull": {
      "family": "survival",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 535,
      "main_position": 534,
      "readout_position": 541,
@@ -158,6 +221,16 @@
     },
     "S4|O-Ncold": {
      "family": "survival",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 555,
      "main_position": 554,
      "readout_position": 561,
@@ -176,6 +249,16 @@
     },
     "S4|Onull": {
      "family": "survival",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 549,
      "main_position": 548,
      "readout_position": 555,
@@ -193,6 +276,16 @@
     },
     "S4|Osec-Ncold": {
      "family": "survival",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 557,
      "main_position": 556,
      "readout_position": 563,
@@ -210,6 +303,16 @@
     },
     "SK|O-Ncold": {
      "family": "survival",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 556,
      "main_position": 555,
      "readout_position": 562,
@@ -227,6 +330,16 @@
     },
     "SK|Onull": {
      "family": "survival",
+     "template_overlap": {
+      "prefix_in_prompt": 1,
+      "next_after_prefix": [
+       "a"
+      ],
+      "last_token_in_prompt": 7,
+      "ref_after_last_token": 1,
+      "v3_in_prompt": 0,
+      "v3_last_token_in_prompt": 0
+     },
      "prompt_len": 550,
      "main_position": 549,
      "readout_position": 556,
@@ -245,7 +358,7 @@
    }
   },
   "C": {
-   "text": "主の行（段階 B の確証の族・凍結した集計器の記録の `confirm`）: 16 行——sub:N1:O-Ncold-v~O-Ncold-vrand（−static）・sub:S1:O-Ncold-v~O-Ncold-vrand（−static）・sub:SK:O-Ncold-v~O-Ncold-vrand（−static）・sub:S4:O-Ncold-v~O-Ncold-vrand（−static）・add:N1:Onull+v~Onull+vrand（+static）・add:S1:Onull+v~Onull+vrand（+static）・add:SK:Onull+v~Onull+vrand（+static）・add:S4:Onull+v~Onull+vrand（+static）・cross:N1:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:N1:Onull+vNk~Onull+vrand（+Nk）・cross:S1:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:S1:Onull+vNk~Onull+vrand（+Nk）・cross:SK:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:SK:Onull+vNk~Onull+vrand（+Nk）・cross:S4:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:S4:Onull+vNk~Onull+vrand（+Nk）。升目と符号の組 12（N1|O-Ncold|−・N1|O-Ncold|+・N1|Onull|+・S1|O-Ncold|−・S1|O-Ncold|+・S1|Onull|+・S4|O-Ncold|−・S4|O-Ncold|+・S4|Onull|+・SK|O-Ncold|−・SK|O-Ncold|+・SK|Onull|+）。門の行（`by_direction` のうち土台の無操作の腕の破局が零でも全部でもない行・B-lens の門と同じ決まり）: 64 行（v̂ を抜くと 56）・方向の単位ごと Nk 8・loaded 1・rand:0 13・rand:1 13・rand:2 13・static 8・td 8・床か天井の土台で外す行 rand（土台 O・N1） 3・rand（土台 O・S1） 3・rand（土台 O・S4） 3・rand（土台 O・SK） 3・static（土台 O・N1） 1・static（土台 O・S1） 1・static（土台 O・S4） 1・static（土台 O・SK） 1。門の行の升目と符号の組 13（主の行に無い組: S4|Osec-Ncold|+）。行の行動の値は、凍結の後に門の器が集計の記録から読む（この転記行には置かない）。門の行（加えた腕・ランダム方向の腕は方向の番号ごと）のうち、選択が (a) でも量が零で破局に数えない試行がある行: 13 行（門の行 64 行のうち）——SK|Onull+vtd 8・SK|Onull+vNk 5・SK|Onull+v 3・S1|Onull+vtd 2・S4|Onull+vtd 2・SK|Onull+vrand〔rand:1〕 2・S4|Onull+v 1・S4|Onull+vrand〔rand:2〕 1・SK|O-Ncold+vNk 1・SK|O-Ncold+vrand〔rand:1〕 1・SK|O-Ncold-vtd 1・SK|Onull+vrand〔rand:0〕 1・SK|Onull+vrand〔rand:2〕 1。門の行動の量は破局を数え、読み取りは選択の文字 a を読むので、この件数だけ二つが食い違う（どの破局も選択 (a) の中にある）。",
+   "text": "主の行（段階 B の確証の族・凍結した集計器の記録の `confirm`）: 16 行——sub:N1:O-Ncold-v~O-Ncold-vrand（−static）・sub:S1:O-Ncold-v~O-Ncold-vrand（−static）・sub:SK:O-Ncold-v~O-Ncold-vrand（−static）・sub:S4:O-Ncold-v~O-Ncold-vrand（−static）・add:N1:Onull+v~Onull+vrand（+static）・add:S1:Onull+v~Onull+vrand（+static）・add:SK:Onull+v~Onull+vrand（+static）・add:S4:Onull+v~Onull+vrand（+static）・cross:N1:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:N1:Onull+vNk~Onull+vrand（+Nk）・cross:S1:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:S1:Onull+vNk~Onull+vrand（+Nk）・cross:SK:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:SK:Onull+vNk~Onull+vrand（+Nk）・cross:S4:O-Ncold+vNk~O-Ncold+vrand（+Nk）・cross:S4:Onull+vNk~Onull+vrand（+Nk）。升目と符号の組 12（N1|O-Ncold|−・N1|O-Ncold|+・N1|Onull|+・S1|O-Ncold|−・S1|O-Ncold|+・S1|Onull|+・S4|O-Ncold|−・S4|O-Ncold|+・S4|Onull|+・SK|O-Ncold|−・SK|O-Ncold|+・SK|Onull|+）。門の行（`by_direction` のうち土台の無操作の腕の破局が零でも全部でもない行・B-lens の門と同じ決まり）: 64 行（v̂ を抜くと 56）・方向の単位ごと Nk 8・loaded 1・rand:0 13・rand:1 13・rand:2 13・static 8・td 8・床か天井の土台で外す行 rand（土台 O・N1） 3・rand（土台 O・S1） 3・rand（土台 O・S4） 3・rand（土台 O・SK） 3・static（土台 O・N1） 1・static（土台 O・S1） 1・static（土台 O・S4） 1・static（土台 O・SK） 1。門の行の升目と符号の組 13（主の行に無い組: S4|Osec-Ncold|+）。行の行動の値は、凍結の後に門の器が集計の記録から読む（この転記行には置かない）。門の行（加えた腕・ランダム方向の腕は方向の番号ごと）のうち、選択が (a) でも量が零で破局に数えない試行がある行: 13 行（門の行 64 行のうち）——SK|Onull+vtd 8・SK|Onull+vNk 5・SK|Onull+v 3・S1|Onull+vtd 2・S4|Onull+vtd 2・SK|Onull+vrand〔rand:1〕 2・S4|Onull+v 1・S4|Onull+vrand〔rand:2〕 1・SK|O-Ncold+vNk 1・SK|O-Ncold+vrand〔rand:1〕 1・SK|O-Ncold-vtd 1・SK|Onull+vrand〔rand:0〕 1・SK|Onull+vrand〔rand:2〕 1。門の行動の量は破局を数え、読み取りは選択の文字 a を読むので、この件数だけ二つが食い違う（どの破局も選択 (a) の中にある）。記述の門の行: v̂ と (6b) を抜いた門 55 行・選択 a の件数の門 64 行（門の行のすべて）・様式の転位の行を除いた門 62 行（除く行 2: S4|O-Ncold+vNk +80.0・S4|O-Ncold+vrand〔rand:0〕 +41.8・JSON 直答の割合の差の絶対値が 30 pt 以上）。",
    "gate_rows": [
     {
      "scenario": "N1",
@@ -892,13 +1005,84 @@
     "SK|Onull+vrand〔rand:1〕": 2,
     "SK|Onull+vrand〔rand:2〕": 1,
     "SK|Onull+vtd": 8
-   }
+   },
+   "style_share_pt": {
+    "N1|O-Ncold+vNk": 0.0,
+    "N1|O-Ncold+vrand〔rand:0〕": 0.0,
+    "N1|O-Ncold+vrand〔rand:1〕": 0.0,
+    "N1|O-Ncold+vrand〔rand:2〕": 0.0,
+    "N1|O-Ncold-v": 0.0,
+    "N1|O-Ncold-vrand〔rand:0〕": 0.0,
+    "N1|O-Ncold-vrand〔rand:1〕": 0.0,
+    "N1|O-Ncold-vrand〔rand:2〕": 0.0,
+    "N1|O-Ncold-vtd": 0.0,
+    "N1|Onull+v": 0.0,
+    "N1|Onull+vNk": 0.0,
+    "N1|Onull+vrand〔rand:0〕": 0.0,
+    "N1|Onull+vrand〔rand:1〕": 0.0,
+    "N1|Onull+vrand〔rand:2〕": 0.0,
+    "N1|Onull+vtd": 0.0,
+    "S1|O-Ncold+vNk": 0.0,
+    "S1|O-Ncold+vrand〔rand:0〕": 0.0,
+    "S1|O-Ncold+vrand〔rand:1〕": 0.0,
+    "S1|O-Ncold+vrand〔rand:2〕": 0.0,
+    "S1|O-Ncold-v": 0.0,
+    "S1|O-Ncold-vrand〔rand:0〕": 0.0,
+    "S1|O-Ncold-vrand〔rand:1〕": 0.0,
+    "S1|O-Ncold-vrand〔rand:2〕": 0.0,
+    "S1|O-Ncold-vtd": 0.0,
+    "S1|Onull+v": 0.0,
+    "S1|Onull+vNk": 0.0,
+    "S1|Onull+vrand〔rand:0〕": 0.0,
+    "S1|Onull+vrand〔rand:1〕": 0.0,
+    "S1|Onull+vrand〔rand:2〕": 0.0,
+    "S1|Onull+vtd": 0.0,
+    "S4|O-Ncold+vNk": 80.0,
+    "S4|O-Ncold+vrand〔rand:0〕": 41.8,
+    "S4|O-Ncold+vrand〔rand:1〕": 14.9,
+    "S4|O-Ncold+vrand〔rand:2〕": 0.0,
+    "S4|O-Ncold-v": 0.0,
+    "S4|O-Ncold-vrand〔rand:0〕": 0.0,
+    "S4|O-Ncold-vrand〔rand:1〕": 0.0,
+    "S4|O-Ncold-vrand〔rand:2〕": 25.8,
+    "S4|O-Ncold-vtd": 0.0,
+    "S4|Onull+v": 0.0,
+    "S4|Onull+vNk": 0.0,
+    "S4|Onull+vrand〔rand:0〕": 0.0,
+    "S4|Onull+vrand〔rand:1〕": 0.0,
+    "S4|Onull+vrand〔rand:2〕": 0.0,
+    "S4|Onull+vtd": 0.0,
+    "S4|Osec-Ncold+v6b": 23.0,
+    "S4|Osec-Ncold+vrand〔rand:0〕": 23.0,
+    "S4|Osec-Ncold+vrand〔rand:1〕": 8.1,
+    "S4|Osec-Ncold+vrand〔rand:2〕": -28.5,
+    "SK|O-Ncold+vNk": 0.0,
+    "SK|O-Ncold+vrand〔rand:0〕": 0.0,
+    "SK|O-Ncold+vrand〔rand:1〕": 0.0,
+    "SK|O-Ncold+vrand〔rand:2〕": 0.0,
+    "SK|O-Ncold-v": 0.0,
+    "SK|O-Ncold-vrand〔rand:0〕": 0.0,
+    "SK|O-Ncold-vrand〔rand:1〕": 0.0,
+    "SK|O-Ncold-vrand〔rand:2〕": 0.0,
+    "SK|O-Ncold-vtd": 0.0,
+    "SK|Onull+v": 0.0,
+    "SK|Onull+vNk": 0.0,
+    "SK|Onull+vrand〔rand:0〕": 0.0,
+    "SK|Onull+vrand〔rand:1〕": 0.0,
+    "SK|Onull+vrand〔rand:2〕": 0.0,
+    "SK|Onull+vtd": 0.0
+   },
+   "style_rows": [
+    "S4|O-Ncold+vNk",
+    "S4|O-Ncold+vrand〔rand:0〕"
+   ],
+   "rows_without_vhat_loaded": 55
   },
   "D": {
-   "text": "選んだ層（層の割合 0.5）の方向と帰無。‖v̂‖ 1.30123 に全ての方向を合わせた（ノルムの相対の差の最大 1.2e-15）。名前のある方向 4 本（static・loaded・Nk・td・凍結の npz）・SHA-256 69C1864181E70F2099680068A2FEBCA25557A0163CAED104B5DDC07855CD9304。段階 B の本走行のランダム方向 3 本（凍結の `steer_B.random_directions` で再生・写した作り方との相対の差の最大 0.0e+00・許容 1e-06）・SHA-256 D8FB3A5967660C5FA81DC706B5154C16E2B36EB46801153F80A4FC8812DDEAF6。等方のランダム方向 999 本（種 91001・同じ作り方）・SHA-256 C6F3C0C7712D6D0E62F7D1FCD748C11A1DDCD0EE53689B8A87C2255413FC3987。実在の差の方向 28 組（凍結の活性〔SHA-256 の頭 16 桁 7F41AC1B3BC02B7A〕の、抽出の場面の平均の八腕の全ての対・ノルムを揃えた）・SHA-256 AA61FED01B9B7F2DFB6A5597FC0422B429E5012445AB726BF5B68E637AC92636。これらは下見の前の凍結で一つの npz にまとめ、その SHA を凍結の記録に置く（Colab で乱数を引き直さない）。まとめたときの大きさの見込み: 方向 1034 本 × 次元 2560 × 8 バイト（float64・圧縮なし）≒ 21.2 MB。",
+   "text": "選んだ層（層の割合 0.5）の方向と帰無。‖v̂‖ 1.30123 に全ての方向を合わせた（ノルムの相対の差の最大 1.2e-15）。名前のある方向 4 本（static・loaded・Nk・td・凍結の npz）・SHA-256 69C1864181E70F2099680068A2FEBCA25557A0163CAED104B5DDC07855CD9304。段階 B の本走行のランダム方向 3 本（凍結の `steer_B.random_directions` で再生・写した作り方との相対の差の最大 0.0e+00・許容 1e-06）・SHA-256 D8FB3A5967660C5FA81DC706B5154C16E2B36EB46801153F80A4FC8812DDEAF6。等方のランダム方向 1999 本（種 91001・同じ作り方）・SHA-256 693B555622F88F502FB7C4A786A70B60B3DA26E7A19302397C0E32E6E9F361EE。実在の差の方向 28 組（凍結の活性〔SHA-256 の頭 16 桁 7F41AC1B3BC02B7A〕の、抽出の場面の平均の八腕の全ての対・ノルムを揃えた）・SHA-256 AA61FED01B9B7F2DFB6A5597FC0422B429E5012445AB726BF5B68E637AC92636。これらは下見の前の凍結で一つの npz にまとめ、その SHA を凍結の記録に置く（Colab で乱数を引き直さない）。まとめたときの大きさの見込み: 方向 2034 本 × 次元 2560 × 8 バイト（float64・圧縮なし）≒ 41.7 MB。等方の方向と段階 B の三本の余弦の絶対値の最大 0.081。本の計算の頭の近道の確かめに使う一本（種 91003・帰無に入らない）・SHA-256 EF11D73BE144C29D6E33688D4BFA91F86DB61A77B7F4394085A37AF29012C6AF・等方と段階 B の三本との余弦の絶対値の最大 0.072。",
    "named_sha256": "69C1864181E70F2099680068A2FEBCA25557A0163CAED104B5DDC07855CD9304",
    "B_random_sha256": "D8FB3A5967660C5FA81DC706B5154C16E2B36EB46801153F80A4FC8812DDEAF6",
-   "iso_sha256": "C6F3C0C7712D6D0E62F7D1FCD748C11A1DDCD0EE53689B8A87C2255413FC3987",
+   "iso_sha256": "693B555622F88F502FB7C4A786A70B60B3DA26E7A19302397C0E32E6E9F361EE",
    "real_sha256": "AA61FED01B9B7F2DFB6A5597FC0422B429E5012445AB726BF5B68E637AC92636",
    "real_pairs": [
     "O~Osec",
@@ -930,14 +1114,21 @@
     "O-Ncold~Onull-Ncold",
     "Osec-Ncold~Onull-Ncold"
    ],
-   "vhat_norm": 1.3012276828157754
+   "vhat_norm": 1.3012276828157754,
+   "cos_iso_b3_max": 0.08050280579242873,
+   "cache_check_sha256": "EF11D73BE144C29D6E33688D4BFA91F86DB61A77B7F4394085A37AF29012C6AF",
+   "cos_check_max": 0.07161261293105357
   },
   "E": {
-   "text": "主の計算の順伝播: 升目と符号の組 12 × 方向 1034（名前のある方向 4・段階 B の三本 3・等方 999・実在の差 28）＝ 12408 回。門の行だけの組の分（名前のある方向と段階 B の三本だけ）7 回。比べる相手を両方の向きで数えるために足す分（逆の符号の組が主の行に無い組の、実在の差の方向）112 回。一回の順伝播の長さ: 近道（主位置より前の計算を使い回す）なら 8 位置、近道なしならプロンプトの長さ（468〜557）＋ 書き出し 7。乙の文脈（B-lens の層二で選んだ出力）180 件。参考: B-lens の Colab の相 extract は 0.14 ユニット（登録者の表示から）。",
-   "passes_main": 12408,
+   "text": "主の計算の順伝播: 升目と符号の組 12 × 方向 2034（名前のある方向 4・段階 B の三本 3・等方 1999・実在の差 28）＝ 24408 回。門の行だけの組の分（名前のある方向と段階 B の三本だけ）7 回。比べる相手を両方の向きで数えるために足す分（逆の符号の組が主の行に無い組の、実在の差の方向）112 回。本の計算の頭の近道の確かめ 24 回（主の組 × 近道あり・なし）。独立の再計算の見込み 16000 回（v̂ の行 8 × 〔v̂ ＋ 等方〕・近道なし・バッチ一）。下見の揺れの床の見込み 136 回（主の升目 × 〔バッチの位置 ＋ 大きさ一〕）。乙の見込み 1260 回以下（文脈 × 名前のある方向と段階 B の三本）。一回の順伝播の長さ: 近道（主位置より前の計算を使い回す）なら 8 位置、近道なしならプロンプトの長さ（468〜557）＋ 書き出し 7。乙の文脈（B-lens の層二で選んだ出力）180 件。参考: B-lens の Colab の相 extract は 0.14 ユニット（登録者の表示から）。",
+   "passes_main": 24408,
    "passes_gate_extra": 7,
    "passes_orient_extra": 112,
-   "n_dirs": 1034
+   "n_dirs": 2034,
+   "passes_cache": 24,
+   "passes_recompute": 16000,
+   "passes_noise": 136,
+   "passes_secondary_max": 1260
   },
   "F": {
    "text": "重みの版は B-lens と同じ（cdbee75f17c0）。手元の断片と設定の SHA-256 6 個は、B-lens の転記行 F の値とすべて一致する（config.json 5BEEA1A4A34C6278・tokenizer.json AEB13307A71ACD8F・model.safetensors.index.json D6C42883A895DFEF・model-00001-of-00003.safetensors 75311D91BB08CF0B・model-00002-of-00003.safetensors 0B48ADBB1F60E901・model-00003-of-00003.safetensors 7DD39CCCA5E4DE12）。版の揃え方は B-lens と同じ（NumPy 2.1.3・transformers 4.57.3・torch 2.11.0+cu128・裁定 D187）。",
