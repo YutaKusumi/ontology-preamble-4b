@@ -12,6 +12,10 @@ v2（最終検分の採否表 `records/reviews/Blens/results-final/adoption-tabl
   見出し・状態・冒頭の添え・検分票を最終版のものにする。最終版では、草案の二つ目を同じ走りで作り直して置き場のファイルと同じことを確かめ、
   草案の二つ目から消えた行（改めた行）が、決めた行だけであることを確かめる。`--final` が無ければ、出力は v1 と同じ（草案の二つ目）。
   出力が既にあって --force が無ければ、組んだ文を置き場のファイルと比べ、同じなら何も書かずに終わり、違えば止める。
+v3（起草者の最終の見直し `records/reviews/Blens/results-final/final-read/review-final-Blens.md` の所見・登録者裁定 D198 の案）: `--final` の出力だけを改める。
+  状態の行を機械の区画に移す（F-A: 登録者最終確認の記録 `records/Blens/final-confirmation-Blens.json` があれば、確認の逐語と時刻を書き、無ければ「登録者最終確認の前」と書く）・
+  冒頭に凍結の後の逸脱の一覧（台帳から読む）と、検分票に D-BL2 の一句（F-B）・§3 の二つの行の言い回し（F-C・F-C2）・検分票の区画の頭の添え（F-D）・
+  §3 の並べ直しの表の見出しの理由の句（F-E・任意）・§0 の〈門を通らない〉の添え（F-F・任意）。草案の二つ目の出力は v1・v2 と同じ。
 数はすべて記録から器が読む。走査は凍結した組み立ての器の `lint_report`（凍結した走査器 `report_lint.lint` と、読みの表から作った禁止語）で行い、違反があれば止める。
 出力: records/Blens/results-Blens-draft2.md（`--final` では results-Blens-FINAL-2026-09-24.md）と、同じ名の -machine.json・-lint.md。
 用法: python tools/build_report_Blens_devBL3.py [--final] [--colab-dir <相 extract の出力の置き場>] [--force]
@@ -30,10 +34,14 @@ import blens_core as C
 import blens_lens as BL
 import blens_calib as BC
 
-VERSION = 'v2'
+VERSION = 'v3'
 NL = chr(10)
 OUT = os.path.join(REPO, 'records', 'Blens', 'results-Blens-draft2.md')
 OUT_FINAL = os.path.join(REPO, 'records', 'Blens', 'results-Blens-FINAL-2026-09-24.md')
+FINAL_REL = 'records/Blens/results-Blens-FINAL-2026-09-24.md'
+CONFIRM = os.path.join(REPO, 'records', 'Blens', 'final-confirmation-Blens.json')     # v3: 登録者最終確認の記録（あれば状態の区画に逐語を書く）
+REVIEW = 'records/reviews/Blens/results-final/final-read/review-final-Blens.md'
+OPT_E, OPT_F = True, True                                                                # v3: 起草者の最終の見直しの任意の二つ（裁定 D198 で選ぶ）
 POST = os.path.join(REPO, 'results', 'Blens', 'posthoc-Blens.json')
 UNITS = os.path.join(REPO, 'records', 'Blens', 'colab-units-Blens.json')
 FRJ = os.path.join(REPO, 'records', 'Blens', 'FREEZE-RECORD-Blens.json')
@@ -139,7 +147,7 @@ def main():
                       '見出しと状態の行を改め、%sと%sの印の区画だけを足したもの（組み立ての器 `tools/build_report_Blens_devBL3.py`・登録者裁定 D191・D193）。印の無い文と区画は凍結の器の出力のまま。'
                       % (s16(BR.__file__), s16(BR.OUT), TAG, TAG4))
         head_final = (TAG + 'この最終版は、凍結した組み立ての器 `tools/build_report_Blens.py`（SHA16 %s）の出力を同じ入力で作り直し、置き場の `records/Blens/results-Blens.md`（SHA16 %s）とバイトで同じことを確かめてから、'
-                      '見出しと状態の行を改め、%sと%sの印の区画だけを足したもの（組み立ての器 `tools/build_report_Blens_devBL3.py` %s・登録者裁定 D191・D193・D196）。印の無い文と区画は凍結の器の出力のまま。'
+                      '見出しと状態の行を改め、%sと%sの印の区画だけを足したもの（組み立ての器 `tools/build_report_Blens_devBL3.py` %s・登録者裁定 D191・D193・D196・D198）。印の無い文と区画は凍結の器の出力のまま。'
                       % (s16(BR.__file__), s16(BR.OUT), TAG, TAG4, VERSION))
         changed['head'] = '- ' + head_draft
         ins[0] = [head_final if final else head_draft,
@@ -149,9 +157,14 @@ def main():
                   MB['cost_line_tag'] + ' Colab のユニット %.2f（%s・登録者の表示から）。手元の計算はユニットを使わない。' % (UJ['total_used'], '・'.join('%s %.2f' % (k, v) for k, v in st.items()))]
         ins[0][0] = '- ' + ins[0][0]
         if final:
-            ins[0][1:1] = ['- %s最終版で草案の二つ目（`records/Blens/results-Blens-draft2.md`・SHA16 %s）に足した行は、最終検分の二票の所見によるもの（採否表 `records/reviews/Blens/results-final/adoption-table-Blens-results-final.md` の P605〜P609・'
-                           '登録者裁定 D195・D196）: §0 の §1 への参照・§3 の表の並べ直し・§8 の一致の注と登録者の予想のファイルの時刻の注・§9 の門の限界の句。ほかに改めたのは見出し・状態・この冒頭の添え・検分票だけで、'
-                           'ほかの行は草案の二つ目と同じ（器が確かめた）。' % (TAG, s16(OUT))]
+            opt = ('・〈門を通らない〉の添え' if OPT_F else '', '（見出しに理由の句）' if OPT_E else '')
+            ins[0][1:1] = ['- %s最終版で草案の二つ目（`records/Blens/results-Blens-draft2.md`・SHA16 %s）に足した行と句は、最終検分の二票の所見（採否表 `records/reviews/Blens/results-final/adoption-table-Blens-results-final.md` の P605〜P609・'
+                           '登録者裁定 D195・D196）と、起草者の最終の見直しの所見（`%s`・登録者裁定 D198）によるもの: 状態の区画・凍結の後の逸脱の一覧・§0 の §1 への参照%s・§3 の表の並べ直し%s・'
+                           '§8 の一致の注と登録者の予想のファイルの時刻の注・§9 の門の限界の句・検分票の区画の頭の添え。ほかに改めたのは、見出し・状態の行・この冒頭の添え・§3 の答えの文字の位置の二つの行の言い回し・検分票だけで、'
+                           'ほかの行は草案の二つ目と同じ（器が確かめた）。' % (TAG, s16(OUT), REVIEW, opt[0], opt[1])]
+            FRD = FR['deviations']
+            ttl = lambda d: re.search(r'\*\*([^*]+)\*\*', d['what']).group(1) + ('（更新あり）' if d.get('updates') else '')
+            ins[0].insert(4, '- %s凍結の後の逸脱（台帳 `records/Blens/FREEZE-RECORD-Blens.md`）: %s。' % (TAG, '・'.join('%s %s' % (d['no'], ttl(d)) for d in FRD)))
 
         # ---- 範囲と門の数
         ins[2] = ['- %s範囲: 上の札の分類と、下の読みの型の〈区別できない〉は、v̂・層の割合 %s・主の六つの物差しについてのもの。ほかの方向・層・物差し（§4）には札を付けない。' % (TAG, sel),
@@ -170,6 +183,8 @@ def main():
         if final:                                      # P605
             ins[3].append('- %sM_L_nuclear の二つ目の札を読むための並び（兄弟の三対・比べる相手の |値| の最大と中央値・等方の標準偏差・ランダム方向が実在の差の最上位に来た升目の数・物差しごとの比）は、'
                           '§1 の添えにある。この札は、この要約の行だけで読まない。' % TAG)
+            if OPT_F:                                  # v3・F-F
+                ins[3].append('- %s〈門を通らない〉の「そろわなかった」は、凍結した基準でそろうことが示せなかったという意味で、そろわないことを示したのではない（上の門の読みの添え）。' % TAG)
 
         # ---- 唯一の札の文脈
         comp = {m: [abs(v[PRIM[m]]) for p, v in lay['real'].items() if p not in SW] for m in PRIM}
@@ -245,7 +260,8 @@ def main():
                 i_ += 1
             if names:
                 raise SystemExit('凍結の報告の大きさの目盛りの表に無い行がある（止める）: %s' % names)
-            rows5 += ['- %s上の凍結の表の並べ直し（行の名の縦棒を字として書いた・列と値は凍結の器の出力の表のまま）:' % TAG, ''] + tb
+            why = '行の名の縦棒が表の区切りと重なって列がずれるので、縦棒' if OPT_E else '行の名の縦棒'     # v3・F-E
+            rows5 += ['- %s上の凍結の表の並べ直し（%sを字として書いた・列と値は凍結の器の出力の表のまま）:' % (TAG, why), ''] + tb
         rows5 += ['- %s土台の確率の二つの値: 上の表の変換の後の確率（前）は、Colab の相 extract の残差から手元で組み直した出口の値から出した（S4|Osec-Ncold %s）。較正の検査の確率（%s）は、Colab の模型そのものの出口の値から出した。'
                   '組み直しの差は、手元の logits の突き合わせの最大 %s（許容 %s）の内。比は、同じ組み直しの前と後の差から出している。' % (TAG, f4(loc), f4(pc['p_T']), f4(mg['logit_check_local']['main']['max_abs']), f4(TL['magnitude']['logit_check']['atol'])),
                   '- %s較正の検査の位置（S4|Osec-Ncold|json）: 確率 %s のもとで観測 %d 件以上の割合 %s（z %.2f）。区間 %d〜%d の上端から %d 件内側で「内」。' % (
@@ -255,11 +271,18 @@ def main():
                   '', '| 行 | 「```」の出口の値の正確な変化 | 層一の近似の部分 | 最終の残差に沿う部分 | 尺度の部分 | 方向と最終の残差の余弦 |', '|---|---|---|---|---|---|']
         rows5 += ['| %s | %s | %s | %s | %s | %s |' % (x['row'].replace('|', '\\|'), f4(x['parts_fmain']['exact']), f4(x['parts_fmain']['layer1']), f4(x['parts_fmain']['along']), f4(x['parts_fmain']['scale']), f4(x['cos_u_h'])) for x in el]
         rows5 += ['- %s上の凍結の表の行の名には縦棒が入っていて表の区切りと重なるので、表示では列がずれる（凍結の器の出力のまま）。この区画と事後の区画の表では、縦棒を字として書いた。' % TAG]
+        heads_d = '- %s答えの文字の位置の升目の出力の数と、異なる文の頭の数（%s）: %s。上の表の「文脈」の数は出力の数（S4|Osec-Ncold は、出力が同じ並びで、文脈は一つ）。' % (
+            TAG, TAG4, '・'.join('%s 出力 %d・異なる文の頭 %d' % (k, v['n_outputs'], v['distinct_heads']) for k, v in PH['distinct_heads'].items()))
+        lhead_d = '- %s答えの文字の位置の、正確な直接の経路による出口の値の変化（記述・散文の層は写しの位置・v̂ の行は平均と中央値と四分位、ほかの行は平均）:' % TAG
+        heads_f = heads_d.replace('上の表の「文脈」の数は出力の数', '上の凍結の区画の答えの文字の位置の行の「文脈」の数は出力の数')    # v3・F-C
+        lhead_f = lhead_d.replace('散文の層は写しの位置', '散文の升目は写しの位置')                                        # v3・F-C2
+        if heads_f == heads_d or lhead_f == lhead_d:
+            raise SystemExit('§3 の二つの行の言い回しの直しが当たらない（止める）')
+        changed['heads'], changed['lhead'] = heads_d, lhead_d
         rows5 += ['- %s升目の中の主位置の残差の揺れ（同じ升目の出力の、一件目との要素ごとの差の絶対値の最大・括弧は一件目の残差の要素の絶対値の最大に対する割合）: %s。入力の長さの違いによる bf16 の丸めと見ている。大きさの目盛りは、升目ごとに一件目の残差を使う。'
                   % (TAG, '・'.join(spread)),
-                  '- %s答えの文字の位置の升目の出力の数と、異なる文の頭の数（%s）: %s。上の表の「文脈」の数は出力の数（S4|Osec-Ncold は、出力が同じ並びで、文脈は一つ）。' % (
-                      TAG, TAG4, '・'.join('%s 出力 %d・異なる文の頭 %d' % (k, v['n_outputs'], v['distinct_heads']) for k, v in PH['distinct_heads'].items())),
-                  '- %s答えの文字の位置の、正確な直接の経路による出口の値の変化（記述・散文の層は写しの位置・v̂ の行は平均と中央値と四分位、ほかの行は平均）:' % TAG]
+                  heads_f if final else heads_d,
+                  lhead_f if final else lhead_d]
         st_ = lambda d: '平均 %s（中央値 %s・四分位 %s〜%s）' % (f4(d['mean']), f4(d['median']), f4(d['q1']), f4(d['q3']))
         for key, v in mg['letter'].items():
             parts = []
@@ -403,7 +426,7 @@ def main():
         t_draft = '# B-lens の結果（報告の草案の二つ目・凍結した組み立ての器の出力に逸脱の区画を足したもの）'
         s_draft = '- 起草: 南無弥勒如来（コーディネータ）／登録者: 楠見優太。**状態: 報告の草案の二つ目（結果の巡・第一巡の後・最終の系統外の一票の前）**。組み立ての器: `tools/build_report_Blens.py`（凍結）と `tools/build_report_Blens_devBL3.py`（逸脱の下）。'
         t_fin = '# B-lens の結果（報告の最終版・凍結した組み立ての器の出力に逸脱の区画を足したもの）'
-        s_fin = '- 起草: 南無弥勒如来（コーディネータ）／登録者: 楠見優太。**状態: 報告の最終版（最終検分の後・登録者の確かめの後に公開）**。組み立ての器: `tools/build_report_Blens.py`（凍結）と `tools/build_report_Blens_devBL3.py`（逸脱の下）。'
+        s_fin = '- 起草: 南無弥勒如来（コーディネータ）／登録者: 楠見優太。組み立ての器: `tools/build_report_Blens.py`（凍結）と `tools/build_report_Blens_devBL3.py`（逸脱の下）。'    # v3・F-A: 状態は下の機械の区画
         changed['title'], changed['status'] = t_draft, s_draft
         lines[0], lines[2] = (t_fin, s_fin) if final else (t_draft, s_draft)
         bl = blocks_of(lines, MB)
@@ -430,16 +453,32 @@ def main():
                      '  - 系統の内訳: 組み立てはコーディネータ（Claude 系）一名。結果の巡は系統外三票（新しい個体一）と系統内三票（一票）。最終の系統外の一票はこの後（新しい個体・登録者裁定 D189）。',
                      '  - COI記録: 起草者は器と報告を書いた当人で、「正しく読めている」と書く側に引かれる。登録者は封印した予想の欄に希望の向きを書いた。照合の直しで符号を使わないことを、その向きへの歯止めにした。',
                      '  - 本検分が確認していないこと: 最終の系統外の一票が見つけること。足した区画の文の言い過ぎ（走査は禁止語だけを見る）。']
-        rev_final = ['- %s最終版の検分票:' % TAG,
+        rev_final = ['- %s上の三行は、凍結した組み立ての器が草案のときに出した検分票で、凍結の出力のまま残す。読みの型の当否は、結果の巡と最終検分で見た（採否表 P565〜P603・P604〜P619）。' % TAG,   # v3・F-D
+                     '- %s最終版の検分票:' % TAG,
                      '  - 対象: 報告の最終版（凍結した器の出力と、足した区画）。',
-                     '  - 段階: 結果の後。結果の巡・第一巡の後（採否表 P565〜P603・登録者裁定 D189〜D193）と、最終検分の後（採否表 P604〜P619・登録者裁定 D194〜D197）。',
+                     '  - 段階: 結果の後。結果の巡・第一巡の後（採否表 P565〜P603・登録者裁定 D189〜D193）と、最終検分の後（採否表 P604〜P619・登録者裁定 D194〜D197）と、'
+                     '起草者の最終の見直しの後（`%s`・登録者裁定 D198・D199）。' % REVIEW,
                      rev_draft[3],
                      rev_draft[4],
-                     '  - 系統の内訳: 組み立てはコーディネータ（Claude 系）一名。結果の巡は系統外三票（新しい個体一）と系統内三票（一票）。最終検分は系統外二票（Gemini 3.8 Flash の新しい個体二・正本の一票を二票にした逸脱 D-BL5・登録者裁定 D195）。同じ機種の二票は、会話が別でも相関しうる。',
-                     '  - COI記録: 起草者は器と報告を書いた当人で、「正しく読めている」と書く側に引かれる。登録者は封印した予想の欄に希望の向きを書いた。照合の直しで符号を使わないことを、その向きへの歯止めにした。最終版で足した行は、最終検分の票が挙げたものに限った（読みを足さない）。',
-                     '  - 本検分が確認していないこと: 最終版で足した行は、もう一度の検分を経ていない（登録者裁定 D194・最終検分の後に巡を置かない）。足した区画の文の言い過ぎ（走査は禁止語だけを見る）。']
+                     '  - 系統の内訳: 組み立てはコーディネータ（Claude 系）一名。結果の巡は系統外三票（新しい個体一）と系統内三票（一票）で、凍結の本文 §10 は結果の巡を新しい個体で組むとしたが、'
+                     '依頼文は設計の巡と同じ四名に宛てた（逸脱 D-BL2）。最終検分は系統外二票（Gemini 3.8 Flash の新しい個体二・正本の一票を二票にした逸脱 D-BL5・登録者裁定 D195）。同じ機種の二票は、会話が別でも相関しうる。'
+                     '起草者の最終の見直しは起草者自身のもので、外の目ではない。',                                                                                          # v3・F-B
+                     '  - COI記録: 起草者は器と報告を書いた当人で、「正しく読めている」と書く側に引かれる。登録者は封印した予想の欄に希望の向きを書いた。照合の直しで符号を使わないことを、その向きへの歯止めにした。'
+                     '最終版で足した行と句は、最終検分の票と起草者の最終の見直しが挙げたものに限った（読みを足さない）。',
+                     '  - 本検分が確認していないこと: 最終版で足した行と句は、もう一度の検分を経ていない（登録者裁定 D194・最終検分の後に巡を置かない。起草者の最終の見直しは起草者自身のもの）。足した区画の文の言い過ぎ（走査は禁止語だけを見る）。']
         changed['rev'] = rev_draft
         lines[fence_i:fence_i] = [MB['begin']] + (rev_final if final else rev_draft) + [MB['end'], '']
+        if final:                                      # v3・F-A: 状態の区画（登録者最終確認の記録があれば逐語と時刻・無ければ確認の前）
+            prev = re.search(r'`%s` の (\w+) の版（' % re.escape(FINAL_REL), open(P_(*REVIEW.split('/')), encoding='utf-8').read()).group(1)
+            if os.path.exists(CONFIRM):
+                cf = json.load(open(CONFIRM, encoding='utf-8'))
+                stl = '- 状態: **最終版**（登録者最終確認 %s 日本時間・会話の記録 uuid `%s`・逐語「%s」）。登録者が確かめた案（SHA16 %s）と、この一行のほかは同じ。' % (
+                    cf['jst'], cf['uuid'], cf['words'], cf['proposal_sha16'])
+            else:
+                stl = '- 状態: **報告の最終版**（最終検分と起草者の最終の見直しの後・登録者最終確認の前。確認の後に、この区画に確認の逐語と時刻を入れる）。'
+            lines[3:3] = [MB['begin'], stl,
+                          '- %sこの版の一つ前の最終版（%s の版）は、登録者の指示で登録者最終確認の前に push した（登録者裁定 D199）。その版の状態の行は、確認の後に公開すると書いていた（起草者の最終の見直し F-A）。' % (TAG, prev),
+                          MB['end']]
         return NL.join(lines)
 
     text = compose(a.final)
@@ -447,7 +486,7 @@ def main():
         draft = compose(False)
         if draft != open(OUT, encoding='utf-8').read().replace('\r\n', NL):
             raise SystemExit('作り直した草案の二つ目が、置き場の草案の二つ目と違う（止める）')
-        allowed = {changed['title'], changed['status'], changed['head'], changed['gate']} | set(changed['rev'])
+        allowed = {changed['title'], changed['status'], changed['head'], changed['gate'], changed['heads'], changed['lhead']} | set(changed['rev'])
         dl, fl_ = draft.split(NL), text.split(NL)
         gone = [dl[i] for tg, i1, i2, j1, j2 in difflib.SequenceMatcher(None, dl, fl_, autojunk=False).get_opcodes() if tg in ('replace', 'delete') for i in range(i1, i2)]
         if any(l not in allowed for l in gone):
