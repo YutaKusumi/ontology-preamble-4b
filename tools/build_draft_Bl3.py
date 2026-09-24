@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
-"""build_draft_Bl3.py v2 —— B-lens 層三（Bl3）の草案を原稿から組み立てる（B-lens の `build_draft_Blens.py` の型・凍結した B-lens の器は触らない）。
+"""build_draft_Bl3.py v3 —— B-lens 層三（Bl3）の草案を原稿から組み立てる（B-lens の `build_draft_Blens.py` の型・凍結した B-lens の器は触らない）。
 - 原稿の行 `{{list:正本のキー}}` を、正本の一覧の各項目の箇条に展開する（行頭の字下げは各項目に引き継ぐ・v2）。`{{reading_table}}` は読みの表、`{{predictions_list}}` は予想の項目に展開する。
 - 原稿が引く裁定番号がすべて正本 `decisions` にあることを確かめ、無ければ止める。
 - 組み立ての前に、凍結した `tools/numbers_lint.py` の束縛検査（原稿の数は正本のキー参照か構造）を走らせ、違反があれば止める。
 - 原稿の {{正本のキー}} を正本の値で置換し、§6 の「- **転記行 X** — 〔転記行 X〕」を設計事実の JSON の逐語で置換する。
 - 組み立ての後に、登録検査（文書と正本の説明文）と生成器の文字列リテラル検査を走らせ、報告を書く。違反があれば終了コードを立てる。
+- 組み立てた文書の全ての行（§9 の読みの表の行を除く・表の「書かないこと」の欄は禁止語の出所）を、正本の `print_strings` の禁止語で走査し、当たれば止める（v3・草案の散文は正本の生成器の走査の外にあるため）。
 用法: python tools/build_draft_Bl3.py --src design/design-Bl3-draft1.src.md --out design/design-Bl3-draft1.md --label 草案1 --lint-report records/Bl3/numbers-lint-draft1-Bl3.md
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"""
 import os, re, sys, json, hashlib, argparse, tempfile, shutil
@@ -88,6 +89,18 @@ assert not missing, ('§6 に置かれていない転記行', missing)
 t = '\n'.join(out)
 assert not re.search(r'〔転記行 [A-Z]〕', t), '置き残しがある'
 assert not re.search(r'\{\{[^{}]*\}\}', t), '束縛の置き残しがある'
+BAN = sorted({w for v in J['print_strings'].values() for w in v})
+ban_hits, in9 = [], False
+for i, l in enumerate(t.split('\n'), 1):
+    if l.startswith('## '):
+        in9 = l.startswith('## 9.')
+    if in9 and l.startswith('| '):
+        continue
+    ban_hits.extend((i, w, l[:80]) for w in BAN if w in l)
+if ban_hits:
+    for i, w, l in ban_hits:
+        print('  禁止語 %d 行: %s … %s' % (i, w, l))
+    sys.exit('[build_draft_Bl3] 組み立てた文書が禁止語を含む（%d 件）' % len(ban_hits))
 open(a.out, 'w', encoding='utf-8', newline='\n').write(t)
 print('[build_draft_Bl3] written %s sha16 %s | 転記行 %s | 束縛したキーの種類 %d' % (rel(a.out), sha(a.out), ''.join(replaced), len(set(used))))
 d = tempfile.mkdtemp(prefix='draftBl3_')
