@@ -1,0 +1,36 @@
+# ご意見が引いた行番号の抜き取りの確かめ（機械生成・`checks/citation_spotcheck.py`・束の入力のコミット 029d55f）
+
+- C1 `tools/direction_B.py` 39〜39 行「math.floor(ratio * n_layers」: 当たる | idx = int(math.floor(ratio * n_layers + 0.5)) - 1
+- C1 `tools/bl3_run.py` 116〜116 行「starts = [cell.mp]」: 当たる | starts = [cell.mp] * B
+- C1 `tools/bl3_run.py` 122〜122 行「starts = [0]」: 当たる | starts = [0] * B
+- C1 `tools/bl3_recompute_rewrite.py` 240〜240 行「h[0, int(mp):, :]」: 当たる | h[0, int(mp):, :] = h[0, int(mp):, :] + add
+- C1 `tools/analyze_Bl3.py` 109〜109 行「ue = {u:」: 当たる | ue = {u: {f: eff[f][u] for f in sorted({r['fam'] for r in rows})} for u in units}
+- C1 `tools/analyze_Bl3.py` 244〜244 行「chance=」: 当たる | descriptive=descriptive(T3, main_out), chance={'oriented': T3['nulls']['real']['chance_second'], 'pair': T3['nulls']['real']['chance_second_pair']})
+- C1 `tools/bl3_core.py` 146〜146 行「len(us) < 2」: 当たる | if not rs or len(us) < 2:
+- C1 `tools/bl3_run.py` 461〜461 行「if ck in dropped」: 当たる | if ck in dropped:
+- C1 `tools/run_stageB_local.py` 546〜546 行「apply_chat」: 当たる | ids = steer_B.apply_chat(tok, user_message(at, scen['text'], inst))
+- C2 `tools/run_stageB_local.py` 184〜184 行「hs[」: 当たる | hs[i, int(st):, :] = hs[i, int(st):, :] + (add[i] if per_row else add)
+- C2 `tools/analyze_Bl3.py` 100〜102 行「labels_signature」: 当たる | def labels_signature(lab): ⏎     """札の一致で見る中身（正本 `independent_recompute.agreement`）: Holm の判定・割合を決めた裾・等方の外の行の効き目の側・二つ目の札。""" ⏎     return {rid: (o['iso_ou
+- C2 `tools/bl3_run.py` 119〜119 行「pc['end'] != cell.mp」: 当たる | if pc['end'] != cell.mp:        # 近道の元は主位置の手前で切る（主位置を帯に残す・凍結した確かめ・効き目の比べだけでは弱い: 合成の記録）
+- C2 `tools/colab/boot_Bl3.py` 390〜390 行「main_freeze']['pilot']」: 当たる | pilot = FR['main_freeze']['pilot']
+- C2 `tools/analyze_Bl3.py` 365〜365 行「pilot_attempts」: 当たる | return FR['main_freeze']['pilot_attempts']
+- C2 `tools/analyze_Bl3.py` 65〜65 行「glob.glob」: 当たる | cache[k] = [t for t in (json.loads(l) for l in open(glob.glob(os.path.join(d, 'trials-*.jsonl'))[0], encoding='utf-8')) if t['status'] == 'ok']
+- C2 `tools/bl3_run.py` 211〜211 行「pt[c.set_ids[0]]」: 当たる | pT[c.key] = float(pt[c.set_ids[0]])
+- C2 `tools/dry_run_Bl3.py` 323〜323 行「rows_subset」: 当たる | AZr = AZ.analyze(T3d, FJ, outs, [pilot], DJ['groups']['real']['names'], rows_gate, hook=v_hook, rewrite=None, style_rows=style_rows, rows_subset=set(v
+- G1 `tools/bl3_run.py` 423〜423 行「i_c = 2」: 当たらない（その字のある行 [422]） | res = {}
+- G1 `tools/bl3_run.py` 120〜120 行「ToolError」: 当たる | raise ToolError('近道の元が主位置の手前で切れていない（%d・主位置 %d）: %s' % (pc['end'], cell.mp, cell.key))
+- G1 `tools/bl3_recompute_rewrite.py` 291〜291 行「def recompute_rewrite」: 当たる | def recompute_rewrite(model, tok, T3, FJ, rows, dirs_by_row, dirs, layer_idx, coef, use_cache=None):
+- G1 `tools/colab/boot_Bl3.py` 436〜436 行「use_cache=False」: 当たる | out['rewrite'] = RW.recompute_rewrite(model, tok, T3, FJ, rows_rc, dbr, dirs, L, coef, use_cache=False)
+- G1 `tools/bl3_run.py` 130〜130 行「register_hook」: 当たる | handle = RB.register_hook(self.model, self.layer, RB.make_hook(V, self.coef, int(sign), starts, meta={'bl3': True, 'cell': cell.key}))
+- G2 `design/contrasts-Bl3.json` 292〜292 行「precision」: 当たる | "precision": "順伝播と加減は段階 B と同じ bf16（加減のベクトルは層の出力の型に直して足す・段階 B の走行器のフックと同じ形・係数は一度だけ掛ける・裁定 D90）。最後の層の出口の残差を `float32` に上げ、最終の正規化と、語彙の行列の読み取りの集合の行を `float
+- G2 `design/contrasts-Bl3.json` 297〜297 行「band」: 当たる | "band": "加減は主位置（組み立てたプロンプトの最後のトークン）から読み取りの位置まで（段階 B の帯と同じ起点・裁定 D124）",
+- G2 `design/contrasts-Bl3.json` 1145〜1145 行「what」: 当たる | "what": "主の値の一部を計算し直す: v̂ の行（主の行のうち static の行）ごとに、無操作の値と、v̂・等方の帰無のすべて・比べる相手のすべて（実在の差・両方の向き）の効き目（順伝播の数は転記行 E）",
+- G2 `design/contrasts-Bl3.json` 1164〜1165 行「agreement」: 当たる | "tol_stage1": 0.001, ⏎   "agreement": "段ごとに、全ての効き目の差の絶対値が許容の内で、かつ段の二つの道の値からそれぞれ出した札が同じとき一致とする。札は、v̂ の行の割合をその道の値で出し直し、主の行すべてに掛け直した Holm の判定・割合を決めた裾（上か下か）
+- G2 `tools/bl3_run.py` 86〜87 行「Zs」: 当たる | Zs = (hn @ self.W32[cell.set_ids].T).double().cpu().numpy() ⏎         out = {'Zset': Zs, 'lo': K.log_odds_a(Zs, 0, list(range(1, len(cell.set_ids)))), '
+- G2 `tools/bl3_recompute_rewrite.py` 267〜267 行「logsumexp」: 当たる | lo = z[0] - torch.logsumexp(z[1:], dim=0)
+- G2 `tools/analyze_Bl3.py` 164〜165 行「as_eff」: 当たる | def as_eff(ov): ⏎         return {rid: [o['effect']] + list(o['iso']) + list(o['comps_same']) + list(o['comps_opp']) for rid, o in ov.items()}
+- G2 `tools/bl3_core.py` 218〜227 行「def agreement」: 当たる | def agreement(eff_a, eff_b, tol, labels_a, labels_b): ⏎     """段ごとの一致（正本 `independent_recompute.agreement`）: 全ての効き目の差の絶対値が許容の内で、二つの道の値からそれぞれ出した札が同じ。""" ⏎ 
+
+- まとめ: {'C1': '9/9', 'C2': '8/8', 'G1': '4/5', 'G2': '8/8'}
+
+本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
