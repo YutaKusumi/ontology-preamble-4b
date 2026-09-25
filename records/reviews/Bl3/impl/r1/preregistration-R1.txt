@@ -1,0 +1,36 @@
+R1 pre-registration (kensho step 1). Written before reading the canon, bl3_run, bl3_core, analyze_Bl3,
+bl3_directions, bl3_recompute_rewrite, the instructions text, the frozen tools, and before any dry-run output.
+Already seen before this note: the request (git show c1a759c), tools/dry_run_Bl3.py in full (read to confirm
+it writes only to --out), grep of write/open/from_pretrained lines in ten tools, freeze_Bl3.py module-level
+lines, the SHA16 table check (35/35 OK, npz SHA-256 OK), commit subjects of c1a759c and f5930f1 (exposure).
+
+Severity criteria
+- heavy (juudai): on real data, a main number or machine decision (pilot decision, gate, top label, Holm,
+  recompute agreement, predictions truth) would differ from the canon; or a canon-required check that cannot
+  fail while it guards a main number; or a breach of computation.before_seal; or a path by which the
+  independent recompute agrees when it should not (shared code / shared bug).
+- medium: a recorded descriptive output differs from the canon; an unstated choice by the tool that could
+  change a decision under plausible data; a check weaker than its label claims; an output the frozen text
+  needs is missing.
+- minor: comments/messages/docs mismatch, dead code, improbable edge cases.
+
+Verdict rule
+- sashimodoshi if >=1 heavy confirmed (reproduced, or a concrete line-level breaking scenario).
+- jouken-tsuki if 0 heavy and >=1 medium.
+- mondai-nashi only if 0 heavy and 0 medium.
+- a dry-run check that fails and is not explained by the environment counts at least medium.
+
+Predictions (confidence)
+- P1 dry run (--iso 9 --e2e-iso 9) ends with every check as expected: 0.70
+- P2 at least one medium-or-heavy finding: 0.75
+- P3 at least one heavy finding: 0.25
+- P4 verdict: jouken-tsuki 0.55 / sashimodoshi 0.30 / mondai-nashi 0.15
+
+COI
+- pull A: toward jouken-tsuki/mondai-nashi so as not to obstruct the schedule and the official record already
+  running (I saw that phrase in the frame commit subject).
+- pull B: toward over-finding to look thorough (over-correction).
+- pull C: trusting the coordinator's own checks because they are the same lineage (correlated eyes).
+- counter-marks: each finding needs file:line and a concrete breaking scenario; reproduce by script where
+  feasible; classify only by the criteria above.
+written 2026-09-25T04:48:06Z

@@ -1,0 +1,138 @@
+{
+ "version_under_review": "87ce664",
+ "checks": {
+  "重大-1": {
+   "claim": "封印した予想の SHA-256 を、報告の組み立てでも起動器でも本の凍結でも照らさない（B-lens の器は照らしていた）",
+   "reproduced": true,
+   "how": "検分の版の器で予想の SHA を読む行を探し、一時の置き場で封印の後にコーディネータの予想を書き換えて報告の入力を読み、報告を組んだ",
+   "detail": "予想の SHA を照らす行: {'tools/build_report_Bl3.py': False, 'tools/analyze_Bl3.py': False, 'tools/colab/boot_Bl3.py': False, 'tools/freeze_Bl3.py': False, 'tools/sweep_Bl3.py': False}・B-lens の require_sealed に照合 True・書き換えの前 通る → 後 通らない・止まった None・報告の q4 の行 ['| q4.gate | 通らない | 通らない（一致） | 通らない（一致） |']"
+  },
+  "重大-2": {
+   "claim": "一致だけを見る段の記録は読んだ出力の同定を持たず、結果を開く段は記録の agree だけを見て別に与えられた置き場を開き、開いた集計の再計算の一致が不一致でも止まらない",
+   "reproduced": true,
+   "how": "検分の版の集計の器の judge と、main の open の枝を読んだ",
+   "detail": "judge の中の SHA の同定 False・open の枝は記録の agree だけを見る True・open の枝で開いた集計の再計算の一致を見る False"
+  },
+  "中-3": {
+   "claim": "凍結の器は相 check のコミットの正本の SHA16 だけを照らし、器・設計事実・方向の記録を照らさない。順伝播を呼んだ数は定数 0。守りは最上位の forward の前だけで、模型の本体を直に呼べば止まらない",
+   "reproduced": true,
+   "how": "検分の版の凍結の器の相 check の確かめと起動器の行を読み、乱数の小さな模型に同じ形の守りを掛けて最上位と本体を呼んだ",
+   "detail": "照らすのは正本の SHA16 だけ True・順伝播の数は定数 True・守りは最上位 True・最上位を呼ぶと止まる True・本体を呼ぶと止まる False"
+  },
+  "中-4": {
+   "claim": "本の凍結は下見の試みを与えた順に並べて最後を本の下見にし、session の正本と npz は写すだけで照らさず、試みのコミットの二つの記録は有るかだけを見る",
+   "reproduced": true,
+   "how": "検分の版の凍結の器の本の凍結の確かめを読んだ",
+   "detail": "与えた順のまま True・有るかだけ True"
+  },
+  "中-5": {
+   "claim": "手元の一致だけを見る段・結果を開く段・報告の組み立ては、凍結の記録の SHA16 と手元の器と正本を照らさず、組の一つの DRY の印で全体を DRY として扱う",
+   "reproduced": true,
+   "how": "検分の版の集計の器と報告の器を読んだ",
+   "detail": "凍結の記録の SHA16 を読む行が無い True・DRY は組の一つで全体 True"
+  },
+  "中-6": {
+   "claim": "合成データの器の端から端までは、器の関数を同じプロセスの中で呼び session を手で作る。起動器の三つの相と、ファイルを通した集計の器の CLI は、凍結の器が見る記録では走らない",
+   "reproduced": true,
+   "how": "検分の版の合成データの器を読んだ",
+   "detail": "起動器の名が出てこない True・同じプロセスの端から端まで True・別のプロセスで走らせるもの [\"r = subprocess.run([sys.executable, os.path.join(HERE, 'bl3_recompute_rewrite.py\"]"
+  },
+  "中-7": {
+   "claim": "起動器は既定で三つの組を一度の起動で走らせ、組の出力は /content に置き、zip とダウンロードは最後の一度だけ",
+   "reproduced": true,
+   "how": "検分の版の起動器を読んだ",
+   "detail": "ダウンロードの行 [302]（終わりの関数の中だけ True）・組の既定は三つ True・置き場は /content True"
+  },
+  "軽微8": {
+   "claim": "報告の §1 の (v) の行は「近道を使う」と印字し、§4 は「本の計算の近道: いいえ」と印字して食い違う",
+   "reproduced": true,
+   "how": "検分の版の報告の器の行を探した",
+   "detail": "(v) の行 [130]・§4 の行 [263]"
+  },
+  "軽微9": {
+   "claim": "凍結の記録の rulings は `k >= 'D204'` の文字列の比べで、D58・D59・D75・D90 のような番号も入る",
+   "reproduced": true,
+   "how": "正本の decisions に検分の版の式を当てた",
+   "detail": "入る 204 より前の番号 ['D58', 'D59', 'D75', 'D90']"
+  },
+  "軽微10": {
+   "claim": "門の行だけの升目だけが (i)(ii) を満たさないとき、q1 は「続ける」のまま、読みの型〈下見で一部を外した〉が当たる",
+   "reproduced": true,
+   "how": "芯の決定の関数に門の行だけの升目の不合格を与え、報告の器の読みの型を当てた",
+   "detail": "q1 続ける・外した升目 ['S4|Osec-Ncold']・当たった型に〈下見で一部を外した〉 True"
+  },
+  "軽微11": {
+   "claim": "「nuclear の族は測れなかった」は下見の記録の節（pilot_lines）にだけ置かれ、正本 pilot.decision.family の「報告の頭に」と違う",
+   "reproduced": true,
+   "how": "検分の版の報告の器の行と正本の文を読んだ",
+   "detail": "行 [134]・正本の文に「報告の頭」 True"
+  },
+  "軽微12": {
+   "claim": "掃き出しは層ごとの差分の三つの鍵があるかだけを見て、行の中身と層の数を見ない",
+   "reproduced": true,
+   "how": "検分の版の掃き出しの器を読んだ",
+   "detail": "鍵だけ True"
+  },
+  "軽微13": {
+   "claim": "凍結の本文の確かめ（rebuild_and_check）は引数 fsrc を受けるが使わず、凍結版の原稿と本文の食い違いを見ない",
+   "reproduced": true,
+   "how": "検分の版の凍結の本文の器を読んだ",
+   "detail": "関数の本体に fsrc が出てこない True"
+  },
+  "軽微14": {
+   "claim": "凍結の一行の登録者の逐語に数（「10時」など）があると、組み立ての数の検査で止まる（日時の形だけなら止まらない）",
+   "reproduced": true,
+   "how": "一時の置き場で、数を含まない言葉と含む言葉の二通りで凍結の本文を組んだ（組み立てより後の確かめは一時の置き場に git が無いので外れる）",
+   "detail": "数を含まない言葉: 終わりの値 1・組み立てで止まった False／「10時」を含む言葉: 終わりの値 1・組み立てで止まった True"
+  },
+  "軽微15": {
+   "claim": "起動器の版の確かめは正本 inputs.versions_B の三つだけを照らし、scipy を外す",
+   "reproduced": true,
+   "how": "正本の版の欄と検分の版の起動器の行を読んだ",
+   "detail": "正本の欄 ['numpy', 'scipy', 'torch', 'transformers']・起動器の照らす行 [\"want = {'numpy': PIN['numpy'], 'torch': PIN['torch'], 'transformers': PIN['transformers']}\"]"
+  },
+  "軽微16": {
+   "claim": "凍結の器は正本 inputs.files の置き場を凍結物に入れるが、正本に書いた SHA16 と照らさない",
+   "reproduced": true,
+   "how": "検分の版の凍結の器を読んだ",
+   "detail": "照らさない True"
+  },
+  "軽微17": {
+   "claim": "起動器の verify_frozen は、無いファイルを疎な取り出しの内外を問わず飛ばす",
+   "reproduced": true,
+   "how": "検分の版の起動器を読んだ",
+   "detail": "内外を分けない True"
+  },
+  "軽微18": {
+   "claim": "集計の器の環境の比べは本の計算の組の間だけで、下見の session の GPU と比べない",
+   "reproduced": true,
+   "how": "検分の版の集計の器を読んだ",
+   "detail": "比べる鍵 'commit', 'dry', 'gpu', 'versions', 'canon_sha16', 'directions_npz_sha256', 'layer_idx', 'coef'"
+  },
+  "軽微19": {
+   "claim": "登録者の予想の情報状態の欄（info.coi・free）が空でも、封印の検べを通る",
+   "reproduced": true,
+   "how": "検分の版の封印の器の検べに、欄を空にした登録者の JSON を与えた",
+   "detail": "通った True"
+  },
+  "軽微20": {
+   "claim": "起動器は方向の npz の有無を確かめずに SHA-256 を取るので、npz が無いと止め方でなく予期しない誤りで落ちる",
+   "reproduced": true,
+   "how": "検分の版の起動器を読んだ",
+   "detail": "行 ['npz_sha = sha256f(NPZ)']・有無の確かめ False"
+  },
+  "軽微21": {
+   "claim": "止めは記録の印と終わりだけで session.json を書かず、予期しない誤りの枝も session と zip を作らず、組の n_forward は起動の中の累積",
+   "reproduced": true,
+   "how": "検分の版の起動器を読んだ",
+   "detail": "止めで session を書かない True・予期しない誤りの枝で finish を呼ばない True・累積 True"
+  },
+  "軽微22": {
+   "claim": "正本の生成器の頭の文は v5 のまま（版は v7）・掃き出しの器の頭の文は無い REQUIRED を指す・設計事実を --skip-weights-hash で作り直すと転記行 F から断片が落ちる",
+   "reproduced": true,
+   "how": "検分の版の三つの器を読んだ",
+   "detail": "生成器の頭 \"\"\"make_contrasts_Bl3.py v5 —— B-lens 層三・版 [\"VERSION = 'v7'\"]・掃き出しの頭に REQUIRED True・断片を落とす引数の行 [362]"
+  }
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

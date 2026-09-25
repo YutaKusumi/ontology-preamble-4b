@@ -1,0 +1,48 @@
+{
+ "version_under_review": "87ce664",
+ "checks": {
+  "M1": {
+   "claim": "合成データの器の「本の計算は近道を使わない」の確かめは、器が書いた定数を見るだけで振る舞いを見ない",
+   "reproduced": true,
+   "how": "引かれた行の文を検分の版で読み、近道の口を「いつも近道」に変えた写し（印の定数はそのまま）で本の計算の全体を乱数の小さな模型で走らせた",
+   "detail": "確かめの式の四つの項 True・本の器の定数と近道の口 True・写しで近道の元を作った回 17・そのときの確かめの式 True"
+  },
+  "m1": {
+   "claim": "効き目が NaN のとき、割合は最小・裾は tie で Holm を通り、一致の関数は二つ目以降の鍵の NaN を読み飛ばして一致と答える",
+   "reproduced": true,
+   "how": "芯の関数に NaN を与えた（検分の版）",
+   "detail": "p_and_tail(NaN): p 0.001・上 0・下 0・裾 tie・Holm の判定 True／二つ目の鍵に NaN の一致 True（差の最大 0.0）／一つ目の鍵に NaN の一致 False（差の最大 nan）"
+  },
+  "m2": {
+   "claim": "一致の段と開く段は、組の一つの DRY の印で全体を絞り、組 recompute の n_iso で正本を写し、組の間の環境の違いは記すだけで止めない",
+   "reproduced": true,
+   "how": "検分の版の集計の器の行を読んだ",
+   "detail": "DRY の判定の行 [343, 362, 410]・行を絞る行 [352, 367]・環境を記す関数 [323]・等方の本数の写し [331]・環境の違いで止める行 無い"
+  },
+  "m3": {
+   "claim": "升目の入力の突き合わせは、プロンプトの長さ・主位置・読み取りの位置・族だけで、トークンの並びそのものは照らさない。起動器は tokenizers の版を固定しない",
+   "reproduced": true,
+   "how": "検分の版の走らせる器・起動器・転記行 B の欄を読んだ",
+   "detail": "突き合わせの行 [333]・起動器の固定の行 [\"want = {'numpy': PIN['numpy'], 'torch': PIN['torch'], 'transformers': PIN['transformers']}\"]・転記行 B の升目の欄 ['a_not_catastrophe', 'catastrophe', 'choices', 'family', 'in_main', 'json_direct', 'main_position', 'n_ok', 'preamble_sha16', 'prompt_len', 'readout_position', 'template_overlap']"
+  },
+  "m4": {
+   "claim": "純粋な確かめは K.gate と blens_core.gate_perm を直に呼び、集計の器の gates・row_labels の組み立てを答えのある形で当てない",
+   "reproduced": true,
+   "how": "検分の版の合成データの器の呼び出しを数えた",
+   "detail": "K.gate の行 [99, 101, 117, 118]・gate_perm の行 [111, 112]・AZ.gates の直の呼び出し []・AZ.row_labels の直の呼び出し []"
+  },
+  "m5": {
+   "claim": "等方 9 本と 199 本では最小の p が Holm の第一段を下回れず、等方の外の行の枝に届かない",
+   "reproduced": true,
+   "how": "芯の関数で、帰無のどれよりも大きい値の p を等方の本数ごとに出した",
+   "detail": "Holm の第一段 0.003125（主の行 16）・最小の p: 等方 9 本 0.2000・199 本 0.0100・正本の本数 0.0010"
+  },
+  "m6": {
+   "claim": "方向の記録の名の並びと npz の行を位置で結び、名の並びを正本と転記行 D に照らさない（今の結び付きは正しい）",
+   "reproduced": true,
+   "how": "検分の版の load_dirs の中に正本の名の並びとの照らしがあるかを見て、今の名の並びを正本と転記行 D と比べた",
+   "detail": "load_dirs の中の正本の名との照らし 無い・名前のある方向の並びが正本と同じ True・実在の差の並びが転記行 D と同じ True"
+  }
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
