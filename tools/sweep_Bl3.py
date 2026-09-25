@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""sweep_Bl3.py v1 —— B-lens 層三（Bl3）の掃き出しの器（正本 `report_rules.builder`・草案3 §12「掃き出しの器」・2026-09-25）。
+"""sweep_Bl3.py v2 —— B-lens 層三（Bl3）の掃き出しの器（正本 `report_rules.builder`・草案3 §12「掃き出しの器」・2026-09-25）。
 
 正本と凍結の本文が求める出力の一覧（下の REQUIRED・出所の鍵つき）を、集計の器の結果を開く段の出力（`records/Bl3/analysis-Bl3.json`）と突き合わせ、欠けを返す。
 組み立ての器 `tools/build_report_Bl3.py` が報告を組む前に呼び、欠けがあれば止める。下見で止まったときの出力（下見の記録と予想の答えだけ）は、止まったときに求めるものだけを見る。
@@ -11,7 +11,7 @@ import os, sys, json
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D231）: 効き目の側は全ての行で・偶然の目安の分母
 key3 = lambda sc, b, sg: '%s|%s|%+d' % (sc, b, int(sg))
 
 ROW_KEYS = [('effect', 'labels.print_rule（行の値）'), ('p', 'labels.p_rule'), ('upper', 'labels.print_rule（上の裾の本数）'), ('lower', 'labels.print_rule（下の裾の本数）'),
@@ -58,10 +58,9 @@ def sweep(T3, A):
             need(k in o, '行 %s の %s（%s）' % (rid, k, src))
         for k, src in SECOND_KEYS:
             need(k in (o.get('second') or {}), '行 %s の二つ目の札の %s（%s）' % (rid, k, src))
-        if o.get('iso_outside'):
-            need(o.get('side') is not None, '等方の外の行 %s の効き目の側（labels.side_rule）' % rid)
+        need(o.get('side') is not None, '行 %s の効き目の側（labels.print_rule・どの行にも・裁定 D231）' % rid)
     need('m_rows' in (A.get('rows_meta') or {}) and 'dropped_rows' in (A.get('rows_meta') or {}), 'Holm の段の数と外した行（pilot.decision.drop_effects）')
-    need(set((A.get('chance') or {})) >= {'oriented', 'pair'}, '二つ目の札の偶然の目安（nulls.real.chance_note）')
+    need(set((A.get('chance') or {})) >= {'oriented', 'pair', 'rows_by_direction'}, '二つ目の札の偶然の目安と、外した後の行の数（nulls.real.chance_note・pilot.decision.drop_effects）')
     # 門
     G = A.get('gates') or {}
     for k, src in GATES:
@@ -83,7 +82,7 @@ def sweep(T3, A):
     need(S2.get('summary') and all('blens_direct' in v for v in S2['summary'].values()), '乙と B-lens の直接の経路の値（descriptive.secondary_readout）')
     H = A.get('head') or {}
     need('logit_check' in H and 'layer_check' in H, '本の計算の頭の自己検査（computation.self_checks）')
-    need(not (A.get('main_run') or {}).get('shortcut') or 'steered_cache_check' in H, '本の計算の頭の近道の確かめ（computation.steered_cache_check）')
+    need('shortcut' in H and 'shortcut' in (A.get('main_run') or {}), '本の計算の近道の使い方（computation.shortcut・裁定 D234）')
     # 独立の再計算
     rc = A.get('recompute') or {}
     for st in ('first', 'second'):

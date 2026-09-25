@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""analyze_Bl3.py v1 —— B-lens 層三（Bl3）の集計の器（主の札・門・記述の門・q7・独立の再計算の一致・予想の答え・2026-09-25）。
+"""analyze_Bl3.py v2 —— B-lens 層三（Bl3）の集計の器（主の札・門・記述の門・q7・独立の再計算の一致・予想の答え・2026-09-25）。
 
 入力: 本の計算の出力（升目と符号ごとの効き目・質量・層ごとの差分）・下見の記録（本の凍結で凍結したもの）・独立の再計算の二つの道の出力・段階 B の凍結した集計器の記録と試行の記録・
       設計事実（q7 の区間）・正本。重みは読まない。**読みは付けない**（読みの型の当てはめと文は組み立ての器 `tools/build_report_Bl3.py` が正本の読みの表から行う）。
@@ -20,7 +20,7 @@ sys.path.insert(0, HERE)
 import blens_core as C
 import bl3_core as K
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D231〜D234）: 外した升目の扱い・偶然の目安の数え直し・効き目の側を全ての行で・札の一致の中身・二段の判定の形・一つだけの確かめ
 ARM_RE = re.compile(r'^(.*?)([+-])v(rand|Nk|td|\db)?$')
 KIND = {'': 'static', 'rand': 'rand', 'Nk': 'Nk', 'td': 'td'}
 key3 = lambda sc, base, sg: '%s|%s|%+d' % (sc, base, int(sg))
@@ -62,7 +62,10 @@ def trials_reader(repo=REPO):
         k = (sc, arm)
         if k not in cache:
             d = os.path.join(repo, 'results', 'stageB', 'stageB__%s__%s__s1' % (sc, arm))
-            cache[k] = [t for t in (json.loads(l) for l in open(glob.glob(os.path.join(d, 'trials-*.jsonl'))[0], encoding='utf-8')) if t['status'] == 'ok']
+            fs = glob.glob(os.path.join(d, 'trials-*.jsonl'))
+            if len(fs) != 1:
+                raise SystemExit('段階 B の試行の記録がちょうど一つでない（止める）: %s（%d）' % (d, len(fs)))
+            cache[k] = [t for t in (json.loads(l) for l in open(fs[0], encoding='utf-8')) if t['status'] == 'ok']
         return cache[k]
     return f
 
@@ -93,19 +96,22 @@ def row_labels(T3, main_rows, eff, pair_names, dropped_cells=(), p_override=None
     H = K.holm(pv, alpha)
     for rid, o in out.items():
         o['holm_step'], o['iso_outside'] = H[rid]['step'], bool(H[rid]['pass'])
-        o['side'] = K.effect_side(o['effect'], o.pop('_iso')) if o['iso_outside'] else None
+        o['side'] = K.effect_side(o['effect'], o.pop('_iso'))      # 効き目の側は全ての行で作る（記述・`labels.print_rule`・裁定 D231）。読みの文で書くのは等方の外の行だけ（`labels.side_rule`）
     return out, {'m_rows': len(rows), 'dropped_rows': [r['id'] for r in main_rows if r not in rows]}
 
 
 def labels_signature(lab):
-    """札の一致で見る中身（正本 `independent_recompute.agreement`）: Holm の判定・割合を決めた裾・等方の外の行の効き目の側・二つ目の札。"""
-    return {rid: (o['iso_outside'], o['tail'], (o['side'] or {}).get('side'), (o['side'] or {}).get('sign'), o['second']['top']) for rid, o in lab.items()}
+    """札の一致で見る中身（正本 `independent_recompute.agreement`・裁定 D232）: Holm の判定・等方の外の行の割合を決めた裾・等方の外の行の効き目の側・二つ目の札。
+    帰無の内側の行の裾と側は札に効かないので比べない（どちらかの道だけで等方の外なら、Holm の判定の欄が違うので一致しない）。"""
+    return {rid: (o['iso_outside'], o['tail'] if o['iso_outside'] else None, (o['side'] or {}).get('side') if o['iso_outside'] else None,
+                  (o['side'] or {}).get('sign') if o['iso_outside'] else None, o['second']['top']) for rid, o in lab.items()}
 
 
 # ---------------- 門 ----------------
 def gates(T3, rows, eff, dropped_cells=(), style_rows=()):
     units = ['static', 'loaded', 'Nk', 'td'] + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]
     alpha = T3['gate']['alpha']
+    rows = [r for r in rows if r['cell'] not in set(dropped_cells)]    # 下見で外した升目の行は、効き目を引く前に落とす（本の計算は外した升目の組を流さない・裁定 D231）
     ue = {u: {f: eff[f][u] for f in sorted({r['fam'] for r in rows})} for u in units}
     rs = lambda pred, yk='y': [{'unit': r['unit'], 'cell': r['cell'], 'fam': r['fam'], 'y': r[yk]} for r in rows if pred(r)]
     out = collections.OrderedDict()
@@ -146,14 +152,17 @@ def q7_rows_of(lab, FJ):
 # ---------------- 独立の再計算の一致 ----------------
 def recompute_agreement(T3, main_rows, eff_main, pair_names, hook, rewrite, pilot, dropped_cells=(), rows_subset=None):
     """二段の一致（正本 `independent_recompute.stages`・`agreement`）。hook と rewrite: 行の名 → {'noop_lo','effects': {'方向|符号': 効き目}}。
-    本の計算では v̂ の行のすべてを比べる（行が欠ければ一致しない）。rows_subset は合成データの確かめで比べる行を絞るときだけ使う。"""
+    本の計算では、下見で外した升目の行を除く v̂ の行のすべてを比べる（行が欠ければ一致しない）。rows_subset は合成データの確かめで比べる行を絞るときだけ使う。
+    一段目は、無操作の値と全ての効き目の差が許容の内で、かつ札が同じとき一致（裁定 D233）。二段目は札が同じとき一致とし、効き目の差の最大と許容の内かどうかは記録する（裁定 D234）。"""
+    drop = set(dropped_cells)
+    in_drop = lambda r: '%s|%s' % (r['scenario'], r['base']) in drop
     comps_of = lambda d: K.comparators_for(d, pair_names, T3['nulls']['real']['swap_siblings'])
     n_iso = T3['nulls']['isotropic']['count']
 
     def override(path):
         ov = {}
         for r in main_rows:
-            if r['direction'] != 'static' or r['id'] not in path or (rows_subset is not None and r['id'] not in rows_subset):
+            if r['direction'] != 'static' or r['id'] not in path or in_drop(r) or (rows_subset is not None and r['id'] not in rows_subset):
                 continue
             E = path[r['id']]['effects']
             s = r['sign']
@@ -163,9 +172,12 @@ def recompute_agreement(T3, main_rows, eff_main, pair_names, hook, rewrite, pilo
 
     def as_eff(ov):
         return {rid: [o['effect']] + list(o['iso']) + list(o['comps_same']) + list(o['comps_opp']) for rid, o in ov.items()}
+
+    def with_noop(ov, path):
+        return {rid: [path[rid]['noop_lo']] + v for rid, v in as_eff(ov).items()}      # 一段目は無操作の値も比べる（裁定 D233）
     main_ov = {}
     for r in main_rows:
-        if r['direction'] != 'static' or (rows_subset is not None and r['id'] not in rows_subset):
+        if r['direction'] != 'static' or in_drop(r) or (rows_subset is not None and r['id'] not in rows_subset):
             continue
         k, kk = key3(r['scenario'], r['base'], r['sign']), key3(r['scenario'], r['base'], -r['sign'])
         main_ov[r['id']] = {'effect': eff_main[k]['static'], 'iso': [eff_main[k]['iso:%d' % i] for i in range(n_iso)],
@@ -173,8 +185,13 @@ def recompute_agreement(T3, main_rows, eff_main, pair_names, hook, rewrite, pilo
     sig = lambda ov: labels_signature(row_labels(T3, main_rows, eff_main, pair_names, dropped_cells, p_override=ov)[0])
     hk, rw = override(hook), override(rewrite) if rewrite is not None else None
     tol2 = K.cache_tol(pilot['floor'], T3['pilot']['cache_tol_factor'], T3['pilot']['cache_tol_floor'], T3['pilot']['noise_max']) + pilot['floor']
-    out = {'second': K.agreement(as_eff(main_ov), as_eff(hk), tol2, sig(main_ov), sig(hk)), 'tol_second': tol2}
-    out['first'] = K.agreement(as_eff(hk), as_eff(rw), T3['independent_recompute']['tol_stage1'], sig(hk), sig(rw)) if rw is not None else None
+    s2 = K.agreement(as_eff(main_ov), as_eff(hk), tol2, sig(main_ov), sig(hk))
+    s2 = dict(s2, agree=bool(s2['labels_same']), rule='札の一致（裁定 D234）', values_beyond_tol=not s2['values_within_tol'])
+    out = {'second': s2, 'tol_second': tol2}
+    if rw is not None:
+        out['first'] = dict(K.agreement(with_noop(hk, hook), with_noop(rw, rewrite), T3['independent_recompute']['tol_stage1'], sig(hk), sig(rw)), rule='無操作の値と効き目の値と札（裁定 D233）')
+    else:
+        out['first'] = None
     out['tol_first'] = T3['independent_recompute']['tol_stage1']
     out['agree'] = bool(out['second']['agree'] and (out['first'] or {}).get('agree', False))
     return out
@@ -224,6 +241,14 @@ def secondary_summary(sec_out, calib_letter=None):
 
 
 # ---------------- 記述 ----------------
+def chance_after_drop(T3, lab):
+    """二つ目の札の偶然の目安を、下見で外した後の行で数え直す（正本 `pilot.decision.drop_effects`・生成器と同じ式・裁定 D231）。分母（方向ごとの行の数）も返す。"""
+    co, cp = T3['nulls']['real']['comparators_oriented'], T3['nulls']['real']['comparators']
+    by = collections.Counter(o['direction'] for o in lab.values())
+    return {'oriented': round(sum(n / (co[d] + 1) for d, n in by.items()), 4), 'pair': round(sum(n / (cp[d] + 1) for d, n in by.items()), 4), 'rows_by_direction': dict(by),
+            'canon_all_rows': {'oriented': T3['nulls']['real']['chance_second'], 'pair': T3['nulls']['real']['chance_second_pair']}}
+
+
 def descriptive(T3, main_out):
     mm = T3['pilot']['mass_min']
     below = {k: sum(1 for d, v in o['mass'].items() if d != K.NOOP and v < mm) for k, o in main_out.items()}
@@ -241,7 +266,7 @@ def analyze(T3, FJ, main_out, pilot_attempts, pair_names, rows_gate, hook=None, 
     q7 = q7_rows_of(lab, FJ)
     truth, tmeta = prediction_truth(T3, pilot_attempts, lab, G, q7, pilot.get('floor', 0.0))
     out = collections.OrderedDict(version=VERSION, rows=lab, rows_meta=meta, gates=G, q7_rows=q7, predictions_truth=truth, predictions_meta=tmeta,
-                                  descriptive=descriptive(T3, main_out), chance={'oriented': T3['nulls']['real']['chance_second'], 'pair': T3['nulls']['real']['chance_second_pair']})
+                                  descriptive=descriptive(T3, main_out), chance=chance_after_drop(T3, lab))
     if hook is not None:
         out['recompute'] = recompute_agreement(T3, T3['main_rows'], eff, pair_names, hook, rewrite, pilot, dropped, rows_subset)
     return out
@@ -326,6 +351,7 @@ def judge(T3, parts, sessions, pilot_attempts, pair_names):
     ag = recompute_agreement(with_iso(T3, rc['n_iso']), T3['main_rows'], eff, pair_names, rc['hook'], rc.get('rewrite'), pilot,
                              (pilot.get('decision') or {}).get('dropped', []), rows_subset=set(rc['hook']) if dry else None)
     out.update(first=None if ag['first'] is None else bool(ag['first']['agree']), second=bool(ag['second']['agree']), agree=bool(ag['agree']),
+               second_values_within_tol=bool(ag['second']['values_within_tol']),       # 値だけが許容の外で札が同じときは止めずに台帳に記す（裁定 D234）
                reason=None if ag['agree'] else ('一段目の道が無い' if ag['first'] is None else '二段のどちらかが一致しない'))
     return out
 
@@ -362,7 +388,10 @@ def _pilot_attempts(args_pilot):
     if args_pilot:
         return [json.load(open(p, encoding='utf-8'))['pilot'] for p in args_pilot]
     FR = json.load(open(os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.json'), encoding='utf-8'))
-    return FR['main_freeze']['pilot_attempts']
+    atts = FR['main_freeze']['pilot_attempts']
+    if FR['main_freeze']['pilot'] != atts[-1]:
+        raise SystemExit('本の凍結の下見の記録と、下見の試みの最後が違う（止める）')
+    return atts
 
 
 def main():
@@ -392,8 +421,9 @@ def main():
         J['clause'] = '本記録は一致か不一致かだけを持つ（値は開かない・正本 independent_recompute.print）。'
         json.dump(J, open(out, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
         say = lambda b: '無い' if b is None else ('一致' if b else '不一致')
-        print('[analyze_Bl3] 一致だけを見る段: 器の誤り %s・組の環境 %s・一段目 %s・二段目 %s・全体 %s（値は開いていない）' % (
-            'あり' if any(J['tool_error'].values()) else '無し', '同じ' if J['env']['same'] else '違う', say(J['first']), say(J['second']), say(J['agree'])))
+        print('[analyze_Bl3] 一致だけを見る段: 器の誤り %s・組の環境 %s・一段目 %s・二段目（札） %s・二段目の値 %s・全体 %s（値は開いていない）' % (
+            'あり' if any(J['tool_error'].values()) else '無し', '同じ' if J['env']['same'] else '違う', say(J['first']), say(J['second']),
+            '無い' if J.get('second_values_within_tol') is None else ('許容の内' if J['second_values_within_tol'] else '許容の外（止めずに台帳に記す・裁定 D234）'), say(J['agree'])))
         if not J['agree']:
             raise SystemExit('一致しない（結果を開く前に止め、逸脱の台帳に記して登録者に上げる・裁定 D219）')
         return

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""bl3_core.py v1 —— B-lens 層三（Bl3）の計算の芯（numpy だけ・重みも試行も読まない・2026-09-25）。
+"""bl3_core.py v2 —— B-lens 層三（Bl3）の計算の芯（numpy だけ・重みも試行も読まない・2026-09-25）。
 
 正本 `design/contrasts-Bl3.json` の決まりを、重みや試行を読まない純粋な関数に置く。走らせる器 `tools/bl3_run.py`・集計の器 `tools/analyze_Bl3.py`・
 合成データの器 `tools/dry_run_Bl3.py` が同じ関数を呼ぶ（同じ式を二度書かない）。B-lens の芯 `tools/blens_core.py` の関数は読み取りだけで呼ぶ。
@@ -12,6 +12,7 @@
   - 門（`gate`）: 行の符号を +1 にし、家族の鍵を「升目|符号」にして `blens_core.gate_perm` を呼ぶ。外した升目の行と、行の無くなった単位を除く。
   - 下見の機械の決定（`pilot`）: (vi) の (a)(b)・揺れの床・近道の許容・(i)(ii) の升目の決定・q1 との対応・(iii) の文の選び方・(iv) の印・(v) の近道の決定。
   - 独立の再計算の一致（`independent_recompute.agreement`）と、予想の採点（`predictions`・q7 の決まり・門が判定不能のとき）。
+  - 比べる相手の除き方の錨（裁定 D231）: `comparators_for` の除く対を、B-lens の凍結の器 `tools/blens_lens.py` の `OWN_PAIR` と正本の兄弟の対に照らす。
   - バッチの組み方（`readout.primary.batching`）: 升目と符号ごとの方向の並び（`readout.primary.order_seed` の種）・零のベクトルの無操作・端数を零のベクトルで埋める。
 用法: python tools/bl3_core.py --selftest
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -23,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import blens_core as C
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D231）: 比べる相手の除き方の錨（B-lens の凍結の OWN_PAIR と正本の兄弟の対）
 NOOP, PAD = 'noop', 'pad'
 
 
@@ -130,6 +131,29 @@ def comparators_for(direction, pair_names, swap_siblings):
     if missing:
         raise ValueError('除く対が対の名の並びに無い: %s' % sorted(missing))
     return [p for p in pair_names if p not in drop]
+
+
+def blens_own_pair():
+    """B-lens の凍結の器 `tools/blens_lens.py` の `OWN_PAIR`（方向ごとの自分の対）を、import せずに文から読む（二つの道の外の凍結物を錨にする・裁定 D231）。"""
+    import ast
+    src = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'blens_lens.py'), encoding='utf-8').read()
+    for n in ast.walk(ast.parse(src)):
+        if isinstance(n, ast.Assign) and any(getattr(t, 'id', None) == 'OWN_PAIR' for t in n.targets):
+            return ast.literal_eval(n.value)
+    raise ValueError('blens_lens.py に OWN_PAIR が無い')
+
+
+def comparator_anchor(pair_names, swap_siblings, own_pair):
+    """比べる相手の除き方の錨（裁定 D231）: `comparators_for` の除く対が、v̂ と (6b) では正本の兄弟の対（自分の対を含む）、Nk と td では B-lens の自分の対だけであること。
+    戻り値: 方向ごとの除いた対の並び。違えば ValueError。"""
+    out = {}
+    for d in ('static', 'loaded', 'Nk', 'td'):
+        dropped = sorted(set(pair_names) - set(comparators_for(d, pair_names, swap_siblings)))
+        want = sorted(swap_siblings) if d in ('static', 'loaded') else [own_pair[d]]
+        if dropped != want or (d in ('static', 'loaded') and own_pair[d] not in swap_siblings):
+            raise ValueError('比べる相手の除き方が錨と違う: %s %s（錨 %s）' % (d, dropped, want))
+        out[d] = dropped
+    return out
 
 
 # ---------------- 門 ----------------

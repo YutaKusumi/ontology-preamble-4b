@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
-"""freeze_Bl3.py v1 —— B-lens 層三（Bl3）の凍結の記帳（2026-09-25・正本 `predictions.when`・`computation.main_freeze_check`・裁定 D210・D222・`tools/freeze_Blens.py` の型）。
+"""freeze_Bl3.py v2 —— B-lens 層三（Bl3）の凍結の記帳（2026-09-25・正本 `predictions.when`・`computation.main_freeze_check`・裁定 D210・D222・`tools/freeze_Blens.py` の型）。
 
 相:
   prepilot  下見の前の凍結（正本のすべて・方向の npz・器・裁定 D210）。確かめてから記帳する（外れたら止める・登録者に相談）:
     - 凍結の本文: `tools/make_frozen_Bl3.py` の確かめ（草案3 との差は、題名・凍結の一行・組み立ての記録・正本と設計事実から来る行・原稿の直しだけ）と、数の検査の違反が零。
-    - 正本: `decisions` に D226・D227 がある。設計事実の `contrasts_sha16` と方向の記録の `contrasts_sha16` が正本の SHA16 と同じ。
+    - 正本: `decisions` に、裁定の記録（`records/Bl3/rulings-D*.md`）の名にある番号がすべてあり、`numbering.rulings_next` がその次の番号。
+      設計事実の `contrasts_sha16` と方向の記録の `contrasts_sha16` が正本の SHA16 と同じ。
     - 方向の npz: 記録の SHA-256 と同じ・組ごとの SHA-256 が転記行 D と同じ・作り直してバイトで同じ（`tools/bl3_directions.py --check` を走らせる）。
-    - 合成データの正式の記録（`records/Bl3/dry-run-Bl3-*.md` の最新）: 等方の本数が正本と同じで、確かめがすべて期待どおり。
+    - 合成データの正式の記録（`records/Bl3/dry-run-Bl3-*.md` の最新）: 等方の本数が正本と同じで、確かめがすべて期待どおり。記録の末尾の版の SHA16 の表が、
+      器の一覧（下の TOOLS）の import の閉包と正本・設計事実・方向の記録を覆い、今の版とすべて同じ（違えば取り直す）。
     - 器の自己検査（`bl3_core`・`bl3_directions`・`make_predictions_form_Bl3`・`seal_Bl3`・`build_report_Bl3`・`make_frozen_Bl3`・`bl3_recompute_rewrite`）がすべて通る。
     - 予想の書式が組めて欄の確かめを通り、書式の正本の版が正本の版と同じ。封印はまだ無い（正本 predictions.when）。
     - Colab の起動器の相 check の出力（`--colab-check` の置き場の session.json と check.json）: DRY でない・順伝播を呼んでいない・版が正本 `inputs.versions_B` と文字列で同じ・
       GPU が L4 か A100・重みの SHA-256 が転記行 F と同じ・方向の npz の SHA-256 が記録と同じ・組ごとの SHA-256 が転記行 D と同じ・升目の入力が転記行 B と同じ・
-      残差の書き換えの器を import できた・取り出したコミットの正本の SHA16 が今の正本と同じ。
+      残差の書き換えの器を import できた・取り出したコミットの正本の SHA16 が今の正本と同じ・比べる相手の除き方の錨が手元と同じ・‖static‖ が転記行 D と同じ（裁定 D231）。
     - 器の実装の検分の記録がある（`records/reviews/Bl3/impl/` の採否表・正本 `review_plan.impl`）。
     記帳: `records/Bl3/FREEZE-RECORD-Bl3.json`・`.md`（凍結物の SHA16・器の閉包・読む記録・方向の npz の SHA-256・確かめ）と、全体の台帳（`records/FREEZE-RECORD.md`）の一行。
     Colab の確かめの出力は `records/Bl3/colab-check-Bl3-session.json`・`colab-check-Bl3.json` に写す。
@@ -32,7 +34,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D231〜D235 の後）: 裁定の番号を記録の名から確かめる・合成データの正式の記録の版の SHA16 の表を今の版と突き合わせる・相 check の錨と ‖static‖
 NL = chr(10)
 FR_JSON = os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.json')
 FR_MD = os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.md')
@@ -85,7 +87,8 @@ def frozen_files(T3):
     """凍結物（器の閉包を除く）: 正本・凍結の本文・設計事実・書式・方向・裁定と器の段の記録・読む記録（正本 `inputs.files`）。"""
     files = ['design/contrasts-Bl3.json', 'design/design-Bl3-FROZEN.md', 'design/design-Bl3-FROZEN.src.md', 'records/Bl3/design-facts-Bl3.json', 'records/Bl3/design-facts-Bl3.md',
              'records/Bl3/numbers-lint-FROZEN-Bl3.md', 'records/Bl3/frozen-diff-Bl3.md', 'records/predictions/predictions-form-Bl3-v1.html', 'results/Bl3/directions-Bl3.json',
-             'records/Bl3/tools/tools-log-Bl3.md', 'records/Bl3/tools/recompute-rewrite-dev-Bl3.md', 'records/Bl3/exposure-before-seal-Bl3.md']
+             'records/Bl3/tools/tools-log-Bl3.md', 'records/Bl3/tools/recompute-rewrite-dev-Bl3.md', 'records/Bl3/tools/recompute-rewrite-instructions-Bl3.md',
+             'records/Bl3/exposure-before-seal-Bl3.md']
     files += sorted(rel(p) for p in glob.glob(P('records/Bl3/rulings-D*.md')))
     files += sorted(rel(p) for p in glob.glob(P('records/reviews/Bl3/impl/*.md')))
     files += [v['path'] for v in T3['inputs']['files'].values()]
@@ -109,12 +112,22 @@ def latest_dry_run(T3):
         bad.append('合成データの記録に期待と違う確かめがある')
     if not n_iso or int(n_iso.group(1)) != T3['nulls']['isotropic']['count']:
         bad.append('合成データの正式の記録の等方の本数が正本と違う（正式の記録は正本の本数で走らせる）')
+    table = dict(re.findall(r'^\| ([^ |]+) \| ([0-9A-F]{16}) \|$', txt, flags=re.M))           # 記録の末尾の版の SHA16 の表（`tools/dry_run_Bl3.py` v2）
+    need = set(import_closure(TOOLS)) | {'design/contrasts-Bl3.json', 'records/Bl3/design-facts-Bl3.json', 'records/Bl3/design-facts-Bl3.md', 'results/Bl3/directions-Bl3.json'}
+    lack = sorted(need - set(table))
+    differ = sorted(f for f, s16 in table.items() if not os.path.exists(P(f)) or sha16f(P(f)) != s16)
+    res['sha_table'] = {'files': len(table), 'lack': lack, 'differ': differ}
+    if lack:
+        bad.append('合成データの正式の記録の版の SHA16 の表が、器の閉包と正本・設計事実・方向の記録を覆わない: %s' % lack)
+    if differ:
+        bad.append('合成データの正式の記録を取った版と今の版が違う（取り直す）: %s' % differ)
     return res, bad
 
 
 def prepilot_checks(colab_dir=None):
     import make_frozen_Bl3 as MFB
     import make_predictions_form_Bl3 as FORM
+    import bl3_core as K3
     import bl3_directions as BD
     import numpy as np
     T3 = json.load(open(P('design/contrasts-Bl3.json'), encoding='utf-8'))
@@ -132,9 +145,19 @@ def prepilot_checks(colab_dir=None):
         if '違反の合計: 0' not in open(MFB.LINT, encoding='utf-8').read():
             bad.append('凍結の本文の数の検査に違反がある')
     # 正本と設計事実と方向の記録
-    res['canon'] = {'version': T3['version'], 'sha16': canon16, 'decisions_D226_D227': all(k in T3['decisions'] for k in ('D226', 'D227'))}
-    if not res['canon']['decisions_D226_D227']:
-        bad.append('正本の decisions に D226・D227 が無い')
+    ruled = set()
+    for fp in glob.glob(P('records/Bl3/rulings-D*.md')):
+        m_ = re.fullmatch(r'rulings-D(\d+)(?:-D(\d+))?\.md', os.path.basename(fp))
+        if m_:
+            ruled |= {'D%d' % i for i in range(int(m_.group(1)), int(m_.group(2) or m_.group(1)) + 1)}
+    miss_d = sorted(ruled - set(T3['decisions']), key=lambda x: int(x[1:]))
+    nxt = ('D%d' % (max(int(x[1:]) for x in ruled) + 1)) if ruled else None
+    res['canon'] = {'version': T3['version'], 'sha16': canon16, 'rulings_recorded': len(ruled), 'missing_in_decisions': miss_d,
+                    'rulings_next': T3['numbering']['rulings_next'], 'rulings_next_expected': nxt}
+    if not ruled or miss_d:
+        bad.append('正本の decisions に、裁定の記録の番号が無い: %s' % miss_d)
+    if T3['numbering']['rulings_next'] != nxt:
+        bad.append('正本の次の裁定の番号 %s が、裁定の記録の次の番号 %s と違う' % (T3['numbering']['rulings_next'], nxt))
     if FJ['contrasts_sha16'] != canon16 or DJ['contrasts_sha16'] != canon16:
         bad.append('設計事実か方向の記録の正本の SHA16 が今の正本と違う（作り直す）')
     # 方向の npz
@@ -186,7 +209,9 @@ def prepilot_checks(colab_dir=None):
              'gpu': any(g in str(S.get('gpu')) for g in ('L4', 'A100')), 'weights': S.get('weights_sha256') == FJ['facts']['F']['sha256'],
              'npz': S.get('directions_npz_sha256') == npz_sha, 'groups': (S.get('directions_group_sha256') or {}) == grp and bool(grp),
              'cells': all((CK['cells'].get(k) or {}).get(x) == v[y] for k, v in FJ['facts']['B']['cells'].items() for x, y in (('prompt_len', 'prompt_len'), ('main_position', 'main_position'), ('readout_position', 'readout_position'), ('family', 'family'))),
-             'rewrite_importable': CK.get('rewrite_importable') is True, 'canon_at_commit': S.get('canon_sha16') == canon16}
+             'rewrite_importable': CK.get('rewrite_importable') is True, 'canon_at_commit': S.get('canon_sha16') == canon16,
+             'comparator_anchor': CK.get('comparator_anchor') == K3.comparator_anchor(DJ['groups']['real']['names'], T3['nulls']['real']['swap_siblings'], K3.blens_own_pair()),
+             'static_norm': CK.get('static_norm_matches_fact_D') is True}
         res['colab_check'] = dict(c, commit=S.get('commit'), gpu_name=S.get('gpu'), versions_seen=S.get('versions'))
         bad += ['Colab の確かめ: %s' % k for k, v in c.items() if not v]
     return T3, res, bad
@@ -222,7 +247,7 @@ def prepilot(words, when, colab_dir, force=False):
           '- 合成データ: `%s`（確かめ %s・期待どおり %s）。' % (res['dry_run']['path'], res['dry_run']['checks'], res['dry_run']['as_expected']),
           '- 次: ' + R['next'], '', '## 凍結物の SHA16', '', '| 置き場 | SHA16 |', '|---|---|'] + ['| `%s` | %s |' % kv for kv in sorted(frozen.items())] + ['', CLAUSE, '']
     open(FR_MD, 'w', encoding='utf-8', newline=NL).write(NL.join(md))
-    row = ('| %s | **B-lens 層三 下見の前の凍結**（登録者「%s」%s 日本時間・裁定 D210）: 草案3 の原稿に裁定 D226・D227 の直しを入れて design/design-Bl3-FROZEN.md を組み、正本・方向の npz・器を凍結した。'
+    row = ('| %s | **B-lens 層三 下見の前の凍結**（登録者「%s」%s 日本時間・裁定 D210）: 草案3 の原稿に裁定 D226 の §2 の直しを入れ、正本から来る行とともに design/design-Bl3-FROZEN.md を組み（裁定 D228）、正本・方向の npz・器を凍結した。'
            '凍結の記録 records/Bl3/FREEZE-RECORD-Bl3.json（凍結物 %d 件・器の閉包 %d）。封印はこの後（コーディネータが先）。 | design/design-Bl3-FROZEN.md | %s | 凍結の後の変更は逸脱として台帳に記す |'
            % (when.split(' ')[0], words, when, len(frozen), len(tools), frozen['design/design-Bl3-FROZEN.md']))
     led = open(LEDGER, encoding='utf-8').read()

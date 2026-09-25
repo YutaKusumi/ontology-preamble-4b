@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build_report_Bl3.py v1 —— B-lens 層三（Bl3）の結果の報告の草案を組む（2026-09-25・正本 `reading_rules`・`negation_templates`・`report_rules`・`labels`・`limits`）。
+"""build_report_Bl3.py v2 —— B-lens 層三（Bl3）の結果の報告の草案を組む（2026-09-25・正本 `reading_rules`・`negation_templates`・`report_rules`・`labels`・`limits`）。
 
 組み立て（B-lens の組み立ての器 `tools/build_report_Blens.py` の型）:
   - 数はすべて機械の区画（凍結の走査器 `tools/report_lint.py` の区画の印）の中に置く。区画ごとの中身の SHA16 を別の記録（報告と同じ名の -machine.json）に書く。
@@ -30,7 +30,7 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import report_lint as RL
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D231〜D235）: 偶然の目安は外した後の行で・効き目の側は全ての行で・(iii) の定義・二段の判定の書き方・本の計算は近道を使わない・合成の自己検査は外した升目の組を持たない
 NL = chr(10)
 OUT = os.path.join(REPO, 'records', 'Bl3', 'results-Bl3.md')
 FENCE = '本報告のいかなる数値も、AI に意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
@@ -118,6 +118,7 @@ def pilot_lines(T3, rec, MB, title):
         rows.append('- (vi) の (b) で止めたので、(i)〜(v) は計算していない（正本 pilot.order）')
         return L + machine(rows, MB)
     rows.append('- バッチの大きさ %s・揺れの床 %s・近道の許容 %s' % (rec.get('batch'), f4(rec.get('floor')), f4(rec.get('cache_tol'))))
+    rows += ['- 変換の後の確率の定義（正本）: %s' % T3['pilot']['checks']['iii']['transformed_def'], '- 全語彙（正本）: %s' % T3['pilot']['checks']['i']['full_vocab']]
     rows += ['', '| 升目 | 主の升目 | 無操作の対数オッズ | 選択肢 a の確率（集合の中） | 変換の後の確率 | 質量 | 段階 B の無操作の破局の率 | (i)(ii) |', '|---|---|---|---|---|---|---|---|']
     for k, c in rec['cells'].items():
         why = [] if c['pass_i_ii'] else [w for w, bad in (('質量が下限の下', c['mass'] < P_['mass_min']), ('確率が床か天井の外', not (P_['p_bounds'][0] <= c['pa'] <= P_['p_bounds'][1]))) if bad]
@@ -178,7 +179,9 @@ def build(T3, A, preds, meta, deviations=(), marks=None, rejected=None, confirma
         L += ['', '**主の記述の札と門**（機械の出力）:', ''] + machine([
             '- 主の行 %d（下見で外した後）・等方の外の行: v̂ %d・Nk %d・二つ目の札が付く行 %d' % (A['rows_meta']['m_rows'], cnt('static'), cnt('Nk'), sum(1 for o in rows.values() if o['second']['top'])),
             '- 本の門: %s・v̂ を抜いた門: %s' % (gtxt(G['main']), gtxt(G['without_vhat'])),
-            '- 独立の再計算: 一段目 %s・二段目 %s' % (('一致' if (rc.get('first') or {}).get('agree') else '不一致') if rc.get('first') else '無い', '一致' if (rc.get('second') or {}).get('agree') else '不一致')], MB)
+            '- 独立の再計算: 一段目（無操作の値と効き目の値と札） %s・二段目（札の一致・裁定 D234） %s%s' % (
+                ('一致' if (rc.get('first') or {}).get('agree') else '不一致') if rc.get('first') else '無い', '一致' if (rc.get('second') or {}).get('agree') else '不一致',
+                '（二段目の効き目の差の最大は許容の外・札は同じで、台帳に記した）' if (rc.get('second') or {}).get('values_beyond_tol') and (rc.get('second') or {}).get('agree') else '')], MB)
     L += ['', '**読みの型**（正本の読みの表の条件を器が当てた・型は重なりうる）:', ''] + machine(['- 〈%s〉（%s）: %s' % h for h in reading_types(T3, A)] if not main_tool_error else ['- 〈器の誤り〉（本の計算）: 器の誤りで計算を終えられなかった'], MB)
     L += ['', '**打ち消しの定型**:', ''] + machine(['- ' + x for x in T3['negation_templates']], MB)
     # 1. 下見の記録
@@ -227,7 +230,9 @@ def main_sections(T3, A, MB, mk):
             f4(o['iso_top_share']), nb_txt.replace('|', '｜')))
     meta = A['rows_meta']
     t += ['', '- Holm の段の数（下見で外した後の主の行の数）%d・外した行: %s' % (meta['m_rows'], '・'.join(meta['dropped_rows']) or 'なし'),
-          '- 二つ目の札の偶然の目安（Holm を掛けない）: 向きまで数えて %s・対の単位で %s。%s' % (f4(A['chance']['oriented']), f4(A['chance']['pair']), T3['nulls']['real']['chance_note']),
+          '- 二つ目の札の偶然の目安（Holm を掛けない・下見で外した後の行で数えた）: 向きまで数えて %s・対の単位で %s（行の数 %s・外す前の全ての行では %s と %s）。%s' % (
+              f4(A['chance']['oriented']), f4(A['chance']['pair']), '・'.join('%s %d' % kv for kv in sorted((A['chance'].get('rows_by_direction') or {}).items())),
+              f4((A['chance'].get('canon_all_rows') or {}).get('oriented')), f4((A['chance'].get('canon_all_rows') or {}).get('pair')), T3['nulls']['real']['chance_note']),
           '- 両方の札が付いたときの言い方（正本）: %s' % T3['labels']['print_rule']]
     L += machine(t, MB)
     D = A['descriptive']
@@ -256,7 +261,7 @@ def main_sections(T3, A, MB, mk):
     d = ['- 本の計算の頭の自己検査: 出口の値 差の最大 %s（許容 %s）・最後の層 差 %s（許容 %s）' % (f4(H['logit_check']['max_abs']), f4(H['logit_check']['tol']), f4(H['layer_check']['diff']), f4(H['layer_check']['tol']))]
     sc = H.get('steered_cache_check')
     d.append('- 本の計算の頭の近道の確かめ: %s・本の計算の近道: %s・バッチの大きさ %s' % (
-        ('二つの道の効き目の差の最大 %s（許容 %s）' % (f4(sc['max_abs']), f4(sc['tol']))) if sc else '走らせていない（下見で近道を使わないと決めた）', yn(A['main_run']['shortcut']), A['main_run']['batch']))
+        ('二つの道の効き目の差の最大 %s（許容 %s）' % (f4(sc['max_abs']), f4(sc['tol']))) if sc else '走らせていない（本の計算は近道を使わない・裁定 D234）', yn(A['main_run']['shortcut']), A['main_run']['batch']))
     d += ['- 層ごとの差分: 値は集計の出力の `layerwise` に置いた（名前のある方向と段階 B の三本の行・等方は層ごとの中央値と中央の区間）。' + T3['descriptive']['layerwise']['note_no_reading'],
           '- ' + T3['descriptive']['others']]
     L += machine(d, MB)
@@ -274,10 +279,14 @@ def main_sections(T3, A, MB, mk):
     rc = A.get('recompute') or {}
     L += ['', '## 5. 独立の再計算（二段）', ''] + mk('recompute')
     r = []
-    for st, lab in (('first', '一段目（本の器のフック と 残差の書き換え）'), ('second', '二段目（本の道 と 本の器のフック）')):
+    for st, lab in (('first', '一段目（本の器のフック と 残差の書き換え・無操作の値と効き目の値と札で判定・裁定 D233）'), ('second', '二段目（本の道 と 本の器のフック・札の一致で判定・裁定 D234）')):
         x = rc.get(st)
         tol = rc.get('tol_first') if st == 'first' else rc.get('tol_second')
-        r.append('- %s: %s' % (lab, ('%s・効き目の差の最大 %s（許容 %s）・値の許容 %s・札 %s' % ('一致' if x['agree'] else '不一致', f4(x['max_abs_diff']), f4(tol), yn(x['values_within_tol']), '同じ' if x['labels_same'] else '違う')) if x else '無い'))
+        what = '無操作の値と効き目の差の最大' if st == 'first' else '効き目の差の最大（記録）'
+        r.append('- %s: %s' % (lab, ('%s・%s %s（許容 %s・許容の%s）・札 %s' % ('一致' if x['agree'] else '不一致', what, f4(x['max_abs_diff']), f4(tol), '内' if x['values_within_tol'] else '外',
+                                                                       '同じ' if x['labels_same'] else '違う')) if x else '無い'))
+    if (rc.get('second') or {}).get('values_beyond_tol') and (rc.get('second') or {}).get('agree'):
+        r.append('- 二段目は効き目の差の最大が許容の外で、札は同じだった。止めずに逸脱の台帳に記した（正本 `independent_recompute.agreement`・裁定 D234）')
     r.append('- 組の間の環境: %s' % ('同じ' if (A.get('env') or {}).get('same') else '違う（%s）' % json.dumps((A.get('env') or {}).get('diff'), ensure_ascii=False)))
     L += machine(r, MB)
     return L
@@ -366,6 +375,8 @@ def synth_analysis(T3, FJ, DJ, seed=3, n_iso=199, stop=None, drop=()):
     sets = BR.cell_sign_sets(T3, None, names['named'], names['B_random'], names['iso'], names['real'], gate_only)
     cells_out = collections.OrderedDict()
     for key, ck, sg, ds in sets:
+        if ck in set(drop):
+            continue                                   # 本の計算は下見で外した升目の組を流さない（本の器と同じ形・裁定 D231）
         eff = {d: float(rng.normal(loc=0.3 * sg, scale=0.5)) for d in ds}
         eff['static'] = eff.get('static', 0.0) + 2.5 * sg if 'static' in eff else eff.get('static')
         eff = {k: v for k, v in eff.items() if v is not None}
@@ -399,9 +410,9 @@ def synth_analysis(T3, FJ, DJ, seed=3, n_iso=199, stop=None, drop=()):
     A = AZ.analyze(T3x, FJ, cells_out, [pilot], DJ['groups']['real']['names'], rows_gate, hook=hook, rewrite=hook, style_rows=style_rows)
     A = json.loads(json.dumps(A, default=lambda o: o.item() if hasattr(o, 'item') else float(o)))
     main_keys = {'%s|%s|%+d' % (sc, b, int(sg)) for sc, b, sg in T3['cell_signs_main']}
-    A.update({'dry': True, 'pilot_attempts': [pilot], 'head': {'logit_check': {'max_abs': 0.05, 'tol': 0.5, 'pass': True}, 'steered_cache_check': {'max_abs': 1e-4, 'tol': 0.005, 'shortcut': True},
-                                                               'shortcut': True, 'layer_check': {'diff': 0.0, 'tol': 1e-4, 'pass': True}},
-              'main_run': {'batch': 16, 'shortcut': True, 'dropped': pilot['decision']['dropped']},
+    A.update({'dry': True, 'pilot_attempts': [pilot], 'head': {'logit_check': {'max_abs': 0.05, 'tol': 0.5, 'pass': True},
+                                                               'shortcut': False, 'layer_check': {'diff': 0.0, 'tol': 1e-4, 'pass': True}},
+              'main_run': {'batch': 16, 'shortcut': False, 'dropped': pilot['decision']['dropped']},
               'layerwise': {k: {'noop_lo': {}, 'rows': {}, 'iso_summary': None} for k in cells_out if k in main_keys},
               'gate_rows': [], 'style_rows': style_rows, 'stage_b_notes': AZ.stage_b_notes(T3, AN, rows_gate),
               'secondary': {'counts': {'row_passes': 1, 'sign_batches': 1, 'contexts': 1}, 'contexts_run': 1,

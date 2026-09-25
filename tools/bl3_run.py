@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""bl3_run.py v1 —— B-lens 層三（Bl3）の教師強制の順伝播を走らせる器（2026-09-25・正本 `readout.primary`・`pilot`・`computation`・`descriptive`）。
+"""bl3_run.py v2 —— B-lens 層三（Bl3）の教師強制の順伝播を走らせる器（2026-09-25・正本 `readout.primary`・`pilot`・`computation`・`descriptive`）。
 
 走らせ方（正本のとおり・値は器の出力に置き、読みは付けない）:
   - 入力: 段階 B の組み立てのままのプロンプト（凍結の `steer_B.apply_chat`・`run_stageB_local.user_message`）の直後に、主の書き出し（設計事実の転記行 A の
@@ -7,6 +7,7 @@
   - 加減: 凍結の `run_stageB_local.make_hook`（行ごとの方向の行列を受ける形・層の出力の型に直して足す・係数は一度だけ）を、選んだ層（凍結の
     `direction_B.layer_index`）に凍結の `register_hook` で掛ける。帯は主位置から読み取りの位置まで。零のベクトルの行が無操作。
   - 近道: 主位置より前（添字 0〜主位置−1）の計算を加減なしで一度だけ作り、バッチの大きさに写して、主位置から後ろだけを流す（帯の起点は写した後の 0）。
+    近道は下見の (v) の記述だけに使い、本の計算は近道を使わない（裁定 D234）。頭の近道の確かめ（正本 `computation.steered_cache_check`）は近道を使うときだけの確かめなので、関数を置かない。
   - 読み取り: 最終の正規化の入力（最後の層の出口の残差）を前の hook で取り、`float32` に上げて最終の正規化と語彙の行列の読み取りの集合の行を `float32` で当てる。
     全語彙の softmax は質量にだけ使う（`float32`）。層ごとの差分は、選んだ層の後の各層の出口の hook で取る（`hidden_states` は使わない）。
   - 自己検査: 出口の値（読み取りの集合の `float32` の出口の値と、模型そのものの出口の値〔bf16〕の差の最大・許容 `computation.logit_tol`）と、
@@ -23,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import bl3_core as K
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D231・D234）: 本の計算は近道を使わない・層ごとの余弦は足した向きで・使い回す cache の実の長さの確かめ・乙の文脈のファイルはちょうど一つ・(iii) の定義を下見の記録に
 BUGS = (None, 'double_norm', 'cache_through_mp')
 
 
@@ -118,6 +119,9 @@ class Runner:
         else:
             if pc['end'] != cell.mp:        # 近道の元は主位置の手前で切る（主位置を帯に残す・凍結した確かめ・効き目の比べだけでは弱い: 合成の記録）
                 raise ToolError('近道の元が主位置の手前で切れていない（%d・主位置 %d）: %s' % (pc['end'], cell.mp, cell.key))
+            n_cached = int(pc['legacy'][0][0].shape[-2])      # 記録した切れ目だけでなく、使い回す cache の列の実の長さも見る（裁定 D231）
+            if n_cached != cell.mp:
+                raise ToolError('使い回す cache の列の長さが主位置と違う（%d・主位置 %d）: %s' % (n_cached, cell.mp, cell.key))
             inp = torch.tensor([cell.ids[pc['end']:]] * B, device=self.dev)
             starts = [0] * B
             past = self._expand(pc, B)
@@ -214,7 +218,7 @@ def run_pilot(R, cells_main, cells_gate_only, T3, variant_prefixes, stage_b_rate
     rho = C.spearman(raw, obs)
     rec['cells'] = {c.key: {'lo': nv[c.key]['lo'], 'pa': nv[c.key]['pa'], 'mass': nv[c.key]['mass'], 'pa_transformed': pT.get(c.key), 'stage_b_rate': stage_b_rate.get(c.key),
                             'pass_i_ii': (ok_main if c in cells_main else ok_gate)[c.key], 'main': c in cells_main} for c in cells_all}
-    rec['iii'] = {'rho': rho, 'n': len(raw), 'sentence': K.iii_sentence(rho)}
+    rec['iii'] = {'rho': rho, 'n': len(raw), 'sentence': K.iii_sentence(rho), 'transformed_def': P['checks']['iii']['transformed_def']}      # 変換を通した値の定義を記録にも置く（裁定 D231・D235）
     # (iv) 揺れの版
     iv = {}
     for name, pref in variant_prefixes.items():
@@ -277,7 +281,7 @@ def run_cell_sign(R, cell, sign, dir_ids, batch, seed, key_index, pc=None, layer
             for k_, d in enumerate(ids_):
                 if d in (K.PAD, K.NOOP) or not ((d in layer_dirs) or (keep_iso_layers and d.startswith('iso:'))):
                     continue
-                u = R.torch.tensor(R.vec(d), device=R.dev).float()
+                u = float(sign) * R.torch.tensor(R.vec(d), device=R.dev).float()      # 足した向き（符号を掛けた方向）との余弦（正本 `descriptive.layerwise.values`・裁定 D231）
                 vals = []
                 for j in R.after:
                     dh = r['layers'][j][k_] - noop_h[j]
@@ -290,24 +294,6 @@ def run_cell_sign(R, cell, sign, dir_ids, batch, seed, key_index, pc=None, layer
                     lay['iso'][d] = vals
     eff = {d: lo[d] - lo[K.NOOP] for d in lo if d != K.NOOP}
     return {'lo': lo, 'effects': eff, 'mass': mass, 'pa_noop': pa[K.NOOP], 'layers': lay, 'n_batches': len(plan)}
-
-
-def steered_cache_check(R, items, batch, tol):
-    """本の計算の頭の近道の確かめ（正本 `computation.steered_cache_check`）: 近道の確かめの一本と零のベクトルを、主の組の全ての升目と符号で、
-    近道ありと近道なしの両方の道に同じバッチの大きさで流し、効き目の差の絶対値の最大を返す（許容の外なら近道を使わない）。items: [(升目, 符号)]。"""
-    worst, per = 0.0, {}
-    for cell, sign in items:
-        pc = R.prefix_cache(cell)
-        if batch >= 2:
-            ids_ = [K.NOOP, 'check'] + [K.PAD] * (batch - 2)
-            rf, rs = R.forward(cell, ids_, sign, full=False), R.forward(cell, ids_, sign, pc=pc, full=False)
-            ef, es = float(rf['lo'][1] - rf['lo'][0]), float(rs['lo'][1] - rs['lo'][0])
-        else:
-            ef = float(R.forward(cell, ['check'], sign, full=False)['lo'][0] - R.forward(cell, [K.NOOP], sign, full=False)['lo'][0])
-            es = float(R.forward(cell, ['check'], sign, pc=pc, full=False)['lo'][0] - R.forward(cell, [K.NOOP], sign, pc=pc, full=False)['lo'][0])
-        per['%s|%+d' % (cell.key, sign)] = es - ef
-        worst = max(worst, abs(es - ef))
-    return {'max_abs': worst, 'tol': tol, 'shortcut': worst <= tol, 'per': per}
 
 
 def recompute_hook_path(R, rows, dirs_by_row, log=None):
@@ -390,8 +376,11 @@ def secondary_contexts(tok, T3, FJ, FB, repo):
         scen, inst = RB.scenario_and_instruction(sc)
         prompt = steer_B.apply_chat(tok, RB.user_message(AT[arm]['text'], scen['text'], inst))
         d = os.path.join(repo, 'results', 'stageB', 'stageB__%s__%s__s1' % (sc, arm))
-        tr = {json.loads(l)['trial_id']: json.loads(l) for l in open(glob.glob(os.path.join(d, 'trials-*.jsonl'))[0], encoding='utf-8')}
-        rw = {json.loads(l)['trial_id']: json.loads(l) for l in open(glob.glob(os.path.join(d, 'raw-*.jsonl'))[0], encoding='utf-8')}
+        ft, fr = glob.glob(os.path.join(d, 'trials-*.jsonl')), glob.glob(os.path.join(d, 'raw-*.jsonl'))
+        if len(ft) != 1 or len(fr) != 1:
+            raise ToolError('段階 B の試行の記録か出力の記録がちょうど一つでない: %s（%d・%d）' % (d, len(ft), len(fr)))
+        tr = {json.loads(l)['trial_id']: json.loads(l) for l in open(ft[0], encoding='utf-8')}
+        rw = {json.loads(l)['trial_id']: json.loads(l) for l in open(fr[0], encoding='utf-8')}
         fam = scen['family']
         set_ids = [int(L[x]) for x in fam_letters[fam]] + [int(L['refuse'])]
         for tid in ids_:
@@ -430,23 +419,22 @@ def run_secondary(R, contexts, rows_by_cell, log=None):
 
 
 def run_main_phase(R, T3, FJ, cells, names, pilot, iso_n=None, log=print):
-    """本の計算の全体（正本 `computation`・`readout.primary.batching`）: 頭の自己検査（出口の値・最後の層）と近道の確かめ → 全ての升目と符号。
+    """本の計算の全体（正本 `computation`・`readout.primary.batching`）: 頭の自己検査（出口の値・最後の層）→ 全ての升目と符号。本の計算は近道を使わない（裁定 D234・
+    下見の (v) は記述として残す）ので、頭の近道の確かめは走らせない（正本 `computation.steered_cache_check` は「近道を使うときだけ」）。
     pilot: 本の凍結で凍結した下見の記録（バッチの大きさ・揺れの床・近道の許容・近道・外した升目）。names: {'named','B_random','iso','real'} の名の並び。
     iso_n は合成データの確かめで等方の本数を減らすときだけ使う。戻り値: {'head': 頭の確かめ, 'cells': 升目と符号の鍵 → 出力}。
     層ごとの差分は、名前のある方向と段階 B の三本の行と、等方の帰無の層ごとの中央値と中央の区間だけを残す（正本 `descriptive.layerwise.directions`）。"""
     dropped = set((pilot.get('decision') or {}).get('dropped', []))
-    batch, tol = pilot['batch'], pilot['cache_tol']
+    batch = pilot['batch']
     main_keys = ['%s|%s|%+d' % (sc, b, int(sg)) for sc, b, sg in T3['cell_signs_main']]
     items = [(cells['%s|%s' % (sc, b)], int(sg)) for sc, b, sg in T3['cell_signs_main'] if '%s|%s' % (sc, b) not in dropped]
     head = collections.OrderedDict()
     head['logit_check'] = R.logit_check(items[0][0], T3['computation']['logit_tol'])
     if not head['logit_check']['pass']:
         raise ToolError('出口の値の自己検査が落ちた（本の計算の頭）: %s' % head['logit_check'])
-    shortcut = bool(pilot['v']['shortcut'])
-    if shortcut:
-        head['steered_cache_check'] = steered_cache_check(R, items, batch, tol)
-        shortcut = head['steered_cache_check']['shortcut']
+    shortcut = False                                                    # 本の計算は近道を使わない（裁定 D234）
     head['shortcut'] = shortcut
+    head['shortcut_rule'] = '本の計算は近道を使わない（裁定 D234）・下見の (v) の近道: %s（記述）' % (pilot.get('v') or {}).get('shortcut')
     head['layer_check'] = R.layer_check(items[0][0], items[0][1], 'check', T3['computation']['layer_tol'])
     if not head['layer_check']['pass']:
         raise ToolError('最後の層の自己検査が落ちた（本の計算の頭）: %s' % head['layer_check'])

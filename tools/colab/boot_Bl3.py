@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""boot_Bl3.py v1 —— B-lens 層三（Bl3）の Colab 起動スクリプト（教師強制の順伝播・2026-09-25・正本 `readout`・`pilot`・`computation`・`independent_recompute`）。
+"""boot_Bl3.py v2 —— B-lens 層三（Bl3）の Colab 起動スクリプト（教師強制の順伝播・2026-09-25・正本 `readout`・`pilot`・`computation`・`independent_recompute`）。
 
 相（OP4B_PHASE）:
   check  封印の前の確かめ（正本 `computation.before_seal`: 読み込みと版の確かめだけ・**順伝播を一度も走らせない・値を出さない**。模型の順伝播の前の hook で、呼ばれたら止める）:
@@ -10,7 +10,7 @@
   pilot  封印の後: 下見の前の凍結の記録と封印の記録がそろったコミットで、凍結の記録の SHA16 を取り出した器と正本に照らしてから、正本 `pilot.order` の順に走らせ、
          下見の記録（`bl3_run.run_pilot` の出力）を置く。器の誤り（凍結した確かめが機械で落ちた）は、その文を記録に置いて止める（正本 `pilot.decision.tool_error`）。
   main   本の凍結の後: 凍結の記録に足した下見の記録（バッチの大きさ・揺れの床・近道の許容・近道・外した升目）のまま、組（OP4B_PART・既定は三つとも順に）を走らせる:
-           main       本の計算の頭（出口の値・近道の確かめ・最後の層）→ 全ての升目と符号（`bl3_run.run_main_phase`）
+           main       本の計算の頭（出口の値・最後の層）→ 全ての升目と符号（`bl3_run.run_main_phase`・近道を使わない・裁定 D234）
            recompute  独立の再計算の二つの道（本の器のフック〔`bl3_run.recompute_hook_path`〕・残差の書き換え〔別の個体の器 `bl3_recompute_rewrite`〕・近道なし・バッチ一）
            secondary  乙（`bl3_run.run_secondary`・裁定 D227）
          どの組も頭で出口の値の自己検査を走らせる。**効き目の値は印字しない**（札・門・二段の一致は手元の集計の器が出し、一致か不一致かだけを先に見る・正本
@@ -30,7 +30,7 @@ DRY（手元の検査・OP4B_DRY=1）: 乱数の小さな模型（`tools/dry_run
 """
 import os, sys, re, json, time, glob, shutil, hashlib, datetime, traceback, subprocess, zipfile, collections
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D231・D234）: 本の計算は近道を使わない・相 check に比べる相手の除き方の錨と ‖static‖ の確かめ・相 main で本の凍結の下見と試みの最後を照らす
 T0 = time.time()
 REPO_URL = 'https://github.com/YutaKusumi/ontology-preamble-4b.git'
 PHASES = ('check', 'pilot', 'main')
@@ -326,6 +326,13 @@ def run():
             ctx = BR.secondary_contexts(tok, T3, FJ, FB, REPO)
         except BR.ToolError as e_:
             stop(str(e_))
+        try:
+            anchor = K.comparator_anchor(pair_names, T3['nulls']['real']['swap_siblings'], K.blens_own_pair())      # 比べる相手の除き方の錨（裁定 D231）
+        except ValueError as e_:
+            stop(str(e_))
+        vn = float(np.linalg.norm(dirs_real['static']))
+        if abs(vn - FJ['facts']['D']['vhat_norm']) > 1e-9 * FJ['facts']['D']['vhat_norm']:
+            stop('‖static‖ が転記行 D の値と違う: %r' % vn)
         if len(ctx) != cnt['contexts']:
             stop('乙の文脈の数が B-lens の選んだ出力の数と違う: %d' % len(ctx))
         if (cnt['row_passes'], cnt['sign_batches'], cnt['contexts']) != (E['passes_secondary'], E['batches_secondary'], E['contexts_secondary']):
@@ -348,7 +355,7 @@ def run():
         chk = {'cells': {k: {'prompt_len': len(c.prompt), 'main_position': c.mp, 'readout_position': c.ro, 'family': c.fam, 'set_ids': c.set_ids} for k, c in cells.items()},
                'cell_signs': len(sets), 'passes': n_pass, 'recompute_rows': len(rows_rc), 'recompute_passes_per_path': n_rc, 'gate_rows': len(rows_gate),
                'secondary': dict(cnt, cells=len(sec_rows), letter_token_is_L=sum(1 for c in ctx if c[3]['letter_token_is_L']), max_ids=max(c[3]['n_ids'] for c in ctx)),
-               'hook_register_remove': True, 'rewrite_importable': rw_ok, 'forward_calls': 0}
+               'hook_register_remove': True, 'rewrite_importable': rw_ok, 'forward_calls': 0, 'comparator_anchor': anchor, 'static_norm_matches_fact_D': True}
         write_json(os.path.join(od, 'check.json'), chk)
         mark('check', cell_signs=len(sets), passes=n_pass, recompute_rows=len(rows_rc), gate_rows=len(rows_gate), secondary_contexts=len(ctx), rewrite_importable=rw_ok)
         return finish()
@@ -388,6 +395,8 @@ def run():
         pilot = json.load(open(os.environ['OP4B_DRY_PILOT'], encoding='utf-8'))['pilot']
     else:
         pilot = FR['main_freeze']['pilot']
+        if pilot != FR['main_freeze']['pilot_attempts'][-1]:
+            stop('本の凍結の下見の記録と、下見の試みの最後が違う')
     if pilot.get('tool_error') or (pilot.get('decision') or {}).get('stop'):
         stop('凍結の記録の下見の記録が「止める」か器の誤り（本の計算は走らせない）')
     dropped = list((pilot.get('decision') or {}).get('dropped', []))
@@ -408,8 +417,7 @@ def run():
                 MP = BR.run_main_phase(R, T3, FJ, cells, names, pilot, iso_n=None, log=say)
                 out.update(MP)
                 hd = MP['head']
-                mark('main_head', logit_max_abs=hd['logit_check']['max_abs'], steered_cache_max_abs=(hd.get('steered_cache_check') or {}).get('max_abs'),
-                     shortcut=MP['shortcut'], layer_diff=hd['layer_check']['diff'], cell_signs=len(MP['cells']))
+                mark('main_head', logit_max_abs=hd['logit_check']['max_abs'], shortcut=MP['shortcut'], layer_diff=hd['layer_check']['diff'], cell_signs=len(MP['cells']))
             elif part == 'recompute':
                 rows_rc, dbr = K.recompute_set(T3['main_rows'], pair_names, T3['nulls']['real']['swap_siblings'],
                                                len(names['iso']), dropped)

@@ -1,0 +1,36 @@
+[boot_Bl3] dry_no_gate            0s {'note': 'DRY は凍結と封印の記録を見ない'}
+[boot_Bl3] repo                   0s {'commit': 'dry', 'canon': 'draft3-r3-2026-09-25', 'canon_sha16': 'D41CFA474EA0190E', 'out': '〈一時の置き場〉\\main-20260925T035950Z'}
+[boot_Bl3] versions               0s {'versions': {'numpy': '2.4.2', 'scipy': '1.17.0', 'torch': '2.9.1', 'transformers': '4.57.3', 'torchvision': None, 'torchaudio': None, 'tokenizers': '0.22.2', 'huggingface_hub': '0.36.0', 'accelerate': '1.12.0', 'safetensors': '0.7.0'}, 'gpu': 'dry'}
+[boot_Bl3] weights               21s {'snapshot': 'cdbee75f17c01a7cc42f958dc650907174af0554', 'checked': 0}
+[boot_Bl3] directions            21s {'npz_sha256': 'E660707BCD5E9C3D', 'groups': {'named': '69C1864181E70F20', 'B_random': 'D8FB3A5967660C5F', 'iso': '693B555622F88F50', 'real': 'AA61FED01B9B7F2D', 'check': 'EF11D73BE144C29D'}, 'n': 2035}
+[boot_Bl3] model                 28s {'dry': True, 'layers': 4, 'layer_idx': 1, 'coef': 2.0, 'dtype': 'torch.bfloat16', 'device': 'cpu'}
+[boot_Bl3] cells                 29s {'main': 8, 'gate_only': 1}
+[boot_Bl3] part                  29s {'part': 'main'}
+[bl3_run] 升目と符号 N1|O-Ncold|-1（1/17）・11 秒
+[bl3_run] 升目と符号 N1|O-Ncold|+1（2/17）・25 秒
+[bl3_run] 升目と符号 N1|Onull|+1（3/17）・38 秒
+[bl3_run] 升目と符号 S1|O-Ncold|-1（4/17）・52 秒
+[bl3_run] 升目と符号 S1|O-Ncold|+1（5/17）・66 秒
+[bl3_run] 升目と符号 S1|Onull|+1（6/17）・80 秒
+[bl3_run] 升目と符号 S4|O-Ncold|-1（7/17）・97 秒
+[bl3_run] 升目と符号 S4|O-Ncold|+1（8/17）・113 秒
+[bl3_run] 升目と符号 S4|Onull|+1（9/17）・129 秒
+[bl3_run] 升目と符号 SK|O-Ncold|-1（10/17）・145 秒
+[bl3_run] 升目と符号 SK|O-Ncold|+1（11/17）・162 秒
+[bl3_run] 升目と符号 SK|Onull|+1（12/17）・176 秒
+[bl3_run] 升目と符号 S4|Osec-Ncold|+1（13/17）・181 秒
+[bl3_run] 升目と符号 N1|Onull|-1（14/17）・189 秒
+[bl3_run] 升目と符号 S1|Onull|-1（15/17）・199 秒
+[bl3_run] 升目と符号 S4|Onull|-1（16/17）・208 秒
+[bl3_run] 升目と符号 SK|Onull|-1（17/17）・218 秒
+[boot_Bl3] main_head            248s {'logit_max_abs': 0.07702827453613281, 'shortcut': False, 'layer_diff': 0.0, 'cell_signs': 17}
+[boot_Bl3] part                 248s {'part': 'recompute'}
+[bl3_run] 独立の再計算のフックの道 sub:N1:O-Ncold-v~O-Ncold-vrand（1/2・順伝播 59）・20 秒
+[bl3_run] 独立の再計算のフックの道 add:N1:Onull+v~Onull+vrand（2/2・順伝播 59）・39 秒
+[boot_Bl3] recompute_hook       287s {'rows': 2, 'seconds': 38.7}
+[boot_Bl3] recompute_rewrite     320s {'rows': 2, 'seconds': 33.4}
+[boot_Bl3] part                 320s {'part': 'secondary'}
+[bl3_run] 乙 S4|Osec-Ncold|json stageB__S4__Osec-Ncold__s1__Osec-Ncold__0000（1/2）・0 秒
+[bl3_run] 乙 N1|Onull|prose stageB__N1__Onull__s1__Onull__0000（2/2）・1 秒
+[boot_Bl3] secondary            328s {'contexts': 2, 'seconds': 5.5}
+[boot_Bl3] done                 328s {'zip': 'main-20260925T035950Z.zip', 'sha256': '2B3886FD8A6186FDB9FCECB76D936642B70425F4E1C3D4E171D5427381CEC7A5'}

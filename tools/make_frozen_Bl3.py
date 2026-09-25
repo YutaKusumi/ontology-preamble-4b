@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""make_frozen_Bl3.py v1 —— B-lens 層三（Bl3）の凍結する本文（`design/design-Bl3-FROZEN.{src.md,md}`）を、草案3 の原稿から組む（B-lens の `make_frozen_Blens.py` の型・2026-09-25）。
+"""make_frozen_Bl3.py v2 —— B-lens 層三（Bl3）の凍結する本文（`design/design-Bl3-FROZEN.{src.md,md}`）を、草案3 の原稿から組む（B-lens の `make_frozen_Blens.py` の型・2026-09-25）。
 
-草案3 の登録者の確認の後に、正本の文を直す裁定（D226・D227）があったので、凍結の本文は草案3 の本文と次の三つの差だけを持つ（ほかの差があれば止める）:
+草案3 の登録者の確認の後に、正本の文を直す裁定（D226〜D235）があったので、凍結の本文は草案3 の本文と次の三つの差だけを持つ（ほかの差があれば止める）:
   (一) 題名の印・凍結の一行・組み立ての記録の行（段階 B の器 `make_frozen_B.other_diffs` が許す差）。
   (二) 正本の鍵と設計事実から組まれる行のうち、正本と設計事実の直しで変わった行。同じ原稿を今の正本と設計事実で組み直した本文（組み直し）と草案3 の本文の差として機械で出し、
        記録（`records/Bl3/frozen-diff-Bl3.md`）に並べる。原稿の SHA16 が草案3 の組み立ての記録と、組み立ての器の SHA16 が草案3 の本文を最後に変えたコミットの器と同じことを
@@ -19,7 +19,8 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import make_frozen_B as MF
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25）: 組み直しの数の検査の記録の置き場を決まった言い方に置き換えてから差を取る・凍結の一行の裁定の範囲を D226〜D235 に
+REBUILD_LINT_LABEL = '（組み直しの一時の置き場の数の検査の記録）'      # 組み直しの本文の「束縛」の行の記録の置き場（一時の置き場の道筋を凍結物に残さない）
 NL = chr(10)
 SRC = os.path.join(REPO, 'design', 'design-Bl3-draft3.src.md')
 DRAFT = os.path.join(REPO, 'design', 'design-Bl3-draft3.md')
@@ -28,7 +29,7 @@ FOUT = os.path.join(REPO, 'design', 'design-Bl3-FROZEN.md')
 LINT = os.path.join(REPO, 'records', 'Bl3', 'numbers-lint-FROZEN-Bl3.md')
 DIFFREC = os.path.join(REPO, 'records', 'Bl3', 'frozen-diff-Bl3.md')
 BUILDER = os.path.join(HERE, 'build_draft_Bl3.py')
-FROZEN_LINE = ('- **凍結**: %s（日本時間・登録者の言葉は逐語で「%s」・草案3 の原稿〔コミット %s 時点〕を逐語複製し、題名と本行と、裁定 D226・D227 で正本の文を直した行'
+FROZEN_LINE = ('- **凍結**: %s（日本時間・登録者の言葉は逐語で「%s」・草案3 の原稿〔コミット %s 時点〕を逐語複製し、題名と本行と、裁定 D226〜D235 で正本の文を直した行'
                '〔正本の鍵から組まれる行と、原稿の直し〕だけを改める・直した行は `records/Bl3/frozen-diff-Bl3.md`・以後の変更は逸脱台帳に記帳する）')
 # 原稿の文の直し（裁定・直す前・直した後）。直す前の文は原稿の中でちょうど一度だけ当たること。
 LITERAL_FIXES = [
@@ -98,6 +99,10 @@ def rebuild_and_check(fsrc=None, fout=None):
     with tempfile.TemporaryDirectory() as td:
         rb = os.path.join(td, 'rebuilt.md')
         build(SRC, rb, '草案3', os.path.join(td, 'lint.md'))
+        t_rb, tmp_lint = open(rb, encoding='utf-8').read(), rel(os.path.join(td, 'lint.md'))
+        if t_rb.count(tmp_lint) != 1:
+            raise SystemExit('組み直しの本文に、数の検査の記録の置き場がちょうど一度だけ現れない（止める）')
+        open(rb, 'w', encoding='utf-8', newline='\n').write(t_rb.replace(tmp_lint, REBUILD_LINT_LABEL))
         canon_driven = diffs(DRAFT, rb)
         residual = None
         if fout and os.path.exists(fout):
