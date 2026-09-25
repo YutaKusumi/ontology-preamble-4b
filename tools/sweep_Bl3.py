@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""sweep_Bl3.py v2 —— B-lens 層三（Bl3）の掃き出しの器（正本 `report_rules.builder`・草案3 §12「掃き出しの器」・2026-09-25）。
+"""sweep_Bl3.py v3 —— B-lens 層三（Bl3）の掃き出しの器（正本 `report_rules.builder`・草案3 §12「掃き出しの器」・2026-09-25）。
 
-正本と凍結の本文が求める出力の一覧（下の REQUIRED・出所の鍵つき）を、集計の器の結果を開く段の出力（`records/Bl3/analysis-Bl3.json`）と突き合わせ、欠けを返す。
+正本と凍結の本文が求める出力の一覧（下の ROW_KEYS・SECOND_KEYS・PILOT_KEYS・GATES と、関数 sweep の中の need の行・出所の鍵つき）を、集計の器の結果を開く段の出力（`records/Bl3/analysis-Bl3.json`）と突き合わせ、欠けを返す。
 組み立ての器 `tools/build_report_Bl3.py` が報告を組む前に呼び、欠けがあれば止める。下見で止まったときの出力（下見の記録と予想の答えだけ）は、止まったときに求めるものだけを見る。
 本器は値の当否を見ない（有るか無いかと、行と升目と符号がそろうかだけ）。
 用法: python tools/sweep_Bl3.py <集計の出力の JSON> ／ --selftest（合成の出力は `tools/build_report_Bl3.py --selftest` が作って呼ぶ）
@@ -11,7 +11,7 @@ import os, sys, json
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231）: 効き目の側は全ての行で・偶然の目安の分母
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 層ごとの差分の中身と等方の本数を見る・頭の文／v2（裁定 D231）: 効き目の側は全ての行で・偶然の目安の分母
 key3 = lambda sc, b, sg: '%s|%s|%+d' % (sc, b, int(sg))
 
 ROW_KEYS = [('effect', 'labels.print_rule（行の値）'), ('p', 'labels.p_rule'), ('upper', 'labels.print_rule（上の裾の本数）'), ('lower', 'labels.print_rule（下の裾の本数）'),
@@ -75,9 +75,17 @@ def sweep(T3, A):
     need(set(main_keys) <= set(D.get('mass_below_min') or {}), '質量が下限を下回った方向の数（descriptive.mass）')
     LW = A.get('layerwise') or {}
     need(set(main_keys) <= set(LW), '層ごとの差分（主の組の升目と符号・descriptive.layerwise.directions）')
+    need('n_iso' in A and (A.get('dry') or A.get('n_iso') == T3['nulls']['isotropic']['count']), '等方の本数（DRY でなければ正本の本数・nulls.isotropic.count）')
+    units = list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]
     for k in main_keys:
         lw = LW.get(k) or {}
         need({'noop_lo', 'rows', 'iso_summary'} <= set(lw), '層ごとの差分の %s の行と等方の中央値と中央の区間（descriptive.layerwise）' % k)
+        n_lay = len(lw.get('noop_lo') or {})
+        need(n_lay > 0 and sorted((lw.get('rows') or {})) == sorted(units) and all(len(v) == n_lay for v in (lw.get('rows') or {}).values()),
+             '層ごとの差分の %s の名前のある方向と段階 B の三本の行が、層の数だけそろう（descriptive.layerwise.directions）' % k)
+        iso_s = lw.get('iso_summary') or {}
+        need(iso_s.get('n') == A.get('n_iso') and all(len(iso_s.get(x) or []) == n_lay for x in ('median', 'lo', 'hi')),
+             '層ごとの差分の %s の等方の中央値と中央の区間が、等方の本数と層の数でそろう（descriptive.layerwise.band）' % k)
     S2 = A.get('secondary') or {}
     need(S2.get('summary') and all('blens_direct' in v for v in S2['summary'].values()), '乙と B-lens の直接の経路の値（descriptive.secondary_readout）')
     H = A.get('head') or {}

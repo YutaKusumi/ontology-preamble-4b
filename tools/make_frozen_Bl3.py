@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""make_frozen_Bl3.py v2 —— B-lens 層三（Bl3）の凍結する本文（`design/design-Bl3-FROZEN.{src.md,md}`）を、草案3 の原稿から組む（B-lens の `make_frozen_Blens.py` の型・2026-09-25）。
+"""make_frozen_Bl3.py v3 —— B-lens 層三（Bl3）の凍結する本文（`design/design-Bl3-FROZEN.{src.md,md}`）を、草案3 の原稿から組む（B-lens の `make_frozen_Blens.py` の型・2026-09-25）。
 
-草案3 の登録者の確認の後に、正本の文を直す裁定（D226〜D235）があったので、凍結の本文は草案3 の本文と次の三つの差だけを持つ（ほかの差があれば止める）:
+草案3 の登録者の確認の後に、正本の文を直す裁定（D226〜D238）があったので、凍結の本文は草案3 の本文と次の三つの差だけを持つ（ほかの差があれば止める）:
   (一) 題名の印・凍結の一行・組み立ての記録の行（段階 B の器 `make_frozen_B.other_diffs` が許す差）。
   (二) 正本の鍵と設計事実から組まれる行のうち、正本と設計事実の直しで変わった行。同じ原稿を今の正本と設計事実で組み直した本文（組み直し）と草案3 の本文の差として機械で出し、
        記録（`records/Bl3/frozen-diff-Bl3.md`）に並べる。原稿の SHA16 が草案3 の組み立ての記録と、組み立ての器の SHA16 が草案3 の本文を最後に変えたコミットの器と同じことを
@@ -19,7 +19,8 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import make_frozen_B as MF
 
-VERSION = 'v2'          # v2（2026-09-25）: 組み直しの数の検査の記録の置き場を決まった言い方に置き換えてから差を取る・凍結の一行の裁定の範囲を D226〜D235 に
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 凍結の一行を組み立ての検査の外に置く・凍結版の原稿を組み直して本文と照らす／v2: 組み直しの記録の置き場の言い方・裁定の範囲
+STANDIN = '- **凍結**: （凍結の一行・登録者の逐語と日時は組み立ての後に入れる）'      # 組み立ての間の代わりの行（裁定 D236）
 REBUILD_LINT_LABEL = '（組み直しの一時の置き場の数の検査の記録）'      # 組み直しの本文の「束縛」の行の記録の置き場（一時の置き場の道筋を凍結物に残さない）
 NL = chr(10)
 SRC = os.path.join(REPO, 'design', 'design-Bl3-draft3.src.md')
@@ -29,7 +30,7 @@ FOUT = os.path.join(REPO, 'design', 'design-Bl3-FROZEN.md')
 LINT = os.path.join(REPO, 'records', 'Bl3', 'numbers-lint-FROZEN-Bl3.md')
 DIFFREC = os.path.join(REPO, 'records', 'Bl3', 'frozen-diff-Bl3.md')
 BUILDER = os.path.join(HERE, 'build_draft_Bl3.py')
-FROZEN_LINE = ('- **凍結**: %s（日本時間・登録者の言葉は逐語で「%s」・草案3 の原稿〔コミット %s 時点〕を逐語複製し、題名と本行と、裁定 D226〜D235 で正本の文を直した行'
+FROZEN_LINE = ('- **凍結**: %s（日本時間・登録者の言葉は逐語で「%s」・草案3 の原稿〔コミット %s 時点〕を逐語複製し、題名と本行と、裁定 D226〜D238 で正本の文を直した行'
                '〔正本の鍵から組まれる行と、原稿の直し〕だけを改める・直した行は `records/Bl3/frozen-diff-Bl3.md`・以後の変更は逸脱台帳に記帳する）')
 # 原稿の文の直し（裁定・直す前・直した後）。直す前の文は原稿の中でちょうど一度だけ当たること。
 LITERAL_FIXES = [
@@ -76,6 +77,22 @@ def build(src_path, out_path, label, lint_path):
     return r
 
 
+def build_frozen(src_path, out_path, lint_path):
+    """凍結版の原稿を組む（裁定 D236）: 凍結の一行を決まった代わりの行にして組み立て（数の検査と禁止語の走査はこの本文で走る）、組み立ての後に逐語の一行に戻す。"""
+    src = open(src_path, encoding='utf-8').read()
+    fl = [l for l in src.split('\n') if l.startswith('- **凍結**:')]
+    if len(fl) != 1:
+        raise SystemExit('凍結版の原稿に凍結の一行がちょうど一つでない（%d）' % len(fl))
+    with tempfile.TemporaryDirectory() as td:
+        tmp = os.path.join(td, 'frozen-standin.src.md')
+        open(tmp, 'w', encoding='utf-8', newline='\n').write(src.replace(fl[0], STANDIN))
+        build(tmp, out_path, '凍結版', lint_path)
+    out = open(out_path, encoding='utf-8').read()
+    if out.count(STANDIN) != 1:
+        raise SystemExit('組み立てた本文に代わりの行がちょうど一つでない')
+    open(out_path, 'w', encoding='utf-8', newline='\n').write(out.replace(STANDIN, fl[0]))
+
+
 def draft3_record():
     """草案3 の組み立ての記録の原稿の SHA16（本文の行）と、草案3 の本文を最後に変えたコミットの組み立ての器の SHA16（git から読む・草案3 の数の検査の記録は器の SHA16 を持たないため）。"""
     t = open(DRAFT, encoding='utf-8').read()
@@ -105,6 +122,14 @@ def rebuild_and_check(fsrc=None, fout=None):
         open(rb, 'w', encoding='utf-8', newline='\n').write(t_rb.replace(tmp_lint, REBUILD_LINT_LABEL))
         canon_driven = diffs(DRAFT, rb)
         residual = None
+        res['frozen_src_rebuilt_same'] = None
+        if fsrc and fout and os.path.exists(fsrc) and os.path.exists(fout):
+            fr = os.path.join(td, 'frozen-rebuilt.md')
+            build_frozen(fsrc, fr, os.path.join(td, 'lint-frozen.md'))
+            t_fr = open(fr, encoding='utf-8').read().replace(rel(os.path.join(td, 'lint-frozen.md')), rel(LINT))
+            res['frozen_src_rebuilt_same'] = (t_fr == open(fout, encoding='utf-8').read())
+            if not res['frozen_src_rebuilt_same']:
+                bad.append('凍結版の原稿を組み直した本文が、凍結の本文と違う')
         if fout and os.path.exists(fout):
             d = MF.other_diffs(diffs(rb, fout))
             olds = [o for _, o, _ in LITERAL_FIXES]
@@ -127,7 +152,9 @@ def write_diffrec(res):
          '- (二) 正本の鍵と設計事実から組まれる行の差（同じ原稿を今の正本と設計事実で組み直した本文と、草案3 の本文の差・行の頭の - が草案3・+ が組み直し）:', '', '```diff'] + \
         res['canon_driven'] + ['```', '', '- (三) 原稿の文の直し（裁定・直す前 → 直した後）:', ''] + \
         ['  - %s: 「%s」→「%s」' % (rid, o, n) for rid, o, n in LITERAL_FIXES] + \
-        ['', '- 組み直しと凍結の本文の差の残り（(一) と (三) の外）: %s' % ('無し' if res.get('residual') == [] else ('確かめていない' if res.get('residual') is None else '%d 行' % len(res['residual']))), '',
+        ['', '- 組み直しと凍結の本文の差の残り（(一) と (三) の外）: %s' % ('無し' if res.get('residual') == [] else ('確かめていない' if res.get('residual') is None else '%d 行' % len(res['residual']))),
+         '- 凍結版の原稿を同じ手順で組み直した本文と凍結の本文: %s' % {True: '同じ', False: '違う', None: '確かめていない'}[res.get('frozen_src_rebuilt_same')],
+         '- 凍結の一行（登録者の逐語と日時）は、組み立ての数の検査と禁止語の走査の外に置いた（組み立ての間は決まった代わりの行を置き、組み立ての後に逐語の一行を入れた・裁定 D236）。', '',
          '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。', '']
     open(DIFFREC, 'w', encoding='utf-8', newline=NL).write(NL.join(L))
 
@@ -154,7 +181,15 @@ def main():
             raise AssertionError('直しの前の文が無い原稿を通した')
         except ValueError:
             pass
-        print('[make_frozen_Bl3] 自己検査 OK（題名の印・凍結の一行・原稿の直しの %d 行だけが原稿の差）' % len(LITERAL_FIXES))
+        # 凍結の一行に数のある逐語でも組める（組み立ての検査の外・裁定 D236）
+        with tempfile.TemporaryDirectory() as td:
+            fs, fo = os.path.join(td, 'f.src.md'), os.path.join(td, 'f.md')
+            words_ = '10時に凍結してください（自己検査）'
+            open(fs, 'w', encoding='utf-8', newline='\n').write(frozen_src(src, words_, 'deadbee', '2026-09-26 10:00'))
+            build_frozen(fs, fo, os.path.join(td, 'lint.md'))
+            t = open(fo, encoding='utf-8').read()
+            assert words_ in t and STANDIN not in t and t.count('- **凍結**:') == 1, '凍結の一行が本文に入らない'
+        print('[make_frozen_Bl3] 自己検査 OK（題名の印・凍結の一行・原稿の直しの %d 行だけが原稿の差・数のある逐語の凍結の一行でも組める）' % len(LITERAL_FIXES))
         return
     if a.check:
         res, bad = rebuild_and_check(FSRC, FOUT)
@@ -169,7 +204,7 @@ def main():
         if os.path.exists(p) and not a.force:
             raise SystemExit('既にある（--force で上書き）: %s' % rel(p))
     open(FSRC, 'w', encoding='utf-8', newline='\n').write(frozen_src(open(SRC, encoding='utf-8').read(), a.words, a.commit, a.date))
-    build(FSRC, FOUT, '凍結版', LINT)
+    build_frozen(FSRC, FOUT, LINT)
     res, bad = rebuild_and_check(FSRC, FOUT)
     write_diffrec(res)
     if bad:

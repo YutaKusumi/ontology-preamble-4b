@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""analyze_Bl3.py v2 —— B-lens 層三（Bl3）の集計の器（主の札・門・記述の門・q7・独立の再計算の一致・予想の答え・2026-09-25）。
+"""analyze_Bl3.py v3 —— B-lens 層三（Bl3）の集計の器（主の札・門・記述の門・q7・独立の再計算の一致・予想の答え・2026-09-25）。
 
 入力: 本の計算の出力（升目と符号ごとの効き目・質量・層ごとの差分）・下見の記録（本の凍結で凍結したもの）・独立の再計算の二つの道の出力・段階 B の凍結した集計器の記録と試行の記録・
       設計事実（q7 の区間）・正本。重みは読まない。**読みは付けない**（読みの型の当てはめと文は組み立ての器 `tools/build_report_Bl3.py` が正本の読みの表から行う）。
@@ -11,7 +11,7 @@
 関数は合成データの器 `tools/dry_run_Bl3.py` が合成の出力で呼ぶ。
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, re, sys, json, glob, collections
+import os, re, sys, json, glob, math, hashlib, collections
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -20,7 +20,7 @@ sys.path.insert(0, HERE)
 import blens_core as C
 import bl3_core as K
 
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231〜D234）: 外した升目の扱い・偶然の目安の数え直し・効き目の側を全ての行で・札の一致の中身・二段の判定の形・一つだけの確かめ
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 一致だけを見る段が読んだ出力の同定を記録し開く段が照らす・開いた集計の一致の照らし・凍結の記録と手元の器の照らし・DRY の印と環境の食い違いで止める・下見の GPU・有限でない値で止める／v2（裁定 D231〜D234）
 ARM_RE = re.compile(r'^(.*?)([+-])v(rand|Nk|td|\db)?$')
 KIND = {'': 'static', 'rand': 'rand', 'Nk': 'Nk', 'td': 'td'}
 key3 = lambda sc, base, sg: '%s|%s|%+d' % (sc, base, int(sg))
@@ -260,6 +260,9 @@ def analyze(T3, FJ, main_out, pilot_attempts, pair_names, rows_gate, hook=None, 
     """集計の全体（読みは付けない）。main_out: 升目と符号の鍵 → run_cell_sign の出力。pilot_attempts: 下見の試みの並び（最後が本の凍結の下見）。"""
     pilot = pilot_attempts[-1]
     dropped = (pilot.get('decision') or {}).get('dropped', [])
+    nf = sorted({k for k, o in main_out.items() for d, v in list((o.get('effects') or {}).items()) + list((o.get('mass') or {}).items()) if not math.isfinite(float(v))})
+    if nf:
+        raise SystemExit('有限でない効き目か質量がある（止める・裁定 D236）: %s' % nf[:5])
     eff = {k: o['effects'] for k, o in main_out.items()}
     lab, meta = row_labels(T3, T3['main_rows'], eff, pair_names, dropped)
     G = gates(T3, rows_gate, eff, dropped, style_rows)
@@ -303,13 +306,32 @@ def stage_b_notes(T3, AN, rows_gate):
 PARTS = ('main', 'recompute', 'secondary')
 JUDGE = os.path.join(REPO, 'records', 'Bl3', 'judge-Bl3.json')
 OPENED = os.path.join(REPO, 'records', 'Bl3', 'analysis-Bl3.json')
+FR_PATH = os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.json')
+SEAL_PATH = os.path.join(REPO, 'records', 'Bl3', 'sealing-record-Bl3.json')
+# 二つの段と報告の頭で、本の凍結の記録の SHA16 と照らすもの（正本・設計事実・方向の記録・集計と札と報告の器・裁定 D236）
+FROZEN_CHECK = ('design/contrasts-Bl3.json', 'records/Bl3/design-facts-Bl3.json', 'records/Bl3/design-facts-Bl3.md', 'results/Bl3/directions-Bl3.json',
+                'tools/analyze_Bl3.py', 'tools/bl3_core.py', 'tools/blens_core.py', 'tools/build_report_Bl3.py', 'tools/sweep_Bl3.py', 'tools/report_lint.py')
+STRICT_ENV = ('commit', 'dry', 'canon_sha16', 'directions_npz_sha256', 'layer_idx', 'coef')      # 組の間で違えば止める（GPU と版の違いは記す・裁定 D236）
+
+
+def sha256f(p):
+    h = hashlib.sha256()
+    with open(p, 'rb') as fh:
+        for blk in iter(lambda: fh.read(1 << 24), b''):
+            h.update(blk)
+    return h.hexdigest().upper()
+
+
+sha16f = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
 
 
 def load_outputs(dirs):
-    """起動器の相 main の出力（組ごとの JSON と、その置き場の session.json）を、一つ以上の置き場から読む。同じ組が二つあれば止める。"""
-    parts, sessions = collections.OrderedDict(), collections.OrderedDict()
+    """起動器の相 main の出力（組ごとの JSON と、その置き場の session.json）を、一つ以上の置き場から読む。同じ組が二つあれば止める。
+    戻り値: 組 → 出力・組 → session・組 → 読んだファイルの同定（置き場の名・組の JSON と session.json の SHA-256・裁定 D236）。"""
+    parts, sessions, files = collections.OrderedDict(), collections.OrderedDict(), collections.OrderedDict()
     for d in dirs:
-        S = json.load(open(os.path.join(d, 'session.json'), encoding='utf-8'))
+        sp = os.path.join(d, 'session.json')
+        S = json.load(open(sp, encoding='utf-8'))
         for part in PARTS:
             p = os.path.join(d, '%s.json' % part)
             if os.path.exists(p):
@@ -317,15 +339,21 @@ def load_outputs(dirs):
                     raise SystemExit('同じ組が二つの置き場にある（止める）: %s' % part)
                 parts[part] = json.load(open(p, encoding='utf-8'))
                 sessions[part] = S
-    return parts, sessions
+                files[part] = {'dir': os.path.basename(os.path.normpath(d)), 'json_sha256': sha256f(p), 'session_sha256': sha256f(sp)}
+    return parts, sessions, files
 
 
-def env_same(sessions):
-    """組の間で、コミット・GPU・版・正本・方向の npz・DRY が同じか（違えば記す・二段目の比べに環境の違いが入る）。"""
+def env_same(sessions, pilot_sessions=None):
+    """組の間で、コミット・GPU・版・正本・方向の npz・DRY が同じか（違えば記す）。pilot_sessions（本の凍結の下見の session）を与えると、下見の GPU も並べる（裁定 D236）。"""
     keys = ('commit', 'dry', 'gpu', 'versions', 'canon_sha16', 'directions_npz_sha256', 'layer_idx', 'coef')
     ref = next(iter(sessions.values())) if sessions else {}
     diff = {k: {p: s.get(k) for p, s in sessions.items()} for k in keys if any(s.get(k) != ref.get(k) for s in sessions.values())}
-    return {'same': not diff, 'diff': diff}
+    out = {'same': not diff, 'diff': diff, 'strict': [k for k in diff if k in STRICT_ENV]}
+    if pilot_sessions is not None:
+        pg = sorted({str(s.get('gpu')) for s in pilot_sessions})
+        out['pilot_gpu'] = pg
+        out['gpu_same_as_pilot'] = sorted({str(s.get('gpu')) for s in sessions.values()}) == pg
+    return out
 
 
 def with_iso(T3, n_iso):
@@ -337,16 +365,54 @@ def with_iso(T3, n_iso):
     return T3x
 
 
-def judge(T3, parts, sessions, pilot_attempts, pair_names):
-    """一致だけを見る段: 器の誤りの有無・組の環境・二段の一致か不一致かだけを返す（効き目の値と差の最大は返さない）。"""
+def frozen_versions_bad(FR, repo=REPO, files=FROZEN_CHECK):
+    """手元の器と正本・設計事実・方向の記録を、本の凍結の記録の SHA16 と照らす（台帳に記した差分は許す・裁定 D236）。戻り値: 外れの並び。"""
+    fz = (FR.get('main_freeze') or {}).get('frozen_sha16') or {}
+    led = {td['path']: td for d in FR.get('deviations') or [] for td in d.get('tool_diffs') or []}
+    bad = []
+    for f in files:
+        p = os.path.join(repo, *f.split('/'))
+        want, got = fz.get(f), (sha16f(p) if os.path.exists(p) else None)
+        if want is None:
+            bad.append('%s（本の凍結の記録に無い）' % f)
+        elif got != want and not (f in led and led[f].get('after') == got):
+            bad.append('%s（本の凍結 %s・今 %s）' % (f, want, got))
+    return bad
+
+
+def judge(T3, parts, sessions, pilot_attempts, pair_names, files=None, FR=None):
+    """一致だけを見る段: 器の誤りの有無・組の環境・二段の一致か不一致かだけを返す（効き目の値と差の最大は返さない）。
+    DRY の印が組の間で違うとき・組の間のコミットと正本と npz と層と係数が違うとき・DRY でないのに等方の本数が正本と違うとき・DRY でないのに
+    手元の器と正本が本の凍結の記録と違うときは、一致と答えない（裁定 D236）。読んだ出力の同定（files）と凍結の記録の SHA16 を記録に置く。"""
     out = collections.OrderedDict(parts=list(parts), tool_error={p: bool(v.get('tool_error')) for p, v in parts.items()}, env=env_same(sessions))
-    dry = any(s.get('dry') for s in sessions.values())
+    drys = {p: bool(s.get('dry')) for p, s in sessions.items()}
+    dry = any(drys.values())
     out['dry'] = dry
+    out['inputs'] = files
+    if FR is not None and os.path.exists(FR_PATH):
+        out['freeze_record_sha16'] = sha16f(FR_PATH)
+    if os.path.exists(SEAL_PATH):
+        out['sealing_record_sha16'] = sha16f(SEAL_PATH)
+    stop = lambda why: (out.update(first=None, second=None, agree=None, reason=why), out)[1]
     if any(out['tool_error'].values()) or not {'main', 'recompute'} <= set(parts):
-        out.update(first=None, second=None, agree=None, reason='器の誤りか、組 main・recompute の欠け')
-        return out
-    pilot = pilot_attempts[-1]
+        return stop('器の誤りか、組 main・recompute の欠け')
+    if len(set(drys.values())) > 1:
+        return stop('組の間で DRY の印が違う: %s' % drys)
+    if out['env']['strict']:
+        return stop('組の間の環境が違う: %s' % out['env']['strict'])
     rc = parts['recompute']
+    n_can = T3['nulls']['isotropic']['count']
+    if not dry:
+        main_keys = {key3(sc, b, sg) for sc, b, sg in T3['cell_signs_main']}
+        n_main = {k: sum(1 for d in o['effects'] if d.startswith('iso:')) for k, o in parts['main']['cells'].items() if k in main_keys}
+        if rc['n_iso'] != n_can or any(v != n_can for v in n_main.values()):
+            return stop('DRY でないのに等方の本数が正本と違う（組 recompute %s・本の計算の升目と符号 %s）' % (rc['n_iso'], sorted(set(n_main.values()))))
+        if FR is None:
+            return stop('DRY でないのに凍結の記録が無い')
+        bad = frozen_versions_bad(FR)
+        if bad:
+            return stop('手元の器か正本が本の凍結の記録と違う: %s' % bad)
+    pilot = pilot_attempts[-1]
     eff = {k: o['effects'] for k, o in parts['main']['cells'].items()}
     ag = recompute_agreement(with_iso(T3, rc['n_iso']), T3['main_rows'], eff, pair_names, rc['hook'], rc.get('rewrite'), pilot,
                              (pilot.get('decision') or {}).get('dropped', []), rows_subset=set(rc['hook']) if dry else None)
@@ -356,7 +422,7 @@ def judge(T3, parts, sessions, pilot_attempts, pair_names):
     return out
 
 
-def open_results(T3, FJ, parts, sessions, pilot_attempts, pair_names, AN, calib_letter, FB, repo=REPO):
+def open_results(T3, FJ, parts, sessions, pilot_attempts, pair_names, AN, calib_letter, FB, repo=REPO, pilot_sessions=None):
     """結果を開く段（登録者と一緒に・一致だけを見る段が一致したとき）: 集計の全体と、報告に並べるもの（下見の記録・頭の確かめ・層ごとの差分・乙・段階 B の注・環境）。"""
     rc = parts['recompute']
     dry = any(s.get('dry') for s in sessions.values())
@@ -367,6 +433,7 @@ def open_results(T3, FJ, parts, sessions, pilot_attempts, pair_names, AN, calib_
                 rows_subset=set(rc['hook']) if dry else None)
     main_keys = {key3(sc, b, sg) for sc, b, sg in T3['cell_signs_main']}
     A['dry'] = dry
+    A['n_iso'] = rc['n_iso']
     A['pilot_attempts'] = pilot_attempts
     A['head'] = parts['main']['head']
     A['main_run'] = {k: parts['main'].get(k) for k in ('batch', 'shortcut', 'dropped')}
@@ -378,16 +445,49 @@ def open_results(T3, FJ, parts, sessions, pilot_attempts, pair_names, AN, calib_
         S2 = parts['secondary']
         A['secondary'] = {'counts': S2.get('counts'), 'contexts_run': len(S2.get('contexts') or []), 'summary': secondary_summary(S2.get('contexts') or [], calib_letter)}
     A['sessions'] = {p: {k: s.get(k) for k in ('commit', 'dry', 'gpu', 'versions', 'canon_sha16', 'directions_npz_sha256', 'layer_idx', 'coef', 'finished')} for p, s in sessions.items()}
-    A['env'] = env_same(sessions)
+    A['env'] = env_same(sessions, pilot_sessions)
     A['clause'] = '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
     return A
 
 
-def _pilot_attempts(args_pilot):
+def open_checked(T3, FJ, parts, sessions, files, J, pilot_attempts, pair_names, AN, calib_letter, FB, FR=None, judge_sha16=None, repo=REPO):
+    """結果を開く段の確かめ（裁定 D236）: 一致だけを見る段の記録が一致で、読む出力の同定（置き場の名・組の JSON と session の SHA-256）と凍結の記録の SHA16 が
+    一致だけを見る段の記録と同じで、DRY でないときは手元の器と正本が本の凍結の記録と同じであること。開いた集計の二段の一致が一致だけを見る段と違えば止める（書かない）。"""
+    if not J.get('agree'):
+        raise SystemExit('一致だけを見る段の記録が一致していない（結果を開かない）')
+    if J.get('inputs') != files:
+        ji, fi = J.get('inputs') or {}, files or {}
+        raise SystemExit('結果を開く段の出力が、一致だけを見る段の読んだ出力と違う（開かない）: %s' % [p for p in sorted(set(ji) | set(fi)) if ji.get(p) != fi.get(p)])
+    dry = any(s.get('dry') for s in sessions.values())
+    if not dry:
+        if FR is None:
+            raise SystemExit('DRY でないのに凍結の記録が無い（開かない）')
+        if J.get('freeze_record_sha16') != sha16f(FR_PATH):
+            raise SystemExit('凍結の記録が一致だけを見る段の後に変わった（開かない）')
+        bad = frozen_versions_bad(FR, repo)
+        if bad:
+            raise SystemExit('手元の器か正本が本の凍結の記録と違う（開かない）: %s' % bad)
+    pilot_sessions = ((FR or {}).get('main_freeze') or {}).get('sessions')
+    A = open_results(T3, FJ, parts, sessions, pilot_attempts, pair_names, AN, calib_letter, FB, repo=repo, pilot_sessions=pilot_sessions)
+    rc = A.get('recompute') or {}
+    got = (None if rc.get('first') is None else bool(rc['first']['agree']), bool((rc.get('second') or {}).get('agree')), bool(rc.get('agree')))
+    if got != (J.get('first'), J.get('second'), J.get('agree')):
+        raise SystemExit('開いた集計の二段の一致が、一致だけを見る段と違う（書かない）: %s 対 %s' % (got, (J.get('first'), J.get('second'), J.get('agree'))))
+    A['inputs'] = files
+    A['judge_record_sha16'] = judge_sha16
+    return A
+
+
+def _freeze_record():
+    return json.load(open(FR_PATH, encoding='utf-8')) if os.path.exists(FR_PATH) else None
+
+
+def _pilot_attempts(args_pilot, FR=None):
     """下見の試みの並び: 本の計算では凍結の記録の本の凍結（`main_freeze.pilot_attempts`）から。DRY の出力を試すときだけ、相 pilot の出力の pilot.json を与える。"""
     if args_pilot:
         return [json.load(open(p, encoding='utf-8'))['pilot'] for p in args_pilot]
-    FR = json.load(open(os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.json'), encoding='utf-8'))
+    if FR is None:
+        raise SystemExit('凍結の記録が無い（本の計算では本の凍結の下見の記録を読む）')
     atts = FR['main_freeze']['pilot_attempts']
     if FR['main_freeze']['pilot'] != atts[-1]:
         raise SystemExit('本の凍結の下見の記録と、下見の試みの最後が違う（止める）')
@@ -395,7 +495,7 @@ def _pilot_attempts(args_pilot):
 
 
 def main():
-    import argparse
+    import argparse, datetime
     ap = argparse.ArgumentParser(description='B-lens 層三の手元の二つの段（judge: 一致だけを見る／open: 結果を開く）')
     ap.add_argument('step', choices=['judge', 'open'])
     ap.add_argument('dirs', nargs='+', help='起動器の相 main の出力の置き場（組ごとの JSON と session.json）')
@@ -406,37 +506,40 @@ def main():
     T3 = json.load(open(os.path.join(REPO, 'design', 'contrasts-Bl3.json'), encoding='utf-8'))
     FJ = json.load(open(os.path.join(REPO, 'records', 'Bl3', 'design-facts-Bl3.json'), encoding='utf-8'))
     DJ = json.load(open(os.path.join(REPO, 'results', 'Bl3', 'directions-Bl3.json'), encoding='utf-8'))
-    parts, sessions = load_outputs(a.dirs)
+    parts, sessions, files = load_outputs(a.dirs)
     dry = any(s.get('dry') for s in sessions.values())
     if a.pilot and not dry:
         raise SystemExit('--pilot は DRY の出力を試すときだけ（本の計算では凍結の記録の本の凍結を読む）')
-    attempts = _pilot_attempts(a.pilot)
+    FR = None if dry else _freeze_record()
+    attempts = _pilot_attempts(a.pilot, FR)
     pair_names = list(DJ['groups']['real']['names'])
     if a.step == 'judge':
         out = a.out or JUDGE
         if os.path.exists(out):
             raise SystemExit('既にある（一致だけを見る段は一度だけ）: %s' % out)
-        J = judge(T3, parts, sessions, attempts, pair_names)
-        J['written_utc'] = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+        J = judge(T3, parts, sessions, attempts, pair_names, files, FR)
+        J['written_utc'] = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
         J['clause'] = '本記録は一致か不一致かだけを持つ（値は開かない・正本 independent_recompute.print）。'
         json.dump(J, open(out, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
         say = lambda b: '無い' if b is None else ('一致' if b else '不一致')
-        print('[analyze_Bl3] 一致だけを見る段: 器の誤り %s・組の環境 %s・一段目 %s・二段目（札） %s・二段目の値 %s・全体 %s（値は開いていない）' % (
+        print('[analyze_Bl3] 一致だけを見る段: 器の誤り %s・組の環境 %s・一段目 %s・二段目（札） %s・二段目の値 %s・全体 %s（値は開いていない）%s' % (
             'あり' if any(J['tool_error'].values()) else '無し', '同じ' if J['env']['same'] else '違う', say(J['first']), say(J['second']),
-            '無い' if J.get('second_values_within_tol') is None else ('許容の内' if J['second_values_within_tol'] else '許容の外（止めずに台帳に記す・裁定 D234）'), say(J['agree'])))
+            '無い' if J.get('second_values_within_tol') is None else ('許容の内' if J['second_values_within_tol'] else '許容の外（止めずに台帳に記す・裁定 D234）'), say(J['agree']),
+            ('・理由 %s' % J['reason']) if J.get('reason') else ''))
         if not J['agree']:
             raise SystemExit('一致しない（結果を開く前に止め、逸脱の台帳に記して登録者に上げる・裁定 D219）')
         return
     jp = a.judge_record or JUDGE
-    if not os.path.exists(jp) or not json.load(open(jp, encoding='utf-8')).get('agree'):
-        raise SystemExit('一致だけを見る段の記録が無いか、一致していない（結果を開かない）: %s' % jp)
+    if not os.path.exists(jp):
+        raise SystemExit('一致だけを見る段の記録が無い（結果を開かない）: %s' % jp)
+    J = json.load(open(jp, encoding='utf-8'))
     out = a.out or OPENED
     if os.path.exists(out):
         raise SystemExit('既にある: %s' % out)
     AN = json.load(open(os.path.join(REPO, 'records', 'B', 'analysis-B-2026-09-22.json'), encoding='utf-8'))
     CB = json.load(open(os.path.join(REPO, 'results', 'Blens', 'calib-Blens.json'), encoding='utf-8'))['magnitude']['letter']
     FB = json.load(open(os.path.join(REPO, 'records', 'Blens', 'design-facts-Blens.json'), encoding='utf-8'))
-    A = open_results(T3, FJ, parts, sessions, attempts, pair_names, AN, CB, FB)
+    A = open_checked(T3, FJ, parts, sessions, files, J, attempts, pair_names, AN, CB, FB, FR=FR, judge_sha16=sha16f(jp))
     json.dump(A, open(out, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1, default=lambda o: o.item() if hasattr(o, 'item') else float(o))
     print('[analyze_Bl3] 結果を開いた: %s' % os.path.relpath(out, REPO))
 

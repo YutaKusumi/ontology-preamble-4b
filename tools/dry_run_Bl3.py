@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""dry_run_Bl3.py v2 —— B-lens 層三（Bl3）の合成データの器（正本 `review_plan.synthetic` の形のすべてと、乱数の小さな模型で端から端まで・2026-09-25）。
+"""dry_run_Bl3.py v3 —— B-lens 層三（Bl3）の合成データの器（正本 `review_plan.synthetic` の形のすべてと、乱数の小さな模型で端から端まで・2026-09-25）。
 
 一. 純粋な関数の形（`tools/bl3_core.py`・`tools/blens_core.py`・`tools/analyze_Bl3.py`）: 奇でない押し・零でない帰無の中心・減算の行・下見で外れる升目と門の行だけの升目・
     帰無との同じ値・両方の向きがちょうど対称な比べる相手・掃き出し・端数のバッチ・零の近くの中央値・Holm の境で一本違う p・器の誤りでやり直す流れ・
@@ -13,6 +13,10 @@
 三. わざと壊した読み取り（二重の正規化）と近道の元（主位置まで使い回す・記録した切れ目を偽る）で、自己検査と凍結した確かめが止まることを確かめる。
     本物の相対の加減の大きさにそろえた合成の方向で、書き換えの道の変種・主位置の一つ分の寄与・二段目の本の道とフックの差（意見伺いの C2-3.2）を記述として測る。
 四. 別の個体の書き換えの器（`tools/bl3_recompute_rewrite.py`・中は変えない）の自己検査と `--dry` を今の本の器の上で走らせ、出力を記録に写す。
+五. 起動器の三つの相を DRY で別のプロセスとして走らせ、集計の器の CLI（一致だけを見る段・結果を開く段）と掃き出しと報告の組み立てに通す。一致だけを見る段の後に組の出力を
+    差し替えると、結果を開く段が止まることを確かめる（裁定 D236）。
+v3（裁定 D236）で足した確かめ: 本の計算が近道を使わないことの振る舞い・正本の文から独立に書いた札と、答えの分かる合成での門の組み立て・等方の外の行が出る枝・
+    有限でない値の止め・結果を開く段の結びつき。
 記録の末尾に、走らせた器（凍結の器の一覧と import の閉包）と正本・設計事実・方向の記録の SHA16 を、走りの始めと終わりで同じことを確かめて並べる
 （下見の前の凍結の器が今の版と突き合わせる）。
 **実の重みで読み取りの値を出さない**（正本 `computation.before_seal`）。合成の方向は、実の方向の名だけを借りた乱数（次元は小さな模型のもの）。
@@ -20,7 +24,7 @@
 用法: python tools/dry_run_Bl3.py [--force] [--iso 本数（既定は正本の本数）] [--e2e-iso 本数（既定 9）] [--out 置き場]
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, re, sys, json, math, time, copy, hashlib, argparse, datetime, subprocess, collections
+import os, re, sys, glob, json, math, time, copy, shutil, hashlib, argparse, datetime, tempfile, subprocess, collections
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -29,7 +33,7 @@ sys.path.insert(0, HERE)
 import blens_core as C
 import bl3_core as K
 
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231〜D234）: 本の計算は近道を使わない・二段の判定の形・下見の分かれ道を端から端まで・cache の長さの確かめ・書き換えの器の自己検査・版の SHA16
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 近道の振る舞い・独立の札と答えの分かる門・等方の外の枝・有限でない値・結果を開く段の結びつき・起動器の三つの相／v2（裁定 D231〜D234）
 NL = chr(10)
 SNAP = os.path.expanduser('~/.cache/huggingface/hub/models--Qwen--Qwen3-4B-Instruct-2507/snapshots/cdbee75f17c01a7cc42f958dc650907174af0554')
 T3 = json.load(open(os.path.join(REPO, 'design', 'contrasts-Bl3.json'), encoding='utf-8'))
@@ -42,6 +46,7 @@ sha16f = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).
 
 
 def check(group, name, ok, detail=''):
+    detail = detail if isinstance(detail, str) else '・'.join(map(str, detail)) if isinstance(detail, (list, tuple)) else str(detail)      # 記録の表は文字列だけ
     RESULTS.append((group, name, bool(ok), detail))
     print('[dry_run_Bl3] %s %-4s %s %s' % (group, 'OK' if ok else 'FAIL', name, detail), flush=True)
 
@@ -85,6 +90,71 @@ def tool_shas():
     import freeze_Bl3 as FZ
     files = FZ.import_closure(FZ.TOOLS) + ['design/contrasts-Bl3.json', 'records/Bl3/design-facts-Bl3.json', 'records/Bl3/design-facts-Bl3.md', 'results/Bl3/directions-Bl3.json']
     return collections.OrderedDict((f, sha16f(os.path.join(REPO, *f.split('/')))) for f in files)
+
+
+# ---------------- 正本の文から独立に書いた主の札（検べ用・芯の関数を呼ばない・裁定 D236） ----------------
+def answer_labels(T3, main_rows, eff, pair_names, dropped=()):
+    """正本 `labels.p_rule`（両側に等しい裾）・`labels.iso_outside.rule`（Holm・段を下回れば通し、通らなかった所で止める）・`labels.second`（比べる相手の中央値を中心に、
+    距離が比べる相手のすべてを上回れば最上位・向きの順位と対の単位の順位）・`labels.side_rule`（等方の帰無の四分位と中央値）・`labels.second.iso_top_share`・`nulls.real.rule`
+    （v̂ と (6b) は兄弟の対を除き、Nk と td は B-lens の凍結の自分の対だけを除く）を、文から書き直した。"""
+    alpha = T3['labels']['iso_outside']['holm_alpha']
+    n_iso = T3['nulls']['isotropic']['count']
+    own = K.blens_own_pair()                                           # 二つの道の外の凍結物（B-lens の器の文から読む）
+    swaps = set(T3['nulls']['real']['swap_siblings'])
+    key = lambda sc, b, sg: '%s|%s|%+d' % (sc, b, int(sg))
+    out, pv = collections.OrderedDict(), {}
+    for r in main_rows:
+        if '%s|%s' % (r['scenario'], r['base']) in set(dropped):
+            continue
+        k, kk = key(r['scenario'], r['base'], r['sign']), key(r['scenario'], r['base'], -r['sign'])
+        e = float(eff[k][r['direction']])
+        iso = np.array([eff[k]['iso:%d' % i] for i in range(n_iso)], dtype=np.float64)
+        dropc = swaps if r['direction'] in ('static', 'loaded') else {own[r['direction']]}
+        comps = [q for q in pair_names if q not in dropc]
+        same = np.array([eff[k]['real:' + q] for q in comps], dtype=np.float64)
+        opp = np.array([eff[kk]['real:' + q] for q in comps], dtype=np.float64)
+        up, lo = int(np.sum(iso >= e)), int(np.sum(iso <= e))
+        p = min(1.0, 2.0 * min(up + 1, lo + 1) / (n_iso + 1))
+        tail = 'upper' if up < lo else ('lower' if lo < up else 'tie')
+        allc = np.concatenate([same, opp])
+        c0 = float(np.median(allc))
+        d = abs(e - c0)
+        dc = np.abs(allc - c0)
+        pairv = np.maximum(np.abs(same - c0), np.abs(opp - c0))
+        m0, q1, q3 = float(np.median(iso)), float(np.percentile(iso, 25)), float(np.percentile(iso, 75))
+        if q1 <= 0.0 <= q3:
+            side = ('sign_only', int(np.sign(e)))
+        else:
+            s0 = 1.0 if m0 > 0 else -1.0
+            side = ('stronger' if (e * s0 > 0 and abs(e) > abs(m0)) else ('weaker' if e * s0 >= 0 else 'opposite'), None)
+        out[r['id']] = {'p': p, 'tail': tail, 'top': bool(np.all(d > dc)), 'rank_o': int(1 + np.sum(dc >= d)), 'rank_p': int(1 + np.sum(pairv >= d)),
+                        'side': side, 'share': float(np.mean(np.abs(iso - c0) > float(np.max(dc))))}
+        pv[r['id']] = p
+    still = True
+    for i, rid in enumerate(sorted(pv, key=lambda x: (pv[x], x))):
+        ok = still and pv[rid] < alpha / (len(pv) - i)
+        out[rid]['holm'] = ok
+        still = ok
+    return out
+
+
+def synth_effects(T3, pair_names, n_iso, seed):
+    """合成の効き目（升目と符号の鍵 → 方向の名 → 効き目）: 奇でない押し（逆の符号の升目の効き目は別に引く）・零でない帰無の中心（升目ごとに中心を変える）・
+    等方の外に出る強い v̂ と Nk の行を半分ほど。値に意味は無い（札の組み立ての確かめだけに使う）。"""
+    rng = np.random.default_rng(seed)
+    names = list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]
+    keys = sorted({'%s|%s|%+d' % (sc, b, int(sg)) for sc, b, sg in T3['cell_signs_main']} | {'%s|%s|%+d' % (sc, b, -int(sg)) for sc, b, sg in T3['cell_signs_main']})
+    eff = {}
+    for j, k in enumerate(keys):
+        center = (-1.0) ** j * (0.5 + 0.25 * j)
+        e = {d: float(rng.normal(loc=center, scale=0.5)) for d in names}
+        e.update({'iso:%d' % i: float(x) for i, x in enumerate(rng.normal(loc=center, scale=0.5, size=n_iso))})
+        e.update({'real:' + q: float(x) for q, x in zip(pair_names, rng.normal(loc=0.0, scale=1.5, size=len(pair_names)))})
+        if j % 2 == 0:
+            e['static'] = center + 6.0 * (1 if j % 4 == 0 else -1)
+            e['Nk'] = center - 6.0
+        eff[k] = e
+    return eff
 
 
 # ---------------- 一. 純粋な関数の形 ----------------
@@ -225,6 +295,59 @@ def part_pure():
     stop_sw = raises(lambda: K.comparator_anchor(pn, [x for x in sw if x != own['static']], own), ValueError)
     check(G, '比べる相手の除き方の錨（B-lens の凍結の OWN_PAIR と正本の兄弟の対・裁定 D231）', bool(anc) and stop_own and stop_sw,
           '除いた対の数 %s・錨をずらした写しで止まる %s・兄弟の対から自分の対を抜いた写しで止まる %s' % ({d: len(v) for d, v in anc.items()}, stop_own, stop_sw))
+    # 正本の文から独立に書いた札（芯の関数を呼ばない）と、集計の器の札の突き合わせ（等方は正本の本数・奇でない押し・零でない帰無の中心・下見で外した升目・裁定 D236）
+    n_iso = T3['nulls']['isotropic']['count']
+    pn_ = DJ['groups']['real']['names']
+    eff_s = synth_effects(T3, pn_, n_iso, seed=17)
+    for dropped_ in ([], ['N1|O-Ncold']):
+        mine = answer_labels(T3, T3['main_rows'], eff_s, pn_, dropped_)
+        lab_, meta_ = AZ.row_labels(T3, T3['main_rows'], eff_s, pn_, dropped_)
+        diff_ = []
+        for rid, a_ in mine.items():
+            o = lab_.get(rid)
+            if o is None:
+                diff_.append((rid, '行が無い'))
+                continue
+            got = (round(o['p'], 12), o['tail'], o['iso_outside'], o['second']['top'], o['second']['rank_oriented'], o['second']['rank_pair'], o['side']['side'],
+                   o['side'].get('sign') if o['side']['side'] == 'sign_only' else None, round(o['iso_top_share'], 12))
+            want_ = (round(a_['p'], 12), a_['tail'], a_['holm'], a_['top'], a_['rank_o'], a_['rank_p'], a_['side'][0], a_['side'][1], round(a_['share'], 12))
+            if got != want_:
+                diff_.append((rid, got, want_))
+        n_out = sum(1 for a_ in mine.values() if a_['holm'])
+        check(G, '正本の文から独立に書いた札と集計の器の札（等方 %d 本・外した升目 %s・裁定 D236）' % (n_iso, '・'.join(dropped_) or 'なし'),
+              not diff_ and set(lab_) == set(mine) and n_out > 0 and meta_['m_rows'] == len(mine),
+              '行 %d・食い違い %d・等方の外の行 %d・Holm の段の数 %d%s' % (len(mine), len(diff_), n_out, meta_['m_rows'], ('（例 %s）' % (diff_[:1],)) if diff_ else ''))
+    # 等方の外の行が出る枝: 札の一致の中身（裁定 D232）・q7・予想の答え
+    lab_, _ = AZ.row_labels(T3, T3['main_rows'], eff_s, pn_, [])
+    out_ids = [rid for rid, o in lab_.items() if o['iso_outside']]
+    in_ids = [rid for rid, o in lab_.items() if not o['iso_outside']]
+    q7r = AZ.q7_rows_of(lab_, FJ)
+    sig0 = AZ.labels_signature(lab_)
+    flip_in, flip_out = copy.deepcopy(lab_), copy.deepcopy(lab_)
+    if in_ids:
+        flip_in[in_ids[0]]['tail'] = 'lower' if flip_in[in_ids[0]]['tail'] != 'lower' else 'upper'
+    flip_out[out_ids[0]]['tail'] = 'lower' if flip_out[out_ids[0]]['tail'] != 'lower' else 'upper'
+    check(G, '等方の外の行が出る枝（割合を決めた裾の比べは外の行だけ・q7 の行・裁定 D232・D236）',
+          bool(out_ids) and AZ.labels_signature(flip_in) == sig0 and AZ.labels_signature(flip_out) != sig0 and bool(q7r) and all(r_['id'] in out_ids for r_ in q7r),
+          '等方の外の行 %d・内の行の裾を変える → 札は同じ・外の行の裾を変える → 札が違う・q7 の行 %d' % (len(out_ids), len(q7r)))
+    # 答えの分かる合成での門の組み立て: 門の行の効き目を行動の量と同じ値に置けば、本の門の順位相関はちょうど一（家族の鍵か単位を取り違えれば一にならない）
+    AN = json.load(open(os.path.join(REPO, 'records', 'B', 'analysis-B-2026-09-22.json'), encoding='utf-8'))
+    rows_gate = AZ.stage_b_gate_rows(T3, AN, AZ.trials_reader())
+    units_g = list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]
+    rng_g = np.random.default_rng(23)
+    for drop_g in ([], ['N1|O-Ncold']):
+        eff_g = collections.defaultdict(dict)
+        for r_ in rows_gate:
+            if r_['cell'] in set(drop_g):
+                continue                                               # 外した升目の家族の効き目は置かない（集計の器は引かないはず・裁定 D231）
+            for u in units_g:
+                eff_g[r_['fam']].setdefault(u, float(rng_g.normal()))
+            eff_g[r_['fam']][r_['unit']] = float(r_['y'])
+        G_ = AZ.gates(T3, rows_gate, dict(eff_g), drop_g, ())
+        n_left = sum(1 for r_ in rows_gate if r_['cell'] not in set(drop_g))
+        check(G, '答えの分かる合成での門の組み立て（行の効き目を行動の量に置く・外した升目 %s・裁定 D236）' % ('・'.join(drop_g) or 'なし'),
+              abs(G_['main']['rho'] - 1.0) < 1e-12 and G_['main']['n_rows'] == n_left and G_['desc_choice_a']['rho'] < 1.0 - 1e-9,
+              '本の門の順位相関 %.12f・行 %d（残った門の行 %d）・選択 a の件数の門の順位相関 %.4f（一でない）' % (G_['main']['rho'], G_['main']['n_rows'], n_left, G_['desc_choice_a']['rho']))
 
 
 # ---------------- 二・三. 乱数の小さな模型 ----------------
@@ -334,9 +457,28 @@ def part_model(iso_n, e2e_iso):
     names_ = {'named': list(T3['directions']['named']), 'B_random': ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])],
               'iso': ['iso:%d' % i for i in range(iso_n)], 'real': ['real:' + p for p in pair_names]}
     sets_run = BR.cell_sign_sets(T3, None, names_['named'], names_['B_random'], names_['iso'], names_['real'], gate_only)
-    MP = BR.run_main_phase(R, T3, FJ, cells, names_, pilot, iso_n=None, log=lambda s: None)
+    pc_calls, fwd = [0], collections.Counter()
+    full_len = {len(c.ids) for c in cells.values()}
+    orig_pc = R.prefix_cache
+    R.prefix_cache = lambda c: (pc_calls.__setitem__(0, pc_calls[0] + 1), orig_pc(c))[1]
+
+    def pre_kw(m, args, kwargs):
+        ids_ = kwargs.get('input_ids') if kwargs.get('input_ids') is not None else (args[0] if args else None)
+        fwd['n'] += 1
+        fwd['past'] += int(kwargs.get('past_key_values') is not None)
+        fwd['use_cache'] += int(bool(kwargs.get('use_cache')))
+        fwd['short'] += int(ids_ is None or int(ids_.shape[-1]) not in full_len)
+    hk_ = model.register_forward_pre_hook(pre_kw, with_kwargs=True)
+    try:
+        MP = BR.run_main_phase(R, T3, FJ, cells, names_, pilot, iso_n=None, log=lambda s: None)
+    finally:
+        hk_.remove()
+        R.prefix_cache = orig_pc
     hd = MP['head']
     check(G2, '本の計算の頭の出口の値の自己検査', hd['logit_check']['pass'], '差の最大 %.2e（許容 %s）' % (hd['logit_check']['max_abs'], hd['logit_check']['tol']))
+    check(G2, '本の計算は近道を使わない（振る舞い: 近道の元を作る呼び出し・使い回す cache・use_cache・列の全長を全ての順伝播で数えた・裁定 D236）',
+          fwd['n'] > 0 and pc_calls[0] == 0 and fwd['past'] == 0 and fwd['use_cache'] == 0 and fwd['short'] == 0,
+          '順伝播 %d 回・近道の元を作った回 %d・cache を渡した回 %d・use_cache が真の回 %d・列の全長でない回 %d' % (fwd['n'], pc_calls[0], fwd['past'], fwd['use_cache'], fwd['short']))
     check(G2, '本の計算は近道を使わない（頭の近道の確かめを走らせない・下見の (v) は記述・裁定 D234）',
           MP['shortcut'] is False and hd.get('shortcut') is False and 'steered_cache_check' not in hd and 'shortcut_rule' in hd,
           '下見の (v) の近道の決定 %s・(v) の差の最大 %.2e（近道の許容 %.4f）' % (pilot['v']['shortcut'], max(abs(x) for x in pilot['v']['diffs'].values()), tol))
@@ -356,6 +498,10 @@ def part_model(iso_n, e2e_iso):
     zt = oz['effects']['zero:test']
     dmx = max(abs(oz['effects'][d] - outs[key_z]['effects'][d]) for d in outs[key_z]['effects'])
     check(G2, '零のベクトルの行は無操作と同じ値になる（別のバッチでも）', abs(zt) <= max(floor, 1e-6), '効き目 %.2e（揺れの床 %.2e）・バッチの組を変えた同じ方向の効き目の差の最大 %.2e（記述）' % (zt, floor, dmx))
+    dirs['nan:test'] = np.full(cfg.hidden_size, np.nan)
+    msg_nan = err_of(lambda: BR.run_cell_sign(R, cells[ck_z], sg_z, ['nan:test', 'static'], batch, seed, kz, pc=None), BR.ToolError)
+    del dirs['nan:test']
+    check(G2, '有限でない値の効き目は器の誤りで止まる（走らせる器の出口・裁定 D236）', msg_nan is not None and '有限でない値' in msg_nan, (msg_nan or '')[:70])
     # バッチの中の位置で方向を取り違えない
     c0, sg0 = items[0]
     r1 = R.forward(c0, [K.NOOP, 'static', 'Nk', 'td'], sg0, full=False)
@@ -478,7 +624,7 @@ def part_model(iso_n, e2e_iso):
     import sweep_Bl3 as SW
     import build_report_Bl3 as BRP
     import transformers
-    sess = {'commit': 'dry-e2e', 'dry': False, 'gpu': 'cpu', 'versions': {'numpy': np.__version__, 'torch': torch.__version__, 'transformers': transformers.__version__},
+    sess = {'commit': 'dry-e2e', 'dry': True, 'gpu': 'cpu', 'versions': {'numpy': np.__version__, 'torch': torch.__version__, 'transformers': transformers.__version__},
             'canon_sha16': sha16f(os.path.join(REPO, 'design', 'contrasts-Bl3.json')), 'directions_npz_sha256': DJ['npz_sha256'], 'layer_idx': L, 'coef': coef, 'finished': 'dry-e2e'}
     sec_part = rt({'part': 'secondary', 'rows_by_cell': sec_rows, 'counts': cnt, 'contexts': sec})
     preds = {'registrant': {'q1.pilot': '続ける'}, 'coordinator': {'q1.pilot': '一部の升目を外して続ける'}}
@@ -488,7 +634,8 @@ def part_model(iso_n, e2e_iso):
 
     def e2e(pilot_e):
         """作った下見の記録で、起動器の相 main の三つの組の出力を作り、手元の一致だけを見る段・結果を開く段・掃き出し・報告の組み立て・走査まで通す。
-        組の置き場の session は DRY でない形にする（本の計算と同じく、下見で外した升目の行を除く v̂ の行のすべてを比べる）。"""
+        組の置き場の session は DRY の形（等方を減らすため・裁定 D236 で DRY でない形は等方が正本の本数でなければ止まる）で、独立の再計算は下見で外した升目の行を除く
+        v̂ の行のすべてを流す。結果を開く段は、一致だけを見る段が読んだ出力の同定と照らしてから開く（裁定 D236）。"""
         pilot_e = rt(pilot_e)
         MPe = BR.run_main_phase(R, T3, FJ, cells, names_e, pilot_e, iso_n=None, log=lambda s: None)
         rows_e, dbr_e = K.recompute_set(T3['main_rows'], pair_names, swaps, len(names_e['iso']), MPe['dropped'])
@@ -497,12 +644,17 @@ def part_model(iso_n, e2e_iso):
         parts = collections.OrderedDict([('main', rt(dict(MPe, part='main'))), ('recompute', rt({'part': 'recompute', 'rows': rows_e, 'n_iso': len(names_e['iso']), 'hook': hook_e, 'rewrite': rw_e})),
                                          ('secondary', sec_part)])
         sessions = collections.OrderedDict((p, dict(sess)) for p in parts)
-        J = AZ.judge(T3, parts, sessions, [pilot_e], pair_names)
-        A = rt(AZ.open_results(T3, FJ, parts, sessions, [pilot_e], pair_names, AN, CB, FB))
+        files = collections.OrderedDict((p_, {'dir': 'e2e', 'json_sha256': hashlib.sha256(json.dumps(v_, ensure_ascii=False, sort_keys=True).encode('utf-8')).hexdigest().upper(),
+                                              'session_sha256': 'dry'}) for p_, v_ in parts.items())
+        J = AZ.judge(T3, parts, sessions, [pilot_e], pair_names, files)
+        A = rt(AZ.open_checked(T3, FJ, parts, sessions, files, J, [pilot_e], pair_names, AN, CB, FB))
+        bad_files = copy.deepcopy(files)
+        bad_files['main']['json_sha256'] = '0' * 64
+        bind_stop = err_of(lambda: AZ.open_checked(T3, FJ, parts, sessions, bad_files, J, [pilot_e], pair_names, AN, CB, FB), SystemExit)
         miss = SW.sweep(T3, A)
         text = BRP.build(T3, A, preds, meta_, [], None, '起草者の行（合成）')
         V, _ = BRP.lint_report(text, T3)
-        return {'MP': MPe, 'rows': rows_e, 'J': J, 'A': A, 'miss': miss, 'text': text, 'V': V, 'pilot': pilot_e}
+        return {'MP': MPe, 'rows': rows_e, 'J': J, 'A': A, 'miss': miss, 'text': text, 'V': V, 'pilot': pilot_e, 'bind_stop': bind_stop}
     # 分かれ道一: 主の升目 N1|O-Ncold と門の行だけの升目を (i)(ii) で外した下見の記録（正本の決定の関数で作る）
     drop_cells = ['N1|O-Ncold'] + gate_only_cells[:1]
     pilot_d = copy.deepcopy(pilot)
@@ -519,6 +671,8 @@ def part_model(iso_n, e2e_iso):
           list(ED['MP']['cells']) == [s[0] for s in sets_e if s[1] not in dset] and [x[0] for x in ED['rows']] == left_static and ED['pilot']['decision']['q1'] == '一部の升目を外して続ける',
           '升目と符号 %d（外す前 %d）・独立の再計算の v̂ の行 %d・下見の決定 %s（外した升目 %s）' % (len(ED['MP']['cells']), len(sets_e), len(ED['rows']), ED['pilot']['decision']['q1'],
                                                                               '・'.join(ED['pilot']['decision']['dropped'])))
+    check(G2, tag_d + ': 結果を開く段は、一致だけを見る段が読んだ出力と違う出力を開かない（裁定 D236）', ED['bind_stop'] is not None and '読んだ出力と違う' in ED['bind_stop'],
+          (ED['bind_stop'] or '')[:70])
     check(G2, tag_d + ': 一致だけを見る段が二段とも一致', ED['J']['agree'] and ED['J']['first'] and ED['J']['second'],
           '一段目 %s・二段目 %s・二段目の値 %s' % (ED['J']['first'], ED['J']['second'], '許容の内' if ED['J'].get('second_values_within_tol') else '許容の外'))
     n_gate_left = sum(1 for r in rows_gate if r['cell'] not in dset)
@@ -655,6 +809,69 @@ def part_rewrite_tool():
     return outs
 
 
+# ---------------- 五. 起動器の三つの相を DRY で別のプロセスとして（裁定 D236） ----------------
+def part_boot(iso_n_boot):
+    """起動器の相 check・pilot・main（三つの組）を DRY で別のプロセスとして走らせ、集計の器の CLI の一致だけを見る段と結果を開く段・掃き出しの CLI・報告の組み立てと走査に通す。
+    一致だけを見る段の後に、組の出力の中身だけを変えた写し（置き場の名は同じ）で結果を開く段が止まることを確かめる。出力は一時の置き場に置き、終わりに消す。"""
+    G = '五'
+    import build_report_Bl3 as BRP
+    td = tempfile.mkdtemp(prefix='dry-boot-')
+    env = dict(os.environ, OP4B_DRY='1', OP4B_REPO_DIR=REPO, OP4B_OUT=td, OP4B_DRY_ISO=str(iso_n_boot), OP4B_DRY_SEC='2', OP4B_DRY_RC='2', PYTHONIOENCODING='utf-8')
+    run = lambda cmd, extra=None: subprocess.run([sys.executable] + cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', cwd=REPO, env=dict(env, **(extra or {})))
+    newest = lambda prefix: ([d for d in sorted(glob.glob(os.path.join(td, prefix + '-*'))) if os.path.isdir(d)] or [None])[-1]
+    t1 = time.time()
+    try:
+        r_c = run(['tools/colab/boot_Bl3.py'], {'OP4B_PHASE': 'check'})
+        dc = newest('check')
+        CK = json.load(open(os.path.join(dc, 'check.json'), encoding='utf-8')) if r_c.returncode == 0 and dc else {}
+        cells_ck = CK.get('cells') or {}
+        check(G, '起動器の三つの相（DRY・別のプロセス）: 相 check は順伝播を呼ばずに終わり、呼ばれた数と升目のトークンの並びの SHA16 を書く',
+              r_c.returncode == 0 and CK.get('forward_calls') == 0 and (CK.get('forward_guards') or 0) > 0 and bool(cells_ck) and all('ids_sha16' in v for v in cells_ck.values()),
+              '終わりの値 %d・順伝播を呼んだ数 %s・守り %s・升目 %d' % (r_c.returncode, CK.get('forward_calls'), CK.get('forward_guards'), len(cells_ck)))
+        r_p = run(['tools/colab/boot_Bl3.py'], {'OP4B_PHASE': 'pilot'})
+        dp = newest('pilot')
+        pj = os.path.join(dp, 'pilot.json') if dp else ''
+        r_m = run(['tools/colab/boot_Bl3.py'], {'OP4B_PHASE': 'main', 'OP4B_DRY_PILOT': pj}) if r_p.returncode == 0 else r_p
+        dm = newest('main')
+        S = json.load(open(os.path.join(dm, 'session.json'), encoding='utf-8')) if r_m.returncode == 0 and dm else {}
+        tags = [z.get('tag') for z in S.get('zips') or []]
+        check(G, '起動器の三つの相（DRY・別のプロセス）: 相 pilot と相 main が終わり、組ごとの出力の SHA-256 を session に書き、組ごとに zip を作る',
+              r_p.returncode == 0 and r_m.returncode == 0 and set(S.get('part_sha256') or {}) == set(('main', 'recompute', 'secondary')) and all('part-%s' % x in tags for x in ('main', 'recompute', 'secondary')),
+              '終わりの値 %d・%d・組の出力の SHA-256 %s・zip %s' % (r_p.returncode, r_m.returncode, sorted(S.get('part_sha256') or {}), tags))
+        jr, ar = os.path.join(td, 'judge.json'), os.path.join(td, 'analysis.json')
+        r_j = run(['tools/analyze_Bl3.py', 'judge', dm, '--pilot', pj, '--out', jr]) if dm else r_m
+        r_o = run(['tools/analyze_Bl3.py', 'open', dm, '--pilot', pj, '--judge-record', jr, '--out', ar]) if r_j.returncode == 0 else r_j
+        r_s = run(['tools/sweep_Bl3.py', ar]) if r_o.returncode == 0 else r_o
+        A = json.load(open(ar, encoding='utf-8')) if r_o.returncode == 0 else None
+        V = None
+        if A:
+            text = BRP.build(T3, A, {'registrant': {'q1.pilot': '続ける'}, 'coordinator': {'q1.pilot': '続ける'}}, {k: '0123456789ABCDEF' for k in ('canon', 'freeze', 'seal', 'analysis')}, [], None, '起草者の行（合成）')
+            V, _ = BRP.lint_report(text, T3)
+        check(G, '起動器の三つの相（DRY・別のプロセス）: 集計の器の CLI の一致だけを見る段・結果を開く段・掃き出しの CLI・報告の組み立てと走査が通る',
+              r_j.returncode == 0 and r_o.returncode == 0 and r_s.returncode == 0 and V == [] and bool((A or {}).get('inputs')),
+              '終わりの値 %d・%d・%d・走査の違反 %s・結果を開く段の記録に読んだ出力の同定 %s' % (r_j.returncode, r_o.returncode, r_s.returncode, None if V is None else len(V), bool((A or {}).get('inputs'))))
+        stopped_ok, out_t = False, ''
+        if dm and r_j.returncode == 0:
+            t2 = os.path.join(td, 'tampered')
+            os.makedirs(t2)
+            dt = os.path.join(t2, os.path.basename(dm))                  # 置き場の名は同じにして、組の中身だけを変える
+            shutil.copytree(dm, dt)
+            Mt = json.load(open(os.path.join(dt, 'main.json'), encoding='utf-8'))
+            k0 = next(iter(Mt['cells']))
+            d0 = 'Nk' if 'Nk' in Mt['cells'][k0]['effects'] else next(iter(Mt['cells'][k0]['effects']))
+            Mt['cells'][k0]['effects'][d0] += 1000.0
+            json.dump(Mt, open(os.path.join(dt, 'main.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+            at = os.path.join(td, 'analysis-tampered.json')
+            r_t = run(['tools/analyze_Bl3.py', 'open', dt, '--pilot', pj, '--judge-record', jr, '--out', at])
+            out_t = r_t.stdout + r_t.stderr
+            stopped_ok = r_t.returncode != 0 and '読んだ出力と違う' in out_t and not os.path.exists(at)
+        check(G, '起動器の三つの相（DRY・別のプロセス）: 一致だけを見る段の後に組の出力の中身を変えると、結果を開く段が止まって書かない（裁定 D236）', stopped_ok,
+              ('・'.join([l for l in out_t.split(NL) if '読んだ出力と違う' in l][:1]) or '止まらなかった'))
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
+    return round(time.time() - t1, 1)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--force', action='store_true')
@@ -671,6 +888,7 @@ def main():
     part_pure()
     info = part_model(a.iso, a.e2e_iso)
     rw_out = part_rewrite_tool()
+    boot_s = part_boot(a.e2e_iso)
     sha_end = tool_shas()
     check('四', '走らせた器と正本と設計事実と方向の記録が、走りの始めと終わりで同じ', sha_start == sha_end, '%d ファイル%s' % (
         len(sha_start), '' if sha_start == sha_end else '（変わった: %s）' % [k for k in sha_start if sha_start[k] != sha_end.get(k)]))
@@ -679,7 +897,8 @@ def main():
           '- 実の重みで読み取りの値を出していない（正本 `computation.before_seal`）。二と三は、登録機種の設定を小さくした bf16 の乱数の模型（層 %s・次元 %s・正規化の重みを散らした・実の重みではない）と実のトークナイザで走らせた。合成の方向は、実の方向の名だけを借りた乱数。' % (
               info.get('layers'), info.get('dim')),
           '- 等方の方向の本数: %d（正本 %d）。端から端までの分かれ道の等方の本数 %s（作った下見の記録で・起動器の出力と同じ JSON の往復）。' % (a.iso, T3['nulls']['isotropic']['count'], info.get('e2e_iso')),
-          '- 順伝播: 走らせる器 %s 回・書き換えの道 %s 回（変種の計算と四の走りは数えない）・%.0f 秒。' % (info.get('n_forward'), info.get('rewrite_passes'), time.time() - t0),
+          '- 順伝播: 走らせる器 %s 回・書き換えの道 %s 回（変種の計算と四・五の走りは数えない）・%.0f 秒（五の起動器の三つの相 %.0f 秒・等方 %s 本）。' % (
+              info.get('n_forward'), info.get('rewrite_passes'), time.time() - t0, boot_s, a.e2e_iso),
           '- 確かめ: %d のうち %d が期待どおり。' % (len(RESULTS), n_ok), '',
           '| 部 | 確かめ | 結果 | 詳しく |', '|---|---|---|---|'] + [
           '| %s | %s | %s | %s |' % (g, n, '期待どおり' if ok else '**期待と違う**', d.replace('|', '｜')) for g, n, ok, d in RESULTS] + [

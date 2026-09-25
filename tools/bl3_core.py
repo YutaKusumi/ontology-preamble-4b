@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""bl3_core.py v2 —— B-lens 層三（Bl3）の計算の芯（numpy だけ・重みも試行も読まない・2026-09-25）。
+"""bl3_core.py v3 —— B-lens 層三（Bl3）の計算の芯（numpy だけ・重みも試行も読まない・2026-09-25）。
 
 正本 `design/contrasts-Bl3.json` の決まりを、重みや試行を読まない純粋な関数に置く。走らせる器 `tools/bl3_run.py`・集計の器 `tools/analyze_Bl3.py`・
 合成データの器 `tools/dry_run_Bl3.py` が同じ関数を呼ぶ（同じ式を二度書かない）。B-lens の芯 `tools/blens_core.py` の関数は読み取りだけで呼ぶ。
@@ -24,7 +24,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import blens_core as C
 
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231）: 比べる相手の除き方の錨（B-lens の凍結の OWN_PAIR と正本の兄弟の対）
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 有限でない値で割合と裾は止め、一致の関数は一致しないと答える／v2（裁定 D231）: 比べる相手の除き方の錨
 NOOP, PAD = 'noop', 'pad'
 
 
@@ -57,6 +57,8 @@ def mass_of_set(Z_full, set_ids):
 def p_and_tail(m, null):
     """両側に等しい裾の割合（`blens_core.p_equal_tailed`）と、上の裾と下の裾の本数・割合を決めた裾（上・下・同じ）。"""
     null = np.asarray(null, dtype=np.float64)
+    if not (np.isfinite(m) and np.all(np.isfinite(null))):
+        raise ValueError('有限でない値に割合と裾を当てようとした（裁定 D236）')
     up, lo = int(np.sum(null >= m)), int(np.sum(null <= m))
     tail = 'upper' if up < lo else ('lower' if lo < up else 'tie')
     return {'p': C.p_equal_tailed(m, null), 'upper': up, 'lower': lo, 'tail': tail, 'K': int(len(null))}
@@ -240,11 +242,16 @@ def q1_from_attempts(attempts):
 
 # ---------------- 独立の再計算の一致 ----------------
 def agreement(eff_a, eff_b, tol, labels_a, labels_b):
-    """段ごとの一致（正本 `independent_recompute.agreement`）: 全ての効き目の差の絶対値が許容の内で、二つの道の値からそれぞれ出した札が同じ。"""
+    """段ごとの一致（正本 `independent_recompute.agreement`）: 全ての効き目の差の絶対値が許容の内で、二つの道の値からそれぞれ出した札が同じ。
+    有限でない値が一つでもあれば一致しない（鍵の順に依らない・`non_finite` に鍵を並べる・裁定 D236）。"""
     keys = sorted(eff_a)
     if sorted(eff_b) != keys:
         return {'agree': False, 'reason': 'keys', 'values_within_tol': False, 'labels_same': False, 'max_abs_diff': None,
                 'missing': sorted(set(eff_a) ^ set(eff_b))}
+    finite = lambda v: bool(np.all(np.isfinite(np.asarray(v, dtype=np.float64))))
+    nf = [k for k in keys if not (finite(eff_a[k]) and finite(eff_b[k]))]
+    if nf:
+        return {'agree': False, 'reason': 'non_finite', 'values_within_tol': False, 'labels_same': False, 'max_abs_diff': None, 'non_finite': nf}
     dmax = max(float(np.max(np.abs(np.asarray(eff_a[k], dtype=np.float64) - np.asarray(eff_b[k], dtype=np.float64)))) for k in keys)
     same = labels_a == labels_b
     return {'agree': bool(dmax <= tol and same), 'values_within_tol': bool(dmax <= tol), 'labels_same': bool(same), 'max_abs_diff': dmax}
@@ -383,6 +390,17 @@ def _selftest():
     assert agreement(a_, {'r': [0.1005, 0.2]}, 0.001, {'x': 1}, {'x': 1})['agree']
     assert not agreement(a_, {'r': [0.1005, 0.2]}, 0.0001, {'x': 1}, {'x': 1})['agree']
     assert not agreement(a_, a_, 0.001, {'x': 1}, {'x': 2})['agree']
+    # 有限でない値（裁定 D236）: 割合と裾は止まり、一致の関数は鍵の順に依らず一致しない
+    for bad_ in (float('nan'), float('inf')):
+        try:
+            p_and_tail(bad_, null)
+            raise AssertionError('有限でない値の割合を通した')
+        except ValueError:
+            pass
+    for order_ in (('a', 'b'), ('b', 'a')):
+        ea = {order_[0]: [0.0], order_[1]: [float('nan')]}
+        nf_ = agreement(ea, {'a': [0.0], 'b': [0.0]}, 0.001, {}, {})
+        assert not nf_['agree'] and nf_['reason'] == 'non_finite' and nf_['non_finite'] == [order_[1]], nf_
     # 予想の採点
     assert bucket(0, ['零', '一から三', '四以上']) == '零' and bucket(3, ['零', '一から三', '四以上']) == '一から三' and bucket(4, ['零', '一から三', '四以上']) == '四以上'
     assert bucket(2, ['零', '一か二', '三以上']) == '一か二' and bucket(3, ['零', '一か二', '三以上']) == '三以上'

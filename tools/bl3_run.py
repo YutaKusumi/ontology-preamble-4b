@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""bl3_run.py v2 —— B-lens 層三（Bl3）の教師強制の順伝播を走らせる器（2026-09-25・正本 `readout.primary`・`pilot`・`computation`・`descriptive`）。
+"""bl3_run.py v3 —— B-lens 層三（Bl3）の教師強制の順伝播を走らせる器（2026-09-25・正本 `readout.primary`・`pilot`・`computation`・`descriptive`）。
 
 走らせ方（正本のとおり・値は器の出力に置き、読みは付けない）:
   - 入力: 段階 B の組み立てのままのプロンプト（凍結の `steer_B.apply_chat`・`run_stageB_local.user_message`）の直後に、主の書き出し（設計事実の転記行 A の
@@ -17,19 +17,31 @@
 DRY（乱数の小さな模型）の確かめのために、壊した読み取り（二重の正規化）と壊した近道（主位置まで使い回す）を、引数 `bug` で入れられる（本の計算では入れない）。
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, sys, json, math, time, collections
+import os, sys, json, math, time, hashlib, collections
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import bl3_core as K
 
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231・D234）: 本の計算は近道を使わない・層ごとの余弦は足した向きで・使い回す cache の実の長さの確かめ・乙の文脈のファイルはちょうど一つ・(iii) の定義を下見の記録に
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 出口の値が有限でなければ止める・方向の名の並びを正本と転記行 D に照らす・升目のトークンの並びの SHA16／v2（裁定 D231・D234）: 本の計算は近道を使わない ほか
 BUGS = (None, 'double_norm', 'cache_through_mp')
 
 
 class ToolError(Exception):
     """凍結した確かめが機械で落ちた（器の誤り・正本 `pilot.decision.tool_error.what`）。"""
+
+
+def require_finite(vals, where):
+    """出口の値がすべて有限であること（有限でなければ器の誤りで止める・裁定 D236）。vals: 名 → 値。"""
+    bad = sorted(k for k, v in vals.items() if not math.isfinite(float(v)))
+    if bad:
+        raise ToolError('有限でない値（%s・%d 個・例 %s）' % (where, len(bad), bad[:3]))
+
+
+def ids_sha16(cell):
+    """升目の入力のトークンの並び（プロンプト ＋ 主の書き出し）の SHA16（相 check が書き、凍結の器が手元の組み立てと照らす・裁定 D236）。"""
+    return hashlib.sha256(','.join(str(int(x)) for x in cell.ids).encode('ascii')).hexdigest().upper()[:16]
 
 
 class Cell:
@@ -292,6 +304,9 @@ def run_cell_sign(R, cell, sign, dir_ids, batch, seed, key_index, pc=None, layer
                     lay['rows'][d] = vals
                 else:
                     lay['iso'][d] = vals
+    require_finite(lo, '升目と符号 %s|%+d の対数オッズ' % (cell.key, sign))
+    require_finite(mass, '升目と符号 %s|%+d の質量' % (cell.key, sign))
+    require_finite(pa, '升目と符号 %s|%+d の集合の中の確率' % (cell.key, sign))
     eff = {d: lo[d] - lo[K.NOOP] for d in lo if d != K.NOOP}
     return {'lo': lo, 'effects': eff, 'mass': mass, 'pa_noop': pa[K.NOOP], 'layers': lay, 'n_batches': len(plan)}
 
@@ -307,6 +322,7 @@ def recompute_hook_path(R, rows, dirs_by_row, log=None):
         eff = {}
         for did, sg in dirs_by_row[name]:
             eff['%s|%+d' % (did, sg)] = float(R.forward(cell, [did], sg, full=False)['lo'][0]) - base
+        require_finite(dict(eff, noop=base), '独立の再計算のフックの道の行 %s' % name)
         out[name] = {'noop_lo': base, 'effects': eff}
         if log:
             log('[bl3_run] 独立の再計算のフックの道 %s（%d/%d・順伝播 %d）・%.0f 秒' % (name, i + 1, len(rows), 1 + len(eff), time.time() - t0))
@@ -336,12 +352,17 @@ def build_cells(tok, T3, FJ, keys):
     return out
 
 
-def load_dirs(npz_path, json_path):
-    """方向の npz（`tools/bl3_directions.py`）を名で引ける形にする。SHA-256 は記録と突き合わせる（違えば止める）。"""
+def load_dirs(npz_path, json_path, T3=None, FJ=None):
+    """方向の npz（`tools/bl3_directions.py`）を名で引ける形にする。SHA-256 は記録と突き合わせる（違えば止める）。
+    T3 と FJ を与えると、名前のある方向の名の並びが正本と、実在の差の名の並びが転記行 D と同じことも確かめる（名と行を位置で結ぶので・裁定 D236）。"""
     import hashlib
     J = json.load(open(json_path, encoding='utf-8'))
     if hashlib.sha256(open(npz_path, 'rb').read()).hexdigest().upper() != J['npz_sha256']:
         raise ToolError('方向の npz の SHA-256 が記録と違う')
+    if T3 is not None and list(J['groups']['named']['names']) != list(T3['directions']['named']):
+        raise ToolError('方向の記録の名前のある方向の名の並びが正本と違う')
+    if FJ is not None and list(J['groups']['real']['names']) != list(FJ['facts']['D']['real_pairs']):
+        raise ToolError('方向の記録の実在の差の名の並びが転記行 D と違う')
     Z = np.load(npz_path)
     names = {'named': J['groups']['named']['names'], 'B_random': J['groups']['B_random']['names'],
              'iso': ['iso:%d' % i for i in range(J['groups']['iso']['count'])], 'real': ['real:' + p for p in J['groups']['real']['names']], 'check': ['check']}
@@ -414,6 +435,7 @@ def run_secondary(R, contexts, rows_by_cell, log=None):
             r = R.forward(cell, [K.NOOP] + [d for _, d in items], sg, full=False)
             for k_, (name, did) in enumerate(items, start=1):
                 res[name] = {'dlo': float(r['lo'][k_] - r['lo'][0]), 'dz_a': float(r['Zset'][k_, 0] - r['Zset'][0, 0]), 'dz_c': float(r['Zset'][k_, i_c] - r['Zset'][0, i_c])}
+        require_finite({'%s|%s' % (n_, k_): v_ for n_, d_ in res.items() for k_, v_ in d_.items()}, '乙の文脈 %s %s' % (key, tid))
         out.append(dict(rec, rows=res, n_batches=len(by_sign)))
     return out
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build_report_Bl3.py v2 —— B-lens 層三（Bl3）の結果の報告の草案を組む（2026-09-25・正本 `reading_rules`・`negation_templates`・`report_rules`・`labels`・`limits`）。
+"""build_report_Bl3.py v3 —— B-lens 層三（Bl3）の結果の報告の草案を組む（2026-09-25・正本 `reading_rules`・`negation_templates`・`report_rules`・`labels`・`limits`）。
 
 組み立て（B-lens の組み立ての器 `tools/build_report_Blens.py` の型）:
   - 数はすべて機械の区画（凍結の走査器 `tools/report_lint.py` の区画の印）の中に置く。区画ごとの中身の SHA16 を別の記録（報告と同じ名の -machine.json）に書く。
@@ -30,7 +30,7 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import report_lint as RL
 
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231〜D235）: 偶然の目安は外した後の行で・効き目の側は全ての行で・(iii) の定義・二段の判定の書き方・本の計算は近道を使わない・合成の自己検査は外した升目の組を持たない
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 封印した予想と凍結の記録と手元の器を照らしてから組む・(v) の行の言い方・門の行だけの升目の外し・nuclear の族の文を §0 に・下見の GPU・自己検査の足し／v2（裁定 D231〜D235）
 NL = chr(10)
 OUT = os.path.join(REPO, 'records', 'Bl3', 'results-Bl3.md')
 FENCE = '本報告のいかなる数値も、AI に意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
@@ -70,6 +70,13 @@ def stop_sentence(T3, reason):
     return q[1] if reason == 'vi_b' else q[0]
 
 
+def dropped_split(T3, dec):
+    """下見で外した升目を、主の升目と門の行だけの升目に分ける（裁定 D236）。"""
+    main_cells = {'%s|%s' % tuple(c) for c in T3['cells_main']}
+    d = list((dec or {}).get('dropped') or [])
+    return [c for c in d if c in main_cells], [c for c in d if c not in main_cells]
+
+
 def reading_types(T3, A):
     """読みの表の条件を当てる（型は重なりうる）。戻り値: [(型, 当たった所, 書くこと)]。"""
     RR = {r['type']: r for r in T3['reading_rules']}
@@ -80,8 +87,9 @@ def reading_types(T3, A):
         if last.get('tool_error'):
             return [('器の誤り', '下見', '器の誤りで下見を終えられなかった（正本 pilot.decision.tool_error）')]
         return [('下見で止めた', '下見の決め', RR['下見で止めた']['write'] + '（この下見で当たる文:「%s」）' % stop_sentence(T3, dec.get('reason')))]
-    if dec.get('dropped'):
-        hits.append(('下見で一部を外した', '・'.join(dec['dropped']), RR['下見で一部を外した']['write']))
+    md_, gd_ = dropped_split(T3, dec)
+    if md_:                                                            # 主の升目を外したときだけ（門の行だけの升目の外しは §0 の機械の行・裁定 D236）
+        hits.append(('下見で一部を外した', '・'.join(md_), RR['下見で一部を外した']['write']))
     if last.get('iv'):
         hits.append(('揺れの版の値', '下見の (iv)', RR['揺れの版の値']['write']))
     rows = A['rows']
@@ -127,7 +135,8 @@ def pilot_lines(T3, rec, MB, title):
     rows += ['', '- (iii) 較正（記述）: 順位相関 %s・升目 %s・文: %s' % (f4(rec['iii']['rho']), rec['iii']['n'], T3['pilot']['iii_sentences'][rec['iii']['sentence']])]
     for name, v in (rec.get('iv') or {}).items():
         rows.append('- (iv) 揺れの版 %s: %s' % (name, '・'.join('%s %s（主との差 %s%s）' % (c, f4(x), f4(x - rec['cells'][c]['lo']), '・印' if v['flags'][c] else '') for c, x in v['lo'].items())))
-    rows.append('- (v) 近道の確かめ（無操作の対数オッズの差）: %s・許容 %s・近道を使う: %s' % ('・'.join('%s %s' % (c, f4(d)) for c, d in rec['v']['diffs'].items()), f4(rec['v']['tol']), yn(rec['v']['shortcut'])))
+    rows.append('- (v) 近道の差（無操作の対数オッズの差・記述・本の計算は近道を使わない・裁定 D234）: %s・近道の許容 %s・差がすべて許容の内: %s' % (
+        '・'.join('%s %s' % (c, f4(d)) for c, d in rec['v']['diffs'].items()), f4(rec['v']['tol']), yn(rec['v']['shortcut'])))
     rows.append('- 機械の決定: %s・(i)(ii) を満たす主の升目 %s／%s・外した升目: %s' % (dec.get('q1'), dec.get('n_pass'), dec.get('n_main'), '・'.join(dec.get('dropped') or []) or 'なし'))
     fam = [k for k in (dec.get('dropped') or []) if k.startswith('N1|')]
     if len(fam) >= 2:
@@ -165,7 +174,10 @@ def build(T3, A, preds, meta, deviations=(), marks=None, rejected=None, confirma
     L += ['', '**答えの範囲**:', ''] + machine(['- ' + T3['scope']['reach'], '- ' + T3['negation_templates'][2]], MB)
     last = atts[-1]
     dec = last.get('decision') or {}
-    L += ['', '**下見の機械の決定**:', ''] + machine(['- %s' % ('器の誤りで下見を終えられなかった' if last.get('tool_error') else '%s（外した升目: %s）' % (dec.get('q1'), '・'.join(dec.get('dropped') or []) or 'なし'))]
+    md_, gd_ = dropped_split(T3, dec)
+    L += ['', '**下見の機械の決定**:', ''] + machine(['- %s' % ('器の誤りで下見を終えられなかった' if last.get('tool_error') else '%s（外した主の升目: %s）' % (dec.get('q1'), '・'.join(md_) or 'なし'))]
+                                                    + (['- 門の行だけの升目を外した: %s（門の行と入れ替えの数を数え直した・主の札の行は外していない・正本 pilot.decision.gate_only）' % '・'.join(gd_)] if gd_ and not last.get('tool_error') else [])
+                                                    + (['- nuclear の族は測れなかった（正本 pilot.decision.family）'] if len([k for k in md_ if k.startswith('N1|')]) >= 2 else [])
                                                     + ([] if last.get('tool_error') or (dec.get('stop') and dec.get('reason') == 'vi_b') else
                                                        ['- (iii) の文: ' + T3['pilot']['iii_sentences'][last['iii']['sentence']]]), MB)
     if main_tool_error:
@@ -288,6 +300,8 @@ def main_sections(T3, A, MB, mk):
     if (rc.get('second') or {}).get('values_beyond_tol') and (rc.get('second') or {}).get('agree'):
         r.append('- 二段目は効き目の差の最大が許容の外で、札は同じだった。止めずに逸脱の台帳に記した（正本 `independent_recompute.agreement`・裁定 D234）')
     r.append('- 組の間の環境: %s' % ('同じ' if (A.get('env') or {}).get('same') else '違う（%s）' % json.dumps((A.get('env') or {}).get('diff'), ensure_ascii=False)))
+    if 'pilot_gpu' in (A.get('env') or {}):
+        r.append('- 下見の GPU: %s・本の計算の組の GPU と同じ: %s（揺れの床は下見の GPU で決まる・裁定 D236）' % ('・'.join(A['env']['pilot_gpu']), yn(A['env'].get('gpu_same_as_pilot'))))
     L += machine(r, MB)
     return L
 
@@ -303,11 +317,32 @@ def lint_report(text, T3):
     return RL.lint(text, T_scan, frozenset(), sidecar=side), side
 
 
+def sealed_and_frozen_bad(FR, seal):
+    """報告を組む前の確かめ（裁定 D236・B-lens の `require_sealed` の型）: 二つの予想の SHA-256 が封印の記録と同じ・封印の記録の SHA16 と二つの予想の SHA-256 が
+    本の凍結の記録に写した値と同じ・手元の器と正本と設計事実と方向の記録が本の凍結の記録と同じ（台帳に記した差分は許す）。戻り値: 外れの並び。"""
+    import analyze_Bl3 as AZ
+    bad = []
+    for role, v in seal['predictions'].items():
+        pp = P(v['path'])
+        if not os.path.exists(pp) or hashlib.sha256(open(pp, 'rb').read()).hexdigest().upper() != v['sha256']:
+            bad.append('封印した予想の JSON が無いか、SHA-256 が封印の記録と違う: %s' % role)
+    ms = (FR.get('main_freeze') or {}).get('seal') or {}
+    if ms.get('record_sha16') != sha16f(P('records/Bl3/sealing-record-Bl3.json')):
+        bad.append('封印の記録の SHA16 が、本の凍結の記録に写した値と違う')
+    if any((ms.get('predictions_sha256') or {}).get(r) != v['sha256'] for r, v in seal['predictions'].items()):
+        bad.append('本の凍結の記録に写した予想の SHA-256 が、封印の記録と違う')
+    bad += ['手元の器か正本が本の凍結の記録と違う: %s' % x for x in AZ.frozen_versions_bad(FR, REPO)]
+    return bad
+
+
 def load_inputs(main_tool_error=False):
     import sweep_Bl3 as SW
     T3 = json.load(open(P('design/contrasts-Bl3.json'), encoding='utf-8'))
     FR = json.load(open(P('records/Bl3/FREEZE-RECORD-Bl3.json'), encoding='utf-8'))
     seal = json.load(open(P('records/Bl3/sealing-record-Bl3.json'), encoding='utf-8'))
+    bad = sealed_and_frozen_bad(FR, seal)
+    if bad:
+        raise SystemExit('報告を組む前の確かめが外れた（止める・登録者に相談）: %s' % bad)
     preds = {r: json.load(open(P(v['path']), encoding='utf-8')) for r, v in seal['predictions'].items()}
     ap_ = P('records/Bl3/analysis-Bl3.json')
     atts = FR['main_freeze']['pilot_attempts']
@@ -388,7 +423,8 @@ def synth_analysis(T3, FJ, DJ, seed=3, n_iso=199, stop=None, drop=()):
              'cells': {k: {'lo': -2.0, 'pa': 0.1, 'mass': 0.95, 'pa_transformed': 0.05, 'stage_b_rate': 0.2, 'pass_i_ii': k not in drop, 'main': True} for k in cell_keys},
              'iii': {'rho': 0.3, 'n': len(cell_keys), 'sentence': 'positive'}, 'iv': {'V1': {'lo': {k: -1.9 for k in cell_keys}, 'flags': {k: False for k in cell_keys}}},
              'v': {'diffs': {k: 1e-4 for k in cell_keys}, 'tol': 0.005, 'shortcut': True},
-             'decision': K.cells_decision({k: k not in drop for k in cell_keys}, {}, T3['pilot']['decision']['cells_min_pass'])}
+             'decision': K.cells_decision({k: k not in drop for k in cell_keys}, {g: g not in drop for g in sorted({'%s|%s' % (x[0], x[1]) for x in gate_only})},
+                                          T3['pilot']['decision']['cells_min_pass'])}
     if stop == 'vi_b':
         pilot['decision'] = {'q1': '止める', 'reason': 'vi_b', 'stop': True}
         for k in ('iii', 'iv', 'v', 'cells'):
@@ -413,12 +449,14 @@ def synth_analysis(T3, FJ, DJ, seed=3, n_iso=199, stop=None, drop=()):
     A.update({'dry': True, 'pilot_attempts': [pilot], 'head': {'logit_check': {'max_abs': 0.05, 'tol': 0.5, 'pass': True},
                                                                'shortcut': False, 'layer_check': {'diff': 0.0, 'tol': 1e-4, 'pass': True}},
               'main_run': {'batch': 16, 'shortcut': False, 'dropped': pilot['decision']['dropped']},
-              'layerwise': {k: {'noop_lo': {}, 'rows': {}, 'iso_summary': None} for k in cells_out if k in main_keys},
+              'layerwise': {k: {'noop_lo': {'2': -2.0, '3': -2.0}, 'rows': {u: [[1.0, 0.9, 0.1], [1.1, 0.8, 0.1]] for u in list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]},
+                                'iso_summary': {'median': [[1.0, 0.0, 0.0]] * 2, 'lo': [[0.5, -0.1, -0.1]] * 2, 'hi': [[1.5, 0.1, 0.1]] * 2, 'n': n_iso}} for k in cells_out if k in main_keys},
+              'n_iso': n_iso,
               'gate_rows': [], 'style_rows': style_rows, 'stage_b_notes': AZ.stage_b_notes(T3, AN, rows_gate),
               'secondary': {'counts': {'row_passes': 1, 'sign_batches': 1, 'contexts': 1}, 'contexts_run': 1,
                             'summary': {'S1|O-Ncold-v|static': dict({k: {'mean': 0.1, 'median': 0.1, 'q1': 0.0, 'q3': 0.2, 'n': 20} for k in ('dlo', 'dz_a', 'dz_c')},
                                                                      blens_direct={k: {'mean': x, 'median': x, 'q1': x, 'q3': x} for k, x in (('dlogit_exact_a', 0.1), ('dlogit_exact_c', -0.1))})}},     # B-lens の層二の値と同じ形（文脈の間の要約）
-              'sessions': {}, 'env': {'same': True, 'diff': {}}})
+              'sessions': {}, 'env': {'same': True, 'diff': {}, 'strict': [], 'pilot_gpu': ['NVIDIA L4'], 'gpu_same_as_pilot': True}})
     return A
 
 
@@ -455,7 +493,60 @@ def _selftest():
     td = build(T3, Ad, preds, meta, rejected='起草者の行（合成）')
     Vd, _ = lint_report(td, T3)
     assert Vd == [] and '〈下見で一部を外した〉' in td and Ad['rows_meta']['m_rows'] < len(T3['main_rows']), Vd[:3]
-    print('[build_report_Bl3] 自己検査 OK（合成の報告の走査の違反 0・起草者の欄が空なら埋め残し・禁止語と未登録の数は止まる・掃き出しは欠けを捕まえる・止まった下見と外した升目の組み立て）')
+    # 門の行だけの升目だけを外したとき: 〈下見で一部を外した〉は当たらず、§0 に門の行だけの升目の外しの行が出る（裁定 D236）
+    go_ = sorted({'%s|%s' % (x[0], x[1]) for x in FJ['facts']['C']['cell_signs_gate'] if x not in T3['cell_signs_main']})
+    Ag = synth_analysis(T3, FJ, DJ, drop=tuple(go_))
+    tg = build(T3, Ag, preds, meta, rejected='起草者の行（合成）')
+    Vg, _ = lint_report(tg, T3)
+    assert Vg == [] and '〈下見で一部を外した〉' not in tg and '門の行だけの升目を外した' in tg and SW.sweep(T3, Ag) == [], Vg[:3]
+    # 等方の外の行が出る枝（等方を正本の本数に・裁定 D236・器の実装の検分の R1-m5）: 掃き出し・走査・読みの型・q7
+    Ao = synth_analysis(T3, FJ, DJ, n_iso=T3['nulls']['isotropic']['count'])
+    to_ = build(T3, Ao, preds, meta, rejected='起草者の行（合成）')
+    Vo, _ = lint_report(to_, T3)
+    n_out = sum(1 for o in Ao['rows'].values() if o['iso_outside'])
+    assert n_out > 0 and Vo == [] and SW.sweep(T3, Ao) == [] and ('〈両方の外〉' in to_ or '〈埋もれる〉' in to_) and Ao['q7_rows'], (n_out, Vo[:3])
+    # 封印した予想を書き換えると、報告を組む前の確かめが止める（一時の置き場の写しで・裁定 D236・器の実装の検分の R2-重大1）
+    _selftest_sealed(T3, FJ, DJ)
+    print('[build_report_Bl3] 自己検査 OK（合成の報告の走査の違反 0・起草者の欄が空なら埋め残し・禁止語と未登録の数は止まる・掃き出しは欠けを捕まえる・止まった下見と外した升目の組み立て・'
+          '門の行だけの升目の外し・等方の外の行の枝 %d 行・書き換えた予想で止まる）' % n_out)
+
+
+def _selftest_sealed(T3, FJ, DJ):
+    """一時の置き場に、正本・設計事実・方向の記録・照らす器・予想・封印の記録・凍結の記録を置き、報告の入力を読む。予想を一字変えると止まることを確かめる。"""
+    import tempfile, shutil
+    import analyze_Bl3 as AZ
+    global REPO
+    keep = REPO
+    A = synth_analysis(T3, FJ, DJ)                                  # 段階 B の記録を読むので、置き場を切り替える前に作る
+    td = tempfile.mkdtemp(prefix='report-sealed-')
+    try:
+        for f in AZ.FROZEN_CHECK:
+            os.makedirs(os.path.dirname(os.path.join(td, *f.split('/'))), exist_ok=True)
+            shutil.copyfile(os.path.join(keep, *f.split('/')), os.path.join(td, *f.split('/')))
+        REPO = td
+        pdir = P('records/predictions')
+        os.makedirs(pdir, exist_ok=True)
+        pr = {}
+        for role in ('coordinator', 'registrant'):
+            pp = os.path.join(pdir, 'predictions-Bl3-%s.json' % role)
+            open(pp, 'w', encoding='utf-8', newline='\n').write(json.dumps({'q1.pilot': '続ける', 'q4.gate': '通らない'}, ensure_ascii=False))
+            pr[role] = {'path': 'records/predictions/predictions-Bl3-%s.json' % role, 'sha256': hashlib.sha256(open(pp, 'rb').read()).hexdigest().upper()}
+        json.dump({'predictions': pr}, open(P('records/Bl3/sealing-record-Bl3.json'), 'w', encoding='utf-8'), ensure_ascii=False)
+        json.dump(A, open(P('records/Bl3/analysis-Bl3.json'), 'w', encoding='utf-8'), ensure_ascii=False)
+        FR = {'main_freeze': {'pilot_attempts': A['pilot_attempts'], 'frozen_sha16': {f: sha16f(P(f)) for f in AZ.FROZEN_CHECK},
+                              'seal': {'record_sha16': sha16f(P('records/Bl3/sealing-record-Bl3.json')), 'predictions_sha256': {r: v['sha256'] for r, v in pr.items()}}}, 'deviations': []}
+        json.dump(FR, open(P('records/Bl3/FREEZE-RECORD-Bl3.json'), 'w', encoding='utf-8'), ensure_ascii=False)
+        load_inputs()                                                  # 書き換える前は通る
+        pp = P('records/predictions/predictions-Bl3-coordinator.json')
+        open(pp, 'w', encoding='utf-8', newline='\n').write(json.dumps({'q1.pilot': '続ける', 'q4.gate': '通る'}, ensure_ascii=False))
+        try:
+            load_inputs()
+            raise AssertionError('書き換えた予想で報告を組もうとした')
+        except SystemExit as e_:
+            assert '封印した予想' in str(e_), e_
+    finally:
+        REPO = keep
+        shutil.rmtree(td, ignore_errors=True)
 
 
 if __name__ == '__main__':

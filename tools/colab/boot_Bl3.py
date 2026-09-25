@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""boot_Bl3.py v2 —— B-lens 層三（Bl3）の Colab 起動スクリプト（教師強制の順伝播・2026-09-25・正本 `readout`・`pilot`・`computation`・`independent_recompute`）。
+"""boot_Bl3.py v3 —— B-lens 層三（Bl3）の Colab 起動スクリプト（教師強制の順伝播・2026-09-25・正本 `readout`・`pilot`・`computation`・`independent_recompute`）。
 
 相（OP4B_PHASE）:
   check  封印の前の確かめ（正本 `computation.before_seal`: 読み込みと版の確かめだけ・**順伝播を一度も走らせない・値を出さない**。模型の順伝播の前の hook で、呼ばれたら止める）:
@@ -26,11 +26,15 @@ DRY（手元の検査・OP4B_DRY=1）: 乱数の小さな模型（`tools/dry_run
   三つの相を CPU で通す。OP4B_REPO_DIR・OP4B_OUT が要る。版・GPU・重み・凍結と封印の記録は見ない（印を残す）。方向の npz の確かめは手元の npz で行う。
   相 main は OP4B_DRY_PILOT（相 pilot の出力の pilot.json）を読む。OP4B_DRY_ISO で等方の本数（既定 9）、OP4B_DRY_SEC で乙の文脈の数（既定 2）、
   OP4B_DRY_RC で独立の再計算の v̂ の行の数（既定 2・減算の行と加算の行を一つずつから）を減らす。残差の書き換えの器が無ければ、DRY に限り印を残して飛ばす。
+v3 の決め（裁定 D236）: 手順の順は「方向の npz と器を push → 相 check → 下見の前の凍結の記帳」（npz が取り出しに無ければ止める）。版は numpy・torch・transformers の三つを
+  文字列で照らす（計算の道は scipy を読まないので照らさない・session に並べる・裁定 D237）。相 check の守りは模型・模型の本体・語彙の行列・各層の前の hook で、呼ばれた数を数えて
+  書く（守りの止めは Exception の外の型）。相 pilot と main は、そのコミットの二つの予想の SHA-256 を封印の記録と照らす。相 main は組ごとに出力の SHA-256 を session に書き、
+  組ごとに zip を作って落とす（落ちた組から走らせ直せるように）。止めと予期しない誤りでも session を書いて zip を作る。
 柵: 本スクリプトの出力は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, sys, re, json, time, glob, shutil, hashlib, datetime, traceback, subprocess, zipfile, collections
 
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231・D234）: 本の計算は近道を使わない・相 check に比べる相手の除き方の錨と ‖static‖ の確かめ・相 main で本の凍結の下見と試みの最後を照らす
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 封印した予想の照らし・組の出力の SHA-256・組ごとの zip・止めと誤りの記録・相 check の守りと数・トークンの並びの SHA16 ほか／v2（裁定 D231・D234）
 T0 = time.time()
 REPO_URL = 'https://github.com/YutaKusumi/ontology-preamble-4b.git'
 PHASES = ('check', 'pilot', 'main')
@@ -38,13 +42,14 @@ PARTS = ('main', 'recompute', 'secondary')
 SPARSE = ['tools', 'arms', 'design', 'records', 'results/Bl3', 'results/stageB']
 LOG = []
 PROGRESS = {'path': None}
+CTX = {'od': None, 'session': None, 'dry': False}          # 止めと誤りでも記録を置くため（裁定 D236）
 CLAUSE = '本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
 now = lambda: datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 sha16f = lambda p: hashlib.sha256(open(p, 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
 
 
-class Stop(Exception):
-    pass
+class Stop(BaseException):
+    """相 check の守りの止め（Exception の外の型で、`except Exception` に呑まれない・裁定 D236）。"""
 
 
 def sha256f(p):
@@ -75,8 +80,33 @@ def sh(cmd, check=True):
     return r
 
 
+def package(tag, extra=None):
+    """置き場の中身を zip にして落とす（組ごと・終わり・止め・誤り・裁定 D236）。session を書いてから zip にし、zip の SHA-256 を session と進みの印字に記す。"""
+    od, S = CTX['od'], CTX['session']
+    if not od or S is None:
+        return None
+    S.update(extra or {})
+    S.update({'log': LOG, 'packaged': tag, 'packaged_at': now(), 'seconds': round(time.time() - T0, 1), 'clause': CLAUSE})
+    write_json(os.path.join(od, 'session.json'), S)
+    zp = od + ('.zip' if tag == 'final' else '-%s.zip' % tag)
+    with zipfile.ZipFile(zp, 'w', zipfile.ZIP_DEFLATED) as z:
+        for fn in sorted(os.listdir(od)):
+            z.write(os.path.join(od, fn), os.path.join(os.path.basename(od), fn))
+    zsha = sha256f(zp)
+    S.setdefault('zips', []).append({'tag': tag, 'zip': os.path.basename(zp), 'sha256': zsha})
+    mark('packaged', tag=tag, zip=os.path.basename(zp), sha256=zsha)
+    if not CTX['dry']:
+        try:
+            from google.colab import files
+            files.download(zp)
+        except Exception as e_:
+            print('[boot_Bl3] zip の自動のダウンロードが走らなかった（左の「ファイル」から落とす）: %s' % e_)
+    return zp
+
+
 def stop(msg):
     mark('stop', reason=msg)
+    package('stopped', {'stopped': msg})               # 止めでも session を書いて zip を作る（裁定 D236）
     sys.exit('[boot_Bl3] 止める（登録者に相談）: ' + msg)
 
 
@@ -95,12 +125,16 @@ def write_json(path, obj):
 
 
 def verify_frozen(repo, sha_map):
-    """凍結の記録の SHA16（改行を LF にそろえた SHA-256 の頭 16 桁）を、取り出した作業木のファイルに照らす。疎な取り出しで無いファイルは飛ばして数を記す。"""
+    """凍結の記録の SHA16（改行を LF にそろえた SHA-256 の頭 16 桁）を、取り出した作業木のファイルに照らす。疎な取り出しの外のファイルは飛ばして数を記し、
+    内側で無いファイルは外れにする（裁定 D236）。"""
     bad, skipped = [], []
     for rp, want in sha_map.items():
         p = os.path.join(repo, *rp.split('/'))
         if not os.path.exists(p):
-            skipped.append(rp)
+            if any(rp == d or rp.startswith(d + '/') for d in SPARSE):
+                bad.append({'path': rp, 'got': None, 'want': want})
+            else:
+                skipped.append(rp)
             continue
         got = sha16f(p)
         if got != want:
@@ -154,6 +188,7 @@ def run():
     od = os.path.join(OUTROOT, '%s-%s' % (PHASE, stamp))
     os.makedirs(od, exist_ok=True)
     PROGRESS['path'] = os.path.join(od, 'progress.log')
+    CTX.update(od=od, dry=DRY, session={'kind': 'bl3_colab_%s' % PHASE, 'boot': VERSION, 'commit': COMMIT, 'dry': DRY})
     CANON = os.path.join(REPO, 'design', 'contrasts-Bl3.json')
     T3 = json.load(open(CANON, encoding='utf-8'))
     FJ = json.load(open(os.path.join(REPO, 'records', 'Bl3', 'design-facts-Bl3.json'), encoding='utf-8'))
@@ -169,6 +204,11 @@ def run():
                 if not os.path.exists(p):
                     stop('相 %s は下見の前の凍結と封印の後に走らせる（%s が無い・正本 predictions.when）' % (PHASE, os.path.basename(p)))
             FR = json.load(open(FRP, encoding='utf-8'))
+            SR = json.load(open(SRP, encoding='utf-8'))
+            for role in ('coordinator', 'registrant'):                 # 封印した予想の SHA-256 を封印の記録と照らす（裁定 D236）
+                pp = os.path.join(REPO, *SR['predictions'][role]['path'].split('/'))
+                if not os.path.exists(pp) or sha256f(pp) != SR['predictions'][role]['sha256']:
+                    stop('封印した予想の JSON が無いか、SHA-256 が封印の記録と違う: %s' % role)
             if PHASE == 'main' and 'main_freeze' not in FR:
                 stop('相 main は本の凍結の後に走らせる（凍結の記録に本の凍結が無い）')
             sha_map = FR['main_freeze']['frozen_sha16'] if PHASE == 'main' else FR['frozen_sha16']
@@ -230,6 +270,11 @@ def run():
         os.environ['HF_HUB_DISABLE_XET'] = '1'
         from huggingface_hub import snapshot_download
         SNAPDIR = snapshot_download(M['repo'], revision=M['rev'])
+        idx = json.load(open(os.path.join(SNAPDIR, 'model.safetensors.index.json'), encoding='utf-8'))
+        need_f = ['config.json', 'tokenizer.json', 'model.safetensors.index.json'] + sorted(set(idx['weight_map'].values()))
+        miss_f = [x for x in need_f if x not in FJ['facts']['F']['sha256']]
+        if miss_f:
+            stop('転記行 F に、重みの索引の断片か設定のファイルが欠けている: %s' % miss_f)      # 裁定 D236
         W_SHA = {fn: sha256f(os.path.join(SNAPDIR, fn)) for fn in FJ['facts']['F']['sha256']}
         badw = [fn for fn, sha in FJ['facts']['F']['sha256'].items() if W_SHA[fn] != sha]
         if badw:
@@ -239,6 +284,8 @@ def run():
     # ---- 4. 方向の npz（方向の記録の SHA-256・組ごとの SHA-256 を転記行 D と・Colab で乱数を引き直さない）
     NPZ = os.path.join(REPO, 'results', 'Bl3', 'directions-Bl3.npz')
     DJP = os.path.join(REPO, 'results', 'Bl3', 'directions-Bl3.json')
+    if not os.path.exists(NPZ) or not os.path.exists(DJP):
+        stop('方向の npz か方向の記録が取り出しに無い（npz と器を push してから相 check を走らせる・裁定 D236）')
     DJ = json.load(open(DJP, encoding='utf-8'))
     npz_sha = sha256f(NPZ)
     if npz_sha != DJ['npz_sha256']:
@@ -248,7 +295,7 @@ def run():
     Zd = np.load(NPZ)
     try:
         grp = BD.verify_against_facts({g: Zd[g] for g in BD.GROUPS}, FJ)
-        dirs_real, names_real = BR.load_dirs(NPZ, DJP)
+        dirs_real, names_real = BR.load_dirs(NPZ, DJP, T3, FJ)             # 名の並びを正本と転記行 D に照らす（裁定 D236）
     except (SystemExit, BR.ToolError) as e_:
         stop(str(e_))
     pair_names = list(DJ['groups']['real']['names'])
@@ -285,28 +332,24 @@ def run():
 
     SESSION = {'kind': 'bl3_colab_%s' % PHASE, 'boot': VERSION, 'commit': COMMIT, 'dry': DRY, 'gpu': GPU, 'versions': VER, 'weights_sha256': W_SHA,
                'canon_sha16': sha16f(CANON), 'directions_npz_sha256': npz_sha, 'directions_group_sha256': grp, 'frozen_check': frozen, 'layer_idx': L, 'coef': coef}
+    CTX['session'] = SESSION
 
     def finish(extra=None):
-        SESSION.update(extra or {})
-        SESSION.update({'log': LOG, 'finished': now(), 'seconds': round(time.time() - T0, 1), 'clause': CLAUSE})
-        write_json(os.path.join(od, 'session.json'), SESSION)
-        zp = od + '.zip'
-        with zipfile.ZipFile(zp, 'w', zipfile.ZIP_DEFLATED) as z:
-            for fn in sorted(os.listdir(od)):
-                z.write(os.path.join(od, fn), os.path.join(os.path.basename(od), fn))
-        zsha = sha256f(zp)
-        mark('done', zip=os.path.basename(zp), sha256=zsha)
-        if not DRY:
-            try:
-                from google.colab import files
-                files.download(zp)
-            except Exception as e_:
-                print('[boot_Bl3] zip の自動のダウンロードが走らなかった（左の「ファイル」から落とす）: %s' % e_)
+        package('final', dict(extra or {}, finished=now()))
+        mark('done', zips=len(SESSION.get('zips') or []))
         return od
 
     # ---- 7. 相 check（順伝播を一度も走らせない）
     if PHASE == 'check':
-        guard = model.register_forward_pre_hook(lambda m, a: (_ for _ in ()).throw(Stop('相 check で順伝播が呼ばれた（正本 computation.before_seal）')))
+        calls = collections.Counter()
+
+        def guard_of(name):
+            def h(m, a):
+                calls[name] += 1
+                raise Stop('相 check で順伝播が呼ばれた（%s・正本 computation.before_seal）' % name)
+            return h
+        guards = [model.register_forward_pre_hook(guard_of('model')), model.model.register_forward_pre_hook(guard_of('model.model')),
+                  model.lm_head.register_forward_pre_hook(guard_of('lm_head'))] + [l_.register_forward_pre_hook(guard_of('layers.%d' % i_)) for i_, l_ in enumerate(model.model.layers)]
         E = FJ['facts']['E']
         sets = BR.cell_sign_sets(T3, None, names_real['named'], names_real['B_random'], names_real['iso'], names_real['real'], gate_only)
         n_pass = sum(len(s[3]) for s in sets)
@@ -351,11 +394,13 @@ def run():
             rw_ok = False
         if not rw_ok and not DRY:
             stop('残差の書き換えの器（tools/bl3_recompute_rewrite.py の recompute_rewrite）を import できない')
-        guard.remove()
-        chk = {'cells': {k: {'prompt_len': len(c.prompt), 'main_position': c.mp, 'readout_position': c.ro, 'family': c.fam, 'set_ids': c.set_ids} for k, c in cells.items()},
+        for g_ in guards:
+            g_.remove()
+        chk = {'cells': {k: {'prompt_len': len(c.prompt), 'main_position': c.mp, 'readout_position': c.ro, 'family': c.fam, 'set_ids': c.set_ids, 'ids_sha16': BR.ids_sha16(c)} for k, c in cells.items()},
                'cell_signs': len(sets), 'passes': n_pass, 'recompute_rows': len(rows_rc), 'recompute_passes_per_path': n_rc, 'gate_rows': len(rows_gate),
                'secondary': dict(cnt, cells=len(sec_rows), letter_token_is_L=sum(1 for c in ctx if c[3]['letter_token_is_L']), max_ids=max(c[3]['n_ids'] for c in ctx)),
-               'hook_register_remove': True, 'rewrite_importable': rw_ok, 'forward_calls': 0, 'comparator_anchor': anchor, 'static_norm_matches_fact_D': True}
+               'hook_register_remove': True, 'rewrite_importable': rw_ok, 'forward_calls': sum(calls.values()), 'forward_guards': len(guards),
+               'comparator_anchor': anchor, 'static_norm_matches_fact_D': True}
         write_json(os.path.join(od, 'check.json'), chk)
         mark('check', cell_signs=len(sets), passes=n_pass, recompute_rows=len(rows_rc), gate_rows=len(rows_gate), secondary_contexts=len(ctx), rewrite_importable=rw_ok)
         return finish()
@@ -407,6 +452,7 @@ def run():
     for part in parts:
         mark('part', part=part)
         out = collections.OrderedDict(part=part, clause=CLAUSE)
+        n0 = R.n_forward
         try:
             if part != 'main':                       # どの組も頭で出口の値の自己検査（本の計算の組は run_main_phase の頭で行う）
                 lc = R.logit_check(first_cell, T3['computation']['logit_tol'])
@@ -459,11 +505,13 @@ def run():
                 mark('secondary', contexts=len(ctx), seconds=round(time.time() - t1, 1))
         except TOOL_ERR as e_:
             out['tool_error'] = str(e_)
-        out['n_forward'] = R.n_forward
+        out['n_forward'], out['n_forward_total'] = R.n_forward - n0, R.n_forward      # 組の順伝播の数と、起動の中の累積（裁定 D236）
         write_json(os.path.join(od, '%s.json' % part), out)
+        SESSION.setdefault('part_sha256', {})[part] = sha256f(os.path.join(od, '%s.json' % part))      # 一致だけを見る段が読む組の出力の同定（裁定 D236）
         if 'tool_error' in out:
             finish({'tool_error': out['tool_error'], 'tool_error_part': part})
             stop('器の誤りで組 %s が止まった（正本 computation.tool_error・結果を開かずに登録者に上げる）: %s' % (part, out['tool_error']))
+        package('part-%s' % part)                                   # 組ごとに zip を作って落とす（落ちた組から走らせ直せるように・裁定 D236）
     return finish()
 
 
@@ -472,7 +520,12 @@ if __name__ == '__main__':
         run()
     except SystemExit:
         raise
+    except Stop as e_:
+        LOG.append({'step': 'guard', 'at': now(), 'reason': str(e_)})
+        package('stopped', {'stopped': str(e_)})
+        sys.exit('[boot_Bl3] 止める（相 check の守り・登録者に相談）: %s' % e_)
     except Exception:
         LOG.append({'step': 'crash', 'at': now(), 'traceback': traceback.format_exc()[-4000:]})
+        package('crash', {'crash': traceback.format_exc()[-4000:]})       # 予期しない誤りでも session を書いて zip を作る（裁定 D236）
         say('[boot_Bl3] 予期しない誤りで止まった（器の誤りではない・登録者に相談）')
         raise

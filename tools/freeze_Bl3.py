@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""freeze_Bl3.py v2 —— B-lens 層三（Bl3）の凍結の記帳（2026-09-25・正本 `predictions.when`・`computation.main_freeze_check`・裁定 D210・D222・`tools/freeze_Blens.py` の型）。
+"""freeze_Bl3.py v3 —— B-lens 層三（Bl3）の凍結の記帳（2026-09-25・正本 `predictions.when`・`computation.main_freeze_check`・裁定 D210・D222・`tools/freeze_Blens.py` の型）。
 
 相:
   prepilot  下見の前の凍結（正本のすべて・方向の npz・器・裁定 D210）。確かめてから記帳する（外れたら止める・登録者に相談）:
@@ -24,6 +24,10 @@
       下見の試みの session が DRY でない。最後の試みが本の凍結の下見（器の誤りの試みは、やり直したときの一度目として残す）。
     - 凍結の記録に足すのは `main_freeze` の鍵だけ（ほかの鍵は一字も変えない）。
     記帳: 凍結の記録の `main_freeze`（下見の試み・最後の試みの記録と機械の決定・session・凍結物の SHA16・器の差分・登録者の言葉と時刻）と、全体の台帳の一行。
+v3 の決め（裁定 D236）: 手順の順は「方向の npz と器を push → Colab の相 check → 下見の前の凍結の記帳」。相 check のコミットの器の閉包・正本・設計事実・方向の記録を
+  `git show <コミット>:<置き場>` で今の版と照らし、順伝播を呼んだ数（守りが数えた値）が零で、升目のトークンの並びの SHA16 が手元で組んだ並びと同じことを見る。
+  本の凍結は、下見の試みを session の終わりの時刻の順に並べ（与えた順と違えば止める）、試みごとに正本・npz・凍結の確かめを照らし、試みのコミットの凍結の記録と
+  封印の記録の中身を今の記録と照らし、二つ以上の試みには逸脱の台帳のやり直しの記帳を求め、封印の記録の SHA16 と二つの予想の SHA-256 を本の凍結の記録に写す。
 用法: python tools/freeze_Bl3.py prepilot --words "<登録者の逐語>" --when "<日時（日本時間）>" --colab-check <相 check の出力の置き場> ／ prepilot --check-only
       python tools/freeze_Bl3.py main --words "<登録者の逐語>" --when "<日時（日本時間）>" --pilot <相 pilot の出力の置き場> [<二つ目> …]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -34,7 +38,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 
-VERSION = 'v2'          # v2（2026-09-25・裁定 D231〜D235 の後）: 裁定の番号を記録の名から確かめる・合成データの正式の記録の版の SHA16 の表を今の版と突き合わせる・相 check の錨と ‖static‖
+VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 相 check のコミットの版とトークンの並び・本の凍結の試みの順と由来・封印の写し・番号の数の比べ・inputs.files・転記行 F／v2（裁定 D231〜D235 の後）
 NL = chr(10)
 FR_JSON = os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.json')
 FR_MD = os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.md')
@@ -117,11 +121,27 @@ def latest_dry_run(T3):
     lack = sorted(need - set(table))
     differ = sorted(f for f, s16 in table.items() if not os.path.exists(P(f)) or sha16f(P(f)) != s16)
     res['sha_table'] = {'files': len(table), 'lack': lack, 'differ': differ}
+    res['boot_phases'] = '起動器の三つの相' in txt
+    if not res['boot_phases']:
+        bad.append('合成データの正式の記録に、起動器の三つの相を別のプロセスで走らせた確かめが無い（裁定 D236）')
     if lack:
         bad.append('合成データの正式の記録の版の SHA16 の表が、器の閉包と正本・設計事実・方向の記録を覆わない: %s' % lack)
     if differ:
         bad.append('合成データの正式の記録を取った版と今の版が違う（取り直す）: %s' % differ)
     return res, bad
+
+
+sha16b = lambda b: hashlib.sha256(b.replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
+
+
+def local_ids_sha16(T3, FJ):
+    """手元のトークナイザで升目の入力を組み、トークンの並びの SHA16 を返す（相 check の値と照らす・裁定 D236）。"""
+    from transformers import AutoTokenizer
+    import bl3_run as BR
+    M_ = T3['inputs']['model']
+    tok = AutoTokenizer.from_pretrained(os.path.expanduser('~/.cache/huggingface/hub/models--%s/snapshots/%s' % (M_['repo'].replace('/', '--'), M_['rev'])))
+    keys = ['%s|%s' % tuple(c) for c in T3['cells_main']] + sorted({'%s|%s' % (x[0], x[1]) for x in FJ['facts']['C']['cell_signs_gate'] if x not in T3['cell_signs_main']})
+    return {k: BR.ids_sha16(c) for k, c in BR.build_cells(tok, T3, FJ, keys).items()}
 
 
 def prepilot_checks(colab_dir=None):
@@ -158,6 +178,20 @@ def prepilot_checks(colab_dir=None):
         bad.append('正本の decisions に、裁定の記録の番号が無い: %s' % miss_d)
     if T3['numbering']['rulings_next'] != nxt:
         bad.append('正本の次の裁定の番号 %s が、裁定の記録の次の番号 %s と違う' % (T3['numbering']['rulings_next'], nxt))
+    inp_bad = [k for k, v in T3['inputs']['files'].items() if v.get('sha16') and (not os.path.exists(P(v['path'])) or sha16f(P(v['path'])) != v['sha16'])]
+    res['inputs_files'] = {'checked': sum(1 for v in T3['inputs']['files'].values() if v.get('sha16')), 'bad': inp_bad}
+    if inp_bad:
+        bad.append('正本 inputs.files の SHA16 と今のファイルが違う: %s' % inp_bad)
+    M_ = T3['inputs']['model']
+    snap = os.path.expanduser('~/.cache/huggingface/hub/models--%s/snapshots/%s' % (M_['repo'].replace('/', '--'), M_['rev']))
+    if os.path.exists(os.path.join(snap, 'model.safetensors.index.json')):
+        shards = sorted(set(json.load(open(os.path.join(snap, 'model.safetensors.index.json'), encoding='utf-8'))['weight_map'].values()))
+        miss_f = [x for x in ['config.json', 'tokenizer.json', 'model.safetensors.index.json'] + shards if x not in FJ['facts']['F']['sha256']]
+        res['fact_F'] = {'shards': len(shards), 'missing': miss_f}
+        if miss_f:
+            bad.append('転記行 F に、重みの索引の断片か設定のファイルが欠けている: %s' % miss_f)
+    else:
+        bad.append('手元に重みの索引が無く、転記行 F の断片を確かめられない')
     if FJ['contrasts_sha16'] != canon16 or DJ['contrasts_sha16'] != canon16:
         bad.append('設計事実か方向の記録の正本の SHA16 が今の正本と違う（作り直す）')
     # 方向の npz
@@ -211,7 +245,14 @@ def prepilot_checks(colab_dir=None):
              'cells': all((CK['cells'].get(k) or {}).get(x) == v[y] for k, v in FJ['facts']['B']['cells'].items() for x, y in (('prompt_len', 'prompt_len'), ('main_position', 'main_position'), ('readout_position', 'readout_position'), ('family', 'family'))),
              'rewrite_importable': CK.get('rewrite_importable') is True, 'canon_at_commit': S.get('canon_sha16') == canon16,
              'comparator_anchor': CK.get('comparator_anchor') == K3.comparator_anchor(DJ['groups']['real']['names'], T3['nulls']['real']['swap_siblings'], K3.blens_own_pair()),
-             'static_norm': CK.get('static_norm_matches_fact_D') is True}
+             'static_norm': CK.get('static_norm_matches_fact_D') is True, 'forward_guards': (CK.get('forward_guards') or 0) > 0}
+        cm = S.get('commit') or ''
+        at_commit = [f for f in import_closure(TOOLS) + ['design/contrasts-Bl3.json', 'records/Bl3/design-facts-Bl3.json', 'records/Bl3/design-facts-Bl3.md', 'results/Bl3/directions-Bl3.json']
+                     if sha16b(subprocess.run(['git', '-C', REPO, 'show', '%s:%s' % (cm, f)], capture_output=True).stdout) != sha16f(P(f))]
+        c['versions_at_commit'] = bool(re.fullmatch(r'[0-9a-f]{40}', cm)) and not at_commit
+        res['colab_check_versions_differ'] = at_commit
+        tok_local = local_ids_sha16(T3, FJ)
+        c['token_ids'] = all((CK['cells'].get(k) or {}).get('ids_sha16') == v for k, v in tok_local.items())
         res['colab_check'] = dict(c, commit=S.get('commit'), gpu_name=S.get('gpu'), versions_seen=S.get('versions'))
         bad += ['Colab の確かめ: %s' % k for k, v in c.items() if not v]
     return T3, res, bad
@@ -232,7 +273,7 @@ def prepilot(words, when, colab_dir, force=False):
     tools = import_closure(TOOLS)
     files = frozen_files(T3) + [res['dry_run']['path'], rel(CC_SESSION), rel(CC_CHECK)]
     frozen = {r: sha16f(P(r)) for r in files + tools}
-    R = {'kind': 'bl3_freeze_record', 'version': VERSION, 'stage': 'prepilot', 'frozen_jst': when, 'registrant_words': words, 'rulings': sorted(k for k in T3['decisions'] if k >= 'D204'),
+    R = {'kind': 'bl3_freeze_record', 'version': VERSION, 'stage': 'prepilot', 'frozen_jst': when, 'registrant_words': words, 'rulings': sorted((k for k in T3['decisions'] if int(k[1:]) >= 204), key=lambda x: int(x[1:])),
          'frozen_sha16': frozen, 'tools_import_closure': tools, 'directions_npz_sha256': res['directions']['sha256'], 'checks': res,
          'deviation_rule': '凍結の後の変更は、逸脱として番号・日付・理由・登録者の承認を台帳（この記録の deviations）に記す。器の差分は tool_diffs に置き場・前・後の SHA16 を記す（正本 computation.main_freeze_check）',
          'deviations': [],
@@ -282,7 +323,7 @@ def main_freeze_checks(FR, pilot_dirs):
     res['ledgered_not_changed'] = sorted(p for p in ledgered if now_sha.get(p) == frozen.get(p))
     if res['ledgered_not_changed']:
         bad.append('台帳に記した器の差分が凍結物に現れない: %s' % res['ledgered_not_changed'])
-    atts, sessions = [], []
+    atts, sessions, fin = [], [], []
     for d in pilot_dirs:
         PJ = json.load(open(os.path.join(d, 'pilot.json'), encoding='utf-8'))
         S = json.load(open(os.path.join(d, 'session.json'), encoding='utf-8'))
@@ -291,8 +332,39 @@ def main_freeze_checks(FR, pilot_dirs):
         c = S.get('commit') or ''
         if not (re.fullmatch(r'[0-9a-f]{40}', c) and in_commit(c, 'records/Bl3/FREEZE-RECORD-Bl3.json') and in_commit(c, 'records/Bl3/sealing-record-Bl3.json')):
             bad.append('下見の試みのコミットが、凍結の記録と封印の記録を含むコミットでない: %s' % c)
+        if S.get('canon_sha16') != frozen.get(canon) or S.get('directions_npz_sha256') != FR.get('directions_npz_sha256') or ((S.get('frozen_check') or {}).get('bad') or []):
+            bad.append('下見の試みの session の正本か npz か凍結の確かめが、凍結の記録と合わない: %s' % d)
+        if re.fullmatch(r'[0-9a-f]{40}', c):
+            # 封印の記録は封印の後に変わらないので、まるごと照らす。凍結の記録は台帳（deviations）が足されうるので、凍結物の SHA16 の表と npz の SHA-256 を照らす
+            if sha16b(subprocess.run(['git', '-C', REPO, 'show', '%s:records/Bl3/sealing-record-Bl3.json' % c], capture_output=True).stdout) != sha16f(SEAL):
+                bad.append('下見の試みのコミットの封印の記録が、今の封印の記録と違う: %s' % c)
+            try:
+                FRc = json.loads(subprocess.run(['git', '-C', REPO, 'show', '%s:records/Bl3/FREEZE-RECORD-Bl3.json' % c], capture_output=True).stdout.decode('utf-8'))
+            except Exception:
+                FRc = {}
+            if FRc.get('frozen_sha16') != frozen or FRc.get('directions_npz_sha256') != FR.get('directions_npz_sha256'):
+                bad.append('下見の試みのコミットの凍結の記録の凍結物か npz が、今の凍結の記録と違う: %s' % c)
         atts.append(PJ['pilot'])
+        fin.append(S.get('finished') or '')
         sessions.append({k: S.get(k) for k in ('commit', 'gpu', 'versions', 'canon_sha16', 'directions_npz_sha256', 'finished')})
+    if fin != sorted(fin) or not all(fin):
+        bad.append('下見の試みの与えた順が、session の終わりの時刻の順と違う（または時刻が無い）: %s' % fin)
+    reruns = [x for x in FR.get('deviations') or [] if x.get('kind') == 'pilot_rerun']
+    if len(atts) >= 2 and len(reruns) < len(atts) - 1:
+        bad.append('下見の試みが二つ以上あるのに、逸脱の台帳にやり直しの記帳（kind pilot_rerun）が足りない: 試み %d・記帳 %d' % (len(atts), len(reruns)))
+    SR = json.load(open(SEAL, encoding='utf-8')) if os.path.exists(SEAL) else {}
+    # 封印の記録にある凍結の記録の SHA16 は、封印の記録を足したコミットの凍結の記録と照らす（封印の後に逸脱を台帳に記すと、今の凍結の記録は変わりうるため）
+    sc_ = subprocess.run(['git', '-C', REPO, 'log', '--diff-filter=A', '--format=%H', '-1', '--', 'records/Bl3/sealing-record-Bl3.json'], capture_output=True, text=True).stdout.strip()
+    if not sc_:
+        bad.append('封印の記録を足したコミットが無い（封印の記録をコミットしてから本の凍結）')
+    elif sha16b(subprocess.run(['git', '-C', REPO, 'show', '%s:records/Bl3/FREEZE-RECORD-Bl3.json' % sc_], capture_output=True).stdout) != SR.get('freeze_record_sha16'):
+        bad.append('封印の記録にある凍結の記録の SHA16 が、封印の記録を足したコミットの凍結の記録と違う')
+    pre = {}
+    for role, v in (SR.get('predictions') or {}).items():
+        pre[role] = sha256f(P(v['path'])) if os.path.exists(P(v['path'])) else None
+        if pre[role] != v.get('sha256'):
+            bad.append('封印した予想の JSON が無いか、SHA-256 が封印の記録と違う: %s' % role)
+    res['seal'] = {'record_sha16': sha16f(SEAL) if os.path.exists(SEAL) else None, 'predictions_sha256': pre}
     if not atts:
         bad.append('下見の試みが無い')
     elif atts[-1].get('tool_error'):
@@ -313,7 +385,7 @@ def main_freeze(words, when, pilot_dirs):
         raise SystemExit('本の凍結の確かめが外れた（止める・登録者に相談）: %s' % bad)
     before = {k: v for k, v in FR.items()}
     FR['main_freeze'] = {'frozen_jst': when, 'registrant_words': words, 'pilot_attempts': atts, 'pilot': atts[-1], 'decision': atts[-1].get('decision'),
-                         'sessions': sessions, 'frozen_sha16': now_sha, 'tool_diffs_applied': res['changed'], 'freeze_tool': 'tools/freeze_Bl3.py %s' % VERSION}
+                         'sessions': sessions, 'frozen_sha16': now_sha, 'tool_diffs_applied': res['changed'], 'seal': res['seal'], 'freeze_tool': 'tools/freeze_Bl3.py %s' % VERSION}
     assert all(FR[k] == before[k] for k in before), '本の凍結でほかの鍵が変わった'
     assert set(FR) - set(before) == {'main_freeze'}
     json.dump(FR, open(FR_JSON, 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)

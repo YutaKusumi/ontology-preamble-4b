@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""make_contrasts_Bl3.py v5 —— B-lens 層三（Bl3・段階 B の後・B-lens の後・別の小さな登録）の正本 `design/contrasts-Bl3.json` を作る（草案3・登録者裁定 D203〜D223）。
+"""make_contrasts_Bl3.py v8 —— B-lens 層三（Bl3・段階 B の後・B-lens の後・別の小さな登録）の正本 `design/contrasts-Bl3.json` を作る（草案3・登録者裁定 D203〜D223）。
 数は数値の葉に置き、説明の文には構造でない数を打たない（凍結した `tools/numbers_lint.py` の登録検査が正本の説明文と生成器の文字列を見る）。
 段階 B と B-lens の凍結物（正本・集計の記録・方向・活性の記録）は読むだけで変えない。入力の置き場の SHA は器が計算する。再実行で同一バイト（時刻を持たない）。
 起草者が置いた値（設計の巡で諮る）は `drafter_values` に名を並べる。
@@ -10,6 +10,8 @@ v5（草案3 の起草者の見直しの後）: 見直しの記録（`records/Bl
 v6（器の段・下見の前の凍結の準備）: 器の段で見つけたこと T1〜T4（`records/Bl3/tools/tools-log-Bl3.md`）の登録者裁定 D226・D227 を受ける（`records/Bl3/rulings-D226-D227.md`）。
 v7（器についての意見伺いの後）: 登録者裁定 D228〜D235 を受ける（`records/Bl3/rulings-D228-D230.md`・`records/Bl3/rulings-D231-D235.md`・意見伺いの採否の案 `records/reviews/Bl3/opinions-tools/adoption-proposal-opinions-tools-Bl3.md`）。
   裁定 D234 の言い方を、正本の残りの文（下見の記録の並べ方・頭の近道の確かめの定め・最後の層の自己検査の一本・器の実装の検分の見どころと順・見込みの注）にもそろえた。
+v8（器の実装の検分の後）: 登録者裁定 D236〜D238 を受ける（`records/Bl3/rulings-D236-D237.md`・`records/Bl3/rulings-D238.md`・採否の案 `records/reviews/Bl3/impl/adoption-table-impl-Bl3.md`）。
+  検分の順に器の直しの確かめの段を足し（裁定 D238）、合成データの確かめの一覧に、直しで足した確かめを書き足した（裁定 D236）。
 用法: python tools/make_contrasts_Bl3.py
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"""
 import os, re, json, math, hashlib, collections
@@ -17,7 +19,7 @@ import os, re, json, math, hashlib, collections
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 j = lambda *p: os.path.join(REPO, *p)
 NL = chr(10)
-VERSION = 'v7'
+VERSION = 'v8'
 s16 = lambda rel: hashlib.sha256(open(j(*rel.split('/')), 'rb').read().replace(b'\r\n', b'\n')).hexdigest().upper()[:16]
 TL = json.load(open(j('design', 'contrasts-Blens.json'), encoding='utf-8'))          # B-lens の正本（凍結・読むだけ）
 TB = json.load(open(j('design', 'contrasts-B.json'), encoding='utf-8'))              # 段階 B の正本（凍結・読むだけ）
@@ -130,6 +132,9 @@ decisions = {
     'D233': '独立の再計算の一段目は、無操作の値も比べる（同上）',
     'D234': '本の計算は近道を使わない。独立の再計算の二段目は札の一致で判定し、効き目の差の最大は記録して報告に並べる（値だけが許容の外で札が同じときは止めずに逸脱の台帳に記す）。一段目は値と札の両方で判定する。下見の (v) は記述として残す（同上）',
     'D235': '正本の小さな直しと限界の足し（採否の案の C の表）を、下見の前の凍結の正本でまとめて入れる（同上）',
+    'D236': '器の実装の検分（二体）の採否の案の A の表（凍結の前に直す）をすべて採る。走っていた合成データの正式の記録は止め、直した後に取り直す（`records/Bl3/rulings-D236-D237.md`）',
+    'D237': '採否の案の B の表（記録に置く）を採る（同上）',
+    'D238': '直した後に、新しい個体の系統外二名（Gemini）と claude.ai の Claude Opus 5.5 二名に、直しの確かめの検分を頼む（巡を一つ足す・重い所見で直しが大きくなったため）。直しと正式の記録の取り直しの後に、依頼文と束をコーディネータが用意し、登録者が渡す（`records/Bl3/rulings-D238.md`）',
 }
 
 READING = [
@@ -174,7 +179,7 @@ all_ban = sorted(set(value_ban + mech_ban + added_ban + reading_never))
 
 T = {
     'id': 'Bl3',
-    'version': 'draft3-r3-2026-09-25',
+    'version': 'draft3-r4-2026-09-25',
     'generator': 'tools/make_contrasts_Bl3.py %s' % VERSION,
     'note': '段階 B の後・B-lens の後の登録外の記述（小さな登録）。段階 B と B-lens の札・報告・凍結物は変えない。本文と正本が食い違う場合は正本が勝つ。',
     'decisions': decisions,
@@ -210,7 +215,8 @@ T = {
             ('design_r2_verification', 'records/reviews/Bl3/design-round2/verification-Bl3-design-r2.md'), ('rulings_D224_D225', 'records/Bl3/rulings-D224-D225.md'),
             ('draft3_review', 'records/Bl3/draft3-review/review-draft3-Bl3.md'), ('exposure', 'records/Bl3/exposure-before-seal-Bl3.md'),
             ('rulings_D226_D227', 'records/Bl3/rulings-D226-D227.md'), ('rulings_D228_D230', 'records/Bl3/rulings-D228-D230.md'),
-            ('rulings_D231_D235', 'records/Bl3/rulings-D231-D235.md'), ('opinions_adoption', 'records/reviews/Bl3/opinions-tools/adoption-proposal-opinions-tools-Bl3.md'))},
+            ('rulings_D231_D235', 'records/Bl3/rulings-D231-D235.md'), ('opinions_adoption', 'records/reviews/Bl3/opinions-tools/adoption-proposal-opinions-tools-Bl3.md'),
+            ('rulings_D236_D237', 'records/Bl3/rulings-D236-D237.md'), ('rulings_D238', 'records/Bl3/rulings-D238.md'), ('impl_adoption', 'records/reviews/Bl3/impl/adoption-table-impl-Bl3.md'))},
         'activations': {'place': ACT_PLACE, 'sha256_head16': DIRS['activations_npz_sha256'][:16].upper(), 'arms': ARMS8, 'scenes': DIRS['extraction_scenarios']},
         'versions_B': TL['inputs']['versions_B'],
         'versions_note': 'これは B の本走行のセッション記録の版である。torch は CUDA の組みまで揃え、Colab の起動器が入れ直して文字列の完全な一致で確かめる（裁定 D187）',
@@ -405,10 +411,14 @@ T = {
                            '門と最上位の判定の呼び方（符号の二重掛け・中心の引き方）', '層の出力の取り方（`hidden_states` の最後の要素を使わない）',
                            '合成データの確かめを検分者が実際に走らせ、その記録を残す（採否表 P694）'],
                  'budget': '起動の前に、体数・機種・費用を登録者に申告する（独立の再計算の器の書き手を立てるときも同じ）'},
+        'impl_recheck': {'gemini': 2, 'claude_ai': 2, 'fresh': True, 'when': '器の直しと合成データの正式の記録の取り直しの後・Colab の相 check の前',
+                         'what': '直した器と検分の版からの差分・採否の案・二体の票と確かめ・合成データの正式の記録（束と依頼文はコーディネータが用意し、登録者が渡す）',
+                         'why': '器の実装の検分の重い所見で直しが大きくなったので、巡を一つ足す（`review_plan.no_more`・裁定 D238）'},
         'results': {'gemini': 2, 'claude_ai': 2, 'fresh': True},
         'final': {'external': 1, 'fresh': True, 'label': '最終'},
         'counting': 'claude.ai の Claude はコーディネータと同じ系列。何票でも一票に数え、独立の重みは系統外の票に置く（裁定 D59）',
         'order': ['設計の巡（一巡目）', '裁定', '草案2', '設計の巡（二巡目・下見の前の凍結の前の最終検分）', '裁定', '草案3', '登録者の確認（草案3）', '器と合成データの確かめ（独立の再計算の器は別の個体が書く）', '器の実装の検分',
+                  '器の直しの確かめ（系統外二名・claude.ai 二名・裁定 D238）',
                   '下見の前の凍結と記録先行の公開（正本・方向の npz・器）', '封印（下見の前）', '下見（決定木を機械で当てる）', '本の凍結（下見の記録と機械の決定を凍結の記録に足す）',
                   '計算（頭の自己検査・本の計算は近道を使わない・裁定 D234・独立の再計算の二段の判定・結果は登録者と一緒に開く）', '報告', '結果の巡（新しい個体）', '最終の系統外の一票（「最終」と明記）', '起草者の最終の見直し', '登録者最終確認と公開'],
         'no_more': 'この順のほかに巡を置かない（裁定 D160 の型）。重い所見で直しが大きくなるときは、登録者に上げて決めていただく',
@@ -416,7 +426,10 @@ T = {
                       '帰無との同じ値', '両方の向きがちょうど対称な比べる相手', '書き出しの割り方が変わる場合（器が止まるか）', '主位置まで使い回してしまう近道の誤り',
                       '門と主の札と向きの足し分に要る全ての升目・符号・方向の組の突き合わせ（掃き出し）',
                       '端数のバッチ（零のベクトルで埋めた分の値を使わない）', '零の近くの中央値（零が等方の帰無の四分位の間にある）', 'Holm の境で一本違う p（独立の再計算の札の一致の判定）',
-                      '器の誤りでやり直す流れ（一度目の記録と決定を並べる・q1 の採点）', 'bf16 相当の揺れを入れた合成の模型（近道の許容の式と、独立の再計算の二段）'],
+                      '器の誤りでやり直す流れ（一度目の記録と決定を並べる・q1 の採点）', 'bf16 相当の揺れを入れた合成の模型（近道の許容の式と、独立の再計算の二段）', '本の計算が近道を使わないことの振る舞いの確かめ（近道の元を作る呼び出しの数・使い回す cache・列の全長・裁定 D236）',
+                      '正本の文から独立に書いた札と門と、集計の器の出力の突き合わせ（下見で外した升目の場合を含む・裁定 D236）',
+                      '等方の外の行が出る枝（等方は正本の本数・割合を決めた裾と側の一致・q7・読みの型・裁定 D236）',
+                      '起動器の三つの相を DRY で別のプロセスとして走らせ、集計の器の CLI と報告の組み立てに通す（裁定 D236）'],
     },
     'report_rules': {
         'template': ['頭に凍結の後の逸脱の一覧（台帳から器が読む）', '状態は機械の区画で、登録者最終確認の前と後の二つの型（確認の後は逐語と時刻・裁定 D199 の型）',
@@ -468,7 +481,7 @@ T = {
                '最後の層の自己検査（`computation.self_checks.layer`）は作りの上で恒等で、層と位置の取り方だけを確かめる（裁定 D235）'],
     'drafter_values': ['nulls.isotropic.seed', 'readout.primary.order_seed', 'computation.steered_cache_check.seed', 'readout.variants', 'pilot.variant_flag', 'pilot.noise_max', 'pilot.repeat_n',
                        'independent_recompute.tol_stage1', 'computation.layer_tol', 'labels.side_rule', 'labels.second.ranks', 'predictions.items', 'predictions.q7_rule', 'cost'],
-    'numbering': {'rulings_next': 'D236'},
+    'numbering': {'rulings_next': 'D239'},
     'clause': '本正本のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。',
 }
 assert T['pilot']['decision']['cells_min_pass'] <= T['pilot']['decision']['cells_total']

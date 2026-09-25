@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""seal_Bl3.py v1 —— B-lens 層三（Bl3）の予想の封印（2026-09-25・正本 `predictions.order`・`predictions.when`: 下見の前の凍結の後・下見の前に、コーディネータが先に封印して
+"""seal_Bl3.py v2 —— B-lens 層三（Bl3）の予想の封印（2026-09-25・正本 `predictions.order`・`predictions.when`: 下見の前の凍結の後・下見の前に、コーディネータが先に封印して
 SHA だけを伝え、登録者はコーディネータの予想を開かずに封印する・裁定 D148・D210・`tools/seal_Blens.py` v2 の型）。
 
 相:
@@ -24,7 +24,7 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import make_predictions_form_Bl3 as FORM
 
-VERSION = 'v1'
+VERSION = 'v2'          # v2（2026-09-25・裁定 D236）: 登録者の情報状態の欄が空なら、封印は止めずに印を置いて知らせる
 PRED = os.path.join(REPO, 'records', 'predictions')
 PATHS = {'coordinator': os.path.join(PRED, 'predictions-Bl3-coordinator.json'), 'registrant': os.path.join(PRED, 'predictions-Bl3-registrant.json')}
 RECORD_JSON = os.path.join(REPO, 'records', 'Bl3', 'sealing-record-Bl3.json')
@@ -123,8 +123,16 @@ def registrant(json_path, sha):
     if any(vals.get(k) != M[k] for k in ('form', 'program', 'contrasts')):
         raise SystemExit('登録者の JSON の様式の名・プログラム・正本の版が書式と違う')
     validate(vals, keys, opts, 'registrant', T, full=False)
+    empty = info_empty(vals)
+    if empty:
+        print('[seal_Bl3] 登録者の情報状態の欄が空です（%s）。封印は止めません。正本 predictions.free（裁定 D217）は両方が書くとするので、登録者にお知らせします' % '・'.join(empty))
     open(PATHS['registrant'], 'wb').write(b)
     print('[seal_Bl3] 登録者の予想を写した: %s・SHA-256 %s' % (rel(PATHS['registrant']), sha256b(b)))
+
+
+def info_empty(v):
+    """情報状態の欄（`info.coi`・`free`）のうち、空のものの名（正本 predictions.free・裁定 D217・D236）。"""
+    return [k for k in ('info.coi', 'free') if not str(v.get(k) or '').strip()]
 
 
 def record():
@@ -141,13 +149,15 @@ def record():
         b = open(p, 'rb').read()
         v = json.loads(b.decode('utf-8'))
         validate(v, keys, opts, role, T, full=(role == 'coordinator'))
-        R['predictions'][role] = {'path': rel(p), 'sha256': sha256b(b), 'date': v.get('date'), 'n_predicted': sum(1 for k in FORM.prediction_keys(T) if v.get(k) not in (None, '', FORM.NP))}
+        R['predictions'][role] = {'path': rel(p), 'sha256': sha256b(b), 'date': v.get('date'), 'n_predicted': sum(1 for k in FORM.prediction_keys(T) if v.get(k) not in (None, '', FORM.NP)),
+                                  'info_empty': info_empty(v)}                 # 情報状態の欄が空なら、その欄の名（裁定 D236）
     R['clause'] = '本記録のいかなる記述も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
     json.dump(R, open(RECORD_JSON, 'w', encoding='utf-8', newline='\n'), ensure_ascii=False, indent=1)
     md = ['# B-lens 層三の予想の封印の記録（機械生成・`tools/seal_Bl3.py` %s・%s）' % (VERSION, R['written_utc']), '',
           '- 順: %s' % R['order'], '- 時: %s' % R['when'], '- 情報状態の決まり: %s' % R['free_rule'],
           '- 書式: `%s`（SHA-256 %s）' % (R['form']['path'], R['form']['sha256']), '- 下見の前の凍結の記録: `%s`（SHA16 %s）' % (rel(FREEZE), R['freeze_record_sha16'])]
-    md += ['- %s の予想: `%s`（SHA-256 %s・日付 %s・予想した欄 %d）' % (ROLE_WHO[r], x['path'], x['sha256'], x['date'], x['n_predicted']) for r, x in R['predictions'].items()]
+    md += ['- %s の予想: `%s`（SHA-256 %s・日付 %s・予想した欄 %d%s）' % (ROLE_WHO[r], x['path'], x['sha256'], x['date'], x['n_predicted'],
+                                                              ('・情報状態の欄が空: %s' % '・'.join(x['info_empty'])) if x['info_empty'] else '') for r, x in R['predictions'].items()]
     md += ['- この記録が無ければ、Colab の起動器の相 pilot と相 main は走らない。', '', R['clause'], '']
     open(RECORD_MD, 'w', encoding='utf-8', newline='\n').write('\n'.join(md))
     print('[seal_Bl3] 封印の記録を書いた: %s' % rel(RECORD_JSON))
