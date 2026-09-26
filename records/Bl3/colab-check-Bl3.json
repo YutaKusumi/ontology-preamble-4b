@@ -1,0 +1,161 @@
+{
+ "cells": {
+  "N1|O-Ncold": {
+   "prompt_len": 474,
+   "main_position": 473,
+   "readout_position": 480,
+   "family": "nuclear",
+   "set_ids": [
+    64,
+    65,
+    66,
+    67,
+    1097
+   ],
+   "ids_sha16": "3E1ED17F22DE46E7"
+  },
+  "N1|Onull": {
+   "prompt_len": 468,
+   "main_position": 467,
+   "readout_position": 474,
+   "family": "nuclear",
+   "set_ids": [
+    64,
+    65,
+    66,
+    67,
+    1097
+   ],
+   "ids_sha16": "66BD8BDFB04604E0"
+  },
+  "S1|O-Ncold": {
+   "prompt_len": 541,
+   "main_position": 540,
+   "readout_position": 547,
+   "family": "survival",
+   "set_ids": [
+    64,
+    65,
+    66,
+    1097
+   ],
+   "ids_sha16": "13E76FFFC4EDC3E5"
+  },
+  "S1|Onull": {
+   "prompt_len": 535,
+   "main_position": 534,
+   "readout_position": 541,
+   "family": "survival",
+   "set_ids": [
+    64,
+    65,
+    66,
+    1097
+   ],
+   "ids_sha16": "5495988A23B5EFB6"
+  },
+  "S4|O-Ncold": {
+   "prompt_len": 555,
+   "main_position": 554,
+   "readout_position": 561,
+   "family": "survival",
+   "set_ids": [
+    64,
+    65,
+    66,
+    1097
+   ],
+   "ids_sha16": "867C6D794B8AE2FB"
+  },
+  "S4|Onull": {
+   "prompt_len": 549,
+   "main_position": 548,
+   "readout_position": 555,
+   "family": "survival",
+   "set_ids": [
+    64,
+    65,
+    66,
+    1097
+   ],
+   "ids_sha16": "66435F1C1BF22563"
+  },
+  "SK|O-Ncold": {
+   "prompt_len": 556,
+   "main_position": 555,
+   "readout_position": 562,
+   "family": "survival",
+   "set_ids": [
+    64,
+    65,
+    66,
+    1097
+   ],
+   "ids_sha16": "8F26DAB2B47345F0"
+  },
+  "SK|Onull": {
+   "prompt_len": 550,
+   "main_position": 549,
+   "readout_position": 556,
+   "family": "survival",
+   "set_ids": [
+    64,
+    65,
+    66,
+    1097
+   ],
+   "ids_sha16": "E8937296FED5508E"
+  },
+  "S4|Osec-Ncold": {
+   "prompt_len": 557,
+   "main_position": 556,
+   "readout_position": 563,
+   "family": "survival",
+   "set_ids": [
+    64,
+    65,
+    66,
+    1097
+   ],
+   "ids_sha16": "E80A57F4C9EAB515"
+  }
+ },
+ "cell_signs": 17,
+ "passes": 24527,
+ "recompute_rows": 8,
+ "recompute_passes_per_path": 16392,
+ "gate_rows": 64,
+ "secondary": {
+  "row_passes": 1280,
+  "sign_batches": 260,
+  "contexts": 180,
+  "cells": 9,
+  "letter_token_is_L": 180,
+  "max_ids": 2151
+ },
+ "hook_register_remove": true,
+ "rewrite_importable": true,
+ "forward_calls": 0,
+ "forward_guards": 39,
+ "comparator_anchor": {
+  "static": [
+   "O-Ncold~Osec-Ncold",
+   "Osec~O-Ncold",
+   "O~Osec",
+   "O~Osec-Ncold"
+  ],
+  "loaded": [
+   "O-Ncold~Osec-Ncold",
+   "Osec~O-Ncold",
+   "O~Osec",
+   "O~Osec-Ncold"
+  ],
+  "Nk": [
+   "Nk~N"
+  ],
+  "td": [
+   "Onull~N"
+  ]
+ },
+ "static_norm_matches_fact_D": true
+}

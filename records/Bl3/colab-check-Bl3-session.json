@@ -1,0 +1,123 @@
+{
+ "kind": "bl3_colab_check",
+ "boot": "v4",
+ "commit": "aa4205b9d8905f2110e471739e2098d67cf92270",
+ "dry": false,
+ "gpu": "NVIDIA L4",
+ "versions": {
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "torch": "2.11.0+cu128",
+  "transformers": "4.57.3",
+  "torchvision": "0.26.0+cu128",
+  "torchaudio": "2.11.0+cu128",
+  "tokenizers": "0.22.2",
+  "huggingface_hub": "0.36.2",
+  "accelerate": "1.14.0",
+  "safetensors": "0.8.0"
+ },
+ "weights_sha256": {
+  "config.json": "5BEEA1A4A34C62782BFB2F911C606741A3BAB8F92D80A118FA053C28AF12E8BA",
+  "tokenizer.json": "AEB13307A71ACD8FE81861D94AD54AB689DF773318809EED3CBE794B4492DAE4",
+  "model.safetensors.index.json": "D6C42883A895DFEF5B0080ED2116A1BCD764F558406B98923D675978A1ABF29C",
+  "model-00001-of-00003.safetensors": "75311D91BB08CF0B882913DA464A1E722A31FB44DB35208663487EFB7A3D8ED6",
+  "model-00002-of-00003.safetensors": "0B48ADBB1F60E901153D91907BA11CE63BD4B8B584482E730F48808D055DFBA1",
+  "model-00003-of-00003.safetensors": "7DD39CCCA5E4DE123C74C14AF44C9BF2EB75DF33B4614382AF0134528E060D5D"
+ },
+ "canon_sha16": "33E543663FE37A5F",
+ "directions_npz_sha256": "E660707BCD5E9C3DF39B8AD5754C11671B33596D0BF7ED9F66C6DD852A1AB40E",
+ "directions_group_sha256": {
+  "named": "69C1864181E70F2099680068A2FEBCA25557A0163CAED104B5DDC07855CD9304",
+  "B_random": "D8FB3A5967660C5FA81DC706B5154C16E2B36EB46801153F80A4FC8812DDEAF6",
+  "iso": "693B555622F88F502FB7C4A786A70B60B3DA26E7A19302397C0E32E6E9F361EE",
+  "real": "AA61FED01B9B7F2DFB6A5597FC0422B429E5012445AB726BF5B68E637AC92636",
+  "check": "EF11D73BE144C29D6E33688D4BFA91F86DB61A77B7F4394085A37AF29012C6AF"
+ },
+ "frozen_check": null,
+ "layer_idx": 17,
+ "coef": 2.0,
+ "finished": "2026-09-26T08:04:31Z",
+ "log": [
+  {
+   "step": "repo",
+   "t": 0.1,
+   "at": "2026-09-26T08:03:12Z",
+   "commit": "aa4205b9d890",
+   "canon": "draft3-r5-2026-09-26",
+   "canon_sha16": "33E543663FE37A5F",
+   "out": "/content/op4b-Bl3/check-20260926T080312Z"
+  },
+  {
+   "step": "versions",
+   "t": 0.2,
+   "at": "2026-09-26T08:03:12Z",
+   "versions": {
+    "numpy": "2.1.3",
+    "scipy": "1.16.3",
+    "torch": "2.11.0+cu128",
+    "transformers": "4.57.3",
+    "torchvision": "0.26.0+cu128",
+    "torchaudio": "2.11.0+cu128",
+    "tokenizers": "0.22.2",
+    "huggingface_hub": "0.36.2",
+    "accelerate": "1.14.0",
+    "safetensors": "0.8.0"
+   },
+   "gpu": "NVIDIA L4"
+  },
+  {
+   "step": "weights",
+   "t": 69.7,
+   "at": "2026-09-26T08:04:21Z",
+   "snapshot": "cdbee75f17c01a7cc42f958dc650907174af0554",
+   "checked": 6
+  },
+  {
+   "step": "directions",
+   "t": 70.2,
+   "at": "2026-09-26T08:04:22Z",
+   "npz_sha256": "E660707BCD5E9C3D",
+   "groups": {
+    "named": "69C1864181E70F20",
+    "B_random": "D8FB3A5967660C5F",
+    "iso": "693B555622F88F50",
+    "real": "AA61FED01B9B7F2D",
+    "check": "EF11D73BE144C29D"
+   },
+   "n": 2035
+  },
+  {
+   "step": "model",
+   "t": 79.1,
+   "at": "2026-09-26T08:04:31Z",
+   "dry": false,
+   "layers": 36,
+   "layer_idx": 17,
+   "coef": 2.0,
+   "dtype": "torch.bfloat16",
+   "device": "cuda"
+  },
+  {
+   "step": "cells",
+   "t": 79.2,
+   "at": "2026-09-26T08:04:31Z",
+   "main": 8,
+   "gate_only": 1
+  },
+  {
+   "step": "check",
+   "t": 79.8,
+   "at": "2026-09-26T08:04:31Z",
+   "cell_signs": 17,
+   "passes": 24527,
+   "recompute_rows": 8,
+   "gate_rows": 64,
+   "secondary_contexts": 180,
+   "rewrite_importable": true
+  }
+ ],
+ "packaged": "final",
+ "packaged_at": "2026-09-26T08:04:31Z",
+ "seconds": 79.8,
+ "clause": "本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
