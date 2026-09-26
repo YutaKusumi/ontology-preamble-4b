@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""make_frozen_Bl3.py v3 —— B-lens 層三（Bl3）の凍結する本文（`design/design-Bl3-FROZEN.{src.md,md}`）を、草案3 の原稿から組む（B-lens の `make_frozen_Blens.py` の型・2026-09-25）。
+"""make_frozen_Bl3.py v4 —— B-lens 層三（Bl3）の凍結する本文（`design/design-Bl3-FROZEN.{src.md,md}`）を、草案3 の原稿から組む（B-lens の `make_frozen_Blens.py` の型・2026-09-25）。
 
-草案3 の登録者の確認の後に、正本の文を直す裁定（D226〜D238）があったので、凍結の本文は草案3 の本文と次の三つの差だけを持つ（ほかの差があれば止める）:
+草案3 の登録者の確認の後に、正本の文を直す裁定（D226〜D241）があったので、凍結の本文は草案3 の本文と次の三つの差だけを持つ（ほかの差があれば止める）:
   (一) 題名の印・凍結の一行・組み立ての記録の行（段階 B の器 `make_frozen_B.other_diffs` が許す差）。
   (二) 正本の鍵と設計事実から組まれる行のうち、正本と設計事実の直しで変わった行。同じ原稿を今の正本と設計事実で組み直した本文（組み直し）と草案3 の本文の差として機械で出し、
        記録（`records/Bl3/frozen-diff-Bl3.md`）に並べる。原稿の SHA16 が草案3 の組み立ての記録と、組み立ての器の SHA16 が草案3 の本文を最後に変えたコミットの器と同じことを
@@ -19,7 +19,7 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import make_frozen_B as MF
 
-VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 凍結の一行を組み立ての検査の外に置く・凍結版の原稿を組み直して本文と照らす／v2: 組み直しの記録の置き場の言い方・裁定の範囲
+VERSION = 'v4'          # v4（2026-09-26・裁定 D239）: 代わりの行で組んだ後、組み立ての記録の行の原稿の道筋と SHA16 を凍結版の原稿のものに置き換える（一時の道筋を本文に残さない・組み直しが同じになる）・自己検査で main と同じ手順の組み直しを照らす／v3（2026-09-25・裁定 D236）: 凍結の一行を組み立ての検査の外に置く・凍結版の原稿を組み直して本文と照らす／v2: 組み直しの記録の置き場の言い方・裁定の範囲
 STANDIN = '- **凍結**: （凍結の一行・登録者の逐語と日時は組み立ての後に入れる）'      # 組み立ての間の代わりの行（裁定 D236）
 REBUILD_LINT_LABEL = '（組み直しの一時の置き場の数の検査の記録）'      # 組み直しの本文の「束縛」の行の記録の置き場（一時の置き場の道筋を凍結物に残さない）
 NL = chr(10)
@@ -30,7 +30,7 @@ FOUT = os.path.join(REPO, 'design', 'design-Bl3-FROZEN.md')
 LINT = os.path.join(REPO, 'records', 'Bl3', 'numbers-lint-FROZEN-Bl3.md')
 DIFFREC = os.path.join(REPO, 'records', 'Bl3', 'frozen-diff-Bl3.md')
 BUILDER = os.path.join(HERE, 'build_draft_Bl3.py')
-FROZEN_LINE = ('- **凍結**: %s（日本時間・登録者の言葉は逐語で「%s」・草案3 の原稿〔コミット %s 時点〕を逐語複製し、題名と本行と、裁定 D226〜D238 で正本の文を直した行'
+FROZEN_LINE = ('- **凍結**: %s（日本時間・登録者の言葉は逐語で「%s」・草案3 の原稿〔コミット %s 時点〕を逐語複製し、題名と本行と、裁定 D226〜D241 で正本の文を直した行'
                '〔正本の鍵から組まれる行と、原稿の直し〕だけを改める・直した行は `records/Bl3/frozen-diff-Bl3.md`・以後の変更は逸脱台帳に記帳する）')
 # 原稿の文の直し（裁定・直す前・直した後）。直す前の文は原稿の中でちょうど一度だけ当たること。
 LITERAL_FIXES = [
@@ -87,9 +87,13 @@ def build_frozen(src_path, out_path, lint_path):
         tmp = os.path.join(td, 'frozen-standin.src.md')
         open(tmp, 'w', encoding='utf-8', newline='\n').write(src.replace(fl[0], STANDIN))
         build(tmp, out_path, '凍結版', lint_path)
+        rec_tmp = '原稿 `%s` SHA16 %s' % (rel(tmp), sha16f(tmp))            # 組み立ての器 `build_draft_Bl3.py` の組み立ての記録の行の形（道筋と SHA16）
     out = open(out_path, encoding='utf-8').read()
     if out.count(STANDIN) != 1:
         raise SystemExit('組み立てた本文に代わりの行がちょうど一つでない')
+    if out.count(rec_tmp) != 1:
+        raise SystemExit('組み立ての記録の行に、代わりの原稿の道筋と SHA16 がちょうど一度だけ現れない（止める）')
+    out = out.replace(rec_tmp, '原稿 `%s` SHA16 %s' % (rel(src_path), sha16f(src_path)))      # 一時の道筋を本文に残さない（裁定 D239・器の直しの確かめ C2-1）
     open(out_path, 'w', encoding='utf-8', newline='\n').write(out.replace(STANDIN, fl[0]))
 
 
@@ -189,7 +193,16 @@ def main():
             build_frozen(fs, fo, os.path.join(td, 'lint.md'))
             t = open(fo, encoding='utf-8').read()
             assert words_ in t and STANDIN not in t and t.count('- **凍結**:') == 1, '凍結の一行が本文に入らない'
-        print('[make_frozen_Bl3] 自己検査 OK（題名の印・凍結の一行・原稿の直しの %d 行だけが原稿の差・数のある逐語の凍結の一行でも組める）' % len(LITERAL_FIXES))
+            # 組み立ての記録の行は凍結版の原稿の道筋と SHA16 を持ち、一時の原稿を指さない（裁定 D239）。同じ手順で二度組むと同じ本文になる
+            assert 'frozen-standin' not in t and ('原稿 `%s` SHA16 %s' % (rel(fs), sha16f(fs))) in t, '組み立ての記録の行が凍結版の原稿を指さない'
+            fo2 = os.path.join(td, 'f2.md')
+            build_frozen(fs, fo2, os.path.join(td, 'lint.md'))
+            assert open(fo2, encoding='utf-8').read() == t, '同じ手順で二度組んだ本文が違う'
+            # main と同じ手順（数の検査の記録の置き場を凍結の記録の置き場として書く）で組んだ本文を、凍結の器と同じ組み直しの照らしに当てる
+            open(fo, 'w', encoding='utf-8', newline='\n').write(t.replace(rel(os.path.join(td, 'lint.md')), rel(LINT)))
+            res_, bad_ = rebuild_and_check(fs, fo)
+            assert res_['frozen_src_rebuilt_same'] is True and not bad_, ('組み直しの照らしが通らない', bad_)
+        print('[make_frozen_Bl3] 自己検査 OK（題名の印・凍結の一行・原稿の直しの %d 行だけが原稿の差・数のある逐語の凍結の一行でも組める・組み立ての記録の行が凍結版の原稿を指す・組み直しが同じ）' % len(LITERAL_FIXES))
         return
     if a.check:
         res, bad = rebuild_and_check(FSRC, FOUT)

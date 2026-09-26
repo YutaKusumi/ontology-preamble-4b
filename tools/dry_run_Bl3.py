@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""dry_run_Bl3.py v3 —— B-lens 層三（Bl3）の合成データの器（正本 `review_plan.synthetic` の形のすべてと、乱数の小さな模型で端から端まで・2026-09-25）。
+"""dry_run_Bl3.py v4 —— B-lens 層三（Bl3）の合成データの器（正本 `review_plan.synthetic` の形のすべてと、乱数の小さな模型で端から端まで・2026-09-25）。
 
 一. 純粋な関数の形（`tools/bl3_core.py`・`tools/blens_core.py`・`tools/analyze_Bl3.py`）: 奇でない押し・零でない帰無の中心・減算の行・下見で外れる升目と門の行だけの升目・
     帰無との同じ値・両方の向きがちょうど対称な比べる相手・掃き出し・端数のバッチ・零の近くの中央値・Holm の境で一本違う p・器の誤りでやり直す流れ・
@@ -24,7 +24,7 @@ v3（裁定 D236）で足した確かめ: 本の計算が近道を使わない�
 用法: python tools/dry_run_Bl3.py [--force] [--iso 本数（既定は正本の本数）] [--e2e-iso 本数（既定 9）] [--out 置き場]
 柵: 本器の出力のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, re, sys, glob, json, math, time, copy, shutil, hashlib, argparse, datetime, tempfile, subprocess, collections
+import os, re, sys, ast, glob, json, math, time, copy, shutil, hashlib, argparse, datetime, tempfile, subprocess, collections
 import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -33,7 +33,7 @@ sys.path.insert(0, HERE)
 import blens_core as C
 import bl3_core as K
 
-VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 近道の振る舞い・独立の札と答えの分かる門・等方の外の枝・有限でない値・結果を開く段の結びつき・起動器の三つの相／v2（裁定 D231〜D234）
+VERSION = 'v4'          # v4（2026-09-26・裁定 D239）: 門の行の割り当てを転記行 C と段階 B の集計の記録から照らす・台帳の照らし・書き換えの道の有限でない値・use_cache の既定を数える・組の書き換えで判定が止まる・相 check の守りが止める・DRY でない枝（六）・記録の名の欄の「|」／v3（2026-09-25・裁定 D236）: 近道の振る舞い・独立の札と答えの分かる門・等方の外の枝・有限でない値・結果を開く段の結びつき・起動器の三つの相／v2（裁定 D231〜D234）
 NL = chr(10)
 SNAP = os.path.expanduser('~/.cache/huggingface/hub/models--Qwen--Qwen3-4B-Instruct-2507/snapshots/cdbee75f17c01a7cc42f958dc650907174af0554')
 T3 = json.load(open(os.path.join(REPO, 'design', 'contrasts-Bl3.json'), encoding='utf-8'))
@@ -330,7 +330,8 @@ def part_pure():
     check(G, '等方の外の行が出る枝（割合を決めた裾の比べは外の行だけ・q7 の行・裁定 D232・D236）',
           bool(out_ids) and AZ.labels_signature(flip_in) == sig0 and AZ.labels_signature(flip_out) != sig0 and bool(q7r) and all(r_['id'] in out_ids for r_ in q7r),
           '等方の外の行 %d・内の行の裾を変える → 札は同じ・外の行の裾を変える → 札が違う・q7 の行 %d' % (len(out_ids), len(q7r)))
-    # 答えの分かる合成での門の組み立て: 門の行の効き目を行動の量と同じ値に置けば、本の門の順位相関はちょうど一（家族の鍵か単位を取り違えれば一にならない）
+    # 答えの分かる合成での門の組み立て: 門の行の効き目を行動の量と同じ値に置けば、本の門の順位相関はちょうど一。これは門の関数が行の鍵どおりに効き目を引くことを確かめる。
+    # 行の家族の鍵・単位・行動の量の割り当ては、確かめる相手（stage_b_gate_rows）が付けたものを使うので、その割り当ての誤りは捕まえない（下の割り当ての照らしが受ける・裁定 D239）
     AN = json.load(open(os.path.join(REPO, 'records', 'B', 'analysis-B-2026-09-22.json'), encoding='utf-8'))
     rows_gate = AZ.stage_b_gate_rows(T3, AN, AZ.trials_reader())
     units_g = list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]
@@ -348,6 +349,88 @@ def part_pure():
         check(G, '答えの分かる合成での門の組み立て（行の効き目を行動の量に置く・外した升目 %s・裁定 D236）' % ('・'.join(drop_g) or 'なし'),
               abs(G_['main']['rho'] - 1.0) < 1e-12 and G_['main']['n_rows'] == n_left and G_['desc_choice_a']['rho'] < 1.0 - 1e-9,
               '本の門の順位相関 %.12f・行 %d（残った門の行 %d）・選択 a の件数の門の順位相関 %.4f（一でない）' % (G_['main']['rho'], G_['main']['n_rows'], n_left, G_['desc_choice_a']['rho']))
+
+    # 門の行の割り当ての照らし（裁定 D239・器の直しの確かめ C1-新7・C2-4）: 鍵（升目・腕・方向・土台・符号・単位）を設計事実の転記行 C（別の器が組んだ）と、
+    # 家族の鍵と升目を鍵の決まり（場面|土台|符号）と、行動の量を正本の文（その行の破局の対数オッズ − 土台の無操作の腕の破局の対数オッズ・件数に連続性の補正を足す）から
+    # 段階 B の凍結した集計の記録で直に計算した値と照らす（芯の式を呼ばない）
+    cc_ = T3['gate']['continuity']
+    BDx = {(r_['scenario'], r_['arm'], r_['direction_id']): r_ for r_ in AN['by_direction']}
+    lg_ = lambda k_, n_: math.log((k_ + cc_) / (n_ - k_ + cc_))
+    y_bad = [r_['name'] for r_ in rows_gate if abs(r_['y'] - (lg_(BDx[(r_['scenario'], r_['arm'], r_['direction_id'])]['cat'], BDx[(r_['scenario'], r_['arm'], r_['direction_id'])]['n_ok'])
+                                                             - lg_(BDx[(r_['scenario'], r_['base'], 'fixed')]['cat'], BDx[(r_['scenario'], r_['base'], 'fixed')]['n_ok']))) > 1e-12]
+    fam_bad = [r_['name'] for r_ in rows_gate if r_['fam'] != '%s|%s|%+d' % (r_['scenario'], r_['base'], int(r_['sign'])) or r_['cell'] != '%s|%s' % (r_['scenario'], r_['base'])]
+    fc_bad = AZ.gate_rows_vs_facts(rows_gate, FJ)
+    check(G, '門の行の割り当ての照らし（鍵を転記行 C と・家族の鍵を鍵の決まりと・行動の量を段階 B の集計の記録から正本の文で・裁定 D239）', not y_bad and not fam_bad and not fc_bad,
+          '行 %d・行動の量の食い違い %d・家族の鍵の食い違い %d・転記行 C との食い違い %d' % (len(rows_gate), len(y_bad), len(fam_bad), len(fc_bad)))
+    # 取り違えの見本: 答えの分かる合成は一のまま通り、上の照らしが捕まえる（鍵を重ねない取り違え三つ）
+    fa_, fb_ = sorted({r_['fam'] for r_ in rows_gate})[0], sorted({r_['fam'] for r_ in rows_gate})[-1]
+    bug_f = copy.deepcopy(rows_gate)
+    for r_ in bug_f:
+        r_['fam'] = fb_ if r_['fam'] == fa_ else (fa_ if r_['fam'] == fb_ else r_['fam'])
+    bug_y = copy.deepcopy(rows_gate)
+    ia_ = next(i for i, r_ in enumerate(bug_y) if r_['fam'] == fa_)
+    ib_ = next(i for i, r_ in enumerate(bug_y) if r_['fam'] == fb_ and abs(r_['y'] - bug_y[ia_]['y']) > 1e-9)
+    bug_y[ia_]['y'], bug_y[ib_]['y'] = bug_y[ib_]['y'], bug_y[ia_]['y']
+    bug_u = copy.deepcopy(rows_gate)
+    fam_u_ = collections.defaultdict(dict)
+    for i, r_ in enumerate(bug_u):
+        fam_u_[r_['fam']][r_['unit']] = i
+    iu_, ju_ = next(((d_['Nk'], d_['td']) for d_ in fam_u_.values() if 'Nk' in d_ and 'td' in d_), None) or         next(((d_[a__], d_[b__]) for d_ in fam_u_.values() for a__ in d_ for b__ in d_ if a__ < b__))
+    bug_u[iu_]['unit'], bug_u[ju_]['unit'] = bug_u[ju_]['unit'], bug_u[iu_]['unit']
+
+    def ak_rho(rows_):
+        rg_ = np.random.default_rng(23)
+        e_ = collections.defaultdict(dict)
+        for r_ in rows_:
+            for u in units_g:
+                e_[r_['fam']].setdefault(u, float(rg_.normal()))
+            e_[r_['fam']][r_['unit']] = float(r_['y'])
+        return AZ.gates(T3, rows_, dict(e_), [], ())['main']['rho']
+    caught = {}
+    for nm_, b_ in (('家族の名の入れ替え', bug_f), ('行動の量の入れ替え', bug_y), ('単位の入れ替え', bug_u)):
+        y2 = [r_['name'] for r_ in b_ if abs(r_['y'] - (lg_(BDx[(r_['scenario'], r_['arm'], r_['direction_id'])]['cat'], BDx[(r_['scenario'], r_['arm'], r_['direction_id'])]['n_ok'])
+                                                       - lg_(BDx[(r_['scenario'], r_['base'], 'fixed')]['cat'], BDx[(r_['scenario'], r_['base'], 'fixed')]['n_ok']))) > 1e-12]
+        f2 = [r_['name'] for r_ in b_ if r_['fam'] != '%s|%s|%+d' % (r_['scenario'], r_['base'], int(r_['sign']))]
+        caught[nm_] = (abs(ak_rho(b_) - 1.0) < 1e-12, bool(y2 or f2 or AZ.gate_rows_vs_facts(b_, FJ)))
+    check(G, '取り違えの見本（鍵を重ねない三つ）: 答えの分かる合成は一のまま通り、割り当ての照らしが捕まえる（裁定 D239）', all(a_ and b__ for a_, b__ in caught.values()),
+          '・'.join('%s: 答えの分かる合成 %s・割り当ての照らし %s' % (k_, '一のまま' if v_[0] else '一でない', '捕まえた' if v_[1] else '捕まえない') for k_, v_ in caught.items()))
+    # 台帳の器の差分の照らし（裁定 D239・芯の ledger_chain_bad）
+    bs_ = {'tools/a.py': '1', 'tools/b.py': '2'}
+    dv_ = lambda *tds: [{'no': 'x', 'tool_diffs': [{'path': p_, 'before': b__, 'after': a__} for p_, b__, a__ in tds]}]
+    cases_ = [('差分なし・同じ', dict(bs_), [], True), ('台帳に無い変え', {'tools/a.py': '3', 'tools/b.py': '2'}, [], False),
+              ('台帳に記した変え', {'tools/a.py': '3', 'tools/b.py': '2'}, dv_(('tools/a.py', '1', '3')), True),
+              ('同じ置き場の二度の直し', {'tools/a.py': '4', 'tools/b.py': '2'}, dv_(('tools/a.py', '1', '3')) + dv_(('tools/a.py', '3', '4')), True),
+              ('前後の切れ', {'tools/a.py': '4', 'tools/b.py': '2'}, dv_(('tools/a.py', '1', '3')) + dv_(('tools/a.py', '5', '4')), False),
+              ('記したのに現れない', dict(bs_), dv_(('tools/a.py', '1', '3')), False)]
+    got_ = [(nm_, not K.ledger_chain_bad(bs_, now_, d_)) for nm_, now_, d_, want_ in cases_]
+    check(G, '台帳の器の差分を路ごとにつなげる照らし（二度の直しは通り・切れと無い変えと現れない差分は止まる・裁定 D239）', all(g_ == w_[3] for (_, g_), w_ in zip(got_, cases_)),
+          '・'.join('%s %s' % (nm_, '通る' if g_ else '止まる') for nm_, g_ in got_))
+    # 書き換えの道の有限でない値は、判定の段で不一致として記す（例外で落ちない・裁定 D239・器の直しの確かめ C2-7）
+    n_can_ = T3['nulls']['isotropic']['count']
+    pair_names = list(DJ['groups']['real']['names'])
+    eff_n = synth_effects(T3, pair_names, n_can_, 37)
+    swaps_ = T3['nulls']['real']['swap_siblings']
+    rows_n, dbr_n = K.recompute_set(T3['main_rows'], pair_names, swaps_, n_can_)
+
+    def path_n(noise):
+        o_ = {}
+        for nm_, ck_, s_ in rows_n:
+            sc_, b__ = ck_.split('|')
+            o_[nm_] = {'noop_lo': 0.0, 'effects': {'%s|%+d' % (d_, sg_): float(eff_n['%s|%s|%+d' % (sc_, b__, sg_)][d_]) + noise for d_, sg_ in dbr_n[nm_]}}
+        return o_
+    hk_n, rw_n = path_n(0.0), path_n(1e-7)
+    ag_ok = AZ.recompute_agreement(T3, T3['main_rows'], eff_n, pair_names, hk_n, rw_n, {'floor': 1e-6})
+    rw_bad = copy.deepcopy(rw_n)
+    r0_ = next(iter(rw_bad))
+    rw_bad[r0_]['effects'][next(k_ for k_ in rw_bad[r0_]['effects'] if k_.startswith('static|'))] = float('nan')
+    try:
+        ag_nan = AZ.recompute_agreement(T3, T3['main_rows'], eff_n, pair_names, hk_n, rw_bad, {'floor': 1e-6})
+        nan_msg = '不一致 %s・理由 %s' % (not ag_nan['agree'], ag_nan.get('reason'))
+        nan_ok = (not ag_nan['agree']) and ag_nan.get('reason') == 'non_finite'
+    except Exception as e_:
+        nan_ok, nan_msg = False, '%s: %s' % (type(e_).__name__, str(e_)[:60])
+    check(G, '書き換えの道の有限でない値は判定の段で不一致として記す（例外で落ちない・等方 %d 本・裁定 D239）' % n_can_, bool(ag_ok['agree']) and nan_ok,
+          'NaN の無い二つの道 一致 %s／書き換えの道の v̂ の効き目の一つを NaN に → %s' % (bool(ag_ok['agree']), nan_msg))
 
 
 # ---------------- 二・三. 乱数の小さな模型 ----------------
@@ -466,7 +549,7 @@ def part_model(iso_n, e2e_iso):
         ids_ = kwargs.get('input_ids') if kwargs.get('input_ids') is not None else (args[0] if args else None)
         fwd['n'] += 1
         fwd['past'] += int(kwargs.get('past_key_values') is not None)
-        fwd['use_cache'] += int(bool(kwargs.get('use_cache')))
+        fwd['use_cache'] += int(kwargs.get('use_cache') is not False)          # 渡さない（模型の設定の既定）回も数える（裁定 D239・器の直しの確かめ C1-新10）
         fwd['short'] += int(ids_ is None or int(ids_.shape[-1]) not in full_len)
     hk_ = model.register_forward_pre_hook(pre_kw, with_kwargs=True)
     try:
@@ -478,7 +561,7 @@ def part_model(iso_n, e2e_iso):
     check(G2, '本の計算の頭の出口の値の自己検査', hd['logit_check']['pass'], '差の最大 %.2e（許容 %s）' % (hd['logit_check']['max_abs'], hd['logit_check']['tol']))
     check(G2, '本の計算は近道を使わない（振る舞い: 近道の元を作る呼び出し・使い回す cache・use_cache・列の全長を全ての順伝播で数えた・裁定 D236）',
           fwd['n'] > 0 and pc_calls[0] == 0 and fwd['past'] == 0 and fwd['use_cache'] == 0 and fwd['short'] == 0,
-          '順伝播 %d 回・近道の元を作った回 %d・cache を渡した回 %d・use_cache が真の回 %d・列の全長でない回 %d' % (fwd['n'], pc_calls[0], fwd['past'], fwd['use_cache'], fwd['short']))
+          '順伝播 %d 回・近道の元を作った回 %d・cache を渡した回 %d・use_cache が偽でない回 %d・列の全長でない回 %d' % (fwd['n'], pc_calls[0], fwd['past'], fwd['use_cache'], fwd['short']))
     check(G2, '本の計算は近道を使わない（頭の近道の確かめを走らせない・下見の (v) は記述・裁定 D234）',
           MP['shortcut'] is False and hd.get('shortcut') is False and 'steered_cache_check' not in hd and 'shortcut_rule' in hd,
           '下見の (v) の近道の決定 %s・(v) の差の最大 %.2e（近道の許容 %.4f）' % (pilot['v']['shortcut'], max(abs(x) for x in pilot['v']['diffs'].values()), tol))
@@ -789,7 +872,8 @@ def part_model(iso_n, e2e_iso):
             key, max(dm), sum(x > tol2 for x in dm), len(dm), max(dsh), sum(x > tol2 for x in dsh), len(dsh), s_['lo'][K.NOOP] - m_['lo'][K.NOOP], max(abs(x) for x in h_S['effects'].values())))
     check(G3, '（記述）本物の相対の加減の大きさの合成の方向での、二段目の本の道とフックの差・近道ありの本の道との比べ（判定に入れない・二段目の許容 %.4f・意見伺いの C2-3.2）' % tol2, True, '／'.join(lines_S))
     return {'pilot': pilot, 'pilot_batch1': pilot_1, 'n_forward': sum(r.n_forward for r in RUNNERS), 'rewrite_passes': RW_PASSES[0], 'seconds': round(time.time() - t0, 1),
-            'iso_n': iso_n, 'e2e_iso': e2e_iso, 'layers': cfg.num_hidden_layers, 'dim': cfg.hidden_size}
+            'iso_n': iso_n, 'e2e_iso': e2e_iso, 'layers': cfg.num_hidden_layers, 'dim': cfg.hidden_size,
+            'MP': MP, 'sec_part': sec_part, 'L': L, 'coef': coef}                   # 六（DRY でない枝）に渡す（本の計算の出力と乙の組・裁定 D239）
 
 
 # ---------------- 四. 別の個体の書き換えの器の自己検査と --dry ----------------
@@ -815,6 +899,7 @@ def part_boot(iso_n_boot):
     一致だけを見る段の後に、組の出力の中身だけを変えた写し（置き場の名は同じ）で結果を開く段が止まることを確かめる。出力は一時の置き場に置き、終わりに消す。"""
     G = '五'
     import build_report_Bl3 as BRP
+    import analyze_Bl3 as AZ
     td = tempfile.mkdtemp(prefix='dry-boot-')
     env = dict(os.environ, OP4B_DRY='1', OP4B_REPO_DIR=REPO, OP4B_OUT=td, OP4B_DRY_ISO=str(iso_n_boot), OP4B_DRY_SEC='2', OP4B_DRY_RC='2', PYTHONIOENCODING='utf-8')
     run = lambda cmd, extra=None: subprocess.run([sys.executable] + cmd, capture_output=True, text=True, encoding='utf-8', errors='replace', cwd=REPO, env=dict(env, **(extra or {})))
@@ -828,6 +913,13 @@ def part_boot(iso_n_boot):
         check(G, '起動器の三つの相（DRY・別のプロセス）: 相 check は順伝播を呼ばずに終わり、呼ばれた数と升目のトークンの並びの SHA16 を書く',
               r_c.returncode == 0 and CK.get('forward_calls') == 0 and (CK.get('forward_guards') or 0) > 0 and bool(cells_ck) and all('ids_sha16' in v for v in cells_ck.values()),
               '終わりの値 %d・順伝播を呼んだ数 %s・守り %s・升目 %d' % (r_c.returncode, CK.get('forward_calls'), CK.get('forward_guards'), len(cells_ck)))
+        # 守りの掛かった呼び出しを相 check の中に入れる（DRY に限る環境の変数・Exception で呑もうとする・裁定 D239・器の直しの確かめ C2-13）
+        r_g = run(['tools/colab/boot_Bl3.py'], {'OP4B_PHASE': 'check', 'OP4B_DRY_GUARD_TEST': '1'})
+        zs_g = sorted(glob.glob(os.path.join(td, 'check-*-stopped.zip')))
+        out_g = r_g.stdout + r_g.stderr
+        check(G, '起動器の三つの相（DRY・別のプロセス）: 相 check の中の守りの掛かった呼び出しを Exception で呑もうとしても、守りが止めて止めの zip を作る（裁定 D239）',
+              r_g.returncode != 0 and bool(zs_g) and '相 check の守り' in out_g,
+              '終わりの値 %d・止めの zip %d・印字 %s' % (r_g.returncode, len(zs_g), [l.strip() for l in out_g.split(NL) if '相 check の守り' in l][:1]))
         r_p = run(['tools/colab/boot_Bl3.py'], {'OP4B_PHASE': 'pilot'})
         dp = newest('pilot')
         pj = os.path.join(dp, 'pilot.json') if dp else ''
@@ -850,7 +942,7 @@ def part_boot(iso_n_boot):
         check(G, '起動器の三つの相（DRY・別のプロセス）: 集計の器の CLI の一致だけを見る段・結果を開く段・掃き出しの CLI・報告の組み立てと走査が通る',
               r_j.returncode == 0 and r_o.returncode == 0 and r_s.returncode == 0 and V == [] and bool((A or {}).get('inputs')),
               '終わりの値 %d・%d・%d・走査の違反 %s・結果を開く段の記録に読んだ出力の同定 %s' % (r_j.returncode, r_o.returncode, r_s.returncode, None if V is None else len(V), bool((A or {}).get('inputs'))))
-        stopped_ok, out_t = False, ''
+        stopped_ok, out_t, stopped_j, out_j = False, '', False, ''
         if dm and r_j.returncode == 0:
             t2 = os.path.join(td, 'tampered')
             os.makedirs(t2)
@@ -861,12 +953,268 @@ def part_boot(iso_n_boot):
             d0 = 'Nk' if 'Nk' in Mt['cells'][k0]['effects'] else next(iter(Mt['cells'][k0]['effects']))
             Mt['cells'][k0]['effects'][d0] += 1000.0
             json.dump(Mt, open(os.path.join(dt, 'main.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+            # 一つ目: session はそのまま → 一致だけを見る段が、起動器が書いた組の SHA-256 と違うことで止まって書かない（裁定 D239）
+            jt = os.path.join(td, 'judge-tampered.json')
+            r_jt = run(['tools/analyze_Bl3.py', 'judge', dt, '--pilot', pj, '--out', jt])
+            out_j = r_jt.stdout + r_jt.stderr
+            stopped_j = r_jt.returncode != 0 and 'session に書いた値と違う' in out_j and not os.path.exists(jt)
+            # 二つ目: session の組の SHA-256 もそろえて書き換える → 結果を開く段が、一致だけを見る段の読んだ出力と違うことで止まって書かない（裁定 D236）
+            St = json.load(open(os.path.join(dt, 'session.json'), encoding='utf-8'))
+            St['part_sha256']['main'] = AZ.sha256f(os.path.join(dt, 'main.json'))
+            json.dump(St, open(os.path.join(dt, 'session.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
             at = os.path.join(td, 'analysis-tampered.json')
             r_t = run(['tools/analyze_Bl3.py', 'open', dt, '--pilot', pj, '--judge-record', jr, '--out', at])
             out_t = r_t.stdout + r_t.stderr
             stopped_ok = r_t.returncode != 0 and '読んだ出力と違う' in out_t and not os.path.exists(at)
-        check(G, '起動器の三つの相（DRY・別のプロセス）: 一致だけを見る段の後に組の出力の中身を変えると、結果を開く段が止まって書かない（裁定 D236）', stopped_ok,
-              ('・'.join([l for l in out_t.split(NL) if '読んだ出力と違う' in l][:1]) or '止まらなかった'))
+        check(G, '起動器の三つの相（DRY・別のプロセス）: 組の出力の中身を変えて session はそのままなら、一致だけを見る段が止まって書かない（組の SHA-256・裁定 D239）', stopped_j,
+              ('・'.join([l.strip() for l in out_j.split(NL) if 'session に書いた値と違う' in l][:1]) or '止まらなかった'))
+        check(G, '起動器の三つの相（DRY・別のプロセス）: 一致だけを見る段の後に組の出力と session をそろえて変えると、結果を開く段が止まって書かない（裁定 D236）', stopped_ok,
+              ('・'.join([l.strip() for l in out_t.split(NL) if '読んだ出力と違う' in l][:1]) or '止まらなかった'))
+    finally:
+        shutil.rmtree(td, ignore_errors=True)
+    return round(time.time() - t1, 1)
+
+
+# ---------------- 六. DRY でない枝（一時の git の置き場・裁定 D239） ----------------
+def part_nondry(info):
+    """DRY でない枝を、一時の git の置き場（今の作業木を写した複製）で、器を別のプロセスとして走らせて確かめる（裁定 D239・器の直しの確かめ C1-新5・C2-14・C1 と C2 の条件）。
+    凍結の本文の器と予想の書式の器を走らせて下見の前の凍結の確かめ（Colab の確かめを除く）に当て、下見の前の凍結の記録と封印の記録（合成）を置いてコミットし、
+    下見の出力（二の段の下見の記録を DRY でない形の session で）で本の凍結の器を走らせてコミットする。相 main の三つの組の出力は、組を一つずつ走らせた形で DRY でない session と
+    置く（本の計算の出力は二の段のもの・等方は正本の本数・独立の再計算の二つの道の値はそこから合成）。集計の器の CLI（一致だけを見る段・台帳の追記・結果を開く段）・掃き出し・
+    報告の器の CLI を通し、止まるべき場合を確かめる。実の重みは読まない。一時の置き場は終わりに消す。戻り値: 秒。"""
+    G = '六'
+    import analyze_Bl3 as AZ
+    import freeze_Bl3 as FZ
+    import importlib.util
+    t1 = time.time()
+    td = tempfile.mkdtemp(prefix='dry-nondry-')
+    CL = os.path.join(td, 'clone')
+    CLAUSE_ = '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
+    base_env = {k: v for k, v in os.environ.items() if not k.startswith('OP4B_')}
+    run_ = lambda args, cwd=None: subprocess.run(args, capture_output=True, text=True, encoding='utf-8', errors='replace', cwd=cwd, env=dict(base_env, PYTHONIOENCODING='utf-8'))
+    py = lambda *a: run_([sys.executable] + list(a), cwd=CL)
+    git = lambda *a: run_(['git', '-C', CL, '-c', 'user.name=dry-run', '-c', 'user.email=dry-run@invalid'] + list(a))
+    say_ = lambda r: r.stdout + r.stderr
+    line_ = lambda r, w: ([l.strip() for l in say_(r).split(NL) if w in l] or ['（印字に「%s」が無い）' % w])[0][:140]
+    P_ = lambda rel: os.path.join(CL, *rel.split('/'))
+    rd_ = lambda p: open(p, encoding='utf-8').read()
+    wr_ = lambda p, t: open(p, 'w', encoding='utf-8', newline=NL).write(t)
+
+    def set_json(path, fn):
+        o_ = json.load(open(path, encoding='utf-8'))
+        fn(o_)
+        json.dump(o_, open(path, 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1, default=jdefault)
+    try:
+        assert run_(['git', 'clone', '-q', '--shared', '--no-checkout', REPO, CL]).returncode == 0, 'git clone'
+        assert git('checkout', '-q', 'HEAD').returncode == 0, 'git checkout'
+        for d in ('tools', 'design', 'records/Bl3', 'records/reviews/Bl3', 'results/Bl3'):
+            shutil.copytree(os.path.join(REPO, *d.split('/')), P_(d), dirs_exist_ok=True, ignore=shutil.ignore_patterns('__pycache__'))
+        # (一) 凍結の本文の器を端から端まで・予想の書式・下見の前の凍結の確かめ（Colab の確かめを除く）
+        r_mf = py('tools/make_frozen_Bl3.py', '--words', '（合成の登録者の言葉）', '--commit', 'deadbeef', '--date', '2026-09-26 00:00')
+        ftxt = rd_(P_('design/design-Bl3-FROZEN.md')) if os.path.exists(P_('design/design-Bl3-FROZEN.md')) else ''
+        rec_line = ('原稿 `design/design-Bl3-FROZEN.src.md` SHA16 %s' % sha16f(P_('design/design-Bl3-FROZEN.src.md'))) if os.path.exists(P_('design/design-Bl3-FROZEN.src.md')) else '?'
+        r_ck = py('tools/make_frozen_Bl3.py', '--check')
+        local_ = [x for x in (td, td.replace('\\', '/'), os.path.expanduser('~'), os.path.expanduser('~').replace('\\', '/'), 'AppData', 'frozen-standin') if x in ftxt]
+        check(G, 'DRY でない枝: 凍結の本文の器を一時の複製で端から端まで走らせ、組み立ての記録の行が凍結版の原稿を指し、手元の道筋が無く、組み直しが同じ（裁定 D239）',
+              r_mf.returncode == 0 and r_ck.returncode == 0 and rec_line in ftxt and not local_,
+              '組み立ての終わりの値 %d・組み直しの確かめの終わりの値 %d・記録の行が凍結版の原稿を指す %s・手元の道筋 %d' % (r_mf.returncode, r_ck.returncode, rec_line in ftxt, len(local_)))
+        r_fm = py('tools/make_predictions_form_Bl3.py')
+        r_co = py('tools/freeze_Bl3.py', 'prepilot', '--check-only')
+        m_ = re.search(r'下見の前の凍結の確かめが外れた（止める・登録者に相談）: (\[.*\])', say_(r_co))
+        co_bad = ast.literal_eval(m_.group(1)) if m_ else []
+        other = [x for x in co_bad if not x.startswith('合成データの正式の記録')]
+        check(G, 'DRY でない枝: 予想の書式を組み、下見の前の凍結の確かめ（Colab の確かめを除く）で凍結の本文と書式と正本と方向と器の自己検査が通る（外れは、取り直す前の合成データの正式の記録のものだけ）',
+              r_fm.returncode == 0 and (r_co.returncode == 0 or (bool(m_) and not other)),
+              '書式の終わりの値 %d・確かめの外れ %d（合成データの正式の記録の外の外れ %d%s）' % (r_fm.returncode, len(co_bad), len(other), ('・' + other[0][:60]) if other else ''))
+        # (二) 下見の前の凍結の記録と封印の記録（合成）を置いてコミットする
+        files_ = sorted({f for f in FZ.frozen_files(T3) + FZ.import_closure(FZ.TOOLS) if os.path.exists(P_(f))})
+        fz = collections.OrderedDict((f, sha16f(P_(f))) for f in files_)
+        FRp = P_('records/Bl3/FREEZE-RECORD-Bl3.json')
+        json.dump({'kind': 'bl3_freeze_record', 'version': 'dry', 'stage': 'prepilot', 'frozen_jst': '（合成）', 'registrant_words': '（合成）', 'frozen_sha16': fz,
+                   'directions_npz_sha256': DJ['npz_sha256'], 'deviation_rule': '（合成）', 'deviations': [], 'clause': CLAUSE_},
+                  open(FRp, 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)
+        wr_(P_('records/Bl3/FREEZE-RECORD-Bl3.md'), '# （合成）下見の前の凍結の記録' + NL + NL + CLAUSE_ + NL)       # 本の凍結の器が読んで書き足す
+        os.makedirs(P_('records/predictions'), exist_ok=True)
+        pr_ = {}
+        for role in ('coordinator', 'registrant'):
+            rp_ = 'records/predictions/predictions-Bl3-%s.json' % role
+            wr_(P_(rp_), json.dumps({'q1.pilot': '続ける', 'q4.gate': '通らない'}, ensure_ascii=False))
+            pr_[role] = {'path': rp_, 'sha256': hashlib.sha256(open(P_(rp_), 'rb').read()).hexdigest().upper()}
+        json.dump({'predictions': pr_, 'freeze_record_sha16': sha16f(FRp), 'clause': CLAUSE_}, open(P_('records/Bl3/sealing-record-Bl3.json'), 'w', encoding='utf-8', newline=NL),
+                  ensure_ascii=False, indent=1)
+        git('add', '-A')
+        git('commit', '-q', '-m', 'dry: prepilot freeze and seal (synthetic)')
+        C_a = git('rev-parse', 'HEAD').stdout.strip()
+        # (三) 下見の出力（二の段の下見の記録・DRY でない形の session）で本の凍結の器を走らせ、コミットする
+        pil = json.loads(json.dumps(info['pilot'], default=jdefault))
+        canon16 = sha16f(P_('design/contrasts-Bl3.json'))
+        vers = dict(T3['inputs']['versions_B'])
+        pdir = os.path.join(td, 'pilot-1')
+        os.makedirs(pdir)
+        json.dump({'pilot': pil, 'variants_used': [], 'clause': CLAUSE_}, open(os.path.join(pdir, 'pilot.json'), 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)
+        json.dump({'kind': 'bl3_colab_pilot', 'boot': 'dry', 'commit': C_a, 'dry': False, 'gpu': 'NVIDIA L4（合成）', 'versions': vers, 'canon_sha16': canon16,
+                   'directions_npz_sha256': DJ['npz_sha256'], 'frozen_check': {'checked': len(fz), 'skipped': [], 'bad': []}, 'finished': '2026-09-26T01:00:00+09:00'},
+                  open(os.path.join(pdir, 'session.json'), 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)
+        r_mz = py('tools/freeze_Bl3.py', 'main', '--words', '（合成の本の凍結の言葉）', '--when', '2026-09-26 01:10', '--pilot', pdir)
+        FR1 = json.load(open(FRp, encoding='utf-8'))
+        git('add', '-A')
+        git('commit', '-q', '-m', 'dry: main freeze (synthetic)')
+        C_b = git('rev-parse', 'HEAD').stdout.strip()
+        check(G, 'DRY でない枝: 本の凍結の器が、下見の試みのコミット・封印の記録の錨・凍結物の照らしを通って本の凍結を記す（台帳の行の数を記す・裁定 D239）',
+              r_mz.returncode == 0 and 'main_freeze' in FR1 and FR1['main_freeze'].get('deviations_n') == 0 and FR1['main_freeze'].get('pilot') == pil,
+              '終わりの値 %d・%s' % (r_mz.returncode, line_(r_mz, '本の凍結')))
+        # (四) 相 main の三つの組の出力（組を一つずつ・DRY でない session）
+        MP = info['MP']
+        n_can = T3['nulls']['isotropic']['count']
+        dropped = sorted((pil.get('decision') or {}).get('dropped', []))
+        cells_ = json.loads(json.dumps(MP['cells'], default=jdefault))
+        rng_p = np.random.default_rng(29)
+        for o_ in cells_.values():                     # 等方を正本の本数にそろえる（二の段の等方を試しの走りで減らしたときだけ・合成の値）
+            for v_ in [v for v in o_.values() if isinstance(v, dict) and 'iso:0' in v]:
+                have = [d_ for d_ in v_ if d_.startswith('iso:')]
+                vals = np.array([v_[d_] for d_ in have], dtype=float)
+                for i_ in range(len(have), n_can):
+                    v_['iso:%d' % i_] = float(rng_p.normal(vals.mean(), vals.std() + 1e-6))
+            if (o_.get('layers') or {}).get('iso_summary'):
+                o_['layers']['iso_summary']['n'] = n_can
+        pair_names_ = list(DJ['groups']['real']['names'])
+        rows_rc, dbr = K.recompute_set(T3['main_rows'], pair_names_, T3['nulls']['real']['swap_siblings'], n_can, dropped)
+
+        def path_(noise):
+            o2 = {}
+            for nm_, ck_, s_ in rows_rc:
+                sc_, b_ = ck_.split('|')
+                o2[nm_] = {'noop_lo': float(cells_['%s|%s|%+d' % (sc_, b_, s_)]['lo'][K.NOOP]) + noise,
+                           'effects': {'%s|%+d' % (d_, sg_): float(cells_['%s|%s|%+d' % (sc_, b_, sg_)]['effects'][d_]) + noise for d_, sg_ in dbr[nm_]}}
+            return o2
+        head_ = json.loads(json.dumps(MP['head'], default=jdefault))
+        parts_ = collections.OrderedDict([
+            ('main', {'part': 'main', 'clause': CLAUSE_, 'head': head_, 'cells': cells_, 'batch': pil['batch'], 'shortcut': False, 'dropped': dropped, 'n_forward': 0, 'n_forward_total': 0}),
+            ('recompute', {'part': 'recompute', 'clause': CLAUSE_, 'logit_check': head_['logit_check'], 'rows': [list(r_) for r_ in rows_rc], 'n_iso': n_can,
+                           'hook': path_(0.0), 'rewrite': path_(1e-7), 'n_forward': 0, 'n_forward_total': 0}),
+            ('secondary', dict(json.loads(json.dumps(info['sec_part'], default=jdefault)), part='secondary', clause=CLAUSE_, logit_check=head_['logit_check']))])
+        dirs_ = []
+        for i_, (part_, obj_) in enumerate(parts_.items()):
+            d_ = os.path.join(td, 'main-%s' % part_)
+            os.makedirs(d_)
+            jp_ = os.path.join(d_, '%s.json' % part_)
+            json.dump(obj_, open(jp_, 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1, default=jdefault)
+            json.dump({'kind': 'bl3_colab_main', 'boot': 'dry', 'commit': C_b, 'dry': False, 'gpu': 'NVIDIA L4（合成）', 'versions': vers, 'weights_sha256': FJ['facts']['F']['sha256'],
+                       'canon_sha16': canon16, 'directions_npz_sha256': DJ['npz_sha256'], 'frozen_check': {'checked': len(fz), 'skipped': [], 'bad': []},
+                       'layer_idx': info['L'], 'coef': info['coef'],
+                       'pilot_used': {'batch': pil['batch'], 'floor': pil['floor'], 'cache_tol': pil['cache_tol'], 'shortcut': (pil.get('v') or {}).get('shortcut'), 'dropped': dropped},
+                       'parts': [part_], 'part_sha256': {part_: AZ.sha256f(jp_)}, 'finished': '2026-09-26T0%d:00:00+09:00' % (2 + i_)},
+                      open(os.path.join(d_, 'session.json'), 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)
+            dirs_.append(d_)
+        # (五) 正しい流れ: 台帳の一行 → 一致だけを見る段 → 台帳の追記 → 結果を開く段 → 掃き出し → 報告の器の CLI
+        set_json(FRp, lambda o: o['deviations'].append({'no': '合成の一', 'kind': 'note', 'reason': '（合成）一致だけを見る段の前に記した行', 'tool_diffs': []}))
+        r_j = py('tools/analyze_Bl3.py', 'judge', *dirs_)
+        set_json(FRp, lambda o: o['deviations'].append({'no': '合成の二', 'kind': 'recompute_values', 'reason': '（合成）二段目の値だけが許容の外で札は同じ', 'tool_diffs': []}))
+        r_o = py('tools/analyze_Bl3.py', 'open', *dirs_)
+        r_s = py('tools/sweep_Bl3.py', 'records/Bl3/analysis-Bl3.json')
+        rej = os.path.join(td, 'rejected.md')
+        wr_(rej, '- 起草者の行（合成・数を打たない）' + NL)
+        r_r = py('tools/build_report_Bl3.py', '--rejected', rej)
+        check(G, 'DRY でない枝: 一致だけを見る段（等方は正本の本数・凍結の記録と手元の器・相 main が使った下見の記録・session のコミットの本の凍結）→ 台帳の追記 → 結果を開く段 → 掃き出し → 報告の器の CLI（走査の違反 0）が通る（裁定 D239）',
+              r_j.returncode == 0 and '全体 一致' in say_(r_j) and r_o.returncode == 0 and r_s.returncode == 0 and r_r.returncode == 0 and '走査の違反 0' in say_(r_r),
+              '終わりの値 判定 %d・開く %d・掃き出し %d・報告 %d・%s' % (r_j.returncode, r_o.returncode, r_s.returncode, r_r.returncode,
+                                                               line_(r_r, '走査の違反') if r_r.returncode == 0 else line_(r_r if r_r.returncode else (r_o if r_o.returncode else r_j), '止')))
+        FRbak = rd_(FRp)
+        jr0 = P_('records/Bl3/judge-Bl3.json')
+
+        def copy_dirs(tag, mutate):
+            out_ = []
+            for d_ in dirs_:
+                d2 = os.path.join(td, tag, os.path.basename(d_))
+                shutil.copytree(d_, d2)
+                mutate(d2)
+                out_.append(d2)
+            return out_
+        # (六) 書き換えで止まる: 組の JSON だけ → 判定・組と session をそろえて → 開く段・判定の記録 → 開く段
+        tamper = lambda d2: set_json(os.path.join(d2, 'main.json'), lambda o: o['cells'][next(iter(o['cells']))]['effects'].__setitem__('static', 99.0)) if d2.endswith('main-main') else None
+
+        def tamper_both(d2):
+            if d2.endswith('main-main'):
+                tamper(d2)
+                set_json(os.path.join(d2, 'session.json'), lambda o: o['part_sha256'].__setitem__('main', AZ.sha256f(os.path.join(d2, 'main.json'))))
+        da, db = copy_dirs('a', tamper), copy_dirs('b', tamper_both)
+        r_a = py('tools/analyze_Bl3.py', 'judge', *da, '--out', os.path.join(td, 'j-a.json'))
+        r_b = py('tools/analyze_Bl3.py', 'open', *db, '--judge-record', jr0, '--out', os.path.join(td, 'a-b.json'))
+        jc = os.path.join(td, 'j-c.json')
+        Jc = json.load(open(jr0, encoding='utf-8'))
+        Jc['env']['diff'] = {'gpu': {'main': '（書き換えた）'}}
+        json.dump(Jc, open(jc, 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)
+        r_c = py('tools/analyze_Bl3.py', 'open', *dirs_, '--judge-record', jc, '--out', os.path.join(td, 'a-c.json'))
+        check(G, 'DRY でない枝: 組の JSON だけを書き換えると一致だけを見る段が、組と session をそろえて書き換えると結果を開く段が、判定の記録を書き換えると結果を開く段が、止まって書かない（裁定 D236・D239）',
+              r_a.returncode != 0 and 'session に書いた値と違う' in say_(r_a) and not os.path.exists(os.path.join(td, 'j-a.json')) and
+              r_b.returncode != 0 and '読んだ出力と違う' in say_(r_b) and not os.path.exists(os.path.join(td, 'a-b.json')) and
+              r_c.returncode != 0 and 'もう一度走らせた答えが、判定の記録と違う' in say_(r_c) and not os.path.exists(os.path.join(td, 'a-c.json')),
+              '／'.join([line_(r_a, 'session に書いた値と違う'), line_(r_b, '読んだ出力と違う'), line_(r_c, 'もう一度走らせた答え')]))
+        # (七) 凍結の記録の書き換えで止まる: 台帳の外・台帳の前の行
+        set_json(FRp, lambda o: o['main_freeze'].__setitem__('frozen_jst', '（書き換えた）'))
+        r_d1 = py('tools/analyze_Bl3.py', 'open', *dirs_, '--out', os.path.join(td, 'a-d1.json'))
+        wr_(FRp, FRbak)
+        set_json(FRp, lambda o: o['deviations'][0].__setitem__('reason', '（書き換えた前の行）'))
+        r_d2 = py('tools/analyze_Bl3.py', 'open', *dirs_, '--out', os.path.join(td, 'a-d2.json'))
+        wr_(FRp, FRbak)
+        check(G, 'DRY でない枝: 一致だけを見る段の後に、凍結の記録の台帳の外を書き換えても、判定の時にあった台帳の行を書き換えても、結果を開く段が止まる（台帳は後ろに足すだけ・裁定 D239）',
+              r_d1.returncode != 0 and '台帳の外' in say_(r_d1) and r_d2.returncode != 0 and '一致だけを見る段の時の行が変わった' in say_(r_d2),
+              '／'.join([line_(r_d1, '台帳の外'), line_(r_d2, '一致だけを見る段の時の行')]))
+        # (八) 器の変えと台帳: 台帳に無い変え → 止まる・記す → 通る・同じ器の二度の直し → 通る・台帳に無い三度目 → 止まる（起動器の版の照らしも同じ）
+        spec_ = importlib.util.spec_from_file_location('boot_Bl3_nondry', P_('tools/colab/boot_Bl3.py'))
+        BT = importlib.util.module_from_spec(spec_)
+        spec_.loader.exec_module(BT)
+        swp = P_('tools/sweep_Bl3.py')
+        swp_bak = rd_(swp)
+        mf_ = json.load(open(FRp, encoding='utf-8'))['main_freeze']
+        b0 = mf_['frozen_sha16']['tools/sweep_Bl3.py']
+        led_ = lambda b__, a__: set_json(FRp, lambda o: o['deviations'].append({'no': '合成の器', 'kind': 'tool_fix', 'reason': '（合成）', 'tool_diffs': [{'path': 'tools/sweep_Bl3.py', 'before': b__, 'after': a__}]}))
+        vb_ = lambda: BT.verify_frozen(CL, mf_['frozen_sha16'], json.load(open(FRp, encoding='utf-8'))['deviations'][int(mf_.get('deviations_n') or 0):])[0]
+        open(swp, 'a', encoding='utf-8', newline=NL).write('# 合成の直し（一）' + NL)
+        s1 = sha16f(swp)
+        r_e1, v_e1 = py('tools/analyze_Bl3.py', 'judge', *dirs_, '--out', os.path.join(td, 'j-e1.json')), vb_()
+        led_(b0, s1)
+        r_e2, v_e2 = py('tools/analyze_Bl3.py', 'judge', *dirs_, '--out', os.path.join(td, 'j-e2.json')), vb_()
+        open(swp, 'a', encoding='utf-8', newline=NL).write('# 合成の直し（二）' + NL)
+        s2 = sha16f(swp)
+        led_(s1, s2)
+        r_e3, v_e3 = py('tools/analyze_Bl3.py', 'judge', *dirs_, '--out', os.path.join(td, 'j-e3.json')), vb_()
+        open(swp, 'a', encoding='utf-8', newline=NL).write('# 合成の直し（三・台帳に無い）' + NL)
+        r_e4, v_e4 = py('tools/analyze_Bl3.py', 'judge', *dirs_, '--out', os.path.join(td, 'j-e4.json')), vb_()
+        wr_(swp, swp_bak)
+        wr_(FRp, FRbak)
+        check(G, 'DRY でない枝: 器を変えると、台帳に無ければ一致だけを見る段と起動器の版の照らしが止まり、台帳に記せば通り、同じ器を二度直しても通り、台帳に無い三度目の変えで止まる（裁定 D239）',
+              r_e1.returncode != 0 and bool(v_e1) and r_e2.returncode == 0 and not v_e2 and r_e3.returncode == 0 and not v_e3 and r_e4.returncode != 0 and bool(v_e4),
+              '一致だけを見る段の終わりの値 %d・%d・%d・%d／起動器の版の照らしの外れ %d・%d・%d・%d' % (r_e1.returncode, r_e2.returncode, r_e3.returncode, r_e4.returncode,
+                                                                          len(v_e1), len(v_e2), len(v_e3), len(v_e4)))
+        # (九) 相 main が使った下見の記録の食い違い・session のコミットの本の凍結の食い違い
+        dg = copy_dirs('g', lambda d2: set_json(os.path.join(d2, 'session.json'), lambda o: o['pilot_used'].__setitem__('dropped', ['N1|O-Ncold'])) if d2.endswith('main-main') else None)
+        dh = copy_dirs('h', lambda d2: set_json(os.path.join(d2, 'session.json'), lambda o: o.__setitem__('commit', C_a)))
+        r_g = py('tools/analyze_Bl3.py', 'judge', *dg, '--out', os.path.join(td, 'j-g.json'))
+        r_h = py('tools/analyze_Bl3.py', 'judge', *dh, '--out', os.path.join(td, 'j-h.json'))
+        check(G, 'DRY でない枝: 相 main が使った下見の記録が手元の本の凍結の下見と違うと、また session のコミットの凍結の記録の本の凍結が手元と違うと、一致だけを見る段が止まる（裁定 D239）',
+              r_g.returncode != 0 and '相 main が使った下見の記録' in say_(r_g) and r_h.returncode != 0 and '手元の本の凍結と違う' in say_(r_h),
+              '／'.join([line_(r_g, '相 main が使った下見の記録'), line_(r_h, '手元の本の凍結と違う')]))
+        # (十) 報告の器の CLI: DRY の集計・一致だけを見る段の記録の欠け・封印の記録の書き換えで止まり、戻すと通る
+        ap_ = P_('records/Bl3/analysis-Bl3.json')
+        a_bak = rd_(ap_)
+        set_json(ap_, lambda o: o.__setitem__('dry', True))
+        r_r1 = py('tools/build_report_Bl3.py', '--rejected', rej, '--force')
+        wr_(ap_, a_bak)
+        j_bak = rd_(jr0)
+        os.remove(jr0)
+        r_r2 = py('tools/build_report_Bl3.py', '--rejected', rej, '--force')
+        wr_(jr0, j_bak)
+        sr_ = P_('records/Bl3/sealing-record-Bl3.json')
+        s_bak = open(sr_, 'rb').read()
+        open(sr_, 'wb').write(s_bak.rstrip() + b'\n\n')
+        r_r3 = py('tools/build_report_Bl3.py', '--rejected', rej, '--force')
+        open(sr_, 'wb').write(s_bak)
+        r_r4 = py('tools/build_report_Bl3.py', '--rejected', rej, '--force')
+        check(G, 'DRY でない枝: 報告の器の CLI は、DRY の集計・一致だけを見る段の記録の欠け・封印の記録の書き換え（公開したコミットの錨）で止まり、戻すと通る（裁定 D239）',
+              r_r1.returncode != 0 and 'DRY の集計' in say_(r_r1) and r_r2.returncode != 0 and '一致だけを見る段の記録が無い' in say_(r_r2) and
+              r_r3.returncode != 0 and '下見の試みのコミット' in say_(r_r3) and r_r4.returncode == 0,
+              '／'.join([line_(r_r1, 'DRY の集計'), line_(r_r2, '一致だけを見る段の記録が無い'), line_(r_r3, '下見の試みのコミット'), '戻すと終わりの値 %d' % r_r4.returncode]))
     finally:
         shutil.rmtree(td, ignore_errors=True)
     return round(time.time() - t1, 1)
@@ -889,6 +1237,7 @@ def main():
     info = part_model(a.iso, a.e2e_iso)
     rw_out = part_rewrite_tool()
     boot_s = part_boot(a.e2e_iso)
+    nd_s = part_nondry(info)
     sha_end = tool_shas()
     check('四', '走らせた器と正本と設計事実と方向の記録が、走りの始めと終わりで同じ', sha_start == sha_end, '%d ファイル%s' % (
         len(sha_start), '' if sha_start == sha_end else '（変わった: %s）' % [k for k in sha_start if sha_start[k] != sha_end.get(k)]))
@@ -897,11 +1246,11 @@ def main():
           '- 実の重みで読み取りの値を出していない（正本 `computation.before_seal`）。二と三は、登録機種の設定を小さくした bf16 の乱数の模型（層 %s・次元 %s・正規化の重みを散らした・実の重みではない）と実のトークナイザで走らせた。合成の方向は、実の方向の名だけを借りた乱数。' % (
               info.get('layers'), info.get('dim')),
           '- 等方の方向の本数: %d（正本 %d）。端から端までの分かれ道の等方の本数 %s（作った下見の記録で・起動器の出力と同じ JSON の往復）。' % (a.iso, T3['nulls']['isotropic']['count'], info.get('e2e_iso')),
-          '- 順伝播: 走らせる器 %s 回・書き換えの道 %s 回（変種の計算と四・五の走りは数えない）・%.0f 秒（五の起動器の三つの相 %.0f 秒・等方 %s 本）。' % (
-              info.get('n_forward'), info.get('rewrite_passes'), time.time() - t0, boot_s, a.e2e_iso),
+          '- 順伝播: 走らせる器 %s 回・書き換えの道 %s 回（変種の計算と四・五・六の走りは数えない）・%.0f 秒（五の起動器の三つの相 %.0f 秒・等方 %s 本・六の DRY でない枝 %.0f 秒）。' % (
+              info.get('n_forward'), info.get('rewrite_passes'), time.time() - t0, boot_s, a.e2e_iso, nd_s),
           '- 確かめ: %d のうち %d が期待どおり。' % (len(RESULTS), n_ok), '',
           '| 部 | 確かめ | 結果 | 詳しく |', '|---|---|---|---|'] + [
-          '| %s | %s | %s | %s |' % (g, n, '期待どおり' if ok else '**期待と違う**', d.replace('|', '｜')) for g, n, ok, d in RESULTS] + [
+          '| %s | %s | %s | %s |' % (g, n.replace('|', '｜'), '期待どおり' if ok else '**期待と違う**', d.replace('|', '｜')) for g, n, ok, d in RESULTS] + [
           '', '## 下見の記録（乱数の模型・値に意味は無い・経路の確かめ）', '', '```json',
           json.dumps({k: v for k, v in info['pilot'].items() if k in ('logit_check', 'vi', 'batch', 'floor', 'cache_tol', 'iii', 'v', 'decision')}, ensure_ascii=False, indent=1, default=float), '```', '']
     if info.get('pilot_batch1'):

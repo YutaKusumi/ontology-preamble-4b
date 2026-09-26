@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""sweep_Bl3.py v3 —— B-lens 層三（Bl3）の掃き出しの器（正本 `report_rules.builder`・草案3 §12「掃き出しの器」・2026-09-25）。
+"""sweep_Bl3.py v4 —— B-lens 層三（Bl3）の掃き出しの器（正本 `report_rules.builder`・草案3 §12「掃き出しの器」・2026-09-25）。
 
 正本と凍結の本文が求める出力の一覧（下の ROW_KEYS・SECOND_KEYS・PILOT_KEYS・GATES と、関数 sweep の中の need の行・出所の鍵つき）を、集計の器の結果を開く段の出力（`records/Bl3/analysis-Bl3.json`）と突き合わせ、欠けを返す。
 組み立ての器 `tools/build_report_Bl3.py` が報告を組む前に呼び、欠けがあれば止める。下見で止まったときの出力（下見の記録と予想の答えだけ）は、止まったときに求めるものだけを見る。
@@ -11,7 +11,7 @@ import os, sys, json
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
-VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 層ごとの差分の中身と等方の本数を見る・頭の文／v2（裁定 D231）: 効き目の側は全ての行で・偶然の目安の分母
+VERSION = 'v4'          # v4（2026-09-26・裁定 D239）: 一致だけを見る段の記録の SHA16 と読んだ出力の同定を求める／v3（2026-09-25・裁定 D236）: 層ごとの差分の中身と等方の本数を見る・頭の文／v2（裁定 D231）: 効き目の側は全ての行で・偶然の目安の分母
 key3 = lambda sc, b, sg: '%s|%s|%+d' % (sc, b, int(sg))
 
 ROW_KEYS = [('effect', 'labels.print_rule（行の値）'), ('p', 'labels.p_rule'), ('upper', 'labels.print_rule（上の裾の本数）'), ('lower', 'labels.print_rule（下の裾の本数）'),
@@ -75,6 +75,8 @@ def sweep(T3, A):
     need(set(main_keys) <= set(D.get('mass_below_min') or {}), '質量が下限を下回った方向の数（descriptive.mass）')
     LW = A.get('layerwise') or {}
     need(set(main_keys) <= set(LW), '層ごとの差分（主の組の升目と符号・descriptive.layerwise.directions）')
+    need('judge_record_sha16' in A and 'inputs' in A and (A.get('dry') or (bool(A.get('judge_record_sha16')) and bool(A.get('inputs')))),
+         '一致だけを見る段の記録の SHA16 と読んだ出力の同定（DRY でなければ中身がある・裁定 D239）')
     need('n_iso' in A and (A.get('dry') or A.get('n_iso') == T3['nulls']['isotropic']['count']), '等方の本数（DRY でなければ正本の本数・nulls.isotropic.count）')
     units = list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]
     for k in main_keys:

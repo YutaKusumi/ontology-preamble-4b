@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""bl3_core.py v3 —— B-lens 層三（Bl3）の計算の芯（numpy だけ・重みも試行も読まない・2026-09-25）。
+"""bl3_core.py v4 —— B-lens 層三（Bl3）の計算の芯（numpy だけ・重みも試行も読まない・2026-09-25）。
 
 正本 `design/contrasts-Bl3.json` の決まりを、重みや試行を読まない純粋な関数に置く。走らせる器 `tools/bl3_run.py`・集計の器 `tools/analyze_Bl3.py`・
 合成データの器 `tools/dry_run_Bl3.py` が同じ関数を呼ぶ（同じ式を二度書かない）。B-lens の芯 `tools/blens_core.py` の関数は読み取りだけで呼ぶ。
@@ -13,6 +13,7 @@
   - 下見の機械の決定（`pilot`）: (vi) の (a)(b)・揺れの床・近道の許容・(i)(ii) の升目の決定・q1 との対応・(iii) の文の選び方・(iv) の印・(v) の近道の決定。
   - 独立の再計算の一致（`independent_recompute.agreement`）と、予想の採点（`predictions`・q7 の決まり・門が判定不能のとき）。
   - 比べる相手の除き方の錨（裁定 D231）: `comparators_for` の除く対を、B-lens の凍結の器 `tools/blens_lens.py` の `OWN_PAIR` と正本の兄弟の対に照らす。
+  - 逸脱の台帳の器の差分の照らし（裁定 D239）: 路ごとに台帳の差分（path・before・after）を記した順につなげ、凍結の値から今の値まで前後がつながるときだけ許す。
   - バッチの組み方（`readout.primary.batching`）: 升目と符号ごとの方向の並び（`readout.primary.order_seed` の種）・零のベクトルの無操作・端数を零のベクトルで埋める。
 用法: python tools/bl3_core.py --selftest
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
@@ -24,7 +25,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import blens_core as C
 
-VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 有限でない値で割合と裾は止め、一致の関数は一致しないと答える／v2（裁定 D231）: 比べる相手の除き方の錨
+VERSION = 'v4'          # v4（2026-09-26・裁定 D239）: 逸脱の台帳の器の差分を路ごとにつなげて照らす関数／v3（2026-09-25・裁定 D236）: 有限でない値で割合と裾は止め、一致の関数は一致しないと答える／v2（裁定 D231）: 比べる相手の除き方の錨
 NOOP, PAD = 'noop', 'pad'
 
 
@@ -307,6 +308,33 @@ def batch_plan(dir_ids, batch, seed, key):
     return [order[i * batch:(i + 1) * batch] for i in range(n_b)]
 
 
+def ledger_chain_bad(base, now, deviations, paths=None):
+    """凍結物の SHA16 の違いを、逸脱の台帳の器の差分（`tool_diffs` の path・before・after）で許すかを照らす（裁定 D239・器の直しの確かめ C1-新6・C2-11）。
+    路ごとに台帳の差分を記した順に並べ、凍結の値（base）から今の値（now）まで前後がつながるときだけ許す（同じファイルを二度直しても通る）。
+    deviations には base を決めた後に記した台帳の行だけを与える。paths を与えると、その路だけを照らす（ほかの路の差分は見ない）。
+    外れ: 台帳に差分が無いのに値が違う・差分の前後がつながらない・最後の差分と今の値が違う・差分を記したのに今の値が凍結の値と同じ・台帳に記した路が凍結物に無い。"""
+    chains = collections.OrderedDict()
+    for d in deviations or []:
+        for td in d.get('tool_diffs') or []:
+            chains.setdefault(td.get('path'), []).append(td)
+    check = list(base) if paths is None else list(paths)
+    bad = []
+    for pth in sorted(set(check) | (set(chains) if paths is None else set(chains) & set(check))):
+        want, got, ch = base.get(pth), now.get(pth), chains.get(pth, [])
+        if pth not in base:
+            bad.append('%s（凍結物に無い%s）' % (pth, '・台帳に記した' if ch else ''))
+        elif not ch:
+            if got != want:
+                bad.append('%s（凍結 %s・今 %s・台帳に差分が無い）' % (pth, want, got))
+        elif not all(ch[i].get('before') == (want if i == 0 else ch[i - 1].get('after')) for i in range(len(ch))):
+            bad.append('%s（台帳の差分の前後がつながらない）' % pth)
+        elif ch[-1].get('after') != got:
+            bad.append('%s（台帳の最後の差分 %s と今 %s が違う）' % (pth, ch[-1].get('after'), got))
+        elif got == want:
+            bad.append('%s（台帳に差分を記したが、今の値が凍結の値と同じ）' % pth)
+    return bad
+
+
 # ---------------- 自己検査 ----------------
 def _selftest():
     rng = np.random.default_rng(0)
@@ -416,6 +444,18 @@ def _selftest():
     assert sorted(x for x in flat if x not in (PAD, NOOP)) == sorted(ids)
     assert batch_plan(ids, 16, 91002, 0) == bp and batch_plan(ids, 16, 91002, 1) != bp
     assert flat.index(PAD) >= len(flat) - 13
+    # 逸脱の台帳の器の差分の照らし（裁定 D239）
+    bs = {'a': '1', 'b': '2'}
+    dv = lambda *tds: [{'no': 'x', 'tool_diffs': [{'path': p_, 'before': b_, 'after': a_} for p_, b_, a_ in tds]}]
+    assert ledger_chain_bad(bs, dict(bs), []) == []
+    assert ledger_chain_bad(bs, {'a': '3', 'b': '2'}, []) and ledger_chain_bad(bs, {'a': '3', 'b': '2'}, dv(('a', '1', '3'))) == []
+    assert ledger_chain_bad(bs, {'a': '4', 'b': '2'}, dv(('a', '1', '3')) + dv(('a', '3', '4'))) == []            # 同じファイルを二度直す
+    assert ledger_chain_bad(bs, {'a': '4', 'b': '2'}, dv(('a', '1', '3')) + dv(('a', '5', '4')))                    # 前後がつながらない
+    assert ledger_chain_bad(bs, {'a': '9', 'b': '2'}, dv(('a', '1', '3')))                                         # 最後の差分と今が違う
+    assert ledger_chain_bad(bs, dict(bs), dv(('a', '1', '1')))                                                      # 記したのに今が凍結の値と同じ
+    assert ledger_chain_bad(bs, dict(bs), dv(('c', '0', '1')))                                                      # 凍結物に無い路
+    assert ledger_chain_bad(bs, {'a': '3', 'b': '2'}, dv(('a', '1', '3')), paths=['b']) == []                        # 与えた路だけを照らす
+    assert ledger_chain_bad(bs, {'a': '1', 'b': None}, [], paths=['b'])                                              # 無いファイル
     print('[bl3_core] 自己検査 OK（%s）' % VERSION)
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""boot_Bl3.py v3 —— B-lens 層三（Bl3）の Colab 起動スクリプト（教師強制の順伝播・2026-09-25・正本 `readout`・`pilot`・`computation`・`independent_recompute`）。
+"""boot_Bl3.py v4 —— B-lens 層三（Bl3）の Colab 起動スクリプト（教師強制の順伝播・2026-09-25・正本 `readout`・`pilot`・`computation`・`independent_recompute`）。
 
 相（OP4B_PHASE）:
   check  封印の前の確かめ（正本 `computation.before_seal`: 読み込みと版の確かめだけ・**順伝播を一度も走らせない・値を出さない**。模型の順伝播の前の hook で、呼ばれたら止める）:
@@ -9,7 +9,7 @@
          乙の行と文脈（B-lens の選んだ出力の一覧の SHA16 と、全ての文脈を組めること）・加減の hook を掛けて外せること・残差の書き換えの器が import できること。
   pilot  封印の後: 下見の前の凍結の記録と封印の記録がそろったコミットで、凍結の記録の SHA16 を取り出した器と正本に照らしてから、正本 `pilot.order` の順に走らせ、
          下見の記録（`bl3_run.run_pilot` の出力）を置く。器の誤り（凍結した確かめが機械で落ちた）は、その文を記録に置いて止める（正本 `pilot.decision.tool_error`）。
-  main   本の凍結の後: 凍結の記録に足した下見の記録（バッチの大きさ・揺れの床・近道の許容・近道・外した升目）のまま、組（OP4B_PART・既定は三つとも順に）を走らせる:
+  main   本の凍結の後: 凍結の記録に足した下見の記録（バッチの大きさ・揺れの床・近道の許容・近道・外した升目）のまま、組（OP4B_PART・DRY でないときは組を一つずつ与える・裁定 D239・DRY の既定は三つとも順に）を走らせる:
            main       本の計算の頭（出口の値・最後の層）→ 全ての升目と符号（`bl3_run.run_main_phase`・近道を使わない・裁定 D234）
            recompute  独立の再計算の二つの道（本の器のフック〔`bl3_run.recompute_hook_path`〕・残差の書き換え〔別の個体の器 `bl3_recompute_rewrite`〕・近道なし・バッチ一）
            secondary  乙（`bl3_run.run_secondary`・裁定 D227）
@@ -34,7 +34,7 @@ v3 の決め（裁定 D236）: 手順の順は「方向の npz と器を push �
 """
 import os, sys, re, json, time, glob, shutil, hashlib, datetime, traceback, subprocess, zipfile, collections
 
-VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 封印した予想の照らし・組の出力の SHA-256・組ごとの zip・止めと誤りの記録・相 check の守りと数・トークンの並びの SHA16 ほか／v2（裁定 D231・D234）
+VERSION = 'v4'          # v4（2026-09-26・裁定 D239）: 版の照らしで台帳の器の差分をつなげて許す・相 main で封印の記録を本の凍結の記録と照らす・zip の SHA-256 の並びを別のファイルに書く・DRY でない相 main は組を一つずつ・DRY に限る守りの試し／v3（2026-09-25・裁定 D236）: 封印した予想の照らし・組の出力の SHA-256・組ごとの zip・止めと誤りの記録・相 check の守りと数・トークンの並びの SHA16 ほか／v2（裁定 D231・D234）
 T0 = time.time()
 REPO_URL = 'https://github.com/YutaKusumi/ontology-preamble-4b.git'
 PHASES = ('check', 'pilot', 'main')
@@ -94,6 +94,7 @@ def package(tag, extra=None):
             z.write(os.path.join(od, fn), os.path.join(os.path.basename(od), fn))
     zsha = sha256f(zp)
     S.setdefault('zips', []).append({'tag': tag, 'zip': os.path.basename(zp), 'sha256': zsha})
+    write_json(od + '-zips.json', {'zips': S['zips'], 'clause': CLAUSE})      # 最後の zip の SHA-256 も手元に残す（zip の外の小さなファイル・裁定 D239）
     mark('packaged', tag=tag, zip=os.path.basename(zp), sha256=zsha)
     if not CTX['dry']:
         try:
@@ -124,22 +125,23 @@ def write_json(path, obj):
     return sha16f(path)
 
 
-def verify_frozen(repo, sha_map):
+def verify_frozen(repo, sha_map, deviations=()):
     """凍結の記録の SHA16（改行を LF にそろえた SHA-256 の頭 16 桁）を、取り出した作業木のファイルに照らす。疎な取り出しの外のファイルは飛ばして数を記し、
-    内側で無いファイルは外れにする（裁定 D236）。"""
-    bad, skipped = [], []
-    for rp, want in sha_map.items():
+    内側で無いファイルは外れにする（裁定 D236）。凍結の後に台帳に記した器の差分は、路ごとに前後をつなげて許す（芯の `ledger_chain_bad`・裁定 D239）。
+    deviations には sha_map を決めた後に記した台帳の行だけを与える。戻り値: 外れの並び（文字列）と、飛ばした置き場の並び。"""
+    if os.path.join(repo, 'tools') not in sys.path:
+        sys.path.insert(0, os.path.join(repo, 'tools'))
+    import bl3_core as K_
+    now, skipped = {}, []
+    for rp in sha_map:
         p = os.path.join(repo, *rp.split('/'))
-        if not os.path.exists(p):
-            if any(rp == d or rp.startswith(d + '/') for d in SPARSE):
-                bad.append({'path': rp, 'got': None, 'want': want})
-            else:
-                skipped.append(rp)
-            continue
-        got = sha16f(p)
-        if got != want:
-            bad.append({'path': rp, 'got': got, 'want': want})
-    return bad, skipped
+        if os.path.exists(p):
+            now[rp] = sha16f(p)
+        elif any(rp == d or rp.startswith(d + '/') for d in SPARSE):
+            now[rp] = None
+        else:
+            skipped.append(rp)
+    return K_.ledger_chain_bad(sha_map, now, list(deviations), paths=[rp for rp in sha_map if rp not in skipped]), skipped
 
 
 def pick_recompute_rows(rows, n):
@@ -164,6 +166,8 @@ def run():
     given = [p.strip() for p in os.environ.get('OP4B_PART', ','.join(PARTS)).split(',') if p.strip()]
     if PHASE == 'main' and (not given or any(p not in PARTS for p in given)):
         sys.exit('[boot_Bl3] OP4B_PART は %s の組み合わせ（コンマで区切る）' % '・'.join(PARTS))
+    if PHASE == 'main' and not DRY and ('OP4B_PART' not in os.environ or len(given) != 1):
+        sys.exit('[boot_Bl3] DRY でない相 main は組を一つずつ走らせる（OP4B_PART に組を一つ与える・裁定 D239）')
     parts = [p for p in PARTS if p in given] if PHASE == 'main' else []
     print('[boot_Bl3] %s 開始 phase=%s %s%s' % (VERSION, PHASE, 'DRY' if DRY else COMMIT, (' parts=' + ','.join(parts)) if parts else ''), flush=True)
 
@@ -211,8 +215,11 @@ def run():
                     stop('封印した予想の JSON が無いか、SHA-256 が封印の記録と違う: %s' % role)
             if PHASE == 'main' and 'main_freeze' not in FR:
                 stop('相 main は本の凍結の後に走らせる（凍結の記録に本の凍結が無い）')
+            if PHASE == 'main' and sha16f(SRP) != ((FR['main_freeze'].get('seal') or {}).get('record_sha16')):
+                stop('封印の記録の SHA16 が、本の凍結の記録に写した値と違う（裁定 D239）')
             sha_map = FR['main_freeze']['frozen_sha16'] if PHASE == 'main' else FR['frozen_sha16']
-            bad, skipped = verify_frozen(REPO, sha_map)
+            devs = (FR.get('deviations') or [])[int(FR['main_freeze'].get('deviations_n') or 0):] if PHASE == 'main' else (FR.get('deviations') or [])
+            bad, skipped = verify_frozen(REPO, sha_map, devs)
             frozen = {'checked': len(sha_map) - len(skipped), 'skipped': skipped, 'bad': bad}
             if bad:
                 stop('凍結の記録の SHA16 と取り出したファイルが違う: %s' % bad)
@@ -350,6 +357,11 @@ def run():
             return h
         guards = [model.register_forward_pre_hook(guard_of('model')), model.model.register_forward_pre_hook(guard_of('model.model')),
                   model.lm_head.register_forward_pre_hook(guard_of('lm_head'))] + [l_.register_forward_pre_hook(guard_of('layers.%d' % i_)) for i_, l_ in enumerate(model.model.layers)]
+        if DRY and os.environ.get('OP4B_DRY_GUARD_TEST') == '1':      # 守りが止めることの確かめ（DRY に限る・合成データの器が使う・Exception で呑めない・裁定 D239）
+            try:
+                model.model(input_ids=torch.zeros((1, 2), dtype=torch.long))
+            except Exception:
+                pass
         E = FJ['facts']['E']
         sets = BR.cell_sign_sets(T3, None, names_real['named'], names_real['B_random'], names_real['iso'], names_real['real'], gate_only)
         n_pass = sum(len(s[3]) for s in sets)

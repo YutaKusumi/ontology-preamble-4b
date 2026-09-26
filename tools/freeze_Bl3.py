@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""freeze_Bl3.py v3 —— B-lens 層三（Bl3）の凍結の記帳（2026-09-25・正本 `predictions.when`・`computation.main_freeze_check`・裁定 D210・D222・`tools/freeze_Blens.py` の型）。
+"""freeze_Bl3.py v4 —— B-lens 層三（Bl3）の凍結の記帳（2026-09-25・正本 `predictions.when`・`computation.main_freeze_check`・裁定 D210・D222・`tools/freeze_Blens.py` の型）。
 
 相:
   prepilot  下見の前の凍結（正本のすべて・方向の npz・器・裁定 D210）。確かめてから記帳する（外れたら止める・登録者に相談）:
@@ -38,7 +38,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 
-VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 相 check のコミットの版とトークンの並び・本の凍結の試みの順と由来・封印の写し・番号の数の比べ・inputs.files・転記行 F／v2（裁定 D231〜D235 の後）
+VERSION = 'v4'          # v4（2026-09-26・裁定 D239）: 起動器の三つの相と DRY でない枝の確かめを記録の行で数える・台帳の器の差分を路ごとにつなげて照らす・本の凍結に台帳の行の数を記す・決まりの文に下見のやり直しの記帳・手元のトークナイザの版とファイルの SHA-256 を記す／v3（2026-09-25・裁定 D236）: 相 check のコミットの版とトークンの並び・本の凍結の試みの順と由来・封印の写し・番号の数の比べ・inputs.files・転記行 F／v2（裁定 D231〜D235 の後）
 NL = chr(10)
 FR_JSON = os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.json')
 FR_MD = os.path.join(REPO, 'records', 'Bl3', 'FREEZE-RECORD-Bl3.md')
@@ -121,9 +121,16 @@ def latest_dry_run(T3):
     lack = sorted(need - set(table))
     differ = sorted(f for f, s16 in table.items() if not os.path.exists(P(f)) or sha16f(P(f)) != s16)
     res['sha_table'] = {'files': len(table), 'lack': lack, 'differ': differ}
-    res['boot_phases'] = '起動器の三つの相' in txt
+    # 記録の表の行で数える（語が記録のどこかにあるかでは見ない・裁定 D239・器の直しの確かめ C1-新9・C2-5）
+    five = [l for l in txt.split(NL) if l.startswith('| 五 | 起動器の三つの相（DRY・別のプロセス）')]
+    six = [l for l in txt.split(NL) if l.startswith('| 六 | ')]
+    res['boot_phases'] = len(five) >= 4 and all('| 期待どおり |' in l for l in five)
+    res['non_dry_branches'] = len(six) >= 1 and all('| 期待どおり |' in l for l in six)
+    res['rows_five_six'] = [len(five), len(six)]
     if not res['boot_phases']:
-        bad.append('合成データの正式の記録に、起動器の三つの相を別のプロセスで走らせた確かめが無い（裁定 D236）')
+        bad.append('合成データの正式の記録に、起動器の三つの相を別のプロセスで走らせた確かめ（五の行）がそろっていない（裁定 D236・D239）')
+    if not res['non_dry_branches']:
+        bad.append('合成データの正式の記録に、DRY でない枝の確かめ（六の行）が無いか、期待と違う（裁定 D239）')
     if lack:
         bad.append('合成データの正式の記録の版の SHA16 の表が、器の閉包と正本・設計事実・方向の記録を覆わない: %s' % lack)
     if differ:
@@ -135,13 +142,24 @@ sha16b = lambda b: hashlib.sha256(b.replace(b'\r\n', b'\n')).hexdigest().upper()
 
 
 def local_ids_sha16(T3, FJ):
-    """手元のトークナイザで升目の入力を組み、トークンの並びの SHA16 を返す（相 check の値と照らす・裁定 D236）。"""
+    """手元のトークナイザで升目の入力を組み、トークンの並びの SHA16 と、手元の transformers と tokenizers の版と、トークナイザのファイルの SHA-256 を返す
+    （相 check の値と照らす・裁定 D236・版とファイルは照らさずに記す・裁定 D239）。"""
     from transformers import AutoTokenizer
+    import importlib.metadata as md_
     import bl3_run as BR
     M_ = T3['inputs']['model']
-    tok = AutoTokenizer.from_pretrained(os.path.expanduser('~/.cache/huggingface/hub/models--%s/snapshots/%s' % (M_['repo'].replace('/', '--'), M_['rev'])))
+    snap = os.path.expanduser('~/.cache/huggingface/hub/models--%s/snapshots/%s' % (M_['repo'].replace('/', '--'), M_['rev']))
+    tok = AutoTokenizer.from_pretrained(snap)
     keys = ['%s|%s' % tuple(c) for c in T3['cells_main']] + sorted({'%s|%s' % (x[0], x[1]) for x in FJ['facts']['C']['cell_signs_gate'] if x not in T3['cell_signs_main']})
-    return {k: BR.ids_sha16(c) for k, c in BR.build_cells(tok, T3, FJ, keys).items()}
+
+    def ver_(k):
+        try:
+            return md_.version(k)
+        except Exception:
+            return None
+    info = {'transformers': ver_('transformers'), 'tokenizers': ver_('tokenizers'),
+            'files_sha256': {fn: sha256f(os.path.join(snap, fn)) for fn in sorted(os.listdir(snap)) if re.match(r'^(tokenizer|vocab|merges|special_tokens_map|added_tokens)', fn)}}
+    return {k: BR.ids_sha16(c) for k, c in BR.build_cells(tok, T3, FJ, keys).items()}, info
 
 
 def prepilot_checks(colab_dir=None):
@@ -251,7 +269,7 @@ def prepilot_checks(colab_dir=None):
                      if sha16b(subprocess.run(['git', '-C', REPO, 'show', '%s:%s' % (cm, f)], capture_output=True).stdout) != sha16f(P(f))]
         c['versions_at_commit'] = bool(re.fullmatch(r'[0-9a-f]{40}', cm)) and not at_commit
         res['colab_check_versions_differ'] = at_commit
-        tok_local = local_ids_sha16(T3, FJ)
+        tok_local, res['local_tokenizer'] = local_ids_sha16(T3, FJ)
         c['token_ids'] = all((CK['cells'].get(k) or {}).get('ids_sha16') == v for k, v in tok_local.items())
         res['colab_check'] = dict(c, commit=S.get('commit'), gpu_name=S.get('gpu'), versions_seen=S.get('versions'))
         bad += ['Colab の確かめ: %s' % k for k, v in c.items() if not v]
@@ -275,7 +293,7 @@ def prepilot(words, when, colab_dir, force=False):
     frozen = {r: sha16f(P(r)) for r in files + tools}
     R = {'kind': 'bl3_freeze_record', 'version': VERSION, 'stage': 'prepilot', 'frozen_jst': when, 'registrant_words': words, 'rulings': sorted((k for k in T3['decisions'] if int(k[1:]) >= 204), key=lambda x: int(x[1:])),
          'frozen_sha16': frozen, 'tools_import_closure': tools, 'directions_npz_sha256': res['directions']['sha256'], 'checks': res,
-         'deviation_rule': '凍結の後の変更は、逸脱として番号・日付・理由・登録者の承認を台帳（この記録の deviations）に記す。器の差分は tool_diffs に置き場・前・後の SHA16 を記す（正本 computation.main_freeze_check）',
+         'deviation_rule': '凍結の後の変更は、逸脱として番号・日付・理由・登録者の承認を台帳（この記録の deviations）に記す。器の差分は tool_diffs に置き場（path）・前（before）・後（after）の SHA16 を記す（同じ置き場を二度直すときは、前の差分の後の SHA16 を次の差分の前に書く・路ごとにつなげて照らす）。下見のやり直しは kind pilot_rerun の行で記す。台帳は後ろに足すだけで、前の行を書き換えない（正本 computation.main_freeze_check・裁定 D222・D239）',
          'deviations': [],
          'next': '記録先行の公開（push）→ 予想の封印（コーディネータが先・SHA だけを伝える → 登録者）→ Colab の相 pilot → 本の凍結（下見の記録と機械の決定を足す）→ Colab の相 main → 一致だけを見る段 → 結果を登録者と一緒に開く',
          'clause': CLAUSE}
@@ -307,22 +325,11 @@ def main_freeze_checks(FR, pilot_dirs):
     canon = 'design/contrasts-Bl3.json'
     if sha16f(P(canon)) != frozen[canon]:
         bad.append('正本の SHA16 が下見の前の凍結から変わった（正本を変える直しは本の凍結の決まりの外・登録者に上げる）')
-    ledgered = {}
-    for d in FR.get('deviations') or []:
-        for td in d.get('tool_diffs') or []:
-            ledgered[td['path']] = td
-    now_sha = {}
-    for pth, want in frozen.items():
-        got = sha16f(P(pth)) if os.path.exists(P(pth)) else None
-        now_sha[pth] = got
-        if got != want:
-            td = ledgered.get(pth)
-            if not td or td.get('before') != want or td.get('after') != got:
-                bad.append('凍結物の SHA16 の違いが逸脱の台帳の器の差分と合わない: %s（凍結 %s・今 %s）' % (pth, want, got))
+    import bl3_core as K3
+    now_sha = {pth: (sha16f(P(pth)) if os.path.exists(P(pth)) else None) for pth in frozen}
+    # 台帳の器の差分は路ごとに記した順につなげて照らす（同じ置き場を二度直しても通る・裁定 D239・器の直しの確かめ C1-新6・C2-11）
+    bad += ['凍結物の SHA16 の違いが逸脱の台帳の器の差分と合わない: %s' % x for x in K3.ledger_chain_bad(frozen, now_sha, FR.get('deviations') or [])]
     res['changed'] = sorted(p for p in frozen if now_sha[p] != frozen[p])
-    res['ledgered_not_changed'] = sorted(p for p in ledgered if now_sha.get(p) == frozen.get(p))
-    if res['ledgered_not_changed']:
-        bad.append('台帳に記した器の差分が凍結物に現れない: %s' % res['ledgered_not_changed'])
     atts, sessions, fin = [], [], []
     for d in pilot_dirs:
         PJ = json.load(open(os.path.join(d, 'pilot.json'), encoding='utf-8'))
@@ -385,7 +392,8 @@ def main_freeze(words, when, pilot_dirs):
         raise SystemExit('本の凍結の確かめが外れた（止める・登録者に相談）: %s' % bad)
     before = {k: v for k, v in FR.items()}
     FR['main_freeze'] = {'frozen_jst': when, 'registrant_words': words, 'pilot_attempts': atts, 'pilot': atts[-1], 'decision': atts[-1].get('decision'),
-                         'sessions': sessions, 'frozen_sha16': now_sha, 'tool_diffs_applied': res['changed'], 'seal': res['seal'], 'freeze_tool': 'tools/freeze_Bl3.py %s' % VERSION}
+                         'sessions': sessions, 'frozen_sha16': now_sha, 'tool_diffs_applied': res['changed'], 'seal': res['seal'], 'freeze_tool': 'tools/freeze_Bl3.py %s' % VERSION,
+                         'deviations_n': len(FR.get('deviations') or [])}          # 本の凍結の時の台帳の行の数（これより後の器の差分を本の凍結の値からつなげて照らす・裁定 D239）
     assert all(FR[k] == before[k] for k in before), '本の凍結でほかの鍵が変わった'
     assert set(FR) - set(before) == {'main_freeze'}
     json.dump(FR, open(FR_JSON, 'w', encoding='utf-8', newline=NL), ensure_ascii=False, indent=1)

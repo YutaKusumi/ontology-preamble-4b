@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build_report_Bl3.py v3 —— B-lens 層三（Bl3）の結果の報告の草案を組む（2026-09-25・正本 `reading_rules`・`negation_templates`・`report_rules`・`labels`・`limits`）。
+"""build_report_Bl3.py v4 —— B-lens 層三（Bl3）の結果の報告の草案を組む（2026-09-25・正本 `reading_rules`・`negation_templates`・`report_rules`・`labels`・`limits`）。
 
 組み立て（B-lens の組み立ての器 `tools/build_report_Blens.py` の型）:
   - 数はすべて機械の区画（凍結の走査器 `tools/report_lint.py` の区画の印）の中に置く。区画ごとの中身の SHA16 を別の記録（報告と同じ名の -machine.json）に書く。
@@ -23,14 +23,14 @@
 用法: python tools/build_report_Bl3.py [--force] [--rejected <起草者の行の md>] [--marks <印の JSON>] [--main-tool-error] ／ --selftest
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, re, sys, json, hashlib, argparse, collections
+import os, re, sys, json, hashlib, argparse, subprocess, collections
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import report_lint as RL
 
-VERSION = 'v3'          # v3（2026-09-25・裁定 D236）: 封印した予想と凍結の記録と手元の器を照らしてから組む・(v) の行の言い方・門の行だけの升目の外し・nuclear の族の文を §0 に・下見の GPU・自己検査の足し／v2（裁定 D231〜D235）
+VERSION = 'v4'          # v4（2026-09-26・裁定 D239）: 封印の記録を下見の試みのコミットの封印の記録と照らす・一致だけを見る段の記録と読んだ出力の同定を照らす・DRY の集計で組まない／v3（2026-09-25・裁定 D236）: 封印した予想と凍結の記録と手元の器を照らしてから組む・(v) の行の言い方・門の行だけの升目の外し・nuclear の族の文を §0 に・下見の GPU・自己検査の足し／v2（裁定 D231〜D235）
 NL = chr(10)
 OUT = os.path.join(REPO, 'records', 'Bl3', 'results-Bl3.md')
 FENCE = '本報告のいかなる数値も、AI に意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'
@@ -317,11 +317,18 @@ def lint_report(text, T3):
     return RL.lint(text, T_scan, frozenset(), sidecar=side), side
 
 
-def sealed_and_frozen_bad(FR, seal):
-    """報告を組む前の確かめ（裁定 D236・B-lens の `require_sealed` の型）: 二つの予想の SHA-256 が封印の記録と同じ・封印の記録の SHA16 と二つの予想の SHA-256 が
-    本の凍結の記録に写した値と同じ・手元の器と正本と設計事実と方向の記録が本の凍結の記録と同じ（台帳に記した差分は許す）。戻り値: 外れの並び。"""
+def sealed_and_frozen_bad(FR, seal, git_show=None):
+    """報告を組む前の確かめ（裁定 D236・D239・B-lens の `require_sealed` の型）: 二つの予想の SHA-256 が封印の記録と同じ・封印の記録の SHA16 と二つの予想の SHA-256 が
+    本の凍結の記録に写した値と同じ・封印の記録が本の凍結の記録にある下見の試み（最後）のコミットの封印の記録と同じ（公開したコミットに錨を置く）・
+    手元の器と正本と設計事実と方向の記録が本の凍結の記録と同じ（台帳に記した差分は許す）。git_show は自己検査で差し替えるときだけ与える。戻り値: 外れの並び。"""
     import analyze_Bl3 as AZ
     bad = []
+    gs = git_show or (lambda c_, p_: subprocess.run(['git', '-C', REPO, 'show', '%s:%s' % (c_, p_)], capture_output=True).stdout)
+    sess = (FR.get('main_freeze') or {}).get('sessions') or []
+    c_last = (sess[-1] if sess else {}).get('commit')
+    b_ = gs(c_last, 'records/Bl3/sealing-record-Bl3.json') if c_last else b''
+    if not b_ or hashlib.sha256(b_.replace(b'\r\n', b'\n')).hexdigest().upper()[:16] != sha16f(P('records/Bl3/sealing-record-Bl3.json')):
+        bad.append('封印の記録が、本の凍結の記録にある下見の試みのコミット（%s）の封印の記録と違う（または読めない）' % (c_last or 'なし')[:12])
     for role, v in seal['predictions'].items():
         pp = P(v['path'])
         if not os.path.exists(pp) or hashlib.sha256(open(pp, 'rb').read()).hexdigest().upper() != v['sha256']:
@@ -335,19 +342,32 @@ def sealed_and_frozen_bad(FR, seal):
     return bad
 
 
-def load_inputs(main_tool_error=False):
+def load_inputs(main_tool_error=False, git_show=None):
     import sweep_Bl3 as SW
     T3 = json.load(open(P('design/contrasts-Bl3.json'), encoding='utf-8'))
     FR = json.load(open(P('records/Bl3/FREEZE-RECORD-Bl3.json'), encoding='utf-8'))
     seal = json.load(open(P('records/Bl3/sealing-record-Bl3.json'), encoding='utf-8'))
-    bad = sealed_and_frozen_bad(FR, seal)
+    bad = sealed_and_frozen_bad(FR, seal, git_show)
     if bad:
         raise SystemExit('報告を組む前の確かめが外れた（止める・登録者に相談）: %s' % bad)
     preds = {r: json.load(open(P(v['path']), encoding='utf-8')) for r, v in seal['predictions'].items()}
     ap_ = P('records/Bl3/analysis-Bl3.json')
     atts = FR['main_freeze']['pilot_attempts']
+    jp_ = P('records/Bl3/judge-Bl3.json')
     if os.path.exists(ap_):
         A = json.load(open(ap_, encoding='utf-8'))
+        # 一致だけを見る段 → 結果を開く段 → 報告の鎖の終端（裁定 D239・器の直しの確かめ G1-2-1・G2-新2・C1-新2・C2-3）
+        if A.get('dry'):
+            raise SystemExit('DRY の集計の記録で本の報告は組まない（止める）')
+        if not os.path.exists(jp_):
+            raise SystemExit('一致だけを見る段の記録が無い（報告を組まない）: records/Bl3/judge-Bl3.json')
+        J = json.load(open(jp_, encoding='utf-8'))
+        if sha16f(jp_) != A.get('judge_record_sha16'):
+            raise SystemExit('一致だけを見る段の記録の SHA16 が、集計の記録に写した値と違う（止める）')
+        if not J.get('agree') or J.get('dry'):
+            raise SystemExit('一致だけを見る段の記録が一致でないか、DRY の記録（止める）')
+        if A.get('inputs') != J.get('inputs'):
+            raise SystemExit('集計の記録の読んだ出力の同定が、一致だけを見る段の記録と違う（止める）')
         miss = SW.sweep(T3, A)
         if miss:
             raise SystemExit('掃き出し: 集計の出力に、正本と凍結の本文が求める出力の欠けがある（止める）: %s' % miss)
@@ -361,7 +381,7 @@ def load_inputs(main_tool_error=False):
             truth = collections.OrderedDict((k, v if k == 'q1.pilot' else None) for k, v in truth.items())
         A = {'pilot_attempts': atts, 'predictions_truth': truth, 'predictions_meta': dict(tmeta, stopped=tmeta['stopped'] and not main_tool_error)}
     meta = {'canon': sha16f(P('design/contrasts-Bl3.json')), 'freeze': sha16f(P('records/Bl3/FREEZE-RECORD-Bl3.json')), 'seal': sha16f(P('records/Bl3/sealing-record-Bl3.json')),
-            'analysis': sha16f(ap_) if os.path.exists(ap_) else 'なし'}
+            'analysis': sha16f(ap_) if os.path.exists(ap_) else 'なし', 'judge': sha16f(jp_) if os.path.exists(jp_) else 'なし'}
     fc = P('records/Bl3/final-confirmation-Bl3.json')
     confirmation = json.load(open(fc, encoding='utf-8')) if os.path.exists(fc) else None
     return T3, FR, A, preds, meta, confirmation
@@ -446,7 +466,7 @@ def synth_analysis(T3, FJ, DJ, seed=3, n_iso=199, stop=None, drop=()):
     A = AZ.analyze(T3x, FJ, cells_out, [pilot], DJ['groups']['real']['names'], rows_gate, hook=hook, rewrite=hook, style_rows=style_rows)
     A = json.loads(json.dumps(A, default=lambda o: o.item() if hasattr(o, 'item') else float(o)))
     main_keys = {'%s|%s|%+d' % (sc, b, int(sg)) for sc, b, sg in T3['cell_signs_main']}
-    A.update({'dry': True, 'pilot_attempts': [pilot], 'head': {'logit_check': {'max_abs': 0.05, 'tol': 0.5, 'pass': True},
+    A.update({'dry': True, 'inputs': {}, 'judge_record_sha16': None, 'pilot_attempts': [pilot], 'head': {'logit_check': {'max_abs': 0.05, 'tol': 0.5, 'pass': True},
                                                                'shortcut': False, 'layer_check': {'diff': 0.0, 'tol': 1e-4, 'pass': True}},
               'main_run': {'batch': 16, 'shortcut': False, 'dropped': pilot['decision']['dropped']},
               'layerwise': {k: {'noop_lo': {'2': -2.0, '3': -2.0}, 'rows': {u: [[1.0, 0.9, 0.1], [1.1, 0.8, 0.1]] for u in list(T3['directions']['named']) + ['rand:%d' % i for i in range(T3['nulls']['B_random']['count'])]},
@@ -508,7 +528,7 @@ def _selftest():
     # 封印した予想を書き換えると、報告を組む前の確かめが止める（一時の置き場の写しで・裁定 D236・器の実装の検分の R2-重大1）
     _selftest_sealed(T3, FJ, DJ)
     print('[build_report_Bl3] 自己検査 OK（合成の報告の走査の違反 0・起草者の欄が空なら埋め残し・禁止語と未登録の数は止まる・掃き出しは欠けを捕まえる・止まった下見と外した升目の組み立て・'
-          '門の行だけの升目の外し・等方の外の行の枝 %d 行・書き換えた予想で止まる）' % n_out)
+          '門の行だけの升目の外し・等方の外の行の枝 %d 行・書き換えた予想と封印の記録の錨と一致だけを見る段の記録と DRY の集計で止まる）' % n_out)
 
 
 def _selftest_sealed(T3, FJ, DJ):
@@ -517,10 +537,11 @@ def _selftest_sealed(T3, FJ, DJ):
     import analyze_Bl3 as AZ
     global REPO
     keep = REPO
-    A = synth_analysis(T3, FJ, DJ)                                  # 段階 B の記録を読むので、置き場を切り替える前に作る
+    A = synth_analysis(T3, FJ, DJ, n_iso=T3['nulls']['isotropic']['count'])      # 段階 B の記録を読むので、置き場を切り替える前に作る（DRY でない集計として照らすので等方は正本の本数）
     td = tempfile.mkdtemp(prefix='report-sealed-')
     try:
-        for f in AZ.FROZEN_CHECK:
+        fc_ = AZ.frozen_check_files()
+        for f in fc_:
             os.makedirs(os.path.dirname(os.path.join(td, *f.split('/'))), exist_ok=True)
             shutil.copyfile(os.path.join(keep, *f.split('/')), os.path.join(td, *f.split('/')))
         REPO = td
@@ -532,15 +553,44 @@ def _selftest_sealed(T3, FJ, DJ):
             open(pp, 'w', encoding='utf-8', newline='\n').write(json.dumps({'q1.pilot': '続ける', 'q4.gate': '通らない'}, ensure_ascii=False))
             pr[role] = {'path': 'records/predictions/predictions-Bl3-%s.json' % role, 'sha256': hashlib.sha256(open(pp, 'rb').read()).hexdigest().upper()}
         json.dump({'predictions': pr}, open(P('records/Bl3/sealing-record-Bl3.json'), 'w', encoding='utf-8'), ensure_ascii=False)
+        inputs_ = {'main': {'dir': 'main-x', 'json_sha256': 'A' * 64, 'session_sha256': 'B' * 64}}
+        jr_ = P('records/Bl3/judge-Bl3.json')
+        json.dump({'agree': True, 'first': True, 'second': True, 'dry': False, 'inputs': inputs_}, open(jr_, 'w', encoding='utf-8'), ensure_ascii=False)
+        A = dict(A, dry=False, inputs=inputs_, judge_record_sha16=sha16f(jr_))
         json.dump(A, open(P('records/Bl3/analysis-Bl3.json'), 'w', encoding='utf-8'), ensure_ascii=False)
-        FR = {'main_freeze': {'pilot_attempts': A['pilot_attempts'], 'frozen_sha16': {f: sha16f(P(f)) for f in AZ.FROZEN_CHECK},
+        C_ = 'c' * 40
+        FR = {'main_freeze': {'pilot_attempts': A['pilot_attempts'], 'frozen_sha16': {f: sha16f(P(f)) for f in fc_}, 'sessions': [{'commit': C_}],
                               'seal': {'record_sha16': sha16f(P('records/Bl3/sealing-record-Bl3.json')), 'predictions_sha256': {r: v['sha256'] for r, v in pr.items()}}}, 'deviations': []}
         json.dump(FR, open(P('records/Bl3/FREEZE-RECORD-Bl3.json'), 'w', encoding='utf-8'), ensure_ascii=False)
-        load_inputs()                                                  # 書き換える前は通る
+        seal_bytes = open(P('records/Bl3/sealing-record-Bl3.json'), 'rb').read()
+        gs_ok = lambda c_, p_: seal_bytes if (c_ == C_ and p_ == 'records/Bl3/sealing-record-Bl3.json') else b''
+
+        def stops(fn, word):
+            try:
+                fn()
+                return False
+            except SystemExit as e_:
+                return word in str(e_)
+        load_inputs(git_show=gs_ok)                                    # 書き換える前は通る
+        assert stops(lambda: load_inputs(git_show=lambda c_, p_: b'{}'), '下見の試みのコミット'), '封印の記録の錨の違いで止まらない'
+        ap2 = P('records/Bl3/analysis-Bl3.json')
+        a_txt = open(ap2, encoding='utf-8').read()
+        json.dump(dict(A, dry=True), open(ap2, 'w', encoding='utf-8'), ensure_ascii=False)
+        assert stops(lambda: load_inputs(git_show=gs_ok), 'DRY の集計'), 'DRY の集計で止まらない'
+        json.dump(dict(A, inputs={'main': {'dir': 'other'}}), open(ap2, 'w', encoding='utf-8'), ensure_ascii=False)
+        assert stops(lambda: load_inputs(git_show=gs_ok), '読んだ出力の同定'), '読んだ出力の同定の違いで止まらない'
+        open(ap2, 'w', encoding='utf-8').write(a_txt)
+        j_txt = open(jr_, encoding='utf-8').read()
+        open(jr_, 'w', encoding='utf-8').write(j_txt.replace('"agree": true', '"agree": false'))
+        assert stops(lambda: load_inputs(git_show=gs_ok), 'SHA16'), '一致だけを見る段の記録の書き換えで止まらない'
+        os.remove(jr_)
+        assert stops(lambda: load_inputs(git_show=gs_ok), '一致だけを見る段の記録が無い'), '一致だけを見る段の記録が無くても止まらない'
+        open(jr_, 'w', encoding='utf-8').write(j_txt)
+        load_inputs(git_show=gs_ok)                                    # 戻すと通る
         pp = P('records/predictions/predictions-Bl3-coordinator.json')
         open(pp, 'w', encoding='utf-8', newline='\n').write(json.dumps({'q1.pilot': '続ける', 'q4.gate': '通る'}, ensure_ascii=False))
         try:
-            load_inputs()
+            load_inputs(git_show=gs_ok)
             raise AssertionError('書き換えた予想で報告を組もうとした')
         except SystemExit as e_:
             assert '封印した予想' in str(e_), e_
