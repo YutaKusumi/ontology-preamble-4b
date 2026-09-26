@@ -275,5 +275,586 @@
  "deviation_rule": "凍結の後の変更は、逸脱として番号・日付・理由・登録者の承認を台帳（この記録の deviations）に記す。器の差分は tool_diffs に置き場（path）・前（before）・後（after）の SHA16 を記す（同じ置き場を二度直すときは、前の差分の後の SHA16 を次の差分の前に書く・路ごとにつなげて照らす）。下見のやり直しは kind pilot_rerun の行で記す。台帳は後ろに足すだけで、前の行を書き換えない（正本 computation.main_freeze_check・裁定 D222・D239）",
  "deviations": [],
  "next": "記録先行の公開（push）→ 予想の封印（コーディネータが先・SHA だけを伝える → 登録者）→ Colab の相 pilot → 本の凍結（下見の記録と機械の決定を足す）→ Colab の相 main → 一致だけを見る段 → 結果を登録者と一緒に開く",
- "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。",
+ "main_freeze": {
+  "frozen_jst": "2026-09-26 19:54",
+  "registrant_words": "本の凍結の準備が整いました。結果が予想通りで無かったとしても、貴重な収穫があると思います。また、既に、ここに至るまでにもそのプロセスや熟慮に熟慮を重ねた器材自体も既に価値があると思います。それでは、凍結をしてください",
+  "pilot_attempts": [
+   {
+    "version": "v3",
+    "logit_check": {
+     "cell": "N1|O-Ncold",
+     "max_abs": 0.0859527587890625,
+     "tol": 0.5,
+     "pass": true
+    },
+    "vi": {
+     "a": {
+      "N1|O-Ncold": 0.689885564636441,
+      "N1|Onull": 0.5161063380070487,
+      "S1|O-Ncold": 0.6450920471284931,
+      "S1|Onull": 0.10781557820173049,
+      "S4|O-Ncold": 0.4130042929756925,
+      "S4|Onull": 1.62091840203977,
+      "SK|O-Ncold": 0.08626939315590221,
+      "SK|Onull": 0.6096649174021351
+     },
+     "b": {
+      "N1|O-Ncold": 0.0,
+      "N1|Onull": 0.0,
+      "S1|O-Ncold": 0.0,
+      "S1|Onull": 0.0,
+      "S4|O-Ncold": 0.0,
+      "S4|Onull": 0.0,
+      "SK|O-Ncold": 0.0,
+      "SK|Onull": 0.0
+     },
+     "decision": {
+      "stop": false,
+      "batch": 1,
+      "floor": 0.0,
+      "spread_a": 1.62091840203977,
+      "spread_b": 0.0
+     }
+    },
+    "batch": 1,
+    "floor": 0.0,
+    "cache_tol": 0.005,
+    "cells": {
+     "N1|O-Ncold": {
+      "lo": -8.783241892894914,
+      "pa": 0.00015325686907010687,
+      "mass": 0.9999999987941308,
+      "pa_transformed": 0.0,
+      "stage_b_rate": 0.12,
+      "pass_i_ii": true,
+      "main": true
+     },
+     "N1|Onull": {
+      "lo": 0.48377166953951445,
+      "pa": 0.6186381031967259,
+      "mass": 0.9999999999472848,
+      "pa_transformed": 0.6662195771487898,
+      "stage_b_rate": 0.675,
+      "pass_i_ii": true,
+      "main": true
+     },
+     "S1|O-Ncold": {
+      "lo": 0.8782689202734275,
+      "pa": 0.7064633704554025,
+      "mass": 0.9999999981730809,
+      "pa_transformed": 0.7932121635950772,
+      "stage_b_rate": 0.32,
+      "pass_i_ii": true,
+      "main": true
+     },
+     "S1|Onull": {
+      "lo": -5.457120191378635,
+      "pa": 0.004247702878368344,
+      "mass": 0.9999999999991545,
+      "pa_transformed": 0.0,
+      "stage_b_rate": 0.325,
+      "pass_i_ii": true,
+      "main": true
+     },
+     "S4|O-Ncold": {
+      "lo": -6.647958905368569,
+      "pa": 0.0012949868589027735,
+      "mass": 0.9999999996578808,
+      "pa_transformed": 0.0,
+      "stage_b_rate": 0.175,
+      "pass_i_ii": true,
+      "main": true
+     },
+     "S4|Onull": {
+      "lo": -7.721197842568202,
+      "pa": 0.0004431327933539805,
+      "mass": 0.9999999999994884,
+      "pa_transformed": 0.0,
+      "stage_b_rate": 0.37,
+      "pass_i_ii": true,
+      "main": true
+     },
+     "SK|O-Ncold": {
+      "lo": -3.3198395572748183,
+      "pa": 0.03489681168295592,
+      "mass": 0.9999999999984581,
+      "pa_transformed": 0.0,
+      "stage_b_rate": 0.545,
+      "pass_i_ii": true,
+      "main": true
+     },
+     "SK|Onull": {
+      "lo": -13.314594271123973,
+      "pa": 1.6502299413698808e-06,
+      "mass": 0.9999999999998366,
+      "pa_transformed": 0.0,
+      "stage_b_rate": 0.59,
+      "pass_i_ii": false,
+      "main": true
+     },
+     "S4|Osec-Ncold": {
+      "lo": -13.009343133371978,
+      "pa": 2.239304183591717e-06,
+      "mass": 0.9999999999598899,
+      "pa_transformed": null,
+      "stage_b_rate": null,
+      "pass_i_ii": false,
+      "main": false
+     }
+    },
+    "iii": {
+     "rho": 0.14285714285714285,
+     "n": 8,
+     "sentence": "positive",
+     "transformed_def": "変換を通した値は、全語彙の出口の値に段階 B の標本化の変換（温度・top-k・top-p）を当てた後の選択肢 a の文字の確率で、選択の文字と refuse の頭の中で割り直さない（裁定 D235）"
+    },
+    "iv": {
+     "V1": {
+      "lo": {
+       "N1|O-Ncold": -6.845209030652363,
+       "N1|Onull": 0.3272118126997512,
+       "S1|O-Ncold": 0.4414083933854087,
+       "S1|Onull": -6.848444819672743,
+       "S4|O-Ncold": -4.411032776932075,
+       "S4|Onull": -8.888947377384717,
+       "SK|O-Ncold": -2.573330631847483,
+       "SK|Onull": -12.015346561553386
+      },
+      "flags": {
+       "N1|O-Ncold": true,
+       "N1|Onull": false,
+       "S1|O-Ncold": false,
+       "S1|Onull": true,
+       "S4|O-Ncold": true,
+       "S4|Onull": true,
+       "SK|O-Ncold": false,
+       "SK|Onull": true
+      }
+     },
+     "V2": {
+      "lo": {
+       "N1|O-Ncold": -4.862160733754813,
+       "N1|Onull": 2.194319215077279,
+       "S1|O-Ncold": 6.732523874830008,
+       "S1|Onull": -1.1352915554631267,
+       "S4|O-Ncold": -3.0439507302036546,
+       "S4|Onull": -3.9217261741687963,
+       "SK|O-Ncold": 0.5236243221392556,
+       "SK|Onull": -12.383819581660767
+      },
+      "flags": {
+       "N1|O-Ncold": true,
+       "N1|Onull": true,
+       "S1|O-Ncold": true,
+       "S1|Onull": true,
+       "S4|O-Ncold": true,
+       "S4|Onull": true,
+       "SK|O-Ncold": true,
+       "SK|Onull": false
+      }
+     },
+     "V3": {
+      "lo": {
+       "N1|O-Ncold": -10.631068070524933,
+       "N1|Onull": -4.41322512597506,
+       "S1|O-Ncold": 5.466733378520466,
+       "S1|Onull": 0.2562925189944778,
+       "S4|O-Ncold": -2.953968463761285,
+       "S4|Onull": -4.345017431288852,
+       "SK|O-Ncold": 3.1813580742413734,
+       "SK|Onull": -7.2657814096711135
+      },
+      "flags": {
+       "N1|O-Ncold": true,
+       "N1|Onull": true,
+       "S1|O-Ncold": true,
+       "S1|Onull": true,
+       "S4|O-Ncold": true,
+       "S4|Onull": true,
+       "SK|O-Ncold": true,
+       "SK|Onull": true
+      }
+     }
+    },
+    "v": {
+     "diffs": {
+      "N1|O-Ncold": -0.14351628848850595,
+      "N1|Onull": 1.6207703705073513,
+      "S1|O-Ncold": 1.361396962559489,
+      "S1|Onull": -1.2330674287951737,
+      "S4|O-Ncold": 1.157909048572911,
+      "S4|Onull": 0.06662083044667355,
+      "SK|O-Ncold": 0.3836937088121317,
+      "SK|Onull": 0.4112205499877035,
+      "S4|Osec-Ncold": -2.73725172258483
+     },
+     "tol": 0.005,
+     "shortcut": false
+    },
+    "decision": {
+     "q1": "一部の升目を外して続ける",
+     "n_pass": 7,
+     "n_main": 8,
+     "dropped": [
+      "SK|Onull",
+      "S4|Osec-Ncold"
+     ],
+     "stop": false,
+     "reason": null
+    },
+    "n_forward": 84
+   }
+  ],
+  "pilot": {
+   "version": "v3",
+   "logit_check": {
+    "cell": "N1|O-Ncold",
+    "max_abs": 0.0859527587890625,
+    "tol": 0.5,
+    "pass": true
+   },
+   "vi": {
+    "a": {
+     "N1|O-Ncold": 0.689885564636441,
+     "N1|Onull": 0.5161063380070487,
+     "S1|O-Ncold": 0.6450920471284931,
+     "S1|Onull": 0.10781557820173049,
+     "S4|O-Ncold": 0.4130042929756925,
+     "S4|Onull": 1.62091840203977,
+     "SK|O-Ncold": 0.08626939315590221,
+     "SK|Onull": 0.6096649174021351
+    },
+    "b": {
+     "N1|O-Ncold": 0.0,
+     "N1|Onull": 0.0,
+     "S1|O-Ncold": 0.0,
+     "S1|Onull": 0.0,
+     "S4|O-Ncold": 0.0,
+     "S4|Onull": 0.0,
+     "SK|O-Ncold": 0.0,
+     "SK|Onull": 0.0
+    },
+    "decision": {
+     "stop": false,
+     "batch": 1,
+     "floor": 0.0,
+     "spread_a": 1.62091840203977,
+     "spread_b": 0.0
+    }
+   },
+   "batch": 1,
+   "floor": 0.0,
+   "cache_tol": 0.005,
+   "cells": {
+    "N1|O-Ncold": {
+     "lo": -8.783241892894914,
+     "pa": 0.00015325686907010687,
+     "mass": 0.9999999987941308,
+     "pa_transformed": 0.0,
+     "stage_b_rate": 0.12,
+     "pass_i_ii": true,
+     "main": true
+    },
+    "N1|Onull": {
+     "lo": 0.48377166953951445,
+     "pa": 0.6186381031967259,
+     "mass": 0.9999999999472848,
+     "pa_transformed": 0.6662195771487898,
+     "stage_b_rate": 0.675,
+     "pass_i_ii": true,
+     "main": true
+    },
+    "S1|O-Ncold": {
+     "lo": 0.8782689202734275,
+     "pa": 0.7064633704554025,
+     "mass": 0.9999999981730809,
+     "pa_transformed": 0.7932121635950772,
+     "stage_b_rate": 0.32,
+     "pass_i_ii": true,
+     "main": true
+    },
+    "S1|Onull": {
+     "lo": -5.457120191378635,
+     "pa": 0.004247702878368344,
+     "mass": 0.9999999999991545,
+     "pa_transformed": 0.0,
+     "stage_b_rate": 0.325,
+     "pass_i_ii": true,
+     "main": true
+    },
+    "S4|O-Ncold": {
+     "lo": -6.647958905368569,
+     "pa": 0.0012949868589027735,
+     "mass": 0.9999999996578808,
+     "pa_transformed": 0.0,
+     "stage_b_rate": 0.175,
+     "pass_i_ii": true,
+     "main": true
+    },
+    "S4|Onull": {
+     "lo": -7.721197842568202,
+     "pa": 0.0004431327933539805,
+     "mass": 0.9999999999994884,
+     "pa_transformed": 0.0,
+     "stage_b_rate": 0.37,
+     "pass_i_ii": true,
+     "main": true
+    },
+    "SK|O-Ncold": {
+     "lo": -3.3198395572748183,
+     "pa": 0.03489681168295592,
+     "mass": 0.9999999999984581,
+     "pa_transformed": 0.0,
+     "stage_b_rate": 0.545,
+     "pass_i_ii": true,
+     "main": true
+    },
+    "SK|Onull": {
+     "lo": -13.314594271123973,
+     "pa": 1.6502299413698808e-06,
+     "mass": 0.9999999999998366,
+     "pa_transformed": 0.0,
+     "stage_b_rate": 0.59,
+     "pass_i_ii": false,
+     "main": true
+    },
+    "S4|Osec-Ncold": {
+     "lo": -13.009343133371978,
+     "pa": 2.239304183591717e-06,
+     "mass": 0.9999999999598899,
+     "pa_transformed": null,
+     "stage_b_rate": null,
+     "pass_i_ii": false,
+     "main": false
+    }
+   },
+   "iii": {
+    "rho": 0.14285714285714285,
+    "n": 8,
+    "sentence": "positive",
+    "transformed_def": "変換を通した値は、全語彙の出口の値に段階 B の標本化の変換（温度・top-k・top-p）を当てた後の選択肢 a の文字の確率で、選択の文字と refuse の頭の中で割り直さない（裁定 D235）"
+   },
+   "iv": {
+    "V1": {
+     "lo": {
+      "N1|O-Ncold": -6.845209030652363,
+      "N1|Onull": 0.3272118126997512,
+      "S1|O-Ncold": 0.4414083933854087,
+      "S1|Onull": -6.848444819672743,
+      "S4|O-Ncold": -4.411032776932075,
+      "S4|Onull": -8.888947377384717,
+      "SK|O-Ncold": -2.573330631847483,
+      "SK|Onull": -12.015346561553386
+     },
+     "flags": {
+      "N1|O-Ncold": true,
+      "N1|Onull": false,
+      "S1|O-Ncold": false,
+      "S1|Onull": true,
+      "S4|O-Ncold": true,
+      "S4|Onull": true,
+      "SK|O-Ncold": false,
+      "SK|Onull": true
+     }
+    },
+    "V2": {
+     "lo": {
+      "N1|O-Ncold": -4.862160733754813,
+      "N1|Onull": 2.194319215077279,
+      "S1|O-Ncold": 6.732523874830008,
+      "S1|Onull": -1.1352915554631267,
+      "S4|O-Ncold": -3.0439507302036546,
+      "S4|Onull": -3.9217261741687963,
+      "SK|O-Ncold": 0.5236243221392556,
+      "SK|Onull": -12.383819581660767
+     },
+     "flags": {
+      "N1|O-Ncold": true,
+      "N1|Onull": true,
+      "S1|O-Ncold": true,
+      "S1|Onull": true,
+      "S4|O-Ncold": true,
+      "S4|Onull": true,
+      "SK|O-Ncold": true,
+      "SK|Onull": false
+     }
+    },
+    "V3": {
+     "lo": {
+      "N1|O-Ncold": -10.631068070524933,
+      "N1|Onull": -4.41322512597506,
+      "S1|O-Ncold": 5.466733378520466,
+      "S1|Onull": 0.2562925189944778,
+      "S4|O-Ncold": -2.953968463761285,
+      "S4|Onull": -4.345017431288852,
+      "SK|O-Ncold": 3.1813580742413734,
+      "SK|Onull": -7.2657814096711135
+     },
+     "flags": {
+      "N1|O-Ncold": true,
+      "N1|Onull": true,
+      "S1|O-Ncold": true,
+      "S1|Onull": true,
+      "S4|O-Ncold": true,
+      "S4|Onull": true,
+      "SK|O-Ncold": true,
+      "SK|Onull": true
+     }
+    }
+   },
+   "v": {
+    "diffs": {
+     "N1|O-Ncold": -0.14351628848850595,
+     "N1|Onull": 1.6207703705073513,
+     "S1|O-Ncold": 1.361396962559489,
+     "S1|Onull": -1.2330674287951737,
+     "S4|O-Ncold": 1.157909048572911,
+     "S4|Onull": 0.06662083044667355,
+     "SK|O-Ncold": 0.3836937088121317,
+     "SK|Onull": 0.4112205499877035,
+     "S4|Osec-Ncold": -2.73725172258483
+    },
+    "tol": 0.005,
+    "shortcut": false
+   },
+   "decision": {
+    "q1": "一部の升目を外して続ける",
+    "n_pass": 7,
+    "n_main": 8,
+    "dropped": [
+     "SK|Onull",
+     "S4|Osec-Ncold"
+    ],
+    "stop": false,
+    "reason": null
+   },
+   "n_forward": 84
+  },
+  "decision": {
+   "q1": "一部の升目を外して続ける",
+   "n_pass": 7,
+   "n_main": 8,
+   "dropped": [
+    "SK|Onull",
+    "S4|Osec-Ncold"
+   ],
+   "stop": false,
+   "reason": null
+  },
+  "sessions": [
+   {
+    "commit": "4a17457a0493b2cb4a1ca053743c415234f0c536",
+    "gpu": "NVIDIA L4",
+    "versions": {
+     "numpy": "2.1.3",
+     "scipy": "1.16.3",
+     "torch": "2.11.0+cu128",
+     "transformers": "4.57.3",
+     "torchvision": "0.26.0+cu128",
+     "torchaudio": "2.11.0+cu128",
+     "tokenizers": "0.22.2",
+     "huggingface_hub": "0.36.2",
+     "accelerate": "1.14.0",
+     "safetensors": "0.8.0"
+    },
+    "canon_sha16": "33E543663FE37A5F",
+    "directions_npz_sha256": "E660707BCD5E9C3DF39B8AD5754C11671B33596D0BF7ED9F66C6DD852A1AB40E",
+    "finished": "2026-09-26T10:36:23Z"
+   }
+  ],
+  "frozen_sha16": {
+   "design/contrasts-Bl3.json": "33E543663FE37A5F",
+   "design/design-Bl3-FROZEN.md": "E9EFA213C514BFA6",
+   "design/design-Bl3-FROZEN.src.md": "98757B141E7E7859",
+   "records/Bl3/design-facts-Bl3.json": "20BBA1F720743A4D",
+   "records/Bl3/design-facts-Bl3.md": "409B5EC736E5F2F7",
+   "records/Bl3/numbers-lint-FROZEN-Bl3.md": "A7C0FFC5F51B741D",
+   "records/Bl3/frozen-diff-Bl3.md": "CDFC8422EB1E657F",
+   "records/predictions/predictions-form-Bl3-v1.html": "1FAF0DD29B46087E",
+   "results/Bl3/directions-Bl3.json": "E741D929B106ECBE",
+   "records/Bl3/tools/tools-log-Bl3.md": "F47E1B0AB21A78FE",
+   "records/Bl3/tools/recompute-rewrite-dev-Bl3.md": "F03F51731422643C",
+   "records/Bl3/tools/recompute-rewrite-instructions-Bl3.md": "8024D78192FBFE67",
+   "records/Bl3/exposure-before-seal-Bl3.md": "8A5E02D58D696489",
+   "records/Bl3/rulings-D204-D209.md": "53A1965E04D8802F",
+   "records/Bl3/rulings-D210.md": "D3393687F5F7B63F",
+   "records/Bl3/rulings-D211-D217.md": "BB803A4FD9702674",
+   "records/Bl3/rulings-D218.md": "32C95882687D5429",
+   "records/Bl3/rulings-D219-D223.md": "DA0274860F8B21A4",
+   "records/Bl3/rulings-D224-D225.md": "8F9C78E3F339C931",
+   "records/Bl3/rulings-D226-D227.md": "0C0B6BD0B5771BE4",
+   "records/Bl3/rulings-D228-D230.md": "06978FA3DCB5310E",
+   "records/Bl3/rulings-D231-D235.md": "8981C3E93576CA3B",
+   "records/Bl3/rulings-D236-D237.md": "5F204BC782CA7A39",
+   "records/Bl3/rulings-D238.md": "3F92C29EAF3C662E",
+   "records/Bl3/rulings-D239-D241.md": "0E9D370655987A3C",
+   "records/reviews/Bl3/impl/adoption-table-impl-Bl3.md": "59680923046A3921",
+   "records/reviews/Bl3/impl/frame-impl-Bl3.md": "FCCCCC4950872AB9",
+   "records/reviews/Bl3/impl/permission-impl-Bl3.md": "39FCBDFBAAD5636C",
+   "records/reviews/Bl3/impl/provenance-impl-Bl3.md": "F2925E657A569B40",
+   "records/reviews/Bl3/impl/request-impl-Bl3-R1.md": "E788B49AE256F855",
+   "records/reviews/Bl3/impl/request-impl-Bl3-R2.md": "80DB071F6377F6F0",
+   "design/contrasts-B.json": "EF0DF4295B68F949",
+   "records/B/analysis-B-2026-09-22.json": "04B69DCA950523BE",
+   "design/contrasts-Blens.json": "3864252EC540F93B",
+   "records/Blens/results-Blens-FINAL-2026-09-24.md": "A17C7F6476537677",
+   "records/Blens/design-facts-Blens.json": "DC9D3DD1D386FB70",
+   "results/dirB/dirB__s1/directions.npz": "66CFF4575C07EE6B",
+   "results/dirB/dirB__s1/directions.json": "D5AE575E449200B5",
+   "tools/steer_B.py": "71157C6921E12AC7",
+   "tools/run_stageB_local.py": "E976A4F5B63767FA",
+   "tools/rules_B.py": "4A89BE41F817A8F0",
+   "tools/blens_core.py": "DB3092B1EF0B88B3",
+   "arms/frozen-from-ryokai-os/app-scenarios.json": "7AD7E49459D5C402",
+   "records/reviews/Bl3/design-round1/adoption-table-Bl3-design-r1.md": "799D1B303F90BA96",
+   "records/reviews/Bl3/design-round1/verification-Bl3-design-r1.md": "A4F449FDBB9D28CB",
+   "records/reviews/Bl3/design-round2/adoption-table-Bl3-design-r2.md": "F94505B624402C3E",
+   "records/reviews/Bl3/design-round2/verification-Bl3-design-r2.md": "684F6F98F5100982",
+   "records/Bl3/draft3-review/review-draft3-Bl3.md": "81294EA2349E9609",
+   "records/reviews/Bl3/opinions-tools/adoption-proposal-opinions-tools-Bl3.md": "784B320E390F711F",
+   "records/reviews/Bl3/fixcheck/adoption-fixcheck-Bl3.md": "8C264A9AC71830F7",
+   "results/Blens/calib-Blens.json": "94D0ABBEDF58015F",
+   "records/Bl3/dry-run-Bl3-2026-09-26.md": "2A9217BECFCA98EE",
+   "records/Bl3/colab-check-Bl3-session.json": "585D2DC8107E58B8",
+   "records/Bl3/colab-check-Bl3.json": "E7784EC4422A04A0",
+   "tools/analyze_Bl3.py": "000A02C88C37F122",
+   "tools/bl3_core.py": "E8CD3A24950F8581",
+   "tools/bl3_directions.py": "4BE7E44D135849F4",
+   "tools/bl3_facts.py": "FE85B9500932B658",
+   "tools/bl3_recompute_rewrite.py": "012CB2B68397614A",
+   "tools/bl3_run.py": "46071CD97AB10819",
+   "tools/blens_lens.py": "CB2A138EDFFB8732",
+   "tools/build_draft_Bl3.py": "76B6F8B115B9BFEF",
+   "tools/build_report_Bl3.py": "A15B95DE3A07455E",
+   "tools/colab/boot_Bl3.py": "D718545710EBC219",
+   "tools/colab/boot_Blens.py": "E1B7270F3A2385AC",
+   "tools/direction_B.py": "E84A101655685F2B",
+   "tools/dry_run_Bl3.py": "AA6237260D1A0354",
+   "tools/freeze_Bl3.py": "EEE3F433C9564A3D",
+   "tools/make_contrasts_Bl3.py": "0D325085FA5FA4D5",
+   "tools/make_frozen_B.py": "A333488A9437EF68",
+   "tools/make_frozen_Bl3.py": "024F3DE99F90D06F",
+   "tools/make_predictions_form_B.py": "A213804DCB730737",
+   "tools/make_predictions_form_Bl3.py": "6305BB5766F0F6B6",
+   "tools/numbers_lint.py": "88B6A53BBEC80602",
+   "tools/qf_task_B.py": "86D71D789BB7A320",
+   "tools/report_lint.py": "1F145D63983929EE",
+   "tools/response_mode_A.py": "C3E90B11B62F67A5",
+   "tools/runs_A.py": "A57BE1F5EEACBBB2",
+   "tools/runs_B.py": "269B60867D0924EB",
+   "tools/seal_Bl3.py": "0041BA954F094E21",
+   "tools/sweep_Bl3.py": "9DE77FEE50A64405"
+  },
+  "tool_diffs_applied": [],
+  "seal": {
+   "record_sha16": "8D0AB7A7D0467DB0",
+   "predictions_sha256": {
+    "coordinator": "F9E7E8DF04E4BFEEC098FA055D5A2EC3A35415EC8BEE6BCF016AE1C8C24B662E",
+    "registrant": "497C065D9F629125858438D04542FE442980BAAD9A22CE770868227F0F7F16C6"
+   }
+  },
+  "freeze_tool": "tools/freeze_Bl3.py v4",
+  "deviations_n": 0
+ }
 }

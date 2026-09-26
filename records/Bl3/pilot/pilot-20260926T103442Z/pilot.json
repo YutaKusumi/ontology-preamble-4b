@@ -1,0 +1,233 @@
+{
+ "pilot": {
+  "version": "v3",
+  "logit_check": {
+   "cell": "N1|O-Ncold",
+   "max_abs": 0.0859527587890625,
+   "tol": 0.5,
+   "pass": true
+  },
+  "vi": {
+   "a": {
+    "N1|O-Ncold": 0.689885564636441,
+    "N1|Onull": 0.5161063380070487,
+    "S1|O-Ncold": 0.6450920471284931,
+    "S1|Onull": 0.10781557820173049,
+    "S4|O-Ncold": 0.4130042929756925,
+    "S4|Onull": 1.62091840203977,
+    "SK|O-Ncold": 0.08626939315590221,
+    "SK|Onull": 0.6096649174021351
+   },
+   "b": {
+    "N1|O-Ncold": 0.0,
+    "N1|Onull": 0.0,
+    "S1|O-Ncold": 0.0,
+    "S1|Onull": 0.0,
+    "S4|O-Ncold": 0.0,
+    "S4|Onull": 0.0,
+    "SK|O-Ncold": 0.0,
+    "SK|Onull": 0.0
+   },
+   "decision": {
+    "stop": false,
+    "batch": 1,
+    "floor": 0.0,
+    "spread_a": 1.62091840203977,
+    "spread_b": 0.0
+   }
+  },
+  "batch": 1,
+  "floor": 0.0,
+  "cache_tol": 0.005,
+  "cells": {
+   "N1|O-Ncold": {
+    "lo": -8.783241892894914,
+    "pa": 0.00015325686907010687,
+    "mass": 0.9999999987941308,
+    "pa_transformed": 0.0,
+    "stage_b_rate": 0.12,
+    "pass_i_ii": true,
+    "main": true
+   },
+   "N1|Onull": {
+    "lo": 0.48377166953951445,
+    "pa": 0.6186381031967259,
+    "mass": 0.9999999999472848,
+    "pa_transformed": 0.6662195771487898,
+    "stage_b_rate": 0.675,
+    "pass_i_ii": true,
+    "main": true
+   },
+   "S1|O-Ncold": {
+    "lo": 0.8782689202734275,
+    "pa": 0.7064633704554025,
+    "mass": 0.9999999981730809,
+    "pa_transformed": 0.7932121635950772,
+    "stage_b_rate": 0.32,
+    "pass_i_ii": true,
+    "main": true
+   },
+   "S1|Onull": {
+    "lo": -5.457120191378635,
+    "pa": 0.004247702878368344,
+    "mass": 0.9999999999991545,
+    "pa_transformed": 0.0,
+    "stage_b_rate": 0.325,
+    "pass_i_ii": true,
+    "main": true
+   },
+   "S4|O-Ncold": {
+    "lo": -6.647958905368569,
+    "pa": 0.0012949868589027735,
+    "mass": 0.9999999996578808,
+    "pa_transformed": 0.0,
+    "stage_b_rate": 0.175,
+    "pass_i_ii": true,
+    "main": true
+   },
+   "S4|Onull": {
+    "lo": -7.721197842568202,
+    "pa": 0.0004431327933539805,
+    "mass": 0.9999999999994884,
+    "pa_transformed": 0.0,
+    "stage_b_rate": 0.37,
+    "pass_i_ii": true,
+    "main": true
+   },
+   "SK|O-Ncold": {
+    "lo": -3.3198395572748183,
+    "pa": 0.03489681168295592,
+    "mass": 0.9999999999984581,
+    "pa_transformed": 0.0,
+    "stage_b_rate": 0.545,
+    "pass_i_ii": true,
+    "main": true
+   },
+   "SK|Onull": {
+    "lo": -13.314594271123973,
+    "pa": 1.6502299413698808e-06,
+    "mass": 0.9999999999998366,
+    "pa_transformed": 0.0,
+    "stage_b_rate": 0.59,
+    "pass_i_ii": false,
+    "main": true
+   },
+   "S4|Osec-Ncold": {
+    "lo": -13.009343133371978,
+    "pa": 2.239304183591717e-06,
+    "mass": 0.9999999999598899,
+    "pa_transformed": null,
+    "stage_b_rate": null,
+    "pass_i_ii": false,
+    "main": false
+   }
+  },
+  "iii": {
+   "rho": 0.14285714285714285,
+   "n": 8,
+   "sentence": "positive",
+   "transformed_def": "変換を通した値は、全語彙の出口の値に段階 B の標本化の変換（温度・top-k・top-p）を当てた後の選択肢 a の文字の確率で、選択の文字と refuse の頭の中で割り直さない（裁定 D235）"
+  },
+  "iv": {
+   "V1": {
+    "lo": {
+     "N1|O-Ncold": -6.845209030652363,
+     "N1|Onull": 0.3272118126997512,
+     "S1|O-Ncold": 0.4414083933854087,
+     "S1|Onull": -6.848444819672743,
+     "S4|O-Ncold": -4.411032776932075,
+     "S4|Onull": -8.888947377384717,
+     "SK|O-Ncold": -2.573330631847483,
+     "SK|Onull": -12.015346561553386
+    },
+    "flags": {
+     "N1|O-Ncold": true,
+     "N1|Onull": false,
+     "S1|O-Ncold": false,
+     "S1|Onull": true,
+     "S4|O-Ncold": true,
+     "S4|Onull": true,
+     "SK|O-Ncold": false,
+     "SK|Onull": true
+    }
+   },
+   "V2": {
+    "lo": {
+     "N1|O-Ncold": -4.862160733754813,
+     "N1|Onull": 2.194319215077279,
+     "S1|O-Ncold": 6.732523874830008,
+     "S1|Onull": -1.1352915554631267,
+     "S4|O-Ncold": -3.0439507302036546,
+     "S4|Onull": -3.9217261741687963,
+     "SK|O-Ncold": 0.5236243221392556,
+     "SK|Onull": -12.383819581660767
+    },
+    "flags": {
+     "N1|O-Ncold": true,
+     "N1|Onull": true,
+     "S1|O-Ncold": true,
+     "S1|Onull": true,
+     "S4|O-Ncold": true,
+     "S4|Onull": true,
+     "SK|O-Ncold": true,
+     "SK|Onull": false
+    }
+   },
+   "V3": {
+    "lo": {
+     "N1|O-Ncold": -10.631068070524933,
+     "N1|Onull": -4.41322512597506,
+     "S1|O-Ncold": 5.466733378520466,
+     "S1|Onull": 0.2562925189944778,
+     "S4|O-Ncold": -2.953968463761285,
+     "S4|Onull": -4.345017431288852,
+     "SK|O-Ncold": 3.1813580742413734,
+     "SK|Onull": -7.2657814096711135
+    },
+    "flags": {
+     "N1|O-Ncold": true,
+     "N1|Onull": true,
+     "S1|O-Ncold": true,
+     "S1|Onull": true,
+     "S4|O-Ncold": true,
+     "S4|Onull": true,
+     "SK|O-Ncold": true,
+     "SK|Onull": true
+    }
+   }
+  },
+  "v": {
+   "diffs": {
+    "N1|O-Ncold": -0.14351628848850595,
+    "N1|Onull": 1.6207703705073513,
+    "S1|O-Ncold": 1.361396962559489,
+    "S1|Onull": -1.2330674287951737,
+    "S4|O-Ncold": 1.157909048572911,
+    "S4|Onull": 0.06662083044667355,
+    "SK|O-Ncold": 0.3836937088121317,
+    "SK|Onull": 0.4112205499877035,
+    "S4|Osec-Ncold": -2.73725172258483
+   },
+   "tol": 0.005,
+   "shortcut": false
+  },
+  "decision": {
+   "q1": "一部の升目を外して続ける",
+   "n_pass": 7,
+   "n_main": 8,
+   "dropped": [
+    "SK|Onull",
+    "S4|Osec-Ncold"
+   ],
+   "stop": false,
+   "reason": null
+  },
+  "n_forward": 84
+ },
+ "variants_used": [
+  "V1",
+  "V2",
+  "V3"
+ ],
+ "clause": "本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
