@@ -1,0 +1,63 @@
+{
+ "what": "登録者最終確認の後に組み直した最終版の確かめ（逸脱の器とは別の式・登録者裁定 D252）",
+ "inputs": {
+  "records/Bl3/results-Bl3-FINAL-2026-09-27.md": "90EEB93792733FAC",
+  "records/Bl3/results-Bl3.md": "C3AF650191120624",
+  "records/Bl3/results-Bl3-proposal-confirmed-2026-09-27.md": "BD29053F3B43C802",
+  "records/Bl3/final-confirmation-Bl3.json": "7FC7A39E9855710C",
+  "tools/build_report_Bl3_devBLT1.py": "CC623A817CA8C516",
+  "tools/build_report_Bl3.py": "A15B95DE3A07455E"
+ },
+ "compared_with": {
+  "confirmed_proposal": "1ac0e4b:records/Bl3/results-Bl3-FINAL-2026-09-27.md",
+  "frozen_report_before": "1ac0e4b:records/Bl3/results-Bl3.md"
+ },
+ "checks": [
+  {
+   "what": "(一) 確認の記録の言葉・時刻・uuid が会話の記録の登録者の発言と同じ",
+   "ok": true,
+   "got": "当たり 1・時刻 2026-09-27 19:39・uuid 3947885e-b4c0-4deb-9a91-075863921758・言葉の字数 262"
+  },
+  {
+   "what": "(二) 確認していただいた案の写しが 1ac0e4b の最終版の案とバイトで同じで、SHA16 が確認の記録の値と同じ",
+   "ok": true,
+   "got": "写しの SHA16 BD29053F3B43C802・確認の記録の値 BD29053F3B43C802"
+  },
+  {
+   "what": "(三) 置き場の報告の 1ac0e4b からの違いは状態の行だけで、状態の行に確認の記録の時刻・uuid・言葉がある",
+   "ok": true,
+   "got": "違う行 [4]"
+  },
+  {
+   "what": "(四) 最終版と確認していただいた案の違いは状態の行と頭の添えの一行目だけで、頭の添えの一行目は置き場の報告の SHA16 を替えると同じ",
+   "ok": true,
+   "got": "違う行 [4, 10]・置き場の報告の SHA16 B80CF41089A947F8 → C3AF650191120624"
+  },
+  {
+   "what": "(五) 最終版と置き場の報告の走査の違反 0",
+   "ok": true,
+   "got": "最終版 0・置き場の報告 0"
+  },
+  {
+   "what": "(六) 最終版の足した区画を除き見出しを戻すと、置き場の報告とバイトで同じ",
+   "ok": true,
+   "got": "足した区画 14・見出し「# B-lens 層三の結果（報告の最終版・凍結した組み立ての器の出力に逸脱の区画を足したもの）」"
+  },
+  {
+   "what": "(七) 最終版と置き場の報告の機械の区画の中身の SHA16 が区画の記録と同じ",
+   "ok": true,
+   "got": "results-Bl3-FINAL-2026-09-27.md 区画 38（記録の器 tools/build_report_Bl3_devBLT1.py v3）・results-Bl3.md 区画 24（記録の器 tools/build_report_Bl3.py v4）"
+  },
+  {
+   "what": "(八) 草案の二つ目のファイルは、最終の検分に出したコミット 3f467e7 のときと同じ",
+   "ok": true,
+   "got": "SHA16 1025C96185A13612"
+  },
+  {
+   "what": "(九) 凍結した器で組み直した文が置き場の報告と同じ（メモリの中）・逸脱の器を --final でもう一度走らせると置き場の最終版と同じ文になる（書かない）",
+   "ok": true,
+   "got": "凍結した器 同じ・逸脱の器 既にある出力と同じ（書かない）: records\\Bl3\\results-Bl3-FINAL-2026-09-27.md"
+  }
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
