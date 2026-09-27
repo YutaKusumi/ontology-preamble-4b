@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build_report_Bl3_devBLT1.py v2 —— B-lens 層三（Bl3）の報告の草案の二つ目と最終版（逸脱 D-BLT1・登録者裁定 D243〜D246・v2 は D249・2026-09-27・B-lens の `tools/build_report_Blens_devBL3.py` の型）。
+"""build_report_Bl3_devBLT1.py v3 —— B-lens 層三（Bl3）の報告の草案の二つ目と最終版（逸脱 D-BLT1・登録者裁定 D243〜D246・v2 は D249・v3 は D251・D253・2026-09-27・B-lens の `tools/build_report_Blens_devBL3.py` の型）。
 
 凍結した組み立ての器 `tools/build_report_Bl3.py` を読み込み、同じ入力（凍結の記録の台帳・逸脱の印の JSON `records/Bl3/report-marks-Bl3.json`・起草者の欄
 `records/Bl3/results-rejected-lines-Bl3.md`）で凍結の報告を作り直して、置き場の `records/Bl3/results-Bl3.md` とバイトで同じことを確かめてから、
@@ -18,7 +18,12 @@ v2（最終の系統外の検分の後・登録者裁定 D249）: `--final` で�
   最終の検分を受けた草案の二つ目（置き場のファイル）は書き換えず、最終版との違いが決めた行（見出し・状態の行・凍結の記録の SHA16 の行・逸脱の一覧の D-BLT2 の行・
   頭の添え・検分票・起草者の欄の一行目〔裁定 D248〕・〈両方の外〉の注の等方の最上位の割合の一行〔起草者の最終の見直し・裁定 D251〕）だけであることを確かめる。`--final` が無ければ v1 と同じ組み方（台帳が D-BLT1 だけのときに限る）。
   最終版の出力: records/Bl3/results-Bl3-FINAL-2026-09-27.md・同じ名の -machine.json・-lint.md・-checks.json。
-用法: python tools/build_report_Bl3_devBLT1.py [--final] [--force]
+v3（起草者の最終の見直しの一度目と二度目の後・登録者裁定 D251・D253・記録 `records/Bl3/rulings-D251-D253.md`）: `--final` だけを組む（草案の二つ目は器 v1 の出力で、検分を受けたまま残す・
+  今の台帳では `--final` の無い組み方は止まる）。二度目の見直し（`records/reviews/Bl3/results-final/final-read2/review2-final-Bl3.md`）の R-a〜R-d を入れる:
+  R-a 〈両方の外〉の注の末の一行の二つ目の向きを「弱める側」に／R-b 頭の添えの一行目を、登録者最終確認の前にも後にも合う言い方に（確認の後の状態の行は凍結した器が出す）／
+  R-c §5 の注の「」の中を §0 の文に一字違わずある語に／R-d 頭の添えの一行目と四行目・検分票の段階と COI の行に、起草者の最終の見直しとその裁定を足す。
+  草案の二つ目との違いの決めた行に、〈両方の外〉の注の末の一行と §5 の注の一行を足す（頭の添えと検分票は v2 から決めた行）。
+用法: python tools/build_report_Bl3_devBLT1.py --final [--force]
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
 import os, re, sys, json, math, hashlib, argparse
@@ -30,7 +35,7 @@ sys.path.insert(0, HERE)
 import build_report_Bl3 as BR
 import report_lint as RL
 
-VERSION = 'v2'
+VERSION = 'v3'
 NL = chr(10)
 BS = chr(92)
 TAG = '【逸脱 D-BLT1】'
@@ -126,6 +131,8 @@ def main():
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--final', action='store_true')
     a = ap.parse_args()
+    if not a.final:
+        raise SystemExit('v3 は最終版（--final）だけを組む。草案の二つ目は器 v1 の出力で、検分を受けたまま残す（止める・裁定 D249・D253）')
     T3, FR, A, preds, meta, confirmation = BR.load_inputs()
     if confirmation is not None and not a.final:
         raise SystemExit('登録者最終確認の記録があるときは、最終版（--final）だけを組む（止める）')
@@ -226,7 +233,7 @@ def main():
             '  - 段階 B のこの行の差 %.1f pt・区間［%.2f, %.2f］は零を含む（q7 で数えない行・転記行 C）。主の表の段階 B の札: %s。' % (q7['diff_pt'], q7['lo'], q7['hi'], lab1),
             '  - 等方の最上位の割合 %s（向きまで数えた順位の分母の逆数は %.4f）・二つ目の札の偶然の目安 %s〜%s（§2）。等方の帰無の中央値 %s・効き目の側: %s（主の表）。'
             % (f4(r1['iso_top_share']), 1 / r1['second']['of_oriented'], f4(A['chance']['oriented']), f4(A['chance']['pair']), f4(r1['iso_median']), BR.side_text(T3, r1['side'])),
-            '  - これらは札と型を変えない。どちらの向きにも読まない（区別できたことを強める側にも、偶然の外の側にも）。']
+            '  - これらは札と型を変えない。どちらの向きにも読まない（区別できたことを強める側にも、弱める側にも）。']   # 二度目の見直しの R-a（裁定 D253）
 
     # ---- §3（P706）
     G = A['gates']
@@ -245,7 +252,7 @@ def main():
 
     # ---- §5（P707）
     b_rc = ['- %s独立の再計算の範囲は v̂ の行 %d だけで、Nk の行 %d は計算し直していない（正本 `independent_recompute.what`）。本の計算のバッチの大きさは %d で、正本の注「%s」のとおり、二段目は形だけの確かめだった。'
-            '§0 の「独立の再計算: 一致」は、この範囲の一致。' % (TAG, n_rc, n_nk, batch, T3['independent_recompute']['stages']['second']['note'])]
+            '§0 の独立の再計算の二つの「一致」は、この範囲の一致。' % (TAG, n_rc, n_nk, batch, T3['independent_recompute']['stages']['second']['note'])]   # 二度目の見直しの R-c（裁定 D253）
 
     # ---- §6（P708）
     cq = {'q2': (sum(1 for r in rows.values() if r['direction'] == 'static' and r['iso_outside']), n_st), 'q3': (sum(1 for r in rows.values() if r['direction'] == 'Nk' and r['iso_outside']), n_nk),
@@ -340,11 +347,12 @@ def main():
             None]
     if a.final:
         head[0] = ('- %sこの最終版は、凍結した組み立ての器 `tools/build_report_Bl3.py`（SHA16 %s）の出力を同じ入力で作り直し、置き場の `records/Bl3/results-Bl3.md`（SHA16 %s）とバイトで同じことを確かめてから、'
-                   '見出しと状態の行を改め、%sの印の区画だけを足したもの（組み立ての器 `tools/build_report_Bl3_devBLT1.py` %s・登録者裁定 D243〜D250・採否の案 `%s` と `%s`）。印の無い文と区画は凍結した器の出力のまま。'
-                   % (TAG, s16(BR.__file__), s16(BR.OUT), TAG, VERSION, ADOPT_REL, ADOPT_FINAL_REL))
+                   '見出しを改め（登録者最終確認の前は状態の行も改める・確認の後の状態の行は凍結した器が出す最終版の型の行）、%sの印の区画だけを足したもの'
+                   '（組み立ての器 `tools/build_report_Bl3_devBLT1.py` %s・登録者裁定 D243〜D250・起草者の最終の見直しの裁定 D251・D253・採否の案 `%s` と `%s`）。印の無い文と区画は凍結した器の出力のまま。'
+                   % (TAG, s16(BR.__file__), s16(BR.OUT), TAG, VERSION, ADOPT_REL, ADOPT_FINAL_REL))   # 二度目の見直しの R-b・R-d（裁定 D253）
         head[1] = '- %s起草者の欄（「この結果が退けた説明」）の三行は、結果の巡の後（登録者裁定 D244・D246）と、最終の系統外の検分の後（一行目・登録者裁定 D248）に、凍結した器の口（`--rejected`）で直した。' % TAG
         head.append('- %s最終の系統外の検分を受けた草案の二つ目（`records/Bl3/results-Bl3-draft2.md`・SHA16 %s）から最終版で改めた行は、決めた行（見出し・状態の行・凍結の記録の SHA16 の行・逸脱の一覧の D-BLT2 の行・'
-                    'この頭の添え・検分票・起草者の欄の一行目・〈両方の外〉の注の一行（起草者の最終の見直し・裁定 D251））だけ（器が確かめた・草案の二つ目のファイルは書き換えていない）。' % (TAG, s16(OUT)))
+                    'この頭の添え・検分票・起草者の欄の一行目・起草者の最終の見直しで直した行（〈両方の外〉の注の二行・§5 の注の一行・裁定 D251・D253））だけ（器が確かめた・草案の二つ目のファイルは書き換えていない）。' % (TAG, s16(OUT)))   # R-d
     ins.append((B['status'][1] + 1, head))
     ins.append((ans[0] - 1, b_rej))
     ins.append((B['reading'][1] + 1, b_n1))
@@ -366,11 +374,11 @@ def main():
                 '（採否の案 `%s` と `%s`・登録者裁定 D243〜D250）。') % (TAG, ADOPT_REL, ADOPT_FINAL_REL),
                '- %s最終版の検分票:' % TAG,
                '  - 対象: 報告の最終版（凍結した器の出力と、足した区画）。',
-               '  - 段階: 結果の後。結果の巡の後（登録者裁定 D243〜D246）と、最終の系統外の検分の後（登録者裁定 D247〜D250）。',
+               '  - 段階: 結果の後。結果の巡の後（登録者裁定 D243〜D246）と、最終の系統外の検分の後（登録者裁定 D247〜D250）と、起草者の最終の見直しの後（登録者裁定 D251・D253）。',   # R-d
                rev[4], rev[5],
                '  - 系統の内訳: 組み立てはコーディネータ（Claude 系）一名。結果の巡は系統外二票と系統内二票（一票に数える）。最終の系統外の検分は新しい個体の二票で、正本の一票を二票にした（逸脱 D-BLT2・同じ機種を選んだ二票は会話が別でも相関しうる）。'
                '起草者の最終の見直しは起草者自身のもので、外の目ではない。',
-               '  - COI記録: 起草者は器と報告と起草者の欄を書いた当人で、「正しく読めている」と書く側に引かれる。足した区画は採否の案の区分（三）の行に限り、読みを足さない。最終版で改めた行は、最終の検分の二票の所見と裁定で決めた行に限った。',
+               '  - COI記録: 起草者は器と報告と起草者の欄を書いた当人で、「正しく読めている」と書く側に引かれる。足した区画は採否の案の区分（三）の行に限り、読みを足さない。最終版で改めた行は、最終の検分の二票の所見と起草者の最終の見直しの所見のうち、裁定で決めた行に限った。',   # R-d
                '  - 本検分が確認していないこと: 最終版で改めた行は、もう一度の検分を経ていない（正本 `review_plan.no_more`）。足した区画の文の言い過ぎ（走査器は禁止語と数の形だけを見る）。']
     ins.append((fence_i[0] - 1, rev))
 
@@ -428,15 +436,21 @@ def main():
         fr_line = lambda Ls: [l for l in Ls if l.startswith('- 正本 `design/contrasts-Bl3.json` SHA16')]
         rej1 = lambda Ls: [l for l in Ls if l.startswith('- 「この大きさの加減では')]
         share1 = lambda Ls: [l for l in Ls if l.startswith('  - 等方の最上位の割合 ')]         # 起草者の最終の見直しの直し（裁定 D251）
-        ok_gone = ({T_DRAFT, S_DRAFT} | set(fr_line(d2)) | set(rej1(d2)) | set(share1(d2)) | set(block_lines(d2, '- ' + TAG + 'この草案は'))
+        last1 = lambda Ls: [l for l in Ls if l.startswith('  - これらは札と型を変えない。')]     # 二度目の見直しの R-a（裁定 D253）
+        rc1 = lambda Ls: [l for l in Ls if l.startswith('- ' + TAG + '独立の再計算の範囲は')]  # 二度目の見直しの R-c（裁定 D253）
+        for f_ in (share1, last1, rc1):
+            if len(f_(d2)) != 1 or len(f_(fl)) != 1:
+                raise SystemExit('決めた行が一つに決まらない（止める）')
+        ok_gone = ({T_DRAFT, S_DRAFT} | set(fr_line(d2)) | set(rej1(d2)) | set(share1(d2)) | set(last1(d2)) | set(rc1(d2)) | set(block_lines(d2, '- ' + TAG + 'この草案は'))
                    | set(block_lines(d2, '- ' + TAG + '上の検分票は')))
-        ok_came = ({T_FINAL} | {l for l in fl if l.startswith('- 状態: **')} | set(fr_line(fl)) | set(rej1(fl)) | set(share1(fl)) | {l for l in fl if l.startswith('- 【逸脱 D-BLT2】')}
+        ok_came = ({T_FINAL} | {l for l in fl if l.startswith('- 状態: **')} | set(fr_line(fl)) | set(rej1(fl)) | set(share1(fl)) | set(last1(fl)) | set(rc1(fl))
+                   | {l for l in fl if l.startswith('- 【逸脱 D-BLT2】')}
                    | set(block_lines(fl, '- ' + TAG + 'この最終版は')) | set(block_lines(fl, '- ' + TAG + '上の検分票は')))
         bad_g, bad_c = [l for l in gone if l not in ok_gone], [l for l in came if l not in ok_came]
         if bad_g or bad_c:
             raise SystemExit('草案の二つ目から、決めていない行が変わった（止める）: 消えた %s・足された %s' % ([l[:50] for l in bad_g], [l[:50] for l in bad_c]))
         cmp = {'draft2': 'records/Bl3/results-Bl3-draft2.md', 'draft2_sha16': s16(OUT), 'removed_lines': len(gone), 'added_lines': len(came),
-               'allowed': '見出し・状態の行・凍結の記録の SHA16 の行・逸脱の一覧の D-BLT2 の行・頭の添え・検分票・起草者の欄の一行目・〈両方の外〉の注の等方の最上位の割合の一行（裁定 D251）'}
+               'allowed': '見出し・状態の行・凍結の記録の SHA16 の行・逸脱の一覧の D-BLT2 の行・頭の添え・検分票・起草者の欄の一行目・〈両方の外〉の注の等方の最上位の割合の一行（裁定 D251）と末の一行・§5 の注の一行（裁定 D253）'}
     ck = {'what': ('報告の最終版の確かめ' if a.final else '報告の草案の二つ目の確かめ') + '（逸脱 D-BLT1 の器 %s）' % VERSION,
           'sha16': {'tools/build_report_Bl3.py': s16(BR.__file__), 'records/Bl3/results-Bl3.md': s16(BR.OUT), 'tools/build_report_Bl3_devBLT1.py': s16(os.path.abspath(__file__)), VER_REL: ver_s16,
                     'records/Bl3/open-results-Bl3.json': s16(OPEN), 'records/Bl3/report-marks-Bl3.json': s16(MARKS), 'records/Bl3/results-rejected-lines-Bl3.md': s16(REJ)},
