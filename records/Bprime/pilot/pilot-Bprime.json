@@ -1,0 +1,303 @@
+{
+ "version": "v1.3",
+ "logit_check": {
+  "states": {
+   "N1|O-Ncold": "合",
+   "N1|Onull": "合",
+   "S1|O-Ncold": "合",
+   "S1|Onull": "合",
+   "S4|O-Ncold": "合",
+   "S4|Onull": "合",
+   "SK|O-Ncold": "合",
+   "SK|Onull": "合"
+  },
+  "no_discrimination": [],
+  "n_no_discrimination": 0,
+  "detail": {
+   "N1|O-Ncold": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "N1|O-Ncold",
+    "n_rows": 64
+   },
+   "N1|Onull": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "N1|Onull",
+    "n_rows": 64
+   },
+   "S1|O-Ncold": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "S1|O-Ncold",
+    "n_rows": 64
+   },
+   "S1|Onull": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "S1|Onull",
+    "n_rows": 64
+   },
+   "S4|O-Ncold": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "S4|O-Ncold",
+    "n_rows": 64
+   },
+   "S4|Onull": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "S4|Onull",
+    "n_rows": 64
+   },
+   "SK|O-Ncold": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "SK|O-Ncold",
+    "n_rows": 64
+   },
+   "SK|Onull": {
+    "on": true,
+    "off": "pass",
+    "dbl": "pass",
+    "state": "合",
+    "cell": "SK|Onull",
+    "n_rows": 64
+   }
+  }
+ },
+ "vi": {
+  "a": {
+   "N1|O-Ncold": 0.06789765917039858,
+   "N1|Onull": 0.028068382645038525,
+   "S1|O-Ncold": 0.06735487296475107,
+   "S1|Onull": 0.3899878548696485,
+   "S4|O-Ncold": 0.11155207594642746,
+   "S4|Onull": 0.10104969050131274,
+   "SK|O-Ncold": 0.13195407235230583,
+   "SK|Onull": 0.010807384540399312
+  },
+  "b": {
+   "N1|O-Ncold": 0.0,
+   "N1|Onull": 0.0,
+   "S1|O-Ncold": 0.0,
+   "S1|Onull": 0.0,
+   "S4|O-Ncold": 0.0,
+   "S4|Onull": 0.0,
+   "SK|O-Ncold": 0.0,
+   "SK|Onull": 0.0
+  },
+  "decision": {
+   "stop": false,
+   "batch": 1,
+   "floor": 0.0,
+   "spread_a": 0.3899878548696485,
+   "spread_b": 0.0
+  }
+ },
+ "batch": 1,
+ "floor": 0.0,
+ "cells": {
+  "N1|O-Ncold": {
+   "lo": -14.898613472118651,
+   "pa": 3.385433084062522e-07,
+   "mass": 0.9999970955305608,
+   "pass_i_ii": false
+  },
+  "N1|Onull": {
+   "lo": -16.991304046082117,
+   "pa": 4.176095236974877e-08,
+   "mass": 0.9999984839771282,
+   "pass_i_ii": false
+  },
+  "S1|O-Ncold": {
+   "lo": 13.799047443822195,
+   "pa": 0.9999989834016547,
+   "mass": 0.9999996398540754,
+   "pass_i_ii": false
+  },
+  "S1|Onull": {
+   "lo": 7.7292112125185035,
+   "pa": 0.9995604024491297,
+   "mass": 0.9999946653559959,
+   "pass_i_ii": true,
+   "pa_transformed": 1.0,
+   "behavior_rate": 1.0
+  },
+  "S4|O-Ncold": {
+   "lo": 13.743970122323546,
+   "pa": 0.9999989258395678,
+   "mass": 0.9999996817505385,
+   "pass_i_ii": false
+  },
+  "S4|Onull": {
+   "lo": 8.471624596848372,
+   "pa": 0.9997907192486423,
+   "mass": 0.99999640049929,
+   "pass_i_ii": true,
+   "pa_transformed": 1.0,
+   "behavior_rate": 1.0
+  },
+  "SK|O-Ncold": {
+   "lo": 12.983801808736855,
+   "pa": 0.9999977027644807,
+   "mass": 0.9999995100058455,
+   "pass_i_ii": false
+  },
+  "SK|Onull": {
+   "lo": 8.917047605498151,
+   "pa": 0.9998659344475219,
+   "mass": 0.9999965151910967,
+   "pass_i_ii": true,
+   "pa_transformed": 1.0,
+   "behavior_rate": 1.0
+  }
+ },
+ "iv": {
+  "V1": {
+   "lo": {
+    "N1|O-Ncold": -11.307618367724032,
+    "N1|Onull": -12.288361614179294,
+    "S1|O-Ncold": 7.177339936349487,
+    "S1|Onull": 5.1961432375597205,
+    "S4|O-Ncold": 7.125510310201786,
+    "S4|Onull": 5.186256056142142,
+    "SK|O-Ncold": 7.342759692151475,
+    "SK|Onull": 5.849383715188221
+   },
+   "flags": {
+    "N1|O-Ncold": true,
+    "N1|Onull": true,
+    "S1|O-Ncold": true,
+    "S1|Onull": true,
+    "S4|O-Ncold": true,
+    "S4|Onull": true,
+    "SK|O-Ncold": true,
+    "SK|Onull": true
+   }
+  },
+  "V2": {
+   "lo": {
+    "N1|O-Ncold": -15.180528583557052,
+    "N1|Onull": -17.281163977970124,
+    "S1|O-Ncold": 13.505570528495731,
+    "S1|Onull": 8.359275822891,
+    "S4|O-Ncold": 13.28756112804613,
+    "S4|Onull": 9.098764921081713,
+    "SK|O-Ncold": 12.624573840659439,
+    "SK|Onull": 9.917378430608885
+   },
+   "flags": {
+    "N1|O-Ncold": false,
+    "N1|Onull": false,
+    "S1|O-Ncold": false,
+    "S1|Onull": false,
+    "S4|O-Ncold": false,
+    "S4|Onull": false,
+    "SK|O-Ncold": false,
+    "SK|Onull": true
+   }
+  },
+  "V3": {
+   "lo": {
+    "N1|O-Ncold": -15.122376605571105,
+    "N1|Onull": -17.68657662673631,
+    "S1|O-Ncold": 14.476307879770335,
+    "S1|Onull": 9.457300039789512,
+    "S4|O-Ncold": 14.322098781403328,
+    "S4|Onull": 9.922144906641773,
+    "SK|O-Ncold": 12.339599097459125,
+    "SK|Onull": 9.463277678642537
+   },
+   "flags": {
+    "N1|O-Ncold": false,
+    "N1|Onull": false,
+    "S1|O-Ncold": false,
+    "S1|Onull": true,
+    "S4|O-Ncold": false,
+    "S4|Onull": true,
+    "SK|O-Ncold": false,
+    "SK|Onull": false
+   }
+  }
+ },
+ "decision": {
+  "q1": "止める",
+  "n_pass": 3,
+  "n_main": 8,
+  "dropped": [
+   "N1|O-Ncold",
+   "N1|Onull",
+   "S1|O-Ncold",
+   "S4|O-Ncold",
+   "SK|O-Ncold"
+  ],
+  "stop": true,
+  "reason": "i_ii"
+ },
+ "iii": {
+  "rho": NaN,
+  "n": 3,
+  "dropped_n": 5,
+  "sentence_key": "undefined"
+ },
+ "n_forward": 72,
+ "behavior_state": {
+  "status": "ok"
+ },
+ "chain": [
+  {
+   "type": "TemperatureLogitsWarper",
+   "params": {
+    "temperature": 0.7
+   }
+  },
+  {
+   "type": "TopKLogitsWarper",
+   "params": {
+    "filter_value": "-inf",
+    "min_tokens_to_keep": 1,
+    "top_k": 20
+   }
+  },
+  {
+   "type": "TopPLogitsWarper",
+   "params": {
+    "filter_value": "-inf",
+    "min_tokens_to_keep": 1,
+    "top_p": 0.9
+   }
+  },
+  {
+   "type": "MinPLogitsWarper",
+   "params": {
+    "filter_value": "-inf",
+    "min_p": 0.0,
+    "min_tokens_to_keep": 1
+   }
+  }
+ ],
+ "variants_used": [
+  "V1",
+  "V2",
+  "V3"
+ ],
+ "start_record_sha256": "0457C6786FBCBC2DD7D93CF21A01C77582AD76086E877C6EE2C796BE01DE6D32",
+ "session": "97d48a2b-f548-43bf-8c20-54f17e5fca21",
+ "time_utc": "2026-10-01T05:17:46Z",
+ "clause": "本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
