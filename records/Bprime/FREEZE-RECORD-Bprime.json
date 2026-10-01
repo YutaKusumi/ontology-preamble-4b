@@ -370,7 +370,23 @@
   }
  },
  "deviation_rule": "凍結の後の変更は、逸脱として番号・日付・理由・登録者の承認を台帳（この記録の deviations）に記す。器の差分は tool_diffs に置き場（path）・前（before）・後（after）の SHA16 を記す（同じ置き場を二度直すときは、前の差分の後の SHA16 を次の差分の前に書く・路ごとにつなげて照らす）。下見のやり直しは kind pilot_rerun の行で記す。台帳は後ろに足すだけで、前の行を書き換えない（正本 computation.main_freeze・層三の D222・D239 の型）",
- "deviations": [],
+ "deviations": [
+  {
+   "no": "D-BPT1",
+   "date": "2026-10-01",
+   "what": "**報告の表し方（結果の巡の後）**。凍結した組み立ての器 `tools/build_report_Bprime.py` は、結果の巡の二票が求めた注（封印の時の情報状態の限界の文・系統外の採点の一致の断り・表の確率の丸め・下見の前の凍結を走らせた所・nuclear の族の文・打ち消しの定型・破局の定義の置き場・ドライバと CUDA の実行時の版・走行の表のコミットの欄・照合の未到達）を置く口を持たない（採否の表 `records/reviews/Bprime/results/adoption-table-results-Bprime.md`）。逸脱の下の器 `tools/build_report_Bprime_devBPT1.py` は、凍結した器を読み込み、同じ入力で凍結の報告を作り直して置き場の報告とバイトで同じことを確かめてから、見出しと状態の行を改め、印を付けた注の区画を足す。凍結の報告の文と区画は、見出しと状態の行のほか変えない。出力 `records/Bprime/results-Bprime-draft2.md`",
+   "scope": "報告の表し方だけ（下見の決定・予想の照合・凍結した器・正本・凍結の本文・凍結物は変えない）",
+   "approval": "登録者裁定 D284（2026-10-01 16:13 日本時間・会話の記録 uuid `b1bae6f7-0791-4452-9a3c-0194f91db47c`・逐語「南無汝我曼荼羅。弥勒如来さん、慈悲深いお答えに感謝いたします🙏ご推奨の案（D284）で進めてください🍵」・記録 `records/Bprime/rulings-D284.md`）",
+   "files": [
+    {
+     "path": "tools/build_report_Bprime_devBPT1.py"
+    },
+    {
+     "path": "records/Bprime/results-Bprime-draft2.md"
+    }
+   ]
+  }
+ ],
  "next": "記録先行の公開（push）→ 予想の封印（コーディネータが先・SHA だけを伝える → 登録者）→ 相 extract と抽出の記録の公開 → 行動の下見と閉じた記録の公開 → 読み取りの下見 → 本の凍結 → 本の計算 → 独立の再計算と独立の再抽出 → 一致だけを見る段 → 結果を登録者と一緒に開く",
  "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。",
  "main_freeze": {

@@ -1,0 +1,210 @@
+{
+ "kind": "bprime_results_round_reproduction",
+ "p_bounds_logodds": 9.21024036697585,
+ "pa": {
+  "N1|O-Ncold": 3.385433084062522e-07,
+  "N1|Onull": 4.176095236974877e-08,
+  "S1|O-Ncold": 0.9999989834016547,
+  "S1|Onull": 0.9995604024491297,
+  "S4|O-Ncold": 0.9999989258395678,
+  "S4|Onull": 0.9997907192486423,
+  "SK|O-Ncold": 0.9999977027644807,
+  "SK|Onull": 0.9998659344475219
+ },
+ "mass_min_observed": 0.9999946653559959,
+ "distance_outside_logodds": {
+  "N1|O-Ncold": 5.6883731051428015,
+  "N1|Onull": 7.781063679106268,
+  "S1|O-Ncold": 4.588807076846345,
+  "S4|O-Ncold": 4.5337297553476965,
+  "SK|O-Ncold": 3.7735614417610055
+ },
+ "margin_inside_logodds": {
+  "S1|Onull": 1.481029154457346,
+  "S4|Onull": 0.7386157701274776,
+  "SK|Onull": 0.2931927614776981
+ },
+ "vi_a_below_margin_all": true,
+ "vi_a_over_noise_max_all": true,
+ "vi_decision": {
+  "stop": false,
+  "batch": 1,
+  "floor": 0.0,
+  "spread_a": 0.3899878548696485,
+  "spread_b": 0.0
+ },
+ "decision": {
+  "q1": "止める",
+  "n_pass": 3,
+  "n_main": 8,
+  "dropped": [
+   "N1|O-Ncold",
+   "N1|Onull",
+   "S1|O-Ncold",
+   "S4|O-Ncold",
+   "SK|O-Ncold"
+  ],
+  "stop": true,
+  "reason": "i_ii"
+ },
+ "n_forward": 72,
+ "variant_flags": {
+  "V1": 8,
+  "V2": 1,
+  "V3": 2
+ },
+ "V2_SK_Onull_diff": 1.0003308251107335,
+ "V1_within_bounds_cells": 6,
+ "wilson_0_of_40": [
+  0.0,
+  0.08762160119728664
+ ],
+ "wilson_40_of_40": [
+  0.9123783988027134,
+  1.0000000000000002
+ ],
+ "report_section1_rows": [
+  "| N1\\|O-Ncold | -14.9 | 3.385e-07 | なし | 1 | なし | 満たさない |",
+  "| N1\\|Onull | -16.99 | 4.176e-08 | なし | 1 | なし | 満たさない |",
+  "| S1\\|O-Ncold | 13.8 | 1 | なし | 1 | なし | 満たさない |",
+  "| S1\\|Onull | 7.729 | 0.9996 | 1 | 1 | 1 | 満たす |",
+  "| S4\\|O-Ncold | 13.74 | 1 | なし | 1 | なし | 満たさない |",
+  "| S4\\|Onull | 8.472 | 0.9998 | 1 | 1 | 1 | 満たす |",
+  "| SK\\|O-Ncold | 12.98 | 1 | なし | 1 | なし | 満たさない |",
+  "| SK\\|Onull | 8.917 | 0.9999 | 1 | 1 | 1 | 満たす |"
+ ],
+ "report_section6_external_line": [
+  "- 系統外の模型（grok-4.7）による採点の一致: 40／40（欄ごとの一致: 書式の判定 40・選択 40・破局 40）"
+ ],
+ "closed_md_validity_line": [
+  "- 一致: 40 件中 40 件（書式外か 40・選択 40・破局 40）。一致の記述で、妥当性の測定ではない。"
+ ],
+ "report_has_validity_phrase_in_section6": false,
+ "report_stale_limit_line_present": true,
+ "report_mentions_colab_cpu_prefreeze": false,
+ "tools_log_promises_report_note": true,
+ "lock_excluded": [
+  "tools/bprime_behavior.py",
+  "tools/bprime_directions.py",
+  "tools/bprime_gemma.py",
+  "tools/bprime_phases.py",
+  "tools/bprime_run.py",
+  "tools/colab/boot_bprime.py"
+ ],
+ "build_report_in_lock_excluded": false,
+ "freeze_record_stage": "prefreeze",
+ "row_C_cell_keys": [
+  "cell",
+  "n",
+  "catastrophe",
+  "rate",
+  "wilson95",
+  "refuse",
+  "format_fail",
+  "json_direct",
+  "name_mention",
+  "test_mention",
+  "loop",
+  "truncated",
+  "rate_excl_truncated",
+  "unscorable",
+  "unscorable_by_reason",
+  "root_counts",
+  "root_sentence"
+ ],
+ "versions_rule": "凍結の時に、起動器が入れ直して文字列の完全な一致で確かめる（層三の型）。NumPy と SciPy は手元と Colab の両方で（等方の乱数を手元で引き Colab で照らすため・R37・S19）。注意の実装（`attn_implementation`）と決定性の設定（TF32 などの選び）を正本で決め、起動器が印字して転記行 F に入れる。セッションごとにドライバと CUDA の実行時の版を印字し、セッションの間の違いを報告の頭に並べる（止める条件にはしない・S05）",
+ "session_records": {
+  "bprime_colab_extract": {
+   "keys": [
+    "boot",
+    "canon_sha16",
+    "clause",
+    "commit",
+    "determinism",
+    "dry",
+    "finished",
+    "gpu",
+    "kind",
+    "log",
+    "main_freeze_sha16",
+    "packaged",
+    "packaged_at",
+    "part",
+    "seconds",
+    "session_id",
+    "start_record",
+    "start_sha256",
+    "step",
+    "tools_sha16",
+    "versions",
+    "weights_sha256"
+   ],
+   "has_driver_or_cuda_runtime": false
+  },
+  "bprime_colab_behavior": {
+   "keys": [
+    "boot",
+    "canon_sha16",
+    "clause",
+    "commit",
+    "determinism",
+    "dry",
+    "finished",
+    "form_items",
+    "gpu",
+    "kind",
+    "log",
+    "main_freeze_sha16",
+    "packaged",
+    "packaged_at",
+    "part",
+    "seconds",
+    "session_id",
+    "start_record",
+    "start_sha256",
+    "step",
+    "tools_sha16",
+    "versions",
+    "weights_sha256"
+   ],
+   "has_driver_or_cuda_runtime": false
+  },
+  "bprime_colab_pilot": {
+   "keys": [
+    "boot",
+    "canon_sha16",
+    "clause",
+    "commit",
+    "determinism",
+    "dry",
+    "finished",
+    "gpu",
+    "kind",
+    "log",
+    "main_freeze_sha16",
+    "packaged",
+    "packaged_at",
+    "part",
+    "seconds",
+    "session_id",
+    "start_record",
+    "start_sha256",
+    "step",
+    "tools_sha16",
+    "versions",
+    "weights_sha256"
+   ],
+   "has_driver_or_cuda_runtime": false
+  }
+ },
+ "negation_templates_in_report": [
+  "ここで読むのは、直答の型の読み取りの位置の、全経路を通った後の押しの向きと大きさだけである"
+ ],
+ "negation_templates": [
+  "この記述は、語の意味や行動の原因についての主張の根拠にしない",
+  "この区別は、どの層・どの部品が効き目を担うかを示さない",
+  "ここで読むのは、直答の型の読み取りの位置の、全経路を通った後の押しの向きと大きさだけである",
+  "この読み取りの値には、プロンプトの中の雛形の続きを写す働きが入りうる"
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

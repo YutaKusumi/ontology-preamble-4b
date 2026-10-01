@@ -1,6 +1,6 @@
 # 報告の走査（機械生成・`build_report_Bprime.py` v0.6・走査の二つの層）
 
-- 行の種類: blank 36・excluded 6・fixed 196・free 1
+- 行の種類: blank 36・excluded 6・fixed 195・free 2
 - 当たり 0
 
 本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
