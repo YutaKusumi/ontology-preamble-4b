@@ -1,0 +1,215 @@
+{
+ "kind": "bprime_final_vote_repro",
+ "tool": "make_repro_final_Bprime.py v0",
+ "vote": "votes/grok-4.7/response.md",
+ "checks": {
+  "cells_split": {
+   "claim": "外は N1 の二つ（床）と O-Ncold の S1・S4・SK（天井）、内は S*|Onull の三つ",
+   "got": {
+    "floor": [
+     "N1|O-Ncold",
+     "N1|Onull"
+    ],
+    "ceiling": [
+     "S1|O-Ncold",
+     "S4|O-Ncold",
+     "SK|O-Ncold"
+    ],
+    "inside": [
+     "S1|Onull",
+     "S4|Onull",
+     "SK|Onull"
+    ]
+   },
+   "ok": true
+  },
+  "pass_equals_inside": {
+   "claim": "内の三つが (i)(ii) を満たした",
+   "got": [
+    "S1|Onull",
+    "S4|Onull",
+    "SK|Onull"
+   ],
+   "ok": true
+  },
+  "logodds_bound": {
+   "claim": "対数オッズの境は 9.21024…",
+   "got": {
+    "repro_results": 9.21024036697585,
+    "from_canon": 9.21024036697596
+   },
+   "ok": true
+  },
+  "SK_Onull_pa": {
+   "claim": "SK|Onull の記録は天井の内（0.9998659…）・表示は天井と同じ字",
+   "got": 0.9998659344475219,
+   "ok": true
+  },
+  "mass_not_one": {
+   "claim": "質量は八つともちょうど一ではない",
+   "got": {
+    "N1|O-Ncold": 0.9999970955305608,
+    "N1|Onull": 0.9999984839771282,
+    "S1|O-Ncold": 0.9999996398540754,
+    "S1|Onull": 0.9999946653559959,
+    "S4|O-Ncold": 0.9999996817505385,
+    "S4|Onull": 0.99999640049929,
+    "SK|O-Ncold": 0.9999995100058455,
+    "SK|Onull": 0.9999965151910967
+   },
+   "ok": true
+  },
+  "sigmoid_lo_pa_maxabs": {
+   "claim": "対数オッズと集合の中の確率の対応は sigmoid（床側・内・天井側の三点で検算）",
+   "got": 1.887379141862766e-15,
+   "ok": true
+  },
+  "vi": {
+   "claim": "(vi) の (a) の最大は上限を超え、(b) は零・(vi) の記録は stop false・batch 1（X06）",
+   "got": {
+    "a_max": 0.3899878548696485,
+    "b_max": 0.0,
+    "noise_max": 0.01,
+    "vi_decision": {
+     "stop": false,
+     "batch": 1,
+     "floor": 0.0,
+     "spread_a": 0.3899878548696485,
+     "spread_b": 0.0
+    }
+   },
+   "ok": true
+  },
+  "decision": {
+   "claim": "決定は止める・理由 i_ii・通過 3／8",
+   "got": {
+    "q1": "止める",
+    "n_pass": 3,
+    "n_main": 8,
+    "dropped": [
+     "N1|O-Ncold",
+     "N1|Onull",
+     "S1|O-Ncold",
+     "S4|O-Ncold",
+     "SK|O-Ncold"
+    ],
+    "stop": true,
+    "reason": "i_ii"
+   },
+   "ok": true
+  },
+  "logit_check": {
+   "claim": "自己検査は八升目とも「合」・見分ける力の無い位置は空",
+   "got": {
+    "states": {
+     "N1|O-Ncold": "合",
+     "N1|Onull": "合",
+     "S1|O-Ncold": "合",
+     "S1|Onull": "合",
+     "S4|O-Ncold": "合",
+     "S4|Onull": "合",
+     "SK|O-Ncold": "合",
+     "SK|Onull": "合"
+    },
+    "no_discrimination": []
+   },
+   "ok": true
+  },
+  "run_commits": {
+   "claim": "走行の表のコミットは起動の記録の commit と一致し、行動の下見の session.commit と読み取りの下見の main_freeze.sessions のコミットとは違う",
+   "got": {
+    "table": {
+     "extract": "baee42b53d0ea73605f6091b72dca888c9d26249",
+     "behavior": "4bfba8c65ee7e592ade73beca4c4334f5331455a",
+     "pilot": "5a299762bcbd921d05f1a5ea50a1cec136206a50"
+    },
+    "start_records": {
+     "extract": "baee42b53d0ea73605f6091b72dca888c9d26249",
+     "behavior": "4bfba8c65ee7e592ade73beca4c4334f5331455a",
+     "pilot": "5a299762bcbd921d05f1a5ea50a1cec136206a50"
+    },
+    "behavior_session_commit": "aed71b23f3fd0eaeec4d87f6dd104de6d5c0f062",
+    "pilot_main_freeze_session_commit": "5b94f8fb188017494ad76e90dcab93b20ed9afb7"
+   },
+   "ok": true
+  },
+  "closed_before_pilot": {
+   "claim": "閉じた時刻は読み取りの下見の起動より前・閉じた記録の SHA16 は起動の記録の closed_record_sha16 と一致",
+   "got": {
+    "closed_jst": "2026-10-01T13:59:48+09:00",
+    "start_pilot_jst": "2026-10-01T14:07:22+09:00",
+    "closed_sha16": "75EDB907B98B9A8F",
+    "start_pilot_closed_record_sha16": "75EDB907B98B9A8F"
+   },
+   "ok": true
+  },
+  "g_sha": {
+   "claim": "g の SHA は凍結の記録と出所の記録と G4 の確かめ（g_same）で一致",
+   "got": {
+    "freeze_record": "4A2C5F60D8EA0EC7227CE4FFB12206E584BD4AEE74D15BBFE61EE41DE784A139",
+    "in_provenance": true,
+    "colab_check_g_same": true
+   },
+   "ok": true
+  },
+  "negation_verbatim": {
+   "claim": "打ち消しの定型の写しは正本と一字違わず同じ（§1 に一つ目と四つ目・§6 に一つ目）",
+   "got": {
+    "first_in_draft2": 2,
+    "fourth_in_draft2": 1
+   },
+   "ok": true
+  },
+  "facts_count": {
+   "claim": "確かめの記録の facts は 68 項",
+   "got": 68,
+   "ok": true
+  },
+  "V2_SK_Onull_diff": {
+   "claim": "V2 の SK|Onull の差は表示「1」・記録 1.00033…・印「はい」（X04）",
+   "got": 1.0003308251107335,
+   "ok": true
+  },
+  "wilson_40_upper": {
+   "claim": "Wilson の上端の表示「1」と再現の記録のごくわずかな超過（X04）",
+   "got": [
+    0.9123783988027134,
+    1.0000000000000002
+   ],
+   "ok": true
+  },
+  "adoption_secret_unchecked": {
+   "claim": "採否の表は秘密の確かめを「まだ機械で確かめていない」と書いた（X02）",
+   "got": true,
+   "ok": true
+  },
+  "draft2_status_and_sheet": {
+   "claim": "状態の行は「最終の系統外の一票の前」・検分票は「最終の系統外の一票はこの後」（X01）",
+   "got": {
+    "status": [
+     "- 状態: **報告の草案の二つ目**（結果の巡の後・最終の系統外の一票の前）。"
+    ],
+    "sheet_line": [
+     "  - 系統の内訳: 組み立てはコーディネータ（Claude 系）一名。結果の巡は系統外一票（出所で数えた・D266 の型）と系統内一票。最終の系統外の一票はこの後（新しい呼び出し）。"
+    ]
+   },
+   "ok": true
+  },
+  "frozen_builder_status_types": {
+   "claim": "（コーディネータの照らし）正本は状態を登録者最終確認の前と後の二つの型と定めるが、凍結した組み立ての器が持つ状態の型は草案の型だけ",
+   "got": {
+    "canon_template_line": [
+     "状態は機械の区画で、登録者最終確認の前と後の二つの型（確認の後は逐語と時刻・裁定 D199 の型）"
+    ],
+    "builder_status_keys": [
+     "status_draft",
+     "status_draft"
+    ]
+   },
+   "ok": false
+  }
+ },
+ "n": 19,
+ "n_ok": 18,
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

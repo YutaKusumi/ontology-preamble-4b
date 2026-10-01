@@ -1,0 +1,134 @@
+{
+ "kind": "bprime_publish_W22",
+ "tool": "records/Bprime/tools/stage_W22_Bprime.py v0.1",
+ "ruling": "D284（採否の W22）・D285（最終検分の X02・X08）",
+ "time_jst": "2026-10-01 18:54:45",
+ "secret_check": {
+  "tool": "records/Bprime/tools/check_secrets_Bprime.py v0.1",
+  "files": 15,
+  "env_values_compared": 4,
+  "patterns": [
+   "authorization",
+   "aws",
+   "bearer",
+   "cookie",
+   "ghp",
+   "github_pat",
+   "github_tokens",
+   "google",
+   "google_oauth",
+   "hf",
+   "hf_token_env",
+   "jwt",
+   "key_value",
+   "private_key",
+   "sk",
+   "slack",
+   "xai",
+   "email"
+  ],
+  "hits": 0
+ },
+ "files": [
+  {
+   "from": "（作業の置き場）records/Bprime/extract-run/extract-run-20261001T040457Z/progress.log",
+   "to": "results/Bprime/extract/extract-run-20261001T040457Z/progress.log",
+   "sha256": "318705D4C5C94E5124A3F7ED38A522D2FA8C2E641696EBEC2C09D61458A51F88",
+   "bytes": 809
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/extract-run/extract-run-20261001T040457Z/session.json",
+   "to": "results/Bprime/extract/extract-run-20261001T040457Z/session.json",
+   "sha256": "79C8B91E09BCCF6E7F11C6FAEFDAD886D44985647057205CE44EDC288991BFB3",
+   "bytes": 5290
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/behavior-run-20261001T042902Z/progress.log",
+   "to": "results/Bprime/behavior/behavior-run-20261001T042902Z/progress.log",
+   "sha256": "8308BC6FA8348D1043B0A850DAFE6F354CE1E5CEFCA657736A55765635CF73D0",
+   "bytes": 4725
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/behavior-run-20261001T042902Z/session.json",
+   "to": "results/Bprime/behavior/behavior-run-20261001T042902Z/session.json",
+   "sha256": "AEFF121D0380A0A4B1E0BF0F8B0C7E96A6A3C6D8C451B5F56D9C342FA7721DEE",
+   "bytes": 5776
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/behavior-run-20261001T042902Z/behavior-trials.json",
+   "to": "results/Bprime/behavior/behavior-run-20261001T042902Z/behavior-trials.json",
+   "sha256": "9A575526B38145EBEFB7D50F6E7DC81F38807B1BD89BEE7904436D679DA3EEC8",
+   "bytes": 2387817
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/behavior-run-20261001T042902Z/behavior-scored.json",
+   "to": "results/Bprime/behavior/behavior-run-20261001T042902Z/behavior-scored.json",
+   "sha256": "0A34C52BB2781673065C2BAF3D2C286F9C3B8935BB26513D53F52FDBAD474EE3",
+   "bytes": 387712
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/pilot-run/pilot-run-20261001T050942Z/progress.log",
+   "to": "results/Bprime/pilot/pilot-run-20261001T050942Z/progress.log",
+   "sha256": "AA35D94E598C6CC0A9504A5227067CA2868B2E10AF729DCF1838563EF84872CC",
+   "bytes": 810
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/pilot-run/pilot-run-20261001T050942Z/session.json",
+   "to": "results/Bprime/pilot/pilot-run-20261001T050942Z/session.json",
+   "sha256": "A53D49636932A3E27E6EE7EC22C84C55272D0575FECE2DE59E72A532012060E2",
+   "bytes": 5282
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/external/bundle/items.json",
+   "to": "records/Bprime/behavior/external/bundle/items.json",
+   "sha256": "642820C6E1703F42676834FDB5F55BA5309D4189ACCA524D850DEB2E94F78D46",
+   "bytes": 77796
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/external/bundle/private.json",
+   "to": "records/Bprime/behavior/external/bundle/private.json",
+   "sha256": "4CD0AF7F944154A7887F3A486C758498E588775D585EFC5542B9072E909BF6C5",
+   "bytes": 1936
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/external/bundle/request.md",
+   "to": "records/Bprime/behavior/external/bundle/request.md",
+   "sha256": "C9A46341A032495D17DFDC3F10302A16C3D9647F2E5D971F7DE8B0DC78AC2379",
+   "bytes": 78367
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/external/reply/response.md",
+   "to": "records/Bprime/behavior/external/reply/response.md",
+   "sha256": "7CAC3F8A6B8F7B8284C3BE338797964ED59D14A186E094DDFA72C84136F4E39C",
+   "bytes": 2648
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/external/reply/response-raw.json",
+   "to": "records/Bprime/behavior/external/reply/response-raw.json",
+   "sha256": "D1DCCF142CF138DAE301024B1E6A347EDA0C9C6AB64A37B6C949CF64BA041990",
+   "bytes": 4245
+  },
+  {
+   "from": "（作業の置き場）records/Bprime/behavior-run/external/reply/meta.json",
+   "to": "records/Bprime/behavior/external/reply/meta.json",
+   "sha256": "6091185438609CE798E582E00892D8992E74535EDE56189CB2FC167EDF1F4F99",
+   "bytes": 1326
+  },
+  {
+   "from": "（作業の置き場）tools/tools-log-Bprime.md",
+   "to": "records/Bprime/tools/tools-log-Bprime-after-freeze.md",
+   "sha256": "EFDBC8F5B947FBC7667133B44930A9289CD24BEA850CA26D2FD831C26EBF67D2",
+   "bytes": 89587
+  }
+ ],
+ "notes": {
+  "to": "results/Bprime/NOTES-Bprime.md",
+  "sha256": "7FBB38C0C4EE86903520F983F4C856097B410A1157C3E953A757590BAAFA57D0"
+ },
+ "not_published": [
+  "方向の npz（相 extract の出力）",
+  "画面の写し",
+  "会話の記録の全体"
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

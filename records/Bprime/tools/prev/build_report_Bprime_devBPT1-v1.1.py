@@ -9,7 +9,6 @@ v1（最終の系統外の検分の後・登録者裁定 D285・最終検分の�
   `--final` が無ければ v0 と同じ組み方で草案の二つ目を組む（頭の添えの器の版の字は草案の二つ目を組んだ v0 のまま・置き場の草案の二つ目とバイトで同じことを照らせる）。
   最終版の出力: `records/Bprime/results-Bprime-FINAL-2026-10-01.md` と `records/Bprime/results-Bprime-FINAL-2026-10-01-checks.json`。前の版は `records/Bprime/tools/prev/build_report_Bprime_devBPT1-v0.py`。
 v1.1（起草者の最終の見直しの R-a・R-b・D285 で改めると決めた検分票の区画の中）: 見直しの記録 `records/reviews/Bprime/results-final/final-read/review-final-Bprime.md` があるとき、検分票の「段階」に起草者の最終の見直しの後を足し、「系統の内訳」に系統を呼び出しの出所で数えたことを足す。前の版は `records/Bprime/tools/prev/build_report_Bprime_devBPT1-v1.py`。
-v1.2（登録者最終確認の後・確認の言葉に鉤括弧があった）: 確認の記録の言葉の照らしで、鉤括弧（「」）を、数がそろい入れ子が閉じるときだけ許す（状態の行の型〔D199 の型〕は変えない）。確認の記録があるとき、最終版を確認していただいた案の写し（`records/Bprime/results-Bprime-proposal-confirmed-2026-10-01.md`）と比べ、違いが状態の行・検分票の「段階」の行・頭の添えの一行目の器の版の字だけであることを確かめる。前の版は `records/Bprime/tools/prev/build_report_Bprime_devBPT1-v1.1.py`。
 以下は v0 の説明:
 
 凍結した組み立ての器 `tools/build_report_Bprime.py` を読み込み、その本番の入口（`main_build`・頭で錠を照らす）を同じ入力（凍結の記録〔逸脱の台帳を含む〕・封印の記録と二つの予想・
@@ -35,7 +34,7 @@ REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import build_report_Bprime as BR
 
-VERSION = 'v1.2'
+VERSION = 'v1.1'
 DRAFT_LABEL = 'v0'            # 草案の二つ目の頭の添えに印字した器の版（v1 でも草案の二つ目をバイトのまま組めるように残す）
 NL = chr(10)
 TAG = '【逸脱 D-BPT1】'
@@ -326,8 +325,7 @@ def load_conf():
     cf = ld(P(CONF_REL))
     w = cf['words']
     tg, sr = 'pasted' + '_content', 'system' + '-reminder'
-    depth = [w[:i].count('「') - w[:i].count('」') for i in range(len(w) + 1)]
-    if NL in w or any(b in w for b in ('<' + tg, '<' + sr, sr + '>', 'AppData', 'Users')) or not w.startswith('南無汝我曼荼羅') or depth[-1] != 0 or min(depth) < 0:
+    if NL in w or any(b in w for b in ('<' + tg, '<' + sr, sr + '>', 'AppData', 'Users', '「', '」')) or not w.startswith('南無汝我曼荼羅'):
         raise SystemExit('確認の記録の言葉の形が想定と違う（止める）')
     if not (re.match(r'^\d{4}-\d\d-\d\d \d\d:\d\d$', cf['when_jst']) and re.match(r'^[0-9a-f\-]{36}$', cf['uuid'])):
         raise SystemExit('確認の記録の時刻か uuid の形が想定と違う（止める）')
@@ -388,29 +386,6 @@ def main():
             raise SystemExit('草案の二つ目から、決めていない行が変わった（止める）: 消えた %s・足された %s' % ([x[:40] for x in bad_g], [x[:40] for x in bad_c]))
         cmp = {'draft2': OUT_REL, 'draft2_sha16': d2_16, 'draft2_rebuilt_identical': True, 'removed_lines': len(gone), 'added_lines': len(came),
                'allowed': '見出し・状態の行・頭の添えの一行目と足した一行・検分票の区画（裁定 D285）'}
-        if conf:                                               # v1.2: 確認していただいた案との違いは、状態の行・段階の行・器の版の字だけ
-            cpb = open(P(conf['proposal_copy']), 'rb').read()
-            if s16b(cpb) != conf['proposal_sha16']:
-                raise SystemExit('確認していただいた案の写しが、確認の記録の SHA16 と違う（止める）')
-            cp = cpb.decode('utf-8').split(NL)
-            g2, c2 = [], []
-            for tg_, i1, i2, j1, j2 in difflib.SequenceMatcher(None, cp, Lt, autojunk=False).get_opcodes():
-                if tg_ in ('replace', 'delete'):
-                    g2 += cp[i1:i2]
-                if tg_ in ('replace', 'insert'):
-                    c2 += Lt[j1:j2]
-            oh = [x for x in cp if x.startswith('- ' + TAG + 'この最終版は、')]
-            os_ = [x for x in cp if x.startswith('  - 段階: 結果の後。')]
-            mv = re.search(r'`tools/build_report_Bprime_devBPT1.py` (v[0-9.]+)・', oh[0]) if len(oh) == 1 else None
-            ns = [x for x in B['ken'] if x.startswith('  - 段階: ')]
-            if not (mv and len(os_) == 1 and len(ns) == 1 and B['head'][0] == oh[0].replace('`tools/build_report_Bprime_devBPT1.py` %s・' % mv.group(1), '`tools/build_report_Bprime_devBPT1.py` %s・' % VERSION)
-                    and ns[0] == os_[0][:-1] + 'と、登録者最終確認の後（状態の行）。'):
-                raise SystemExit('確認していただいた案の頭の添えか段階の行が、想定の形と違う（止める）')
-            bad2 = [x for x in g2 if x not in {S_FINAL_PRE, oh[0], os_[0]}] + [x for x in c2 if x not in {status, B['head'][0], ns[0]}]
-            if bad2:
-                raise SystemExit('確認していただいた案から、決めていない行が変わった（止める）: %s' % [x[:40] for x in bad2])
-            cmp['confirmed_proposal'] = {'copy': conf['proposal_copy'], 'sha16': conf['proposal_sha16'], 'removed_lines': len(g2), 'added_lines': len(c2), 'proposal_builder': mv.group(1),
-                                         'allowed': '状態の行・検分票の段階の行・頭の添えの一行目の器の版の字（v1.2）'}
     else:
         B, Lt = B_d, Lt_d
     text = NL.join(Lt)

@@ -1,0 +1,173 @@
+{
+ "kind": "bprime_colab_behavior",
+ "boot": "v0.4",
+ "commit": "aed71b23f3fd0eaeec4d87f6dd104de6d5c0f062",
+ "dry": false,
+ "step": "run",
+ "part": "",
+ "start_record": "start-behavior-f5b09372.json",
+ "start_sha256": "EA94302DEB220630CD4763F84E1EE64C4C321FF9629CC0DB37399209DEDDAE9B",
+ "session_id": "f5b09372-99f0-49e0-97d5-8e3d6e7e6019",
+ "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+ "versions": {
+  "numpy": "2.1.3",
+  "scipy": "1.16.3",
+  "torch": "2.11.0+cu128",
+  "transformers": "5.16.1",
+  "tokenizers": "0.23.1",
+  "huggingface_hub": "1.29.0",
+  "jinja2": "3.1.6",
+  "safetensors": "0.8.0",
+  "accelerate": "1.14.0"
+ },
+ "determinism": {
+  "allow_tf32_matmul": false,
+  "allow_tf32_cudnn": false,
+  "float32_matmul_precision": "highest",
+  "attn_implementation": "sdpa"
+ },
+ "weights_sha256": {
+  "chat_template.jinja": "AE53464BF3BE25802B3A5B37DEF7FD89667067D7577049B3B2D74C4D8DE4C6D4",
+  "config.json": "E967DD38BC5CFD38BD09A995A7BF4A754075DF2B46ABA68F7FBB5A791E6D8DD1",
+  "generation_config.json": "D4226BBE3117D2D253BA4609720BA82C6C4CE4627A9A6AE05387C78983AC03DE",
+  "model.safetensors.index.json": "D4AFF3B976D69C123A29D1C085D7BA4DE1AC3F4CA1726A7F81E1B11462A64EA2",
+  "processor_config.json": "32BDF45D2AD4CC29A0822DDD157A182DE76644F0419A6228D151495256E9813C",
+  "tokenizer.json": "CC8D3A0CE36466CCC1278BF987DF5F71DB1719B9CA6B4118264F45CB627BFE0F",
+  "tokenizer_config.json": "9F4FEC4B1DC6ECDDF8F4A92E9CAEA5971C0E67D81309F3F9066A2BEE8C362633",
+  "model-00001-of-00002.safetensors": "EEEF8791537BC04F110967C513149E037D2A9AE97D49ADD7291EBFA62806BBFA",
+  "model-00002-of-00002.safetensors": "018912220F559F7025D60333E0996183CD538AA77AD6F4988A89CE47BE681F10"
+ },
+ "canon_sha16": "2C5FDDED89D659C0",
+ "tools_sha16": {
+  "tools/analyze_Bprime.py": "77580AB4623E0D8D",
+  "tools/bl3_core.py": "E8CD3A24950F8581",
+  "tools/bl3_directions.py": "4BE7E44D135849F4",
+  "tools/blens_core.py": "DB3092B1EF0B88B3",
+  "tools/bprime_behavior.py": "03D41C1C78947057",
+  "tools/bprime_cells.py": "B806BEB9C181638E",
+  "tools/bprime_core.py": "21CCCE80A84A9ED4",
+  "tools/bprime_directions.py": "8D999D06A7773343",
+  "tools/bprime_external.py": "C12A4931B85B1CE4",
+  "tools/bprime_facts.py": "56C5F2E98FD7C27D",
+  "tools/bprime_gemma.py": "B89384C82C3F92CC",
+  "tools/bprime_meaningless.py": "85F44B995CB994C8",
+  "tools/bprime_numbers_lint.py": "F0F8F559A340FDCB",
+  "tools/bprime_phases.py": "1F6B77917BAA7C72",
+  "tools/bprime_publish_map.py": "64C5E490620F86BD",
+  "tools/bprime_recompute_rewrite.py": "DF0833637E5755D8",
+  "tools/bprime_reextract.py": "AEF215AA0F577E45",
+  "tools/bprime_run.py": "8A37DE1CA759A491",
+  "tools/bprime_typo.py": "FEB15E855E4234E3",
+  "tools/build_report_Bprime.py": "412131B086CA39D9",
+  "tools/close_behavior_Bprime.py": "42018C96F163B735",
+  "tools/colab/boot_bprime.py": "DD601F674E1DD2C8",
+  "tools/direction_B.py": "E84A101655685F2B",
+  "tools/dry_bprime.py": "C7202DF71D8FBDA4",
+  "tools/dry_bprime_behavior.py": "E568A627F4292D12",
+  "tools/freeze_Bprime.py": "A3FCCDAB4335EC30",
+  "tools/g4_attempts_Bprime.py": "6BBE082971844B59",
+  "tools/make_contrasts_Bprime.py": "19F6FA8D75A8D7F0",
+  "tools/make_frozen_B.py": "A333488A9437EF68",
+  "tools/make_frozen_Bprime.py": "3F9EA291B6082676",
+  "tools/make_predictions_form_B.py": "A213804DCB730737",
+  "tools/make_predictions_form_Bl3.py": "6305BB5766F0F6B6",
+  "tools/make_predictions_form_Bprime.py": "9C400361140944E2",
+  "tools/numbers_lint.py": "88B6A53BBEC80602",
+  "tools/qf_task_B.py": "86D71D789BB7A320",
+  "tools/response_mode_A.py": "C3E90B11B62F67A5",
+  "tools/run_stageB_local.py": "E976A4F5B63767FA",
+  "tools/runs_A.py": "A57BE1F5EEACBBB2",
+  "tools/runs_B.py": "269B60867D0924EB",
+  "tools/seal_Bprime.py": "0719E21A6EBFD2C7",
+  "tools/send_external_Bprime.py": "465E0627A34DCA9C",
+  "tools/steer_B.py": "71157C6921E12AC7",
+  "tools/sweep_Bprime.py": "876C6F9EE7054EB8"
+ },
+ "main_freeze_sha16": null,
+ "form_items": {
+  "item1": {
+   "pass": true,
+   "phase": "behavior",
+   "why": null
+  },
+  "item2": {
+   "pass": true,
+   "phase": "behavior",
+   "why": null
+  },
+  "item3": {
+   "pass": true,
+   "phase": "behavior",
+   "why": null
+  },
+  "item4": {
+   "pass": true,
+   "phase": "behavior",
+   "why": null
+  },
+  "item5": {
+   "pass": true,
+   "phase": "behavior",
+   "why": null
+  },
+  "item6": {
+   "pass": true,
+   "phase": "behavior",
+   "why": null
+  }
+ },
+ "finished": "2026-10-01T04:54:01Z",
+ "log": [
+  {
+   "step": "frozen",
+   "t": 0.4,
+   "at": "2026-10-01T04:29:02Z",
+   "checked": 113
+  },
+  {
+   "step": "repo",
+   "t": 0.4,
+   "at": "2026-10-01T04:29:02Z",
+   "commit": "aed71b23f3fd",
+   "canon": "draft12-v6-2026-10-01",
+   "canon_sha16": "2C5FDDED89D659C0",
+   "out": "/content/op4b-Bprime/behavior-run-20261001T042902Z"
+  },
+  {
+   "step": "versions",
+   "t": 0.4,
+   "at": "2026-10-01T04:29:02Z",
+   "versions": {
+    "numpy": "2.1.3",
+    "scipy": "1.16.3",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.16.1",
+    "tokenizers": "0.23.1",
+    "huggingface_hub": "1.29.0",
+    "jinja2": "3.1.6",
+    "safetensors": "0.8.0",
+    "accelerate": "1.14.0"
+   },
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition"
+  },
+  {
+   "step": "load",
+   "t": 40.3,
+   "at": "2026-10-01T04:29:41Z",
+   "seconds": 4.9,
+   "alloc_gib": 58.26
+  },
+  {
+   "step": "behavior",
+   "t": 1499.4,
+   "at": "2026-10-01T04:54:01Z",
+   "cells": 8,
+   "trials": 320,
+   "gen_ids_sha256": "510031253AFC0E3D"
+  }
+ ],
+ "packaged": "final",
+ "packaged_at": "2026-10-01T04:54:01Z",
+ "seconds": 1499.4,
+ "clause": "本記録は器物の出力であり AI の自己報告ではない。いかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

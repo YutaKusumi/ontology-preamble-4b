@@ -1,16 +1,5 @@
 # -*- coding: utf-8 -*-
-"""build_report_Bprime_devBPT1.py v1.1 —— B′ の報告の草案の二つ目と最終版（逸脱 D-BPT1・登録者裁定 D284・D285・2026-10-01・層三の `tools/build_report_Bl3_devBLT1.py` の型・コーディネータ南無弥勒如来）。
-
-v1（最終の系統外の検分の後・登録者裁定 D285・最終検分の採否の表 `records/reviews/Bprime/results-final/adoption-table-final-Bprime.md` の X01・X07）: `--final` で最終版を組む。
-  見出しを「報告の最終版」に、状態の行を正本 `report_rules.template` の二つの型（登録者最終確認の前は「最終の系統外の検分の後・登録者最終確認の前」・確認の後は
-  確認の記録 `records/Bprime/final-confirmation-Bprime.json` の逐語と時刻と会話の記録の uuid）にし（凍結した組み立ての器は草案の型しか持たない・X07）、頭の添えの一行目と検分票を最終版のものにして、
-  頭の添えに最終検分の後の一行を足す。足す区画のほかの中身は草案の二つ目と同じ組み方。最終の検分を受けた草案の二つ目（置き場のファイル）は書き換えず、
-  最終版との違いが決めた行（見出し・状態の行・頭の添えの一行目と足した一行・検分票の区画）だけであることを確かめる（層三の D-BLT1 の v2 の型）。
-  `--final` が無ければ v0 と同じ組み方で草案の二つ目を組む（頭の添えの器の版の字は草案の二つ目を組んだ v0 のまま・置き場の草案の二つ目とバイトで同じことを照らせる）。
-  最終版の出力: `records/Bprime/results-Bprime-FINAL-2026-10-01.md` と `records/Bprime/results-Bprime-FINAL-2026-10-01-checks.json`。前の版は `records/Bprime/tools/prev/build_report_Bprime_devBPT1-v0.py`。
-v1.1（起草者の最終の見直しの R-a・R-b・D285 で改めると決めた検分票の区画の中）: 見直しの記録 `records/reviews/Bprime/results-final/final-read/review-final-Bprime.md` があるとき、検分票の「段階」に起草者の最終の見直しの後を足し、「系統の内訳」に系統を呼び出しの出所で数えたことを足す。前の版は `records/Bprime/tools/prev/build_report_Bprime_devBPT1-v1.py`。
-v1.2（登録者最終確認の後・確認の言葉に鉤括弧があった）: 確認の記録の言葉の照らしで、鉤括弧（「」）を、数がそろい入れ子が閉じるときだけ許す（状態の行の型〔D199 の型〕は変えない）。確認の記録があるとき、最終版を確認していただいた案の写し（`records/Bprime/results-Bprime-proposal-confirmed-2026-10-01.md`）と比べ、違いが状態の行・検分票の「段階」の行・頭の添えの一行目の器の版の字だけであることを確かめる。前の版は `records/Bprime/tools/prev/build_report_Bprime_devBPT1-v1.1.py`。
-以下は v0 の説明:
+"""build_report_Bprime_devBPT1.py v0 —— B′ の報告の草案の二つ目（逸脱 D-BPT1・登録者裁定 D284・2026-10-01・層三の `tools/build_report_Bl3_devBLT1.py` の型・コーディネータ南無弥勒如来）。
 
 凍結した組み立ての器 `tools/build_report_Bprime.py` を読み込み、その本番の入口（`main_build`・頭で錠を照らす）を同じ入力（凍結の記録〔逸脱の台帳を含む〕・封印の記録と二つの予想・
 集計の出力・行動の下見の閉じた記録・転記行・起草者の欄 `records/Bprime/results-draft/rejected-lines-Bprime.md`）で一時の置き場へ走らせて凍結の報告を作り直し、
@@ -28,15 +17,14 @@ v1.2（登録者最終確認の後・確認の言葉に鉤括弧があった）:
 用法: python tools/build_report_Bprime_devBPT1.py [--force]（凍結した器と同じく、`bprime_gemma` が読む環境の変数を渡す）
 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。
 """
-import os, re, sys, json, hashlib, argparse, tempfile, difflib
+import os, re, sys, json, hashlib, argparse, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.abspath(os.path.join(HERE, '..'))
 sys.path.insert(0, HERE)
 import build_report_Bprime as BR
 
-VERSION = 'v1.2'
-DRAFT_LABEL = 'v0'            # 草案の二つ目の頭の添えに印字した器の版（v1 でも草案の二つ目をバイトのまま組めるように残す）
+VERSION = 'v0'
 NL = chr(10)
 TAG = '【逸脱 D-BPT1】'
 DEV = 'D-BPT1'
@@ -52,14 +40,6 @@ T_FROZEN = '# B′ の結果（報告の草案・機械の組み立て）'
 S_FROZEN = '- 状態: **報告の草案（結果の巡の前）**。'
 T_DRAFT = '# B′ の結果（報告の草案の二つ目・凍結した組み立ての器の出力に逸脱の区画を足したもの）'
 S_DRAFT = '- 状態: **報告の草案の二つ目**（結果の巡の後・最終の系統外の一票の前）。'
-T_FINAL = '# B′ の結果（報告の最終版・凍結した組み立ての器の出力に逸脱の区画を足したもの）'
-S_FINAL_PRE = '- 状態: **報告の最終版**（最終の系統外の検分の後・登録者最終確認の前）。'
-S_CONF = '- 状態: **最終版**（登録者最終確認 %s 日本時間・会話の記録 uuid `%s`・逐語「%s」）。'          # 確認の後の型（正本 `report_rules.template`・裁定 D199 の型・層三と同じ字）
-CONF_REL = 'records/Bprime/final-confirmation-Bprime.json'
-OUT_FINAL_REL, CHECKS_FINAL_REL = 'records/Bprime/results-Bprime-FINAL-2026-10-01.md', 'records/Bprime/results-Bprime-FINAL-2026-10-01-checks.json'
-ADOPT_FINAL_REL = 'records/reviews/Bprime/results-final/adoption-table-final-Bprime.md'
-REPRO_FINAL_REL = 'records/reviews/Bprime/results-final/repro-final-Bprime.json'
-REVIEW_REL = 'records/reviews/Bprime/results-final/final-read/review-final-Bprime.md'      # 起草者の最終の見直しの記録（v1.1）
 STALE = 'Gemma の場面の出力と読み取りの値はまだ誰も見ていない'
 NUC = '- nuclear の族は測れなかった（正本 `pilot.decision.family`）'
 KANJI = '〇一二三四五六七八九十'
@@ -83,8 +63,8 @@ def table_last(L, i_hdr):
     return k - 1
 
 
-def facts(C, FR, L, final=False):
-    """注が言う事実を記録と正本で照らし、区画に埋める値を返す（外れたら止める・(六)）。final は最終版の事実も照らす（v1）。"""
+def facts(C, FR, L):
+    """注が言う事実を記録と正本で照らし、区画に埋める値を返す（外れたら止める・(六)）。"""
     F, done = {}, []
 
     def ok(cond, what):
@@ -178,21 +158,11 @@ def facts(C, FR, L, final=False):
     for q in ('q2', 'q3', 'q4'):
         row = [x for x in L if x.startswith('| %s.' % q)]
         ok(len(row) == 1 and row[0].split(' | ')[1] == '採点しない', 'W19: 照合の表の %s は「採点しない」' % q)
-    if final:                                                   # v1: 最終版（X01・X07・裁定 D285）
-        tmpl = C['report_rules']['template']
-        ok(any('登録者最終確認の前と後の二つの型' in x for x in tmpl), 'X07: 正本 report_rules.template は状態を登録者最終確認の前と後の二つの型と定める')
-        ok(set(re.findall(r"\('(status_\w+)'", open(BR.__file__, encoding='utf-8').read())) == {'status_draft'}, 'X07: 凍結した組み立ての器の状態の型は草案の型だけ')
-        ok(os.path.exists(P(ADOPT_FINAL_REL)) and os.path.exists(P(REPRO_FINAL_REL)), 'X01: 最終検分の採否の表と再現の記録が置き場にある')
-        rp = ld(P(REPRO_FINAL_REL))
-        ok(rp['n'] == rp['n_ok'], 'X01: 最終検分の票の事実の主張は、再現の記録ですべて合う')
-        mt = ld(P('records/reviews/Bprime/results-final/votes/grok-4.7/meta.json'))
-        ok(mt['model_requested'] == mt['model_returned'], 'X01: 最終検分の票の返った機種の名は呼んだ機種の名')
-        ok('- **D285**（登録者' in open(P('records/Bprime/rulings-D285.md'), encoding='utf-8').read(), 'X01: 裁定 D285 の記録が置き場にある')
     return F, done
 
 
-def blocks(C, FR, F, L, frozen16, rej_lines, final=False, conf=None, d2_16=None, reviewed=False):
-    """錨の行の添字と、その行の後に置く区画の中身。final は最終版の頭の添えと検分票にする（v1）。"""
+def blocks(C, FR, F, L, frozen16, rej_lines):
+    """錨の行の添字と、その行の後に置く区画の中身。"""
     neg = C['negation_templates']
     sec = lambda h: uniq([i for i, x in enumerate(L) if x.startswith(h)], h)
     s0, s1, s6, s9, s10, s_coi, s_ken = (sec('## 0. '), sec('## 1. '), sec('## 6. '), sec('## 9. '), sec('## 10. '), sec('## 作り手の関係'), sec('## 検分票'))
@@ -218,7 +188,7 @@ def blocks(C, FR, F, L, frozen16, rej_lines, final=False, conf=None, d2_16=None,
         'head': ['- %sこの草案の二つ目は、凍結した組み立ての器 `tools/build_report_Bprime.py`（SHA16 %s）の本番の入口を同じ入力で一時の置き場へ走らせて凍結の報告を作り直し、'
                  '置き場の `records/Bprime/results-Bprime.md`（SHA16 %s）とバイトで同じことを確かめてから、見出しと状態の行を改め、%sの印を付けた区画だけを足したもの'
                  '（逸脱の器 `tools/build_report_Bprime_devBPT1.py` %s・登録者裁定 D284・採否の表 `%s` の W01〜W06・W12・W15・W16・W19）。区画は、生の md では始めと終わりの印の行で囲んだ。'
-                 '印の無い文と区画は凍結した器の出力のまま。' % (TAG, s16(BR.__file__), frozen16, TAG, DRAFT_LABEL, ADOPT_REL),
+                 '印の無い文と区画は凍結した器の出力のまま。' % (TAG, s16(BR.__file__), frozen16, TAG, VERSION, ADOPT_REL),
                  '- %s起草者の欄（「この結果が退けた説明」）の%s行は、結果の巡の後に、凍結した器の口（`--rejected`）で直した（一行目と二行目に範囲の句を足し、一行目の「多くで」を決まりの数を指す'
                  '書き方に改め、三行目に (vi) の (a) の分岐の一文を足し、%s行目を足した・凍結した器の走査の当たり 0・登録者裁定 D284・採否の W11）。' % (TAG, k(rej_lines), k(rej_lines)),
                  '- %s下見の前の凍結を走らせた所: 等方の乱数 g は、凍結の本文（`%s`）の字「%s」と違い、Colab の CPU のランタイム（Linux）で引いた。手元（Windows）で引いた g の下の桁のビットが、'
@@ -262,36 +232,7 @@ def blocks(C, FR, F, L, frozen16, rej_lines, final=False, conf=None, d2_16=None,
                 '足した区画は裁定 D284 の注の行に限り、読みを足さない。',
                 '  - 本検分が確認していないこと: 最終の系統外の一票が見つけること。足した区画の文の言い過ぎ（走査は禁止の語と数の形だけを見る）。公開の置き場での表示（公開の後に確かめる）。'],
     }
-    if final:                                                   # v1: 最終版の頭の添えと検分票（X01・X07・裁定 D285）
-        B['head'][0] = ('- %sこの最終版は、凍結した組み立ての器 `tools/build_report_Bprime.py`（SHA16 %s）の本番の入口を同じ入力で一時の置き場へ走らせて凍結の報告を作り直し、'
-                        '置き場の `records/Bprime/results-Bprime.md`（SHA16 %s）とバイトで同じことを確かめてから、見出しと状態の行を改め、%sの印を付けた区画だけを足したもの'
-                        '（逸脱の器 `tools/build_report_Bprime_devBPT1.py` %s・登録者裁定 D284・D285・採否の表 `%s` の W01〜W06・W12・W15・W16・W19 と `%s` の X01・X07）。'
-                        '区画は、生の md では始めと終わりの印の行で囲んだ。印の無い文と区画は凍結した器の出力のまま。' % (TAG, s16(BR.__file__), frozen16, TAG, VERSION, ADOPT_REL, ADOPT_FINAL_REL))
-        B['head'].insert(1, '- %s最終の系統外の検分の後に、草案の二つ目（`%s`・SHA16 %s・書き換えていない）から、見出し・状態の行・この頭の添えの一行目とこの一行・検分票の区画だけを改めた'
-                            '（器が確かめた・登録者裁定 D285）。状態の行は、正本 `report_rules.template` の二つの型（登録者最終確認の前と後）で、この器が組む（凍結した組み立ての器は草案の型しか'
-                            '持たない・採否の X07・後の登録の器の直しの候補）。' % (TAG, OUT_REL, d2_16))
-        B['ken'] = ['- %s上の検分票は、凍結した組み立ての器が結果の巡の前に出したもので、凍結の出力のまま残す。読みの型の当否と起草者の欄の文は、結果の巡と最終の系統外の検分で見た'
-                    '（採否の表 `%s` と `%s`・登録者裁定 D284・D285）。' % (TAG, ADOPT_REL, ADOPT_FINAL_REL),
-                    '- %sこの最終版の検分票:' % TAG,
-                    '  - 対象: 報告の最終版（凍結した器の出力と、足した区画）。',
-                    '  - 段階: 結果の後。結果の巡の後（登録者裁定 D284）と、最終の系統外の検分の後（登録者裁定 D285）%s%s。' % (
-                        ('と、起草者の最終の見直しの後（`%s`）' % REVIEW_REL) if reviewed else '', 'と、登録者最終確認の後（状態の行）' if conf else ''),
-                    '  - 凍結物の同定: 凍結の本文 SHA16 %s・正本 SHA16 %s（凍結の記録の値）。凍結した組み立ての器は、下見の前の凍結から動かせない器の錠を照らしてから組んだ。'
-                    % (FR['frozen_sha16']['design/design-Bprime-FROZEN.md'], FR['frozen_sha16']['design/contrasts-Bprime.json']),
-                    '  - 盲検の状態: 該当しない（下見の値は機械の決定の後に公開した）。',
-                    '  - 敵対的検分: 注が言う事実は、器が記録と正本で照らした（確かめの記録の `facts`）。足した文は、凍結した器の自由の文の走査に掛けた（当たり 0）。'
-                    '最終の系統外の検分の票の事実の主張は、一次の記録で照らした（`%s`）。' % REPRO_FINAL_REL,
-                    '  - 系統の内訳: 組み立てはコーディネータ（Claude 系）一名。結果の巡は系統外一票と系統内一票（系統は呼び出しの出所で数えた・D266 の型）。最終の系統外の検分は系統外一票（新しい呼び出し）で、結果の巡の系統外の票と'
-                    '行動の下見の採点と同じ機種なので、見逃しが相関しうる。起草者の最終の見直しは起草者自身のもので、外の目ではない。',
-                    '  - COI記録: 起草者は器と報告と起草者の欄と注を書いた当人で、封印した予想の q1 が当たった当人でもあり、「正しく書けていた」と読む側に引かれる。'
-                    '最終版で改めた行は、裁定 D285 で決めた行（見出し・状態の行・頭の添えの一行目と足した一行・検分票）に限った。',
-                    '  - 本検分が確認していないこと: 最終版で改めた行は、もう一度の検分を経ていない（正本 `review_plan.no_more`）。足した区画の文の言い過ぎ（走査は禁止の語と数の形だけを見る）。'
-                    '公開の置き場での表示（公開の後に確かめる）。']
     return A, B
-
-
-def is_new_status(x):
-    return x in (S_DRAFT, S_FINAL_PRE) or x.startswith('- 状態: **最終版**（登録者最終確認 ')
 
 
 def strip_back(Lt):
@@ -305,40 +246,15 @@ def strip_back(Lt):
             raise SystemExit('印の行の形が想定と違う（止める・(二)）')
         out.append(Lt[i])
         i += 1
-    if out[0] in (T_DRAFT, T_FINAL):
+    if out[0] == T_DRAFT:
         out[0] = T_FROZEN
-    return [S_FROZEN if is_new_status(x) else x for x in out], n
-
-
-def assemble(L, A, B, title, status):
-    Lt = list(L)
-    for name in sorted(A, key=lambda n: A[n], reverse=True):
-        Lt[A[name] + 1:A[name] + 1] = ['', BEGIN] + B[name] + [END]
-    Lt[0] = title
-    Lt[Lt.index(S_FROZEN)] = status
-    return Lt
-
-
-def load_conf():
-    """登録者最終確認の記録（あれば）: 鍵 when_jst・uuid・words を照らす。"""
-    if not os.path.exists(P(CONF_REL)):
-        return None
-    cf = ld(P(CONF_REL))
-    w = cf['words']
-    tg, sr = 'pasted' + '_content', 'system' + '-reminder'
-    depth = [w[:i].count('「') - w[:i].count('」') for i in range(len(w) + 1)]
-    if NL in w or any(b in w for b in ('<' + tg, '<' + sr, sr + '>', 'AppData', 'Users')) or not w.startswith('南無汝我曼荼羅') or depth[-1] != 0 or min(depth) < 0:
-        raise SystemExit('確認の記録の言葉の形が想定と違う（止める）')
-    if not (re.match(r'^\d{4}-\d\d-\d\d \d\d:\d\d$', cf['when_jst']) and re.match(r'^[0-9a-f\-]{36}$', cf['uuid'])):
-        raise SystemExit('確認の記録の時刻か uuid の形が想定と違う（止める）')
-    return cf
+    return [S_FROZEN if x == S_DRAFT else x for x in out], n
 
 
 def main():
     sys.stdout.reconfigure(encoding='utf-8')
     ap = argparse.ArgumentParser()
     ap.add_argument('--force', action='store_true')
-    ap.add_argument('--final', action='store_true')
     a = ap.parse_args()
     C, FR = ld(P(CANON_REL)), ld(P(FR_REL))
     if [d.get('no') for d in FR.get('deviations') or []] != [DEV]:
@@ -356,63 +272,15 @@ def main():
     if L[0] != T_FROZEN or L.count(S_FROZEN) != 1:
         raise SystemExit('凍結の報告の見出しか状態の行が想定と違う（止める）')
     rej_lines = len([x for x in open(P(REJ_REL), encoding='utf-8').read().split(NL) if x.strip()])
-    F, done = facts(C, FR, L, final=a.final)
-    A, B_d = blocks(C, FR, F, L, frozen16, rej_lines)
-    if sorted(A) != sorted(B_d) or len(set(A.values())) != len(A):
+    F, done = facts(C, FR, L)
+    A, B = blocks(C, FR, F, L, frozen16, rej_lines)
+    if sorted(A) != sorted(B) or len(set(A.values())) != len(A):
         raise SystemExit('錨と区画の対が想定と違う（止める・(五)）')
-    Lt_d = assemble(L, A, B_d, T_DRAFT, S_DRAFT)
-    conf, cmp = None, None
-    if a.final:                                                 # v1: 最終版
-        d2b = open(P(OUT_REL), 'rb').read()
-        d2_16 = s16b(d2b)
-        if d2_16 != ld(P(CHECKS_REL))['sha16'][OUT_REL] or NL.join(Lt_d).encode('utf-8') != d2b:
-            raise SystemExit('置き場の草案の二つ目が、確かめの記録の SHA か、この器が草案の型で組んだ文と違う（止める）')
-        conf = load_conf()
-        reviewed = os.path.exists(P(REVIEW_REL))
-        if reviewed and not all(w in open(P(REVIEW_REL), encoding='utf-8').read() for w in ('## 検分票', '本検分が確認していないこと')):
-            raise SystemExit('起草者の最終の見直しの記録の形が想定と違う（止める）')
-        _, B = blocks(C, FR, F, L, frozen16, rej_lines, final=True, conf=conf, d2_16=d2_16, reviewed=reviewed)
-        status = (S_CONF % (conf['when_jst'], conf['uuid'], conf['words'])) if conf else S_FINAL_PRE
-        Lt = assemble(L, A, B, T_FINAL, status)
-        gone, came = [], []
-        d2 = d2b.decode('utf-8').split(NL)
-        for tg_, i1, i2, j1, j2 in difflib.SequenceMatcher(None, d2, Lt, autojunk=False).get_opcodes():
-            if tg_ in ('replace', 'delete'):
-                gone += d2[i1:i2]
-            if tg_ in ('replace', 'insert'):
-                came += Lt[j1:j2]
-        ok_gone = {T_DRAFT, S_DRAFT, B_d['head'][0]} | set(B_d['ken'])
-        ok_came = {T_FINAL, status, B['head'][0], B['head'][1]} | set(B['ken'])
-        bad_g, bad_c = [x for x in gone if x not in ok_gone], [x for x in came if x not in ok_came]
-        if bad_g or bad_c:
-            raise SystemExit('草案の二つ目から、決めていない行が変わった（止める）: 消えた %s・足された %s' % ([x[:40] for x in bad_g], [x[:40] for x in bad_c]))
-        cmp = {'draft2': OUT_REL, 'draft2_sha16': d2_16, 'draft2_rebuilt_identical': True, 'removed_lines': len(gone), 'added_lines': len(came),
-               'allowed': '見出し・状態の行・頭の添えの一行目と足した一行・検分票の区画（裁定 D285）'}
-        if conf:                                               # v1.2: 確認していただいた案との違いは、状態の行・段階の行・器の版の字だけ
-            cpb = open(P(conf['proposal_copy']), 'rb').read()
-            if s16b(cpb) != conf['proposal_sha16']:
-                raise SystemExit('確認していただいた案の写しが、確認の記録の SHA16 と違う（止める）')
-            cp = cpb.decode('utf-8').split(NL)
-            g2, c2 = [], []
-            for tg_, i1, i2, j1, j2 in difflib.SequenceMatcher(None, cp, Lt, autojunk=False).get_opcodes():
-                if tg_ in ('replace', 'delete'):
-                    g2 += cp[i1:i2]
-                if tg_ in ('replace', 'insert'):
-                    c2 += Lt[j1:j2]
-            oh = [x for x in cp if x.startswith('- ' + TAG + 'この最終版は、')]
-            os_ = [x for x in cp if x.startswith('  - 段階: 結果の後。')]
-            mv = re.search(r'`tools/build_report_Bprime_devBPT1.py` (v[0-9.]+)・', oh[0]) if len(oh) == 1 else None
-            ns = [x for x in B['ken'] if x.startswith('  - 段階: ')]
-            if not (mv and len(os_) == 1 and len(ns) == 1 and B['head'][0] == oh[0].replace('`tools/build_report_Bprime_devBPT1.py` %s・' % mv.group(1), '`tools/build_report_Bprime_devBPT1.py` %s・' % VERSION)
-                    and ns[0] == os_[0][:-1] + 'と、登録者最終確認の後（状態の行）。'):
-                raise SystemExit('確認していただいた案の頭の添えか段階の行が、想定の形と違う（止める）')
-            bad2 = [x for x in g2 if x not in {S_FINAL_PRE, oh[0], os_[0]}] + [x for x in c2 if x not in {status, B['head'][0], ns[0]}]
-            if bad2:
-                raise SystemExit('確認していただいた案から、決めていない行が変わった（止める）: %s' % [x[:40] for x in bad2])
-            cmp['confirmed_proposal'] = {'copy': conf['proposal_copy'], 'sha16': conf['proposal_sha16'], 'removed_lines': len(g2), 'added_lines': len(c2), 'proposal_builder': mv.group(1),
-                                         'allowed': '状態の行・検分票の段階の行・頭の添えの一行目の器の版の字（v1.2）'}
-    else:
-        B, Lt = B_d, Lt_d
+    Lt = list(L)
+    for name in sorted(A, key=lambda n: A[n], reverse=True):
+        Lt[A[name] + 1:A[name] + 1] = ['', BEGIN] + B[name] + [END]
+    Lt[0] = T_DRAFT
+    Lt[Lt.index(S_FROZEN)] = S_DRAFT
     text = NL.join(Lt)
     back, n_blocks = strip_back(Lt)
     if NL.join(back).encode('utf-8') != fb or n_blocks != len(B):
@@ -431,35 +299,24 @@ def main():
     if not (('  - ' + neg[0]) in Lt and ('  - ' + neg[3]) in Lt):
         raise SystemExit('打ち消しの定型の写しが正本の文と違う（止める・(四)）')
     body = text.encode('utf-8')
-    out_rel, chk_rel = (OUT_FINAL_REL, CHECKS_FINAL_REL) if a.final else (OUT_REL, CHECKS_REL)
-    out = P(out_rel)
+    out = P(OUT_REL)
     if os.path.exists(out) and not a.force:
         if open(out, 'rb').read() == body:
-            print('[build_report_Bprime_devBPT1] 置き場の%sと同じ（書かない）: %s' % ('最終版' if a.final else '草案の二つ目', out_rel))
+            print('[build_report_Bprime_devBPT1] 置き場の草案の二つ目と同じ（書かない）: %s' % OUT_REL)
             return
-        raise SystemExit('置き場の%sと、組んだ文が違う（止める・--force で書き直す）: %s' % ('最終版' if a.final else '草案の二つ目', out_rel))
+        raise SystemExit('置き場の草案の二つ目と、組んだ文が違う（止める・--force で書き直す）: %s' % OUT_REL)
     open(out, 'wb').write(body)
-    ck = {'kind': 'bprime_report_final_checks' if a.final else 'bprime_report_draft2_checks', 'tool': 'tools/build_report_Bprime_devBPT1.py %s' % (VERSION if a.final else DRAFT_LABEL),
-          'deviation': DEV, 'ruling': 'D284・D285' if a.final else 'D284', 'adoption_table': [ADOPT_REL, ADOPT_FINAL_REL] if a.final else ADOPT_REL,
+    ck = {'kind': 'bprime_report_draft2_checks', 'tool': 'tools/build_report_Bprime_devBPT1.py %s' % VERSION, 'deviation': DEV, 'ruling': 'D284', 'adoption_table': ADOPT_REL,
           'sha16': {'tools/build_report_Bprime.py': s16(BR.__file__), 'tools/build_report_Bprime_devBPT1.py': s16(os.path.abspath(__file__)), 'records/Bprime/results-Bprime.md': frozen16,
                     REJ_REL: s16(P(REJ_REL)), FR_REL: s16(P(FR_REL)), CANON_REL: s16(P(CANON_REL)), PILOT_REL: s16(P(PILOT_REL)), CLOSED_REL: s16(P(CLOSED_REL)), PROV_REL: s16(P(PROV_REL)),
-                    out_rel: s16b(body)},
+                    OUT_REL: s16b(body)},
           'checks': {'frozen_rebuild_identical': True, 'frozen_scan_hits': 0, 'strip_back_identical': True, 'blocks': n_blocks, 'added_lines': len(added), 'added_scan_hits': 0,
                      'negation_templates_verbatim': True, 'facts': done},
           'anchors_frozen_line': {n: A[n] + 1 for n in sorted(A, key=lambda n: A[n])},
           'clause': '本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。'}
-    if a.final:
-        ck['draft2_compare'] = cmp
-        ck['status'] = 'confirmed' if conf else 'before_confirmation'
-        if conf:
-            ck['sha16'][CONF_REL] = s16(P(CONF_REL))
-        for r_ in (ADOPT_FINAL_REL, REPRO_FINAL_REL, 'records/Bprime/rulings-D285.md') + ((REVIEW_REL,) if os.path.exists(P(REVIEW_REL)) else ()):
-            ck['sha16'][r_] = s16(P(r_))
-        ck['drafter_final_review'] = REVIEW_REL if os.path.exists(P(REVIEW_REL)) else None
-    with open(P(chk_rel), 'w', encoding='utf-8', newline=NL) as fh:
+    with open(P(CHECKS_REL), 'w', encoding='utf-8', newline=NL) as fh:
         json.dump(ck, fh, ensure_ascii=False, indent=1)
-    print('[build_report_Bprime_devBPT1] 書いた %s（SHA16 %s・区画 %d・足した行 %d・事実の照らし %d・走査の当たり 0%s）' % (
-        out_rel, s16b(body), n_blocks, len(added), len(done), ('・草案の二つ目から消えた行 %d・足された行 %d・状態 %s' % (cmp['removed_lines'], cmp['added_lines'], ck['status'])) if a.final else ''))
+    print('[build_report_Bprime_devBPT1] 書いた %s（SHA16 %s・区画 %d・足した行 %d・事実の照らし %d・走査の当たり 0）' % (OUT_REL, s16b(body), n_blocks, len(added), len(done)))
 
 
 if __name__ == '__main__':
