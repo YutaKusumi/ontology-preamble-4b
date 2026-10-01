@@ -1,0 +1,498 @@
+{
+ "kind": "bprime_facts_pre",
+ "version": "v0",
+ "contract_sha16": "45543569DDCDF0F3",
+ "ledger_sha16": "569CEC81C8F2E7BE",
+ "qwen_revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+ "transformers": "5.16.1",
+ "facts": {
+  "A": {
+   "text": "主の書き出し '```json\\n{\"choice\": \"' は 7 トークン（2717「```」・3723「json」・107「⏎」・14937「{\"」・17005「choice」・1083「\":」・623「 \"」）。読み取りの集合: survival: a 236746「a」・b 236763「b」・c 236755「c」・refuse 1811「ref」／nuclear: a 236746「a」・b 236763「b」・c 236755「c」・d 236753「d」・refuse 1811「ref」。書き出しの自然な続きの割り方（台帳）: a は 1 トークン（「a」）・b は 1 トークン（「b」）・c は 1 トークン（「c」）・d は 1 トークン（「d」）・refuse は 2 トークン（「ref」・「use」）。プロンプトの文字列に書き出しを足して割っても、升目のプロンプトの並びに書き出しの並びを足したものと同じ（8 升目すべて）。揺れの版（下見の (iv) だけに使う）: V1 '{\"choice\": \"'（4 トークン: 「{\"」・「choice」・「\":」・「 \"」・割り方の境を保つ）／V2 '```json\\n{\\n  \"choice\": \"'（10 トークン: 「```」・「json」・「⏎」・「{」・「⏎」・「  」・「\"」・「choice」・「\":」・「 \"」・割り方の境を保つ）／V3 '```json\\n{\"choice\":\"'（6 トークン: 「```」・「json」・「⏎」・「{\"」・「choice」・「\":\"」・割り方の境を保つ）。V3 の頭の 5 トークンは主の書き出しと同じで、最後の片だけが違う（決まりに合う）。V3 の並びがプロンプトに現れる回数 0・V3 の最後のトークンがプロンプトに現れる回数 0（主の升目のすべてで数えた）。使う版: V1・V2・V3。",
+   "prefix_ids": [
+    2717,
+    3723,
+    107,
+    14937,
+    17005,
+    1083,
+    623
+   ],
+   "sets": {
+    "survival": {
+     "letters": [
+      "a",
+      "b",
+      "c"
+     ],
+     "ids": [
+      236746,
+      236763,
+      236755,
+      1811
+     ],
+     "pieces": [
+      "a",
+      "b",
+      "c",
+      "ref"
+     ]
+    },
+    "nuclear": {
+     "letters": [
+      "a",
+      "b",
+      "c",
+      "d"
+     ],
+     "ids": [
+      236746,
+      236763,
+      236755,
+      236753,
+      1811
+     ],
+     "pieces": [
+      "a",
+      "b",
+      "c",
+      "d",
+      "ref"
+     ]
+    }
+   },
+   "variants": {
+    "V1": {
+     "string": "{\"choice\": \"",
+     "ids": [
+      14937,
+      17005,
+      1083,
+      623
+     ],
+     "pieces": [
+      "{\"",
+      "choice",
+      "\":",
+      " \""
+     ],
+     "boundary": {
+      "a": true,
+      "b": true,
+      "c": true,
+      "d": true,
+      "refuse": true
+     },
+     "keep": true,
+     "dropped_why": []
+    },
+    "V2": {
+     "string": "```json\n{\n  \"choice\": \"",
+     "ids": [
+      2717,
+      3723,
+      107,
+      236782,
+      107,
+      138,
+      236775,
+      17005,
+      1083,
+      623
+     ],
+     "pieces": [
+      "```",
+      "json",
+      "\n",
+      "{",
+      "\n",
+      "  ",
+      "\"",
+      "choice",
+      "\":",
+      " \""
+     ],
+     "boundary": {
+      "a": true,
+      "b": true,
+      "c": true,
+      "d": true,
+      "refuse": true
+     },
+     "keep": true,
+     "dropped_why": []
+    },
+    "V3": {
+     "string": "```json\n{\"choice\":\"",
+     "ids": [
+      2717,
+      3723,
+      107,
+      14937,
+      17005,
+      12375
+     ],
+     "pieces": [
+      "```",
+      "json",
+      "\n",
+      "{\"",
+      "choice",
+      "\":\""
+     ],
+     "boundary": {
+      "a": true,
+      "b": true,
+      "c": true,
+      "d": true,
+      "refuse": true
+     },
+     "keep": true,
+     "dropped_why": []
+    }
+   },
+   "v3_checks": {
+    "head_same_tokens": 5,
+    "head_rule": true,
+    "seq_in_prompt": 0,
+    "last_token_in_prompt": 0
+   },
+   "variants_kept": [
+    "V1",
+    "V2",
+    "V3"
+   ],
+   "heads": {
+    "a": {
+     "stable_prefix": true,
+     "next": 236746,
+     "n_after": 1,
+     "pieces_after": [
+      "a"
+     ]
+    },
+    "b": {
+     "stable_prefix": true,
+     "next": 236763,
+     "n_after": 1,
+     "pieces_after": [
+      "b"
+     ]
+    },
+    "c": {
+     "stable_prefix": true,
+     "next": 236755,
+     "n_after": 1,
+     "pieces_after": [
+      "c"
+     ]
+    },
+    "d": {
+     "stable_prefix": true,
+     "next": 236753,
+     "n_after": 1,
+     "pieces_after": [
+      "d"
+     ]
+    },
+    "refuse": {
+     "stable_prefix": true,
+     "next": 1811,
+     "n_after": 2,
+     "pieces_after": [
+      "ref",
+      "use"
+     ]
+    }
+   }
+  },
+  "B": {
+   "text": "升目ごと（場面 × 土台の腕・括弧は族）: N1|O-Ncold（nuclear）: 長さ 431・主位置 430「<channel|>」・読み取り 437・書き出しの並びがプロンプトの中にある位置 320（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）／N1|Onull（nuclear）: 長さ 422・主位置 421「<channel|>」・読み取り 428・書き出しの並びがプロンプトの中にある位置 311（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）／S1|O-Ncold（survival）: 長さ 482・主位置 481「<channel|>」・読み取り 488・書き出しの並びがプロンプトの中にある位置 368（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）／S1|Onull（survival）: 長さ 473・主位置 472「<channel|>」・読み取り 479・書き出しの並びがプロンプトの中にある位置 359（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）／S4|O-Ncold（survival）: 長さ 495・主位置 494「<channel|>」・読み取り 501・書き出しの並びがプロンプトの中にある位置 381（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）／S4|Onull（survival）: 長さ 486・主位置 485「<channel|>」・読み取り 492・書き出しの並びがプロンプトの中にある位置 372（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）／SK|O-Ncold（survival）: 長さ 496・主位置 495「<channel|>」・読み取り 502・書き出しの並びがプロンプトの中にある位置 382（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）／SK|Onull（survival）: 長さ 487・主位置 486「<channel|>」・読み取り 493・書き出しの並びがプロンプトの中にある位置 373（次は 236746「a」）・書き出しの最後のトークン 7 回（その次が refuse の頭 1 回）。二つの機種の、抽出の二場面の文脈（腕 × 場面）の、腕の本文だけのトークン数・プロンプトの長さ・主位置の添字（Gemma／Qwen）: N1|O: Gemma 本文 172・長さ 420・主位置 419／Qwen 本文 193・長さ 462・主位置 461／S1|O: Gemma 本文 172・長さ 471・主位置 470／Qwen 本文 193・長さ 529・主位置 528／N1|Osec: Gemma 本文 171・長さ 419・主位置 418／Qwen 本文 195・長さ 464・主位置 463／S1|Osec: Gemma 本文 171・長さ 470・主位置 469／Qwen 本文 195・長さ 531・主位置 530／N1|O-Ncold: Gemma 本文 183・長さ 431・主位置 430／Qwen 本文 205・長さ 474・主位置 473／S1|O-Ncold: Gemma 本文 183・長さ 482・主位置 481／Qwen 本文 205・長さ 541・主位置 540／N1|Osec-Ncold: Gemma 本文 182・長さ 430・主位置 429／Qwen 本文 207・長さ 476・主位置 475／S1|Osec-Ncold: Gemma 本文 182・長さ 481・主位置 480／Qwen 本文 207・長さ 543・主位置 542。Qwen の組み立ては、層三の記録の長さと主位置に一致した（照らした文脈 N1|O-Ncold・S1|O-Ncold）。",
+   "cells": {
+    "N1|O-Ncold": {
+     "family": "nuclear",
+     "prompt_len": 431,
+     "main_position": 430,
+     "main_token": "<channel|>",
+     "readout_position": 437,
+     "prefix_in_prompt_at": [
+      320
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    },
+    "N1|Onull": {
+     "family": "nuclear",
+     "prompt_len": 422,
+     "main_position": 421,
+     "main_token": "<channel|>",
+     "readout_position": 428,
+     "prefix_in_prompt_at": [
+      311
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    },
+    "S1|O-Ncold": {
+     "family": "survival",
+     "prompt_len": 482,
+     "main_position": 481,
+     "main_token": "<channel|>",
+     "readout_position": 488,
+     "prefix_in_prompt_at": [
+      368
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    },
+    "S1|Onull": {
+     "family": "survival",
+     "prompt_len": 473,
+     "main_position": 472,
+     "main_token": "<channel|>",
+     "readout_position": 479,
+     "prefix_in_prompt_at": [
+      359
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    },
+    "S4|O-Ncold": {
+     "family": "survival",
+     "prompt_len": 495,
+     "main_position": 494,
+     "main_token": "<channel|>",
+     "readout_position": 501,
+     "prefix_in_prompt_at": [
+      381
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    },
+    "S4|Onull": {
+     "family": "survival",
+     "prompt_len": 486,
+     "main_position": 485,
+     "main_token": "<channel|>",
+     "readout_position": 492,
+     "prefix_in_prompt_at": [
+      372
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    },
+    "SK|O-Ncold": {
+     "family": "survival",
+     "prompt_len": 496,
+     "main_position": 495,
+     "main_token": "<channel|>",
+     "readout_position": 502,
+     "prefix_in_prompt_at": [
+      382
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    },
+    "SK|Onull": {
+     "family": "survival",
+     "prompt_len": 487,
+     "main_position": 486,
+     "main_token": "<channel|>",
+     "readout_position": 493,
+     "prefix_in_prompt_at": [
+      373
+     ],
+     "next_after_prefix": [
+      [
+       236746,
+       "a"
+      ]
+     ],
+     "last_token_in_prompt": 7,
+     "refuse_after_last_token": 1
+    }
+   },
+   "two_models": [
+    {
+     "context": "N1|O",
+     "gemma_arm_tokens": 172,
+     "gemma_prompt_len": 420,
+     "gemma_main_position": 419,
+     "qwen_arm_tokens": 193,
+     "qwen_prompt_len": 462,
+     "qwen_main_position": 461
+    },
+    {
+     "context": "S1|O",
+     "gemma_arm_tokens": 172,
+     "gemma_prompt_len": 471,
+     "gemma_main_position": 470,
+     "qwen_arm_tokens": 193,
+     "qwen_prompt_len": 529,
+     "qwen_main_position": 528
+    },
+    {
+     "context": "N1|Osec",
+     "gemma_arm_tokens": 171,
+     "gemma_prompt_len": 419,
+     "gemma_main_position": 418,
+     "qwen_arm_tokens": 195,
+     "qwen_prompt_len": 464,
+     "qwen_main_position": 463
+    },
+    {
+     "context": "S1|Osec",
+     "gemma_arm_tokens": 171,
+     "gemma_prompt_len": 470,
+     "gemma_main_position": 469,
+     "qwen_arm_tokens": 195,
+     "qwen_prompt_len": 531,
+     "qwen_main_position": 530
+    },
+    {
+     "context": "N1|O-Ncold",
+     "gemma_arm_tokens": 183,
+     "gemma_prompt_len": 431,
+     "gemma_main_position": 430,
+     "qwen_arm_tokens": 205,
+     "qwen_prompt_len": 474,
+     "qwen_main_position": 473
+    },
+    {
+     "context": "S1|O-Ncold",
+     "gemma_arm_tokens": 183,
+     "gemma_prompt_len": 482,
+     "gemma_main_position": 481,
+     "qwen_arm_tokens": 205,
+     "qwen_prompt_len": 541,
+     "qwen_main_position": 540
+    },
+    {
+     "context": "N1|Osec-Ncold",
+     "gemma_arm_tokens": 182,
+     "gemma_prompt_len": 430,
+     "gemma_main_position": 429,
+     "qwen_arm_tokens": 207,
+     "qwen_prompt_len": 476,
+     "qwen_main_position": 475
+    },
+    {
+     "context": "S1|Osec-Ncold",
+     "gemma_arm_tokens": 182,
+     "gemma_prompt_len": 481,
+     "gemma_main_position": 480,
+     "qwen_arm_tokens": 207,
+     "qwen_prompt_len": 543,
+     "qwen_main_position": 542
+    }
+   ],
+   "qwen_checked_against_bl3": [
+    "N1|O-Ncold",
+    "S1|O-Ncold"
+   ]
+  },
+  "E": {
+   "text": "本の計算: 升目と符号の主の組 12 × 方向 2031（名前のある方向 4・等方 1999・実在の差 28）＋ 零のベクトル 一 ＝ 組ごとに 2032。逆の向きの組 4 × 実在の差 28 ＋ 零のベクトル 一 ＝ 組ごとに 29。バッチ 16 では、主の組ごとに 127 バッチ・逆の向きの組ごとに 2 バッチ・あわせて 1532 バッチ（正本の `cost` の数と器が照らした）。バッチ一では順伝播 24500 回。独立の再計算（一段目・新しい道 2 × v̂ の行 8 × 〔無操作 ＋ v̂ ＋ 等方 1999 ＋ 比べる相手 48〕）32784 回。Nk の行を入れるなら（案 16・凍結の前に登録者が決める）Nk の行 8 × 道 2 × 〔無操作 ＋ Nk ＋ 等方 1999 ＋ 比べる相手 54〕＝ 32880 回を足す。独立の再抽出 16 回。道の違いの記述（本の計算がバッチ一に移ったときだけ）はバッチ 16 の道で 1532 バッチ。下見の順伝播: 許容の k の測り 64 回（意味のない列の位置 32 × バッチの大きさ 2 通り）・出口の値の自己検査 8・(vi) の (a) 16（升目ごとにバッチ 16 と一）・(b) 16（升目ごとの繰り返しの二回目から・一回目は (a) の大きさ一）・(i)(ii) 8・(iv) 24（揺れの版三つ × 升目）。本の計算の頭: 出口の値の自己検査 8・最後の層の自己検査 1。行動の下見: 生成 320 本（升目 8 × 40）。時間の二つの見込み（バッチ 16 とバッチ一）は、凍結の前の確かめで速さを測ってから足す。",
+   "per_main": 2032,
+   "per_reverse": 29,
+   "batches_16": 1532,
+   "forwards_batch1": 24500,
+   "recompute_static": 32784,
+   "recompute_nk_if_added": 32880,
+   "reextract": 16,
+   "path_difference_batches16": 1532,
+   "pilot": {
+    "measure_k": 64,
+    "logit_check": 8,
+    "vi_a": 16,
+    "vi_b": 16,
+    "i_ii": 8,
+    "iv": 24
+   },
+   "main_head": {
+    "logit_check": 8,
+    "layer_check": 1
+   },
+   "behavior_generations": 320
+  },
+  "F": {
+   "text": "版の固定: 重みの版 `842da3794eaa`・transformers 5.16.1・torch 2.11.0+cu128・CUDA 12.8（ほかに tokenizers・jinja2・huggingface_hub・numpy・scipy を凍結の時に起動器が入れ直して文字列の完全な一致で確かめる）。softcap 30.0（`text_config` の階層・上の階層には無い）。選ぶ層の添字 29（割合 0.5 の式）の種類は `full_attention`・窓 1024・層の道 `model.language_model.layers`（読み込んだ模型の `model` の下）。読み取りの列の長さの最大 503 ＜ 窓 1024（assert）。取った設定の SHA16（手元の目録と一致）: config.json E967DD38BC5CFD38・generation_config.json D4226BBE3117D2D2・tokenizer.json CC8D3A0CE36466CC・tokenizer_config.json 9F4FEC4B1DC6ECDD・chat_template.jinja AE53464BF3BE2580・processor_config.json 32BDF45D2AD4CC29・model.safetensors.index.json D4AFF3B976D69C12。重みの断片 2 本の SHA-256 は手元の目録にまだ無い（凍結の前に目録を作り、起動器が照らす）。GPU・ドライバと CUDA の実行時の版・注意の実装と決定性の設定の印字は起動器が記録する（走行の時の部分）。",
+   "config_sha16": {
+    "config.json": "E967DD38BC5CFD38",
+    "generation_config.json": "D4226BBE3117D2D2",
+    "tokenizer.json": "CC8D3A0CE36466CC",
+    "tokenizer_config.json": "9F4FEC4B1DC6ECDD",
+    "chat_template.jinja": "AE53464BF3BE2580",
+    "processor_config.json": "32BDF45D2AD4CC29",
+    "model.safetensors.index.json": "D4AFF3B976D69C12"
+   },
+   "softcap": 30.0,
+   "layer_index": 29,
+   "layer_type": "full_attention",
+   "window": 1024,
+   "max_seq_len": 503,
+   "shards": [
+    "model-00001-of-00002.safetensors",
+    "model-00002-of-00002.safetensors"
+   ],
+   "shards_in_manifest": 0,
+   "versions": {
+    "transformers": "5.16.1",
+    "torch": "2.11.0+cu128",
+    "cuda": "12.8",
+    "pins_more": [
+     "tokenizers",
+     "jinja2",
+     "huggingface_hub",
+     "numpy",
+     "scipy"
+    ],
+    "rule": "凍結の時に、起動器が入れ直して文字列の完全な一致で確かめる（層三の型）。NumPy と SciPy は手元と Colab の両方で（等方の乱数を手元で引き Colab で照らすため・R37・S19）。注意の実装（`attn_implementation`）と決定性の設定（TF32 などの選び）を正本で決め、起動器が印字して転記行 F に入れる。セッションごとにドライバと CUDA の実行時の版を印字し、セッションの間の違いを報告の頭に並べる（止める条件にはしない・S05）",
+    "attn_implementation": "凍結の前に決める（器の段・値は凍結の前の確かめの記録）",
+    "determinism": "凍結の前に決める（器の段・同上）"
+   }
+  }
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

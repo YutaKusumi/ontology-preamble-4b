@@ -1,0 +1,203 @@
+[run_dry_colab] 始め
+$ git -C /content/ontology-preamble-4b checkout -q 0a456884810681127b6b051da76cd3913cd14f59
+
+$ /usr/bin/python3 -c from huggingface_hub import hf_hub_download as d
+import sys
+for f in ["chat_template.jinja", "config.json", "generation_config.json", "model.safetensors.index.json", "processor_config.json", "tokenizer.json", "tokenizer_config.json"]:
+    d("google/gemma-4-31B-it", f, revision="842da3794eaa0b77d5f08bae87a17459d91ff475", local_dir=sys.argv[1], token=False)
+ /content/kit/Bprime/hf/gemma-4-31B-it/842da3794eaa0b77d5f08bae87a17459d91ff475
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+[run_dry_colab] 設定とトークナイザを照らした（7 本）
+[run_dry_colab] 正式の確かめを背後で走らせ始めた（pid 30720・準備 3 秒）。進みは /content/dry-progress.log・終わりは /content/dry-done.json
+[dry_worker_colab] 始め
+[dry_run_Bprime] 〇 公開の形の一時の置き場                  期待どおり 写した 215
+[dry_run_Bprime] 〇 公開の形で取った閉包の表が作業の置き場のバイトと同じ（別 期待どおり 器 47・別の個体の器 [True, True]
+[dry_run_Bprime] 〇 別の個体の二つの器が作業の置き場と公開の形で同じバイト（ 期待どおり {'bprime_recompute_rewrite.py': True, 'bprime_reextract.py': True}
+[dry_run_Bprime] 一 自己検査 analyze_Bprime.py       期待どおり analyze_Bprime.py v0.4 SELFTEST PASS（主の行 16・等方の外 4・二段の一致・壊した一段目の不一致・鍵の集合の不一致・組の環境・本の凍結の照らし 7・升目の二つの組の印・止めたときの段・道の違い 0）（1.0 秒）
+[dry_run_Bprime] 一 自己検査 bprime_behavior.py      期待どおり bprime_behavior.py v1.1 SELFTEST PASS（標本化の鍵 8・確かめ 9 項目・止まる例 9）（0.4 秒）
+[dry_run_Bprime] 一 自己検査 bprime_core.py          期待どおり bprime_core.py v0.2 SELFTEST PASS（14 群・床の無い形の k 61042.0・床つきの k 5.779・z₀ 1）（1.5 秒）
+[dry_run_Bprime] 一 自己検査 bprime_directions.py    期待どおり bprime_directions.py v1 SELFTEST PASS（g の一致 2.2e-16・係数の確かめ 層三の活性で 2.000000000・‖h‖ の相対の差 4.2e-08・‖v̂‖ の相対の差 4.6e-09）（0.3 秒）
+[dry_run_Bprime] 一 自己検査 bprime_external.py      期待どおり bprime_external.py v1.1 SELFTEST PASS（抜き取り 40・見せる順の先頭 SK|Onull#17・S1|O-Ncold#20・S1|Onull#2・一致 40/40 と一件違いで 39）（0.3 秒）
+[dry_run_Bprime] 一 自己検査 bprime_publish_map.py   期待どおり bprime_publish_map.py v0.2 SELFTEST PASS（例 18・作業の置き場 226 ファイル: 移す 215・移さない 11・登録者の決め 0・当たらない 0・行き先の重なり 0）（0.1 秒）
+[dry_run_Bprime] 一 自己検査 bprime_typo.py          期待どおり bprime_typo.py v0 SELFTEST PASS（12 例・冪等・ラベルと検分の印と鍵の道は触れない）（0.1 秒）
+[dry_run_Bprime] 一 自己検査 build_report_Bprime.py  期待どおり build_report_Bprime.py v0.3 SELFTEST PASS（行 390・決まった行 322・自由の文 1・外す行 6・止まるべき当たり 4 通り・読みの表の型の名 8・質量と道の違いの枝・N1 を外して続けた報告の頭の行・止まった下見の報告・要約の二か所・見分ける力の無い位置の頭の文・走行の表・
+[dry_run_Bprime] 一 自己検査 close_behavior_Bprime.p 期待どおり close_behavior_Bprime.py v0.2 SELFTEST PASS（24 項目）（46.7 秒）
+[dry_run_Bprime] 一 自己検査 freeze_Bprime.py        期待どおり freeze_Bprime.py v0.2 SELFTEST PASS（29 項目・器の閉包 43・凍結物の型 64・全体の走りは合成データの正式の確かめで見る）（4.3 秒）
+[dry_run_Bprime] 一 自己検査 g4_attempts_Bprime.py   期待どおり g4_attempts_Bprime.py v0 SELFTEST PASS（11 項目・封印の後の試みだけを数える・期限で閉じる・錠が見る・一度だけ・つながり・暦の期限）（0.4 秒）
+[dry_run_Bprime] 一 自己検査 make_frozen_Bprime.py   期待どおり make_frozen_Bprime.py v0.1 SELFTEST PASS（11 項目・止まるべき形 5）（0.6 秒）
+[dry_run_Bprime] 一 自己検査 make_predictions_form_B 期待どおり [make_predictions_form_Bprime] 自己検査 OK（欄 8・予想の欄 4）
+（0.1 秒）
+[dry_run_Bprime] 一 自己検査 publish_Bprime.py       期待どおり publish_Bprime.py v0.2 SELFTEST PASS（写す 215・二度目は写さない・中身の違う行き先で止まる・名指しで上書き・移し方の記録は一度だけ・別の名・登録者の決めの物は零）（0.7 秒）
+[dry_run_Bprime] 一 自己検査 seal_Bprime.py          期待どおり eal_Bprime] 登録者の情報状態の欄が空です（info.coi・free）。封印は止めません。登録者にお知らせします
+[seal_Bprime] 登録者の予想を写した: ../../tmp0l_4ihlo/r.json・SHA-256 3775B48C7E3D114E7F2E419CB1A4FD74C8A738
+[dry_run_Bprime] 一 自己検査 send_external_Bprime.py 期待どおり send_external_Bprime.py v0.1 SELFTEST PASS（鍵を読むが印字しない・送る本文・依頼の文を改行を訳さずに読む・--go が無ければ送らない・送る操作はしていない）（0.1 秒）
+[dry_run_Bprime] 一 自己検査 sweep_Bprime.py         期待どおり sweep_Bprime.py v0.1 SELFTEST PASS（出所の鍵 41・欠けのない合成の出力で欠け零・止まるべき形 16・止まったときと器の誤りで閉じたときの形 4）（0.6 秒）
+[dry_run_Bprime] 二 dry_bprime_behavior: case_di 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_block',
+[dry_run_Bprime] 二 dry_bprime_behavior: case_am 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': False, 'counted': False, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_block
+[dry_run_Bprime] 二 dry_bprime_behavior: case_re 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'refuse', 'cat': None, 'counted': False, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_b
+[dry_run_Bprime] 二 dry_bprime_behavior: case_re 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'b', 'cat': False, 'counted': False, 'unscorable': [], 'style_b': False, 'cls': '主', 'rule': 'scorer_bloc
+[dry_run_Bprime] 二 dry_bprime_behavior: case_in 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'b', 'cat': False, 'counted': False, 'unscorable': [], 'style_b': True, 'cls': 'V2', 'rule': 'scorer_bloc
+[dry_run_Bprime] 二 dry_bprime_behavior: case_tw 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'c', 'cat': False, 'counted': False, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_block
+[dry_run_Bprime] 二 dry_bprime_behavior: case_un 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_flat', 
+[dry_run_Bprime] 二 dry_bprime_behavior: case_tr 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': None, 'cat': None, 'counted': False, 'unscorable': ['truncated'], 'style_b': True, 'cls': '鍵なし', 'rule': 
+[dry_run_Bprime] 二 dry_bprime_behavior: case_tr 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': False, 'unscorable': ['truncated'], 'style_b': True, 'cls': '主', 'rule': 'sc
+[dry_run_Bprime] 二 dry_bprime_behavior: case_v1 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'b', 'cat': False, 'counted': False, 'unscorable': [], 'style_b': True, 'cls': 'V1', 'rule': 'scorer_flat
+[dry_run_Bprime] 二 dry_bprime_behavior: case_up 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': False, 'cls': '囲いあり候補外', 'rule': 'scorer_
+[dry_run_Bprime] 二 dry_bprime_behavior: case_ch 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': True, 'cls': '囲いあり候補外', 'rule': 'scorer_b
+[dry_run_Bprime] 二 dry_bprime_behavior: case_th 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'c', 'cat': False, 'counted': False, 'unscorable': [], 'style_b': False, 'cls': '主', 'rule': 'scorer_bloc
+[dry_run_Bprime] 二 dry_bprime_behavior: case_he 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': False, 'cls': '主', 'rule': 'scorer_block'
+[dry_run_Bprime] 二 dry_bprime_behavior: case_cl 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'b', 'cat': False, 'counted': False, 'unscorable': [], 'style_b': False, 'cls': 'V1', 'rule': 'scorer_fla
+[dry_run_Bprime] 二 dry_bprime_behavior: case_pr 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_block',
+[dry_run_Bprime] 二 dry_bprime_behavior: case_pr 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': None, 'cat': None, 'counted': False, 'unscorable': [], 'style_b': False, 'cls': '鍵なし', 'rule': 'no_key', 
+[dry_run_Bprime] 二 dry_bprime_behavior: case_nu 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'd', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_block',
+[dry_run_Bprime] 二 dry_bprime_behavior: case_nu 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'a', 'cat': True, 'counted': True, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_block',
+[dry_run_Bprime] 二 dry_bprime_behavior: case_nu 期待どおり {'round_trip': True, 'mismatch': {}, 'got': {'choice': 'refuse', 'cat': None, 'counted': False, 'unscorable': [], 'style_b': True, 'cls': '主', 'rule': 'scorer_b
+[dry_run_Bprime] 二 dry_bprime_behavior: prefix_ 期待どおり {'d': True, 'e': 'set', 'a_tok': True}
+[dry_run_Bprime] 二 dry_bprime_behavior: decode_ 期待どおり {'stop': [[11, 12], 'stop', 106], 'length': [[11, 12, 13, 14, 15, 16], 'length', None], 'short_no_stop_stops': '止める印も上限も無いのに生成が終わった（生成した長さ 3・上限 6）'}
+[dry_run_Bprime] 二 dry_bprime_behavior: cell_su 期待どおり {'catastrophe': 8, 'want': 8, 'truncated': 8}
+[dry_run_Bprime] 二 dry_bprime_behavior: cell_su 期待どおり {'error': '升目の試行の数が正本と違う: S1|O-Ncold（39）'}
+[dry_run_Bprime] 二 dry_bprime_behavior: iii_sta 期待どおり {'five': 'unscorable', 'four': 'ok', 'tool_error': 'tool_error'}
+[dry_run_Bprime] 二 dry_bprime_behavior: closing 期待どおり {'scorer_sha16': {'parser': '12EAA8B845BC0A2F', 'refuse_rules': '22625AEC81875362', 'frozen_runner_text_funcs': '9F849D2823132BA2', 'response_mode_A': 'C3E90B11
+[dry_run_Bprime] 二 dry_bprime_behavior: seeds   期待どおり {'n': 40, 'first_cell_seed': 2802933347}
+[dry_run_Bprime] 二 dry_bprime_behavior.py の全体（1 期待どおり all_pass
+[dry_run_Bprime] 二 dry_bprime: L1_measure_k_bf1 期待どおり {'k': 4.631988525390625, 'z0': 4, 'k_by_batch': {'16': 4.631988525390625, '1': 4.631988525390625}}
+[dry_run_Bprime] 二 dry_bprime: L2_correct_passe 期待どおり {'states': {'N1|O-Ncold': '合', 'S1|Onull': '合'}, 'off': {'N1|O-Ncold': 'pass', 'S1|Onull': 'pass'}, 'dbl': {'N1|O-Ncold': 'pass', 'S1|Onull': 'pass'}}
+[dry_run_Bprime] 二 dry_bprime: L3_bugs_caught   期待どおり {'states': {'double_norm': {'N1|O-Ncold': '否', 'S1|Onull': '否'}, 'no_softcap': {'N1|O-Ncold': '否', 'S1|Onull': '否'}}, 'sec': 0.1}
+[dry_run_Bprime] 二 dry_bprime: L4_norm_weight_c 期待どおり {'states': {'one_plus_weight': {'N1|O-Ncold': '否', 'S1|Onull': '否'}, 'weight_missing': {'N1|O-Ncold': '否', 'S1|Onull': '否'}}, 'norm_weight_min': 2.0, 'norm_weig
+[dry_run_Bprime] 二 dry_bprime: L_hooks_clean    期待どおり {'ours': 0, 'pre': 0, 'pre_base': 0, 'foreign': [1, 1, 1, 1, 1, 1]}
+[dry_run_Bprime] 二 dry_bprime: L5_small_values_ 期待どおり {'k': 0.09199714660644531, 'z0': 1, 'fallback': True}
+[dry_run_Bprime] 二 dry_bprime: L5_hooks_clean   期待どおり {'ours': 0, 'pre': 0, 'pre_base': 0, 'foreign': [1, 1, 1, 1, 1, 1]}
+[dry_run_Bprime] 二 dry_bprime: S1_alignment     期待どおり {'selected_layer_equal': True, 'last_layer_close': False, 'selected_layer': 2}
+[dry_run_Bprime] 二 dry_bprime: S2_layer_check_a 期待どおり {'layer_check_diff': 0.0, 'layer_tol': 0.0001, 'effect': 0.5109959493311118}
+[dry_run_Bprime] 二 dry_bprime: S3_batch_invaria 期待どおり {'max_abs': 8.725247779839407e-06, 'sec': 0.1}
+[dry_run_Bprime] 二 dry_bprime: S4_sign          期待どおり {'diff': 0.0, 'sec': 0.0}
+[dry_run_Bprime] 二 dry_bprime: S5_extraction_st 期待どおり {'max_abs_vs_hidden_states': 0.0, 'contexts': 16, 'sec': 0.7}
+[dry_run_Bprime] 二 dry_bprime: S6_directions_bu 期待どおり {'iso_rel_max': 1.5544126796798242e-16, 'check_cos_max': 0.2804218764507222, 'npz_same_bytes': True}
+[dry_run_Bprime] 二 dry_bprime: P0_chain_for_rea 期待どおり {'chain': ['TemperatureLogitsWarper', 'TopKLogitsWarper', 'TopPLogitsWarper', 'MinPLogitsWarper'], 'sec': 0.0}
+[dry_run_Bprime] 二 dry_bprime: P1_pilot_full_pa 期待どおり {'q1': '続ける', 'batch': 16, 'floor': 6.405816527443875e-06}
+[dry_run_Bprime] 二 dry_bprime: P2_pilot_contrac 期待どおり {'q1': '止める', 'n_pass': 0, 'dropped_n': 8}
+[dry_run_Bprime] 二 dry_bprime: P3_pilot_behavio 期待どおり {'iii_tool_error': {'fail': 'tool_error', 'sentence_key': None, 'n': 8, 'dropped_n': 0}, 'iii_unscorable': {'fail': 'unscorable', 'sentence_key': None, 'n': 8, 
+[dry_run_Bprime] 二 dry_bprime: P4_pilot_behavio 期待どおり {'bad_status': "ToolError: 行動の下見の状態が決まりの外: 'closed?'", 'missing_rate': 'ToolError: 行動の下見の率が欠けた升目がある（閉じた記録と升目の鍵を照らす）', 'sec': 2.5}
+[dry_run_Bprime] 二 dry_bprime: M1_cell_sign_set 期待どおり {'main': 12, 'reverse': 4, 'overlap': []}
+[dry_run_Bprime] 二 dry_bprime: M2_main_phase    期待どおり {'n_combos': 16, 'effects_per_combo': [28, 35], 'head_states': {'N1|O-Ncold': '合', 'N1|Onull': '合', 'S1|O-Ncold': '合', 'S1|Onull': '合', 'S4|O-Ncold': '合', 'S4|O
+[dry_run_Bprime] 二 dry_bprime: M3_batch1_and_pa 期待どおり {'max_abs_batch1_vs_batch16': 3.023874829510831e-05, 'max_abs_override_vs_main16': 0.0, 'sec': 12.1}
+[dry_run_Bprime] 二 dry_bprime: M4_recompute_hoo 期待どおり {'max_abs': 4.8504742022892344e-06, 'n': 4, 'sec': 0.1}
+[dry_run_Bprime] 二 dry_bprime: SPM_hooks_clean  期待どおり {'ours': 0, 'pre': 0, 'pre_base': 0, 'foreign': [1, 1, 1, 1, 1, 1]}
+[dry_run_Bprime] 二 dry_bprime: G1_resolved_conf 期待どおり {'chain': [['TemperatureLogitsWarper', {'temperature': 0.7}], ['TopKLogitsWarper', {'min_tokens_to_keep': 1, 'top_k': 20}], ['TopPLogitsWarper', {'min_tokens_to
+[dry_run_Bprime] 二 dry_bprime: G2_chain_equals_ 期待どおり {'processed_equal_call': True, 'processed_equal_abort_chain': True, 'chain_desc_equal': True}
+[dry_run_Bprime] 二 dry_bprime: G3_transformed_v 期待どおり {'N': 4000, 'kept': 8, 'a_rank': 3}
+[dry_run_Bprime] 二 dry_bprime: G4_foreign_stop_ 期待どおり {'cases': {'without_turn_end': {'eos': [1, 50], 'error': 'ToolError: 止める印が正本（Gemma の generation_config.json の値）と違う: [1, 50]（正本 [1, 106, 50]）'}, 'synthetic_forei
+[dry_run_Bprime] 二 dry_bprime: G5_forgotten_top 期待どおり {'resolved_top_k': 64, 'error': 'ToolError: generate に実際に渡った標本化の値が正本と違う: top_k=64（正本 20）', 'sec': 0.0}
+[dry_run_Bprime] 二 dry_bprime: G6_wrappers_remo 期待どおり {'exception_inside': "ValueError: The following `model_kwargs` are not used by the model: ['not_a_generation_key'] (note: typos in the generate arguments will a
+[dry_run_Bprime] 二 dry_bprime: G_hooks_clean    期待どおり {'ours': 0, 'pre': 0, 'pre_base': 0, 'foreign': [1, 1, 1, 1, 1, 1]}
+[dry_run_Bprime] 二 dry_bprime.py の全体（126.1 秒）   期待どおり all_pass
+[dry_run_Bprime] 三 bprime_recompute_rewrite.py  期待どおり [ok] [bfloat16] 層ごとの入力（8）と layer_scalar（0.719・0.918…）のある変種でも、手回しの道の最終の正規化の入力が模型の forward と一致（ビット単位） / selftest: 82/82 ok / 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（ま
+[dry_run_Bprime] 三 bprime_recompute_rewrite.py  期待どおり （正本 independent_recompute.agreement の札の一致〔Holm の判定・裾・等方の外の行の側・二つ目の札〕は、この器では見ていない） / dry: 二つの型とも一段目の許容の内 / 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用して
+[dry_run_Bprime] 三 bprime_reextract.py --selfte 期待どおり [ok] [bfloat16] dirs に名前のある方向が無ければ止まる / selftest: 23/23 ok / 柵: 本器のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。（19.2 秒）
+[dry_run_Bprime] 三 bprime_reextract.py --dry    期待どおり [参考] [bfloat16] 十六文脈: reextract_all の名前のある方向の余弦の最小 1.000000000000・‖v̂‖ の相対の差 0・‖h‖ の相対の差の最大 0（dirs はコーディネータの器の値からこの器の式で作った・判定に入れない） / dry: 二つの型とも再抽出の許容の内 / 柵: 本
+[dry_run_Bprime] 四 相 check（DRY）                 期待どおり 項目 17・通らなかった ['model_facts']
+[dry_run_Bprime] 四 小さな模型の層の出力の倍率が 1 から離れている（U45 期待どおり 倍率 [0.965, 0.734, 0.953, 1.086, 0.91, 0.629]
+[dry_run_Bprime] 四 出口の値の大きさ（U46）                期待どおり 語彙の行列 4 倍の最大 7.41（softcap の抜けの見込みの差 0.1566）・40.0 倍の最大 29.94（差 73.37）・cap 30.0・一段目の許容 0.001・測った k 0.00018310546875 での自己検査の見分けの下限 0.23（最大は語彙の全体の値で、読み取りの集合の行の値はこれよ
+[dry_run_Bprime] 四 相 extract（start と run）       期待どおり npz 0621AB9A178B8F45
+[dry_run_Bprime] 四 抽出の記録の確かめ（g との一致ほか）          期待どおり {'g_match': True, 'norms_finite_nonzero': True, 'dim_match': True, 'no_readout': True, 'coefficient_checks': True}
+[dry_run_Bprime] 四 抽出の記録の形の項目（通る形・二つの起動の記録・六つの落 期待どおり {'通る形': True, '二つの起動の記録（器の誤りの記録と台帳のやり直しの行あり）は通る': True, '項目 1 の落ちる形': True, '項目 2 の落ちる形': True, '項目 3 の落ちる形': True, '項目 4 の落ちる形': True, '項目 5 の落ちる形': True, '項目 
+[dry_run_Bprime] 四 相 behavior（生成と採点・76.9 秒）     期待どおり 
+[dry_run_Bprime] 四 行動の下見を閉じた（合成の返事）             期待どおり iii unscorable
+[dry_run_Bprime] 四 相 pilot（22.6 秒）              期待どおり 決定 続ける・バッチ 16
+[dry_run_Bprime] 四 閉じた記録が起動の記録と違えば相 pilot が止まる（ 期待どおり BCC68E3931F6791919505E1ED22E0C6F8CC18FA55'}
+[boot_bprime] 止める（登録者に相談）: 行動の下見の閉じた記録の照らしが外れた（正本 `behavior_pilot.order`「その記録の SHA を確かめてから進む」・U12）: ['起動の記録の SHA16']
+[dry_run_Bprime] 四 相 main の組 main（23.5 秒）       期待どおり 
+[dry_run_Bprime] 四 相 recompute の組 hook（25.9 秒）  期待どおり 
+[dry_run_Bprime] 四 相 recompute の組 rewrite（23.6  期待どおり 
+[dry_run_Bprime] 四 相 recompute の組 reextract（14. 期待どおり 
+[dry_run_Bprime] 四 一致だけを見る段                     期待どおり [analyze_Bprime] 一致だけを見る段: 一致 True（一段目 True・二段目 True・再抽出 True）・理由 None
+[dry_run_Bprime] 四 結果を開く段                       期待どおり [analyze_Bprime] 結果を開く段: 書いた analysis.json（SHA16 EE41038C42CD043C）
+[dry_run_Bprime] 四 掃き出し（欠け零）                    期待どおり [sweep_Bprime] 欠け 0
+[dry_run_Bprime] 四 集計の出力の枝の形（バッチ・外した升目・道の違い）    期待どおり {'batch': 16, 'dropped': [], 'N1 の行': 4, '道の違い': None}
+[dry_run_Bprime] 四 報告の組み立てと走査（当たり零）             期待どおり 行 425・当たり []・nuclear の族の行の節 []・道の違いの行 0・器の誤りの行 なし（期待 なし）
+[dry_run_Bprime] 四 判定の後の差し替えで結果を開く段が止まる         期待どおり 結果を開く段の出力が、一致だけを見る段の読んだ出力と違う（開かない）
+[dry_run_Bprime] 四 〔N1 を外す〕写しの下見の決定             期待どおり {'q1': '一部の升目を外して続ける', 'n_pass': 6, 'n_main': 8, 'dropped': ['N1|O-Ncold', 'N1|Onull'], 'stop': False, 'reason': None}
+[dry_run_Bprime] 四 〔N1 を外す〕相 main の組 main（21.5  期待どおり 
+[dry_run_Bprime] 四 〔N1 を外す〕相 recompute の組 hook（ 期待どおり 
+[dry_run_Bprime] 四 〔N1 を外す〕相 recompute の組 rewri 期待どおり 
+[dry_run_Bprime] 四 〔N1 を外す〕相 recompute の組 reext 期待どおり 
+[dry_run_Bprime] 四 〔N1 を外す〕一致だけを見る段             期待どおり [analyze_Bprime] 一致だけを見る段: 一致 True（一段目 True・二段目 True・再抽出 True）・理由 None
+[dry_run_Bprime] 四 〔N1 を外す〕結果を開く段               期待どおり [analyze_Bprime] 結果を開く段: 書いた analysis.json（SHA16 A72B8E804399C71A）
+[dry_run_Bprime] 四 〔N1 を外す〕掃き出し（欠け零）            期待どおり [sweep_Bprime] 欠け 0
+[dry_run_Bprime] 四 〔N1 を外す〕集計の出力の枝の形（バッチ・外した升目・ 期待どおり {'batch': 16, 'dropped': ['N1|O-Ncold', 'N1|Onull'], 'N1 の行': 0, '道の違い': None}
+[dry_run_Bprime] 四 〔N1 を外す〕報告の組み立てと走査（当たり零）     期待どおり 行 401・当たり []・nuclear の族の行の節 ['summary', 'pilot']・道の違いの行 0・器の誤りの行 なし（期待 なし）
+[dry_run_Bprime] 四 〔バッチ一〕写しの (vi) の決定           期待どおり {'stop': False, 'batch': 1, 'floor': 0.0, 'spread_a': 0.1, 'spread_b': 0.0}
+[dry_run_Bprime] 四 〔バッチ一〕相 main の組 main（31.8 秒） 期待どおり 
+[dry_run_Bprime] 四 〔バッチ一〕相 main の組 pathdiff（22. 期待どおり 
+[dry_run_Bprime] 四 〔バッチ一〕相 recompute の組 hook（25 期待どおり 
+[dry_run_Bprime] 四 〔バッチ一〕相 recompute の組 rewrite 期待どおり 
+[dry_run_Bprime] 四 〔バッチ一〕相 recompute の組 reextra 期待どおり 
+[dry_run_Bprime] 四 〔バッチ一〕一致だけを見る段               期待どおり [analyze_Bprime] 一致だけを見る段: 一致 True（一段目 True・二段目 True・再抽出 True）・理由 None
+[dry_run_Bprime] 四 〔バッチ一〕結果を開く段                 期待どおり [analyze_Bprime] 結果を開く段: 書いた analysis.json（SHA16 C9A2DF3311273A87）
+[dry_run_Bprime] 四 〔バッチ一〕掃き出し（欠け零）              期待どおり [sweep_Bprime] 欠け 0
+[dry_run_Bprime] 四 〔バッチ一〕集計の出力の枝の形（バッチ・外した升目・道の 期待どおり {'batch': 1, 'dropped': [], 'N1 の行': 4, '道の違い': True}
+[dry_run_Bprime] 四 〔バッチ一〕報告の組み立てと走査（当たり零）       期待どおり 行 426・当たり []・nuclear の族の行の節 []・道の違いの行 1・器の誤りの行 なし（期待 なし）
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕閉じた記録（系統外の採点が 期待どおり 系統外の模型による採点ができなかった（行動の下見が器の誤りで終わった）
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕相 pilot       期待どおり (iii) tool_error
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕相 main の組 mai 期待どおり 
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕相 recompute の 期待どおり 
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕相 recompute の 期待どおり 
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕相 recompute の 期待どおり 
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕一致だけを見る段      期待どおり [analyze_Bprime] 一致だけを見る段: 一致 True（一段目 True・二段目 True・再抽出 True）・理由 None
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕結果を開く段        期待どおり [analyze_Bprime] 結果を開く段: 書いた analysis.json（SHA16 B44ED67CE439302D）
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕掃き出し（欠け零）     期待どおり [sweep_Bprime] 欠け 0
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕集計の出力の枝の形（バッチ 期待どおり {'batch': 16, 'dropped': [], 'N1 の行': 4, '道の違い': None}
+[dry_run_Bprime] 四 〔器の誤りで閉じた行動の下見〕報告の組み立てと走査（当た 期待どおり 行 399・当たり []・nuclear の族の行の節 []・道の違いの行 0・器の誤りの行 あり（期待 あり）
+[dry_run_Bprime] 四 〔出口の値を大きく〕相 extract（同じ模型で抽出の 期待どおり 
+[dry_run_Bprime] 四 〔出口の値を大きく〕相 main の組 main（22. 期待どおり 
+[dry_run_Bprime] 四 〔出口の値を大きく〕相 recompute の組 hoo 期待どおり 
+[dry_run_Bprime] 四 〔出口の値を大きく〕相 recompute の組 rew 期待どおり 
+[dry_run_Bprime] 四 〔出口の値を大きく〕相 recompute の組 ree 期待どおり 
+[dry_run_Bprime] 四 〔出口の値を大きく〕一致だけを見る段           期待どおり [analyze_Bprime] 一致だけを見る段: 一致 True（一段目 True・二段目 True・再抽出 True）・理由 None
+[dry_run_Bprime] 四 〔出口の値を大きく〕結果を開く段             期待どおり [analyze_Bprime] 結果を開く段: 書いた analysis.json（SHA16 05EAFD28479C31B7）
+[dry_run_Bprime] 四 〔出口の値を大きく〕掃き出し（欠け零）          期待どおり [sweep_Bprime] 欠け 0
+[dry_run_Bprime] 四 〔出口の値を大きく〕集計の出力の枝の形（バッチ・外した升 期待どおり {'batch': 16, 'dropped': [], 'N1 の行': 4, '道の違い': None}
+[dry_run_Bprime] 四 〔出口の値を大きく〕報告の組み立てと走査（当たり零）   期待どおり 行 423・当たり []・nuclear の族の行の節 []・道の違いの行 0・器の誤りの行 なし（期待 なし）
+[dry_run_Bprime] 〇 走りの始めと終わりで器と正本と台帳の SHA16 が同じ 期待どおり 
+[dry_run_Bprime] 〇 別の個体の二つの器が作業の置き場と公開の形で同じバイト（ 期待どおり {'bprime_recompute_rewrite.py': True, 'bprime_reextract.py': True}
+[dry_run_Bprime] 147 のうち 147 が期待どおり・記録 records/Bprime/dry-run-Bprime-2026-09-30.md
+[dry_run_Bprime] 五 公開の形の git の置き場               期待どおり 78e96d405b0c
+[dry_run_Bprime] 五 凍結の本文を組む                     期待どおり [make_frozen_Bprime] design/design-Bprime-FROZEN.md（SHA16 A7D17D55DB3D596C）・records/Bprime/numbers-lint-FROZEN-Bprime.md・records/Bprime/frozen-diff-Bprime.md
+[dry_run_Bprime] 五 予想の書式を組む                     期待どおり [make_predictions_form_Bprime] records/predictions/predictions-form-Bprime-v1.html（欄 8・予想の欄 4）
+[dry_run_Bprime] 五 下見の前の凍結（合成の Colab の確かめ・凍結の器の 期待どおり on": "highest",
+   "attn_implementation": "sdpa"
+  },
+  "attn_implementation": "sdpa",
+  "pins": {
+   "transformers": "5.16.1",
+   "torch": "2.11.0+cu128",
+   "
+[dry_run_Bprime] 五 封印（合成の予想・コーディネータが先）          期待どおり [seal_Bprime] コーディネータの予想を封印した: records/predictions/predictions-Bprime-coordinator.json・SHA-256 3E15F906FBA53BD8C4469220B891A2AB8C16D1E31DF1272F7A24E689B863A7C0（
+[dry_run_Bprime] 五 錠が通る（相 extract）              期待どおり 
+[dry_run_Bprime] 五 錠が止まる（凍結物の SHA16 の違い）        期待どおり 
+[dry_run_Bprime] 五 錠が止まる（台帳のつながらない差分）           期待どおり 
+[dry_run_Bprime] 五 錠が止まる（予想の SHA の違い）           期待どおり 
+[dry_run_Bprime] 五 錠が止まる（暦の期限・今の時刻を与える口）        期待どおり 
+[dry_run_Bprime] 五 錠が止まる（本の凍結が無い）               期待どおり 
+[dry_run_Bprime] 五 錠が止まる（閉じた記録・U16）             期待どおり 
+[dry_run_Bprime] 五 相 extract（等方 1999・起動の記録と出力の  期待どおり 
+[dry_run_Bprime] 五 相 behavior と閉じた記録（系統外の採点は合成の 期待どおり 
+[dry_run_Bprime] 五 相 pilot（閉じた記録を照らして進む・22.1 秒） 期待どおり 
+[dry_run_Bprime] 五 本の凍結（DRY でない形の写しの下見の出力・0.9 秒 期待どおり 13D555225AB",
+  "predictions_sha256": {
+   "coordinator": "3E15F906FBA53BD8C4469220B891A2AB8C16D1E31DF1272F7A24E689B863A7C0",
+   "registrant": "2127304B0BC1FFB3
+[dry_run_Bprime] 五 錠が通る（相 main・本の凍結の節の SHA16）   期待どおり 
+[dry_run_Bprime] 五 錠が止まる（本の凍結の節の書き換え・U10）       期待どおり 
+[dry_run_Bprime] 五 相 main の組 main（等方 1999・327.7 期待どおり 
+[dry_run_Bprime] 五 相 recompute の組 hook（等方 1999・ 期待どおり 
+[dry_run_Bprime] 五 相 recompute の組 rewrite（等方 19 期待どおり 
+[dry_run_Bprime] 五 相 recompute の組 reextract（等方  期待どおり 
+[dry_run_Bprime] 五 組ごとに違うコミット（集計は中身で照らす・U08）    期待どおり ['0ad8524be1dc', 'daf15ad95b97', 'f2c765a87720', '3069cfdeb96a']
+[dry_run_Bprime] 五 一致だけを見る段（DRY でない枝・--freeze・錠 期待どおり [analyze_Bprime] 一致だけを見る段: 一致 True（一段目 True・二段目 True・再抽出 True）・理由 None
+[dry_run_Bprime] 五 結果を開く段（DRY でない枝・走行の表を照らす・U04 期待どおり [analyze_Bprime] 結果を開く段: 書いた analysis-Bprime.json（SHA16 5F7EABF1D4FA1F4A）
+[dry_run_Bprime] 五 報告の本番の入口（錠・走行の表を読み直して照らす・走査の 期待どおり [build_report_Bprime] 書いた results-Bprime.md（行 435・走査の当たり 0）
+[dry_run_Bprime] 五 書き換えの記録（DRY でない形にした写し・合成の値）  期待どおり extract : session の dry を偽に・commit を d5fba9178812 に・behavior : session の dry を偽に・commit を 120745e38883 に・pilot: 升目の質量と確率を正本の門を満たす合成の値に・(i)(ii) と決定とバッチを凍結の芯で出し直し
+[dry_run_Bprime] 五: 27 のうち 27 が期待どおり・記録 records/Bprime/freeze-path-dry-Bprime-2026-09-30.md
+[dry_worker_colab] dry_run_Bprime の終わり rc=0（2399 秒）

@@ -1,0 +1,86 @@
+{
+ "kind": "bprime_impl_grok_message",
+ "builder": "build_grok_message.py v0",
+ "contract_version": "draft10-v4-2026-09-30",
+ "public_version": "0a456884810681127b6b051da76cd3913cd14f59",
+ "message_sha16": "8648D069006B6230",
+ "message_chars": 282080,
+ "materials": [
+  {
+   "title": "1. 別の個体への指示（書き換えの道と再抽出の道の書き手が受けた指示の全文）",
+   "origin": "作業の置き場 `tools/independent/instructions-rewrite-reextract-Bprime.txt`",
+   "sha16": "4F41E5948F86EBE3",
+   "chars": 9308
+  },
+  {
+   "title": "2. 正本の関わる節（`design/contrasts-Bprime.json`・版 draft10-v4-2026-09-30 の中の鍵 independent_recompute・layers・readout・directions・coefficient・nulls・computation・main_rows・cells_main・cell_signs_main・labels・pilot と inputs.model_facts・inputs.versions）",
+   "origin": "作業の置き場 `design/contrasts-Bprime.json`（全体の SHA16 45543569DDCDF0F3）",
+   "sha16": "B780AA8F6C696A27",
+   "chars": 32994
+  },
+  {
+   "title": "3. `tools/bprime_run.py`（フックの道・読み取り・本の計算の行）",
+   "origin": "作業の置き場 `tools/bprime_run.py`",
+   "sha16": "536C981D3698C2C7",
+   "chars": 26201
+  },
+  {
+   "title": "4. `tools/independent/bprime_recompute_rewrite.py`（書き換えの道（別の個体））",
+   "origin": "作業の置き場 `tools/independent/bprime_recompute_rewrite.py`",
+   "sha16": "DF0833637E5755D8",
+   "chars": 55434
+  },
+  {
+   "title": "5. `tools/independent/bprime_reextract.py`（再抽出の道（別の個体））",
+   "origin": "作業の置き場 `tools/independent/bprime_reextract.py`",
+   "sha16": "AEF215AA0F577E45",
+   "chars": 24001
+  },
+  {
+   "title": "6. `tools/bprime_directions.py`（本の抽出）",
+   "origin": "作業の置き場 `tools/bprime_directions.py`",
+   "sha16": "8D999D06A7773343",
+   "chars": 12174
+  },
+  {
+   "title": "7. `tools/bprime_gemma.py`（模型の助け（層の添字・設定の読み））",
+   "origin": "作業の置き場 `tools/bprime_gemma.py`",
+   "sha16": "700EB39D6510C9C1",
+   "chars": 4232
+  },
+  {
+   "title": "8. `tools/bprime_phases.py`（相の計算（本の計算の組・抽出））",
+   "origin": "作業の置き場 `tools/bprime_phases.py`",
+   "sha16": "11106F052687C333",
+   "chars": 27342
+  },
+  {
+   "title": "9. `tools/colab/boot_bprime.py`（起動器（相 recompute の三つの組の呼び方））",
+   "origin": "作業の置き場 `tools/colab/boot_bprime.py`",
+   "sha16": "2D332F457D1E8733",
+   "chars": 28493
+  },
+  {
+   "title": "10. `tools/analyze_Bprime.py`（集計（一致の判定））",
+   "origin": "作業の置き場 `tools/analyze_Bprime.py`",
+   "sha16": "CD88EAE2A592E8FF",
+   "chars": 31799
+  },
+  {
+   "title": "11. 凍結の芯 `bl3_core.py` の関わる関数（p_and_tail・holm・comparators_for・cache_tol・agreement・recompute_set）",
+   "origin": "公開の置き場の決めた版 `0a456884810681127b6b051da76cd3913cd14f59` の `tools/bl3_core.py`（全体の SHA16 E8CD3A24950F8581）",
+   "sha16": "DD076B4DDD9495C1",
+   "chars": 3370
+  },
+  {
+   "title": "12. transformers 5.16.1 の Gemma 4 の実装の抜き書き（Gemma4RMSNorm・Gemma4TextDecoderLayer・Gemma4TextScaledWordEmbedding・Gemma4TextModel・Gemma4ForConditionalGeneration.forward・Apache-2.0）",
+   "origin": "手元の固定の版の transformers `transformers/models/gemma4/modeling_gemma4.py`（全体の SHA16 3F6A049B83B79BE6）",
+   "sha16": "AD5DB34414669DDA",
+   "chars": 22090
+  }
+ ],
+ "excluded": [
+  "別の個体の開発の記録（本人の読みの申告に引かれないように）"
+ ],
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

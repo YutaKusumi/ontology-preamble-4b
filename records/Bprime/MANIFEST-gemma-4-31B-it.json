@@ -1,0 +1,66 @@
+{
+ "kind": "bprime_weights_manifest",
+ "version": "v0",
+ "repo": "google/gemma-4-31B-it",
+ "revision": "842da3794eaa0b77d5f08bae87a17459d91ff475",
+ "files": {
+  "chat_template.jinja": {
+   "bytes": 18683,
+   "sha256": "AE53464BF3BE25802B3A5B37DEF7FD89667067D7577049B3B2D74C4D8DE4C6D4",
+   "source": "local"
+  },
+  "config.json": {
+   "bytes": 4621,
+   "sha256": "E967DD38BC5CFD38BD09A995A7BF4A754075DF2B46ABA68F7FBB5A791E6D8DD1",
+   "source": "local"
+  },
+  "generation_config.json": {
+   "bytes": 208,
+   "sha256": "D4226BBE3117D2D253BA4609720BA82C6C4CE4627A9A6AE05387C78983AC03DE",
+   "source": "local"
+  },
+  "model.safetensors.index.json": {
+   "bytes": 120246,
+   "sha256": "D4AFF3B976D69C123A29D1C085D7BA4DE1AC3F4CA1726A7F81E1B11462A64EA2",
+   "source": "local"
+  },
+  "processor_config.json": {
+   "bytes": 1689,
+   "sha256": "32BDF45D2AD4CC29A0822DDD157A182DE76644F0419A6228D151495256E9813C",
+   "source": "local"
+  },
+  "tokenizer.json": {
+   "bytes": 32169626,
+   "sha256": "CC8D3A0CE36466CCC1278BF987DF5F71DB1719B9CA6B4118264F45CB627BFE0F",
+   "source": "local"
+  },
+  "tokenizer_config.json": {
+   "bytes": 3082,
+   "sha256": "9F4FEC4B1DC6ECDDF8F4A92E9CAEA5971C0E67D81309F3F9066A2BEE8C362633",
+   "source": "local"
+  },
+  "model-00001-of-00002.safetensors": {
+   "bytes": 49784788364,
+   "sha256": "EEEF8791537BC04F110967C513149E037D2A9AE97D49ADD7291EBFA62806BBFA",
+   "source": "hf_lfs"
+  },
+  "model-00002-of-00002.safetensors": {
+   "bytes": 12761549884,
+   "sha256": "018912220F559F7025D60333E0996183CD538AA77AD6F4988A89CE47BE681F10",
+   "source": "hf_lfs"
+  }
+ },
+ "index_shards": [
+  "model-00001-of-00002.safetensors",
+  "model-00002-of-00002.safetensors"
+ ],
+ "n_shards": 2,
+ "bytes_shards": 62546338248,
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。",
+ "source": {
+  "local_manifest_sha16": "81167B5E82444437",
+  "index_sha16": "D4AFF3B976D69C12",
+  "hf_metadata": "HfApi.model_info(files_metadata=True)・2026-09-30T05:36:07Z",
+  "hf_revision_seen": "842da3794eaa0b77d5f08bae87a17459d91ff475"
+ }
+}

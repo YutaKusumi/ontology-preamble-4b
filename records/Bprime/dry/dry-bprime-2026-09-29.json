@@ -1,0 +1,67 @@
+{
+ "meta": {
+  "version": {
+   "dry_bprime": "v0",
+   "bprime_run": "v0",
+   "bprime_gemma": "v0.1"
+  },
+  "transformers": "5.16.1",
+  "torch": "2.9.1+cpu",
+  "config_sha16": "E967DD38BC5CFD38",
+  "n_layers_tiny": 6,
+  "layer_index_rule": "direction_B.layer_index(0.5, n)",
+  "selected_layer": 2,
+  "prompt_len": 24,
+  "prefix_len": 4,
+  "set_letters": [
+   "a",
+   "b",
+   "c",
+   "d"
+  ],
+  "softcap": 30.0,
+  "main_position_token": "<channel|>"
+ },
+ "tests": {
+  "T1_logit_check_correct": {
+   "pass": true,
+   "max_abs": 0.0
+  },
+  "T2_layer_check_correct": {
+   "pass": true,
+   "diff": 0.0
+  },
+  "T3_double_norm_caught": {
+   "pass": true,
+   "max_abs": 2.5726680755615234
+  },
+  "T4_no_softcap_caught": {
+   "pass": true,
+   "max_abs": 0.2797689437866211
+  },
+  "T5_alignment": {
+   "pass": true,
+   "selected_layer_match": true,
+   "last_layer_match": false
+  },
+  "T6_next_layer_differs": {
+   "pass": true,
+   "effect_correct": 7.339476488469522,
+   "effect_next_layer": 6.2004612564733375
+  },
+  "T7_batch_invariance": {
+   "pass": true,
+   "max_abs": 1.4305032323136402e-06
+  },
+  "T8_sign": {
+   "pass": true,
+   "diff": 0.0
+  },
+  "T9_no_hooks_left": {
+   "pass": true,
+   "ours_left": 0,
+   "foreign_per_layer": "1・1・1・1・1・1"
+  }
+ },
+ "all_pass": true
+}

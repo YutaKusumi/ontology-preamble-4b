@@ -1,0 +1,14 @@
+rows 80000 | |z| max 9.88 | median 1.547
+bin | n | max diff | median diff | max diff/ulp(|z|)
+[0,0.01) | 237 | 0.01545 | 0.00263 | 23139.0
+[0.01,0.1) | 2501 | 0.01554 | 0.00267 | 184.0
+[0.1,1) | 24214 | 0.01830 | 0.00291 | 30.2
+[1,2) | 22370 | 0.02201 | 0.00344 | 2.8
+[2,4) | 24047 | 0.04384 | 0.00582 | 2.8
+[4,8) | 6580 | 0.04992 | 0.00974 | 1.6
+[8,16) | 51 | 0.08822 | 0.02609 | 1.4
+z0=0 | k=46278.00 | tol at |z|=20: 5784.750 | rows usable for off-check: 0 | top z_on among usable: -
+z0=1 | k=5.63 | tol at |z|=20: 0.704 | rows usable for off-check: 0 | top z_on among usable: -
+z0=2 | k=5.61 | tol at |z|=20: 0.702 | rows usable for off-check: 0 | top z_on among usable: -
+z0=4 | k=3.20 | tol at |z|=20: 0.399 | rows usable for off-check: 0 | top z_on among usable: -
+z0=8 | k=2.82 | tol at |z|=20: 0.353 | rows usable for off-check: 0 | top z_on among usable: -

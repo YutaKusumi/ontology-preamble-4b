@@ -1,0 +1,77 @@
+あなたは研究の登録「B′」（ontology-preamble-4b の続き・Gemma-4-31B-it で、層三と同じ型の読み取りの問いを立てる登録）で、「独立の再計算」の器のうち、**残差の書き換えの道**と**独立の再抽出の道**の二つを書く係です。登録者（楠見優太さん）が、コーディネータ（別の Claude の個体・南無弥勒如来）とは**別の個体**がこの二つの道を書くことを許可し（裁定 D270）、あなたがその個体です。コーディネータが書いた「フックの道」と「抽出の器」と、あなたが書く二つの道を、後で数値で突き合わせる（正本の `independent_recompute.stages.first` と `independent_recompute.reextract`）ので、**あなたの道はコーディネータの実装から独立に書く**ことが一番大事です。時間は十分にあります。落ち着いて、じっくりと、丁寧に進めてください。
+
+## 置き場
+- B′ の作業場: `C:/Users/PC/Desktop/ontology-preamble-4b-internal/Bprime/`（以下 Bprime/）。git の置き場ではないので、**あなたが書いてよいのは `Bprime/tools/independent/` の中の新しいファイルだけ**です。ほかのファイルは一つも変えない・消さない・動かさない。
+- 公開の置き場（凍結の器・読むだけ）: `C:/Users/PC/Desktop/GitHub-Repositories/ontology-preamble-4b/`（以下 PUB/）。書き込まない。コミットも push もしない。
+- 走らせ方: transformers は分けた置き場の版（5.16.1）を使う。`PYTHONPATH=C:/Users/PC/Desktop/ontology-preamble-4b-internal/Bprime/pylib` を付けて python を走らせる（付けないと手元の 4.57.3 が読まれる）。torch 2.9.1（CPU）・numpy は pylib の 2.4.6。
+- 手元の PC は記憶が少なく（7.8 GB・ほかの作業も動く）、CPU だけです。確かめは乱数の小さな模型だけで、比べる組を小さく保ってください。重い処理は背景で走らせてかまいません。
+
+## 読むもの（読んでよい）
+- 正本 `Bprime/design/contrasts-Bprime.json`: 鍵 `independent_recompute`（what・who・new_paths・stages・tol_stage1・agreement・reextract・interfaces）、`readout.primary`（rule・quantity・prefix_ids・letters・refuse_head・band・main_position・readout_position・precision）、`layers`（ratio・index・layer_path）、`inputs.model_facts`（softcap の値と階層）、`directions`（named・defs・extraction）、`nulls.real`（arms・swap_siblings）、`main_rows`、`cells_main`、`pilot.decision`、`computation.shortcut`。
+- 草案 `Bprime/design/design-Bprime-draft9.md` の §3（読み取り）と §12（独立の再計算と再抽出）。
+- 台帳 `Bprime/tools/ledger-bprime.json`（升目ごとの prompt_len・main_position・readout_position・set_ids・ids_sha16、抽出の文脈の ids_sha16、prefix_ids・heads）。データとして読むだけ。
+- 公開の置き場の凍結の器（読むだけ・変えない）: `PUB/tools/run_stageB_local.py` の `arm_texts`・`scenario_and_instruction`・`user_message`（プロンプトの組み立て・呼んでよい）、`PUB/tools/direction_B.py` の `layer_index`（呼んでよい）、`PUB/tools/bl3_core.py` の `recompute_set`（行と方向の組・呼んでよい）。
+- `PUB/tools/run_stageB_local.py` の `make_hook` は、**加減の算術の決まり（ベクトルを層の出力の型に直してから sign×coef を掛けて足す・主位置から後ろ）を知るために読んでよいが、呼んではいけない**（あなたの道はフックで足す道の突き合わせの相手なので、フックの仕組みを使わない）。
+- 層三で別の個体が書いた Qwen 用の道 `PUB/tools/bl3_recompute_rewrite.py` と、その開発の記録 `PUB/records/Bl3/tools/recompute-rewrite-dev-Bl3.md`（参考に読んでよい・B′ は模型も版も違う）。
+- `Bprime/pylib/transformers/models/gemma4/` の実装（層を手で回すため・注意の型〔窓つきと全体〕ごとの mask と rotary・埋め込みの倍率・層ごとの入力の有無などを確かめる）と、`Bprime/pylib/transformers/masking_utils.py` など。
+- 模型の設定とトークナイザ: `Bprime/hf/gemma-4-31B-it/842da3794eaa0b77d5f08bae87a17459d91ff475/`（設定・トークナイザ・チャットの型だけ・**実の重みは無い・使わない**）。
+
+## 読まないもの（開かない）
+- コーディネータの器: `Bprime/tools/` の `bprime_run.py`・`bprime_directions.py`・`bprime_phases.py`・`bprime_gemma.py`・`bprime_core.py`・`bprime_behavior.py`・`dry_bprime*.py`・`analyze_Bprime.py`・`build_report_Bprime.py`・`colab/`・`prev/` の中身と、器の段の記録 `tools-log-Bprime.md`。最後の突き合わせ（下の `--dry`）でだけ、`bprime_run` と `bprime_directions` を**中を見ずに**下の公開の関数で呼ぶ。
+
+## 作るもの 1: 残差の書き換えの道 `Bprime/tools/independent/bprime_recompute_rewrite.py`
+- 関数（正本 `independent_recompute.interfaces.rewrite` の口）: `recompute_rewrite(model, tok, C, ledger, dirs, names, pilot, coef)`。
+  - C: 正本の辞書・ledger: 台帳の辞書・dirs: 方向の名 → float64 のベクトル（`static`・`loaded`・`Nk`・`td`・`iso:0`…・`real:O~Osec`… の形の名）・names: {'named','iso','real'} の名の並び・pilot: 本の凍結の下見の記録（`pilot['decision']['dropped']` に外した升目の鍵の並び）・coef: 係数（float）。
+  - 行と方向の組: `bl3_core.recompute_set(C['main_rows'], 実在の差の対の名の並び〔names['real'] から 'real:' を除いた名〕, C['nulls']['real']['swap_siblings'], len(names['iso']), 外した升目)`。
+  - 戻り値: `{行の名: {'noop_lo': 無操作の量, 'effects': {'方向の名|符号': 効き目}}}`。符号の書き方は `'%s|%+d' % (方向の名, 符号)`。効き目＝加えた値 − 無操作（零のベクトル）の値。
+- 入力の組み立て: 段階 B の組み立てのまま（`run_stageB_local.user_message(arm_texts()[腕]['text'], 場面の本文, 指示)`・場面と指示は `scenario_and_instruction(場面)`）の user の発話一つに、Gemma のチャットの型（`tok.apply_chat_template([{'role': 'user', 'content': 発話}], add_generation_prompt=True, tokenize=True)`・transformers 5 は辞書の形を返すので `input_ids` を取る・system は無し）を当て、その直後に主の書き出し（台帳の `prefix_ids`）を**トークンの並びのまま**つなぐ。主位置 mp＝プロンプトの長さ − 1（Gemma では `<channel|>`）、読み取りの位置＝列の最後。升目ごとに台帳の prompt_len・main_position・readout_position・ids_sha16（`hashlib.sha256(','.join(str(x) for x in 列).encode('ascii')).hexdigest().upper()[:16]`）と一致することを確かめ、違えば止める。
+- 加減: 選んだ層（添字＝正本の `layers.index`・小さな模型では `direction_B.layer_index(正本 layers.ratio, 模型の層の数)`）の**出力の隠れ状態を書き換える**: 主位置から列の最後までの位置に、sign×coef×v を足す（v は方向の float64 のベクトル・段階 B の `make_hook` と同じく、v を層の出力の型に直してから sign×coef を掛けて足す）。そのあと残りの層を流す。**フック（register_forward_hook など）で足してはいけない**。層を手で回す（埋め込み → 層 0〜k → 書き換え → 層 k+1〜最後）か、それと同じ計算になる別の組み方で書く。注意の mask（窓つきと全体の二つの型）・位置の埋め込み（rotary・注意の型ごと）・埋め込みの倍率・そのほか Gemma 4 の層に渡るもの（層ごとの入力があればそれも）は、模型の forward と同じにする。バッチ一・近道なし（列の全体を流す・`use_cache=False` と同じ）。
+- 読み取り（正本 `readout.primary.quantity`）: 最後の層の出口の残差（**最終の正規化の入力**）の最後の位置を float32 に上げ、最終の正規化を float32 で当て（Gemma 4 の RMSNorm は正規化した値に重みをそのまま掛ける〔1＋重みではない〕・h × rsqrt(mean(h²)＋eps) × g・g と eps は模型の最終の正規化から）、語彙の行列（埋め込みと共有の `lm_head.weight`）の読み取りの集合の行（台帳の升目の set_ids・a が先頭・最後が refuse の頭）を float32 で当て、softcap（cap × tanh(z ÷ cap)・cap は設定の `text_config.final_logit_softcapping`）を掛ける。量＝z_a − logsumexp（ほかの選択の文字と refuse の頭）。`hidden_states[-1]` は正規化の後の値なので使わない。
+- `--selftest`（乱数の小さな模型で）: 零のベクトルの効き目が零／書き換えを零にした手回しの道の最終の正規化の入力が、模型そのものの forward の最終の正規化の入力と一致（この一致を見るためだけに、最終の正規化に前のフックを掛けて取るのはよい・足すためには使わない）／主位置より前の位置は書き換えない、を確かめる。
+
+## 作るもの 2: 独立の再抽出の道 `Bprime/tools/independent/bprime_reextract.py`
+- 関数（正本 `independent_recompute.interfaces.reextract` の口）:
+  - `reextract(model, contexts, layer_idx)`: contexts は文脈の名 → トークンの並び。戻り値は文脈の名 → 選んだ層の出力の主位置（列の最後のトークン）の値（float64 の numpy の並び）。
+  - `reextract_all(model, tok, C, ledger, dirs)`: 抽出の文脈（正本 `directions.extraction` の八腕 × 二場面・プロンプトだけで書き出しはつながない）を上と同じ組み立てで作り、台帳の抽出の文脈の ids_sha16 と照らし、`reextract` で値を取り、腕ごとに二場面の平均を取り、名前のある方向を正本 `directions.defs` のとおりに作る（static＝O − Osec・loaded＝O-Ncold − Osec-Ncold・Nk＝Nk − N・td＝Onull − N）。戻り値 `{'h_norm_by_context': {文脈: ‖h‖}, 'vhat_norm': ‖static‖, 'named_cos': {名: その名の方向と dirs[名] の余弦}}`。
+- 正本 `independent_recompute.reextract.path` のとおり、本の抽出と同じ読み込みの設定・バッチ一・bf16 で、**違うのは活性を取り出す書き方だけ**にする（コーディネータの抽出の器は層の出力をフックで取り、その層で順伝播を打ち切る書き方。あなたは、それと別の書き方で取る——たとえば `output_hidden_states=True` の `hidden_states[k+1]` の主位置、あるいは層を手で回す書き方。どちらを選んだかと理由を記録に書く）。
+- `--selftest`（乱数の小さな模型で）: 取った値が有限で、文脈と名がそろい、名前のある方向の余弦が dirs に同じ方向を渡したとき一になる、を確かめる。
+
+## 乱数の小さな模型の作り方（自分で書く）
+- 設定の置き場（上の hf の版の置き場）の `config.json` を辞書で読み、`text_config` を縮める: hidden_size 64・intermediate_size 128・num_hidden_layers 6・num_attention_heads 4・num_key_value_heads 2・head_dim 16・global_head_dim 32・num_global_key_value_heads 1・sliding_window 8（列より短くして窓を効かせる）・layer_types は長さ 6 で、選ぶ層（`direction_B.layer_index(0.5, 6)`）と最後の層を 'full_attention'、ほかを 'sliding_attention'。`vision_config` も縮める（hidden_size 32・intermediate_size 64・num_hidden_layers 1・num_attention_heads 2・num_key_value_heads 2・head_dim 16・global_head_dim 16）。
+- `torch.manual_seed(0)`; `from transformers import Gemma4Config, Gemma4ForConditionalGeneration`; `model = Gemma4ForConditionalGeneration(Gemma4Config.from_dict(d)).eval()`; 語彙の行列（埋め込みと共有）を 4 倍にし、最後の正規化の重みを一様乱数 [2, 3) に置き換える（初期値の一のままだと正規化の誤りが見えない）。float32 で確かめ、余裕があれば bf16 でも。トークナイザは上の置き場から `AutoTokenizer.from_pretrained`。
+- 合成の方向: `np.random.default_rng(5)` で次元 64 の正規乱数を引き、ノルムを残差のノルムの 0.5 倍ほどにそろえる。名は `static`・`loaded`・`Nk`・`td`・`iso:0`〜`iso:9`・`real:` ＋ 正本の八腕の全ての対（i<j の順・`'%s~%s'`）。
+
+## コーディネータの道の公開の関数（`--dry` の比べにだけ使う・中は開かない）
+```python
+import sys; sys.path.insert(0, 'C:/Users/PC/Desktop/ontology-preamble-4b-internal/Bprime/tools')
+import bprime_run as BR
+R = BR.Runner(model, C, layer_idx, coef, dirs)                  # dirs: 方向の名 → float64 のベクトル
+cells = BR.build_cells(tok, C, ledger, ['S1|O-Ncold', 'S1|Onull'])     # 升目の鍵 → 升目の入力（台帳と照らす）
+hk = BR.recompute_hook_path(R, [(行の名, cells[升目の鍵], 符号), ...], {行の名: [(方向の名, 符号), ...]})
+# 戻り値: {行の名: {'noop_lo': float, 'effects': {'方向の名|符号': float}}}
+import bprime_directions as BD
+acts, norms, _ = BD.activations(model, 文脈の名 → トークンの並び, layer_idx)   # 文脈の名 → 選んだ層の出力の主位置の値（float64）
+```
+- `bprime_run.Runner` は小さな模型でも動く（正本の `layers.index` は使わず、渡した layer_idx を使う）。
+
+## `--dry`（二つの器それぞれに）
+- 書き換えの道: 正本の主の行（`main_rows`）のうち方向が static の行を二つ（減算の行と加算の行を一つずつ）選び、無操作・static・等方の十本・比べる相手の実在の差の方向（`recompute_set` の組）を、あなたの道とコーディネータのフックの道で同じ入力で流し、**一段目の許容 `independent_recompute.tol_stage1`** の内かを確かめて、差の最大を印字する。
+- 再抽出の道: 抽出の十六の文脈の一部（四つ）で、あなたの `reextract` とコーディネータの `BD.activations` の値を比べ、‖h‖ の相対の差の最大と余弦の最小を印字し、正本 `independent_recompute.reextract` の許容（rel_tol・cos_min）の内かを確かめる。
+
+## 開発の記録 `Bprime/tools/independent/rewrite-reextract-dev-Bprime.md`（日本語）
+- 読んだもの・読まなかったもの・書き方の決め（層の回し方・mask と rotary の作り方・埋め込みの倍率・層ごとの入力・bf16 のまま足すこと・再抽出の取り方）・自己検査と `--dry` の結果（**数は器の出力から写す・手で打たない**）・正本で決まっていなかった所。
+- 末尾に検分票（対象・段階・凍結物の同定・盲検の状態・敵対的検分・系統の内訳・COI記録・判定・本検分が確認していないこと〔必ず一つ以上〕）。最後の行に次の柵を置く: 「本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。」
+
+## 守ること
+- `Bprime/tools/independent/` の外のファイルを一つも変えない。コミットも push もしない。
+- 実の重みを読まない（手元に無い・封印の前の決まり）。乱数の小さな模型だけで確かめる。
+- 数・ハッシュ・引用は器の出力から写し、手で打たない。
+- 正本で決まっていない所に出会ったら、黙って決めずに、選んだ決め方とその理由を開発の記録に書く。
+- 資格情報や API の鍵は使わない・見ない。ネットワークに出ない（必要なものは手元にある）。
+- 分からないことや、決まりの中で決められないことに出会ったら、推測で進めずに、記録に書いて止まり、コーディネータへの返事に書く。
+
+## 終わったら返すもの
+- 書いたファイルの置き場。
+- 書き方の要点（層の回し方・mask と rotary・書き換えの位置と型・再抽出の取り方）。
+- 自己検査と `--dry` の結果（差の最大・許容の内か）を、器の出力のとおりに。
+- 正本で決まっていなかった所と、コーディネータに伝えたいこと。

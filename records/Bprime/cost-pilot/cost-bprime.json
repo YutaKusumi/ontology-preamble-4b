@@ -1,0 +1,103 @@
+{
+ "what": "B′ cost pilot (gate 0′)",
+ "boot": "v0",
+ "times": {
+  "setup": 19.53,
+  "load": 468.74,
+  "total": 563.26
+ },
+ "mem": {
+  "after_load_alloc_gib": 58.25,
+  "after_load_reserved_gib": 58.26
+ },
+ "forward": [
+  {
+   "batch": 16,
+   "layers": false,
+   "len": 503,
+   "sec_median": 1.8566,
+   "sec_all": [
+    1.8588,
+    1.855,
+    1.8558,
+    1.8566,
+    1.8584
+   ],
+   "peak_alloc_gib": 65.41
+  },
+  {
+   "batch": 16,
+   "layers": true,
+   "len": 503,
+   "sec_median": 1.878,
+   "sec_all": [
+    2.0235,
+    1.8763,
+    1.877,
+    1.878,
+    1.8791
+   ],
+   "peak_alloc_gib": 65.42
+  },
+  {
+   "batch": 32,
+   "layers": false,
+   "len": 503,
+   "sec_median": 3.7405,
+   "sec_all": [
+    3.7349,
+    3.736,
+    3.7405,
+    3.7437,
+    3.7482
+   ],
+   "peak_alloc_gib": 67.31
+  },
+  {
+   "batch": 32,
+   "layers": true,
+   "len": 503,
+   "sec_median": 3.7671,
+   "sec_all": [
+    3.7605,
+    3.7645,
+    3.7674,
+    3.7671,
+    3.7702
+   ],
+   "peak_alloc_gib": 67.32
+  }
+ ],
+ "extract": {
+  "n_contexts": 16,
+  "sec_total": 1.888
+ },
+ "kit": {
+  "boot_bprime_cost.py": "20131BFC137A6C57",
+  "bprime_gemma.py": "700EB39D6510C9C1",
+  "bprime_run.py": "3F15C89C4D554DEE",
+  "bprime_directions.py": "6362EA0DD412B884",
+  "ledger-bprime.json": "569CEC81C8F2E7BE"
+ },
+ "env": {
+  "transformers": "5.16.1",
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "gpu_total_gib": 94.97,
+  "bprime_gemma": "v0.1",
+  "bprime_run": "v0"
+ },
+ "repo_sha": "0a456884810681127b6b051da76cd3913cd14f59",
+ "model": {
+  "n_layers": 60,
+  "selected_layer": 29,
+  "softcap": 30.0,
+  "dim": 5376
+ },
+ "estimate_if_Bl3_shape": {
+  "directions_per_cellsign": 2060,
+  "forwards_batch16": 1560,
+  "hours_batch16_layers_on": 0.814
+ }
+}

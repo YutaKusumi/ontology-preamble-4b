@@ -1,0 +1,491 @@
+{
+ "prefix_text": "```json\n{\"choice\": \"",
+ "prefix_ids": [
+  2717,
+  3723,
+  107,
+  14937,
+  17005,
+  1083,
+  623
+ ],
+ "prefix_pieces": [
+  "```",
+  "json",
+  "\n",
+  "{\"",
+  "choice",
+  "\":",
+  " \""
+ ],
+ "heads": {
+  "a": {
+   "stable_prefix": true,
+   "next": 236746,
+   "n_after": 1,
+   "pieces_after": [
+    "a"
+   ]
+  },
+  "b": {
+   "stable_prefix": true,
+   "next": 236763,
+   "n_after": 1,
+   "pieces_after": [
+    "b"
+   ]
+  },
+  "c": {
+   "stable_prefix": true,
+   "next": 236755,
+   "n_after": 1,
+   "pieces_after": [
+    "c"
+   ]
+  },
+  "d": {
+   "stable_prefix": true,
+   "next": 236753,
+   "n_after": 1,
+   "pieces_after": [
+    "d"
+   ]
+  },
+  "refuse": {
+   "stable_prefix": true,
+   "next": 1811,
+   "n_after": 2,
+   "pieces_after": [
+    "ref",
+    "use"
+   ]
+  }
+ },
+ "cells_main": {
+  "N1|O-Ncold": {
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "family": "nuclear",
+   "letters": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "prompt_len": 431,
+   "main_position": 430,
+   "main_position_token": "<channel|>",
+   "readout_position": 437,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    236753,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 320,
+   "ids_sha16": "46DEEE7D7A7CCEFD",
+   "user_message_sha16": "104DA3B37A936DC5"
+  },
+  "N1|Onull": {
+   "scenario": "N1",
+   "arm": "Onull",
+   "family": "nuclear",
+   "letters": [
+    "a",
+    "b",
+    "c",
+    "d"
+   ],
+   "prompt_len": 422,
+   "main_position": 421,
+   "main_position_token": "<channel|>",
+   "readout_position": 428,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    236753,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 311,
+   "ids_sha16": "26E975093D2D37DD",
+   "user_message_sha16": "D69EE98C7A3A788C"
+  },
+  "S1|O-Ncold": {
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "family": "survival",
+   "letters": [
+    "a",
+    "b",
+    "c"
+   ],
+   "prompt_len": 482,
+   "main_position": 481,
+   "main_position_token": "<channel|>",
+   "readout_position": 488,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 368,
+   "ids_sha16": "1A50329D8ED325DC",
+   "user_message_sha16": "CBB58A2743611C9E"
+  },
+  "S1|Onull": {
+   "scenario": "S1",
+   "arm": "Onull",
+   "family": "survival",
+   "letters": [
+    "a",
+    "b",
+    "c"
+   ],
+   "prompt_len": 473,
+   "main_position": 472,
+   "main_position_token": "<channel|>",
+   "readout_position": 479,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 359,
+   "ids_sha16": "348119A3632BB969",
+   "user_message_sha16": "A4D5359168392117"
+  },
+  "S4|O-Ncold": {
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "family": "survival",
+   "letters": [
+    "a",
+    "b",
+    "c"
+   ],
+   "prompt_len": 495,
+   "main_position": 494,
+   "main_position_token": "<channel|>",
+   "readout_position": 501,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 381,
+   "ids_sha16": "1135EAA171808910",
+   "user_message_sha16": "F8FFFF1A857E58F2"
+  },
+  "S4|Onull": {
+   "scenario": "S4",
+   "arm": "Onull",
+   "family": "survival",
+   "letters": [
+    "a",
+    "b",
+    "c"
+   ],
+   "prompt_len": 486,
+   "main_position": 485,
+   "main_position_token": "<channel|>",
+   "readout_position": 492,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 372,
+   "ids_sha16": "AC3D83C932738FEE",
+   "user_message_sha16": "1B399C25F9DEDE83"
+  },
+  "SK|O-Ncold": {
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "family": "survival",
+   "letters": [
+    "a",
+    "b",
+    "c"
+   ],
+   "prompt_len": 496,
+   "main_position": 495,
+   "main_position_token": "<channel|>",
+   "readout_position": 502,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 382,
+   "ids_sha16": "665426785A71DA89",
+   "user_message_sha16": "26ABDFC2C59D5030"
+  },
+  "SK|Onull": {
+   "scenario": "SK",
+   "arm": "Onull",
+   "family": "survival",
+   "letters": [
+    "a",
+    "b",
+    "c"
+   ],
+   "prompt_len": 487,
+   "main_position": 486,
+   "main_position_token": "<channel|>",
+   "readout_position": 493,
+   "set_ids": [
+    236746,
+    236763,
+    236755,
+    1811
+   ],
+   "set_pieces": [
+    "a",
+    "b",
+    "c",
+    "ref"
+   ],
+   "joint_tokenization_same": true,
+   "prefix_in_prompt_at": 373,
+   "ids_sha16": "B20F678C3D00B97E",
+   "user_message_sha16": "8EFB0B1BD172F9C2"
+  }
+ },
+ "extract_contexts": {
+  "N1|O": {
+   "scenario": "N1",
+   "arm": "O",
+   "prompt_len": 420,
+   "main_position": 419,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "7DEA34CE6A45AAEE"
+  },
+  "S1|O": {
+   "scenario": "S1",
+   "arm": "O",
+   "prompt_len": 471,
+   "main_position": 470,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "C56E1D6FF05395CE"
+  },
+  "N1|Osec": {
+   "scenario": "N1",
+   "arm": "Osec",
+   "prompt_len": 419,
+   "main_position": 418,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "5AC11DAF401513F0"
+  },
+  "S1|Osec": {
+   "scenario": "S1",
+   "arm": "Osec",
+   "prompt_len": 470,
+   "main_position": 469,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "6417798E4359F38E"
+  },
+  "N1|Onull": {
+   "scenario": "N1",
+   "arm": "Onull",
+   "prompt_len": 422,
+   "main_position": 421,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "64D8136A92B8D9E0"
+  },
+  "S1|Onull": {
+   "scenario": "S1",
+   "arm": "Onull",
+   "prompt_len": 473,
+   "main_position": 472,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "E3742234AF0EFC55"
+  },
+  "N1|Nk": {
+   "scenario": "N1",
+   "arm": "Nk",
+   "prompt_len": 257,
+   "main_position": 256,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "C04D0752ED1DF32B"
+  },
+  "S1|Nk": {
+   "scenario": "S1",
+   "arm": "Nk",
+   "prompt_len": 308,
+   "main_position": 307,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "B1A2BAEB8EA4C5C8"
+  },
+  "N1|N": {
+   "scenario": "N1",
+   "arm": "N",
+   "prompt_len": 247,
+   "main_position": 246,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "18699CA8B934ED1F"
+  },
+  "S1|N": {
+   "scenario": "S1",
+   "arm": "N",
+   "prompt_len": 298,
+   "main_position": 297,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "4F92D8FDFF58B3F0"
+  },
+  "N1|O-Ncold": {
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "prompt_len": 431,
+   "main_position": 430,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "70ECD2862B1A50B8"
+  },
+  "S1|O-Ncold": {
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "prompt_len": 482,
+   "main_position": 481,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "AD644B1A2CC2F1DB"
+  },
+  "N1|Osec-Ncold": {
+   "scenario": "N1",
+   "arm": "Osec-Ncold",
+   "prompt_len": 430,
+   "main_position": 429,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "96B39ED18333DC32"
+  },
+  "S1|Osec-Ncold": {
+   "scenario": "S1",
+   "arm": "Osec-Ncold",
+   "prompt_len": 481,
+   "main_position": 480,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "01F3BEBB5B08610B"
+  },
+  "N1|Onull-Ncold": {
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "prompt_len": 433,
+   "main_position": 432,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "85D27F01E667E42F"
+  },
+  "S1|Onull-Ncold": {
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "prompt_len": 484,
+   "main_position": 483,
+   "main_position_token": "<channel|>",
+   "ids_sha16": "78E033AB31FE6F09"
+  }
+ },
+ "arms": {
+  "O": {
+   "sha16": "F3EE60C33F825575",
+   "path": "arms/frozen-from-ryokai-os/armsE/preamble-O.md",
+   "n_tokens_text_only": 172
+  },
+  "Osec": {
+   "sha16": "3D0E78BB21133BB0",
+   "path": "arms/materials-draft/ko/O-sec-v3.md",
+   "n_tokens_text_only": 171
+  },
+  "Onull": {
+   "sha16": "2123B3CD8586E7DF",
+   "path": "arms/frozen-from-ryokai-os/armsE/preamble-Onull.md",
+   "n_tokens_text_only": 174
+  },
+  "Nk": {
+   "sha16": "47C3CC833B96F7A3",
+   "path": "arms/materials/preamble-Nkanzeon.md",
+   "n_tokens_text_only": 9
+  },
+  "N": {
+   "sha16": null,
+   "path": null,
+   "n_tokens_text_only": 0
+  },
+  "O-Ncold": {
+   "sha16": "060D77170FEC8B06",
+   "path": "arms/panel/O-Ncold.md",
+   "n_tokens_text_only": 183
+  },
+  "Osec-Ncold": {
+   "sha16": "0AA8B4FDF72E3893",
+   "path": "arms/panel/Osec-Ncold.md",
+   "n_tokens_text_only": 182
+  },
+  "Onull-Ncold": {
+   "sha16": "A60EB61825C6CCB3",
+   "path": "arms/panel/Onull-Ncold.md",
+   "n_tokens_text_only": 185
+  }
+ },
+ "meta": {
+  "version": "v0",
+  "transformers": "5.16.1",
+  "tokenizer_sha16": "CC8D3A0CE36466CC",
+  "chat_template_sha16": "AE53464BF3BE2580",
+  "revision": "842da3794eaa0b77d5f08bae87a17459d91ff475"
+ }
+}

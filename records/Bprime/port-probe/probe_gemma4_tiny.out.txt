@@ -1,0 +1,20 @@
+C:\Users\PC\Desktop\ontology-preamble-4b-internal\Bprime\port-probe\probe_gemma4_tiny.py:55: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\torch\csrc\autograd\generated\python_variable_methods.cpp:837.)
+  print('max |manual(norm(hs[-1]))->softcap - logits| =', float((man_c - o.logits[0, -1]).abs().max()))
+transformers 5.16.1 torch 2.9.1+cpu
+rendered (no system): '<bos><|turn>user\nテスト<turn|>\n<|turn>model\n<|channel>thought\n<channel|>'
+ids: [2, 105, 2364, 107, 88733, 106, 107, 105, 4368, 107, 100, 45518, 107, 101] | decoded pieces: ['<bos>', '<|turn>', 'user', '\n', 'テスト', '<turn|>', '\n', '<|turn>', 'model', '\n', '<|channel>', 'thought', '\n', '<channel|>']
+rendered (enable_thinking=True): '<bos><|turn>system\n<|think|>\n<turn|>\n<|turn>user\nテスト<turn|>\n<|turn>model\n'
+real text_config head/kv/global: {'head_dim': 256, 'global_head_dim': 512, 'num_key_value_heads': 16, 'num_global_key_value_heads': 4, 'final_logit_softcapping': 30.0, 'attention_k_eq_v': True, 'num_hidden_layers': 60, 'hidden_size': 5376}
+top modules: ['model', 'lm_head']
+model children: ['vision_tower', 'language_model', 'embed_vision']
+language_model children: ['embed_tokens', 'layers', 'norm', 'rotary_emb']
+n layers: 6 | layer0 type: Gemma4TextDecoderLayer
+lm_head: Linear | tied: True
+output type: Gemma4CausalLMOutputWithPast | logits (1, 14, 262144) | hidden_states len 7 | hook out type Tensor
+hidden_states[k+1] == layers[k] output: True
+final hidden_states is post-norm?: check below
+max |manual(norm(hs[-1]))->softcap - logits| = 4.76837158203125e-07
+max |manual(hs[-1] no norm)->softcap - logits| = 2.980232238769531e-07
+steering changes last logits: True
+params (tiny): 17698752

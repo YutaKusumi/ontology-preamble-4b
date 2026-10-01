@@ -1,0 +1,35 @@
+{
+ "tests": {
+  "D1_contexts": {
+   "pass": true,
+   "n": 16
+  },
+  "D2_alignment": {
+   "pass": true,
+   "max_abs": 0.0
+  },
+  "D3_norms": {
+   "pass": true,
+   "max_rel_dev": 2.220446049250313e-16
+  },
+  "D4_real_pairs": {
+   "pass": true,
+   "n": 28
+  },
+  "D5_npz_bytes_same": {
+   "pass": true,
+   "sha16": "424955A15797D515"
+  },
+  "D6_iso_seeded": {
+   "pass": true
+  }
+ },
+ "all_pass": true,
+ "meta": {
+  "selected_layer_tiny": 2,
+  "n_layers_tiny": 6,
+  "iso_count_dry": 50,
+  "iso_seed_dry": 92001,
+  "note": "種と本数は枠で決める（ここでは合成の確かめの値）"
+ }
+}
