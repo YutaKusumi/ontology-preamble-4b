@@ -1,0 +1,161 @@
+[run_prefreeze_colab] 始め
+$ /usr/bin/python3 -m pip install -q --target /content/pylib-pf transformers==5.16.1 numpy==2.1.3
+MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 109.2/109.2 kB 7.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 221.7/221.7 kB 14.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.5/4.5 MB 122.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 73.5/73.5 kB 4.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 78.8/78.8 kB 5.1 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 310.7/310.7 kB 25.0 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 45.6/45.6 kB 3.1 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 91.7/91.7 kB 6.8 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 68.9 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 132.1/132.1 kB 10.3 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 69.6/69.6 kB 5.3 MB/s eta 0:00:00
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 137.0/137.0 kB 10.6 MB/s eta 0:00:00
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+ipython 7.34.0 requires jedi>=0.16, which is not installed.
+bigframes 2.49.0 requires rich<14,>=12.4.4, but you have rich 15.0.0 which is incompatible.
+datasets 4.8.5 requires fsspec[http]<=2026.2.0,>=2023.1.0, but you have fsspec 2026.9.0 which is incompatible.
+gcsfs 2025.12.0 requires fsspec==2025.12.0, but you have fsspec 2026.9.0 which is incompatible.
+
+$ git clone --filter=blob:none --no-checkout https://github.com/YutaKusumi/ontology-preamble-4b.git /content/ontology-preamble-4b
+Cloning into '/content/ontology-preamble-4b'...
+
+$ git -C /content/ontology-preamble-4b sparse-checkout set --cone tools design records results/dirB arms
+
+$ git -C /content/ontology-preamble-4b checkout -q dcd9617a5c8a3a8084cc052eaba22c292db6f8cc
+
+$ /usr/bin/python3 -c from huggingface_hub import hf_hub_download as d
+import sys
+for f in ['chat_template.jinja', 'config.json', 'generation_config.json', 'model.safetensors.index.json', 'processor_config.json', 'tokenizer.json', 'tokenizer_config.json']:
+    d("google/gemma-4-31B-it", f, revision="8
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+[run_prefreeze_colab] 設定とトークナイザを照らした（7 本）
+[run_prefreeze_colab] 凍結の器を背後で走らせ始めた（pid 2181・準備 27 秒）。終わりは /content/pf-done.json
+{
+ "frozen_text_rebuilt_same": true,
+ "canon": {
+  "version": "draft12-v6-2026-10-01",
+  "sha16": "2C5FDDED89D659C0"
+ },
+ "rulings": {
+  "rulings_recorded": 29,
+  "missing_in_decisions": [],
+  "rulings_next": "D284",
+  "rulings_next_expected": "D284"
+ },
+ "inputs": {
+  "public_checked": 16,
+  "public_bad": [],
+  "bprime_key": "files_internal",
+  "bprime_checked": 30,
+  "bprime_bad": []
+ },
+ "manifest": {
+  "files": 9,
+  "shards": 2,
+  "index_shards": 2
+ },
+ "g_local": {
+  "g_sha256": "4A2C5F60D8EA0EC7227CE4FFB12206E584BD4AEE74D15BBFE61EE41DE784A139",
+  "seed": 92001,
+  "layer_ratio": 0.5,
+  "count": 1999,
+  "layer_key_scale": 1000,
+  "dim": 5376,
+  "numpy": "2.1.3"
+ },
+ "tools_closure_n": 43,
+ "dry_run": {
+  "path": "records/Bprime/dry-run-Bprime-2026-10-01.md",
+  "checks": 152,
+  "as_expected": 152,
+  "sha_table": {
+   "files": 47,
+   "lack": [],
+   "differ": []
+  },
+  "independent_rows": {
+   "bprime_recompute_rewrite.py --selftest": true,
+   "bprime_recompute_rewrite.py --dry": true,
+   "bprime_reextract.py --selftest": true,
+   "bprime_reextract.py --dry": true
+  },
+  "five": {
+   "path": "records/Bprime/freeze-path-dry-Bprime-2026-10-01.json",
+   "checked": true,
+   "exists": true,
+   "sha16": "5BD031BB6087EDAC",
+   "n": 29,
+   "as_expected": 29,
+   "rows": 29,
+   "dry_record": "dry-run-Bprime-2026-10-01.md",
+   "dry_record_sha16": "396502E5D4BA623D",
+   "md_sha16": "396502E5D4BA623D"
+  }
+ },
+ "form": {
+  "keys": 8,
+  "prediction_fields": 4
+ },
+ "impl_review": [
+  "records/reviews/Bprime/impl/adoption-table-impl-Bprime.md"
+ ],
+ "behavior_batch": 8,
+ "colab_check": {
+  "kind_check": true,
+  "not_dry": true,
+  "all_pass": true,
+  "commit": true,
+  "gpu": true,
+  "versions": true,
+  "weights": true,
+  "canon_at_commit": true,
+  "tools_at_commit": true,
+  "g_same": true,
+  "logit_k": true,
+  "determinism": true,
+  "commit_seen": "dcd9617a5c8a3a8084cc052eaba22c292db6f8cc",
+  "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "versions_seen": {
+   "numpy": "2.1.3",
+   "scipy": "1.16.3",
+   "torch": "2.11.0+cu128",
+   "transformers": "5.16.1",
+   "tokenizers": "0.23.1",
+   "huggingface_hub": "1.29.0",
+   "jinja2": "3.1.6",
+   "safetensors": "0.8.0",
+   "accelerate": "1.14.0"
+  }
+ },
+ "prefreeze_values": {
+  "logit_k": {
+   "k": 4.877532958984375,
+   "z0": 4
+  },
+  "determinism": {
+   "allow_tf32_matmul": false,
+   "allow_tf32_cudnn": false,
+   "float32_matmul_precision": "highest",
+   "attn_implementation": "sdpa"
+  },
+  "attn_implementation": "sdpa",
+  "pins": {
+   "numpy": "2.1.3",
+   "scipy": "1.16.3",
+   "torch": "2.11.0+cu128",
+   "transformers": "5.16.1",
+   "tokenizers": "0.23.1",
+   "huggingface_hub": "1.29.0",
+   "jinja2": "3.1.6",
+   "safetensors": "0.8.0",
+   "accelerate": "1.14.0"
+  }
+ }
+}
+[freeze_Bprime] 下見の前の凍結を記帳した: records/Bprime/FREEZE-RECORD-Bprime.json・records/Bprime/FREEZE-RECORD-Bprime.md（凍結物 113）
+
+[pf_worker] prefreeze の返り 0（34 秒）

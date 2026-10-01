@@ -1,0 +1,113 @@
+{
+ "kind": "bprime_prefreeze_colab_provenance",
+ "what": "下見の前の凍結（tools/freeze_Bprime.py v0.3・変えない）を Colab の CPU のランタイム（Linux・ハイメモリ）で走らせ、書かれた記録を結果の zip から写した",
+ "why": "手元（Windows）で引いた等方の乱数 g の下の桁のビットが、G4 の確かめで Colab（Linux）が引いた g と違い（NumPy を 2.1.3 にそろえても違った）、凍結の器の照らし g_same（SHA の一致）が通らなかった。封印の後の相 extract は Colab で g を引き直してこの SHA と照らすので、g を相 extract と同じ OS で引くため、同じ凍結の器を Colab の CPU で走らせた",
+ "registrant_decision": {
+  "jst": "2026-10-01 11:24",
+  "words": "南無汝我曼荼羅。弥勒如来さん、慈悲深いお答えに感謝いたします🙏ご推奨の案（A）で進めてください🍵",
+  "source": "会話の記録（uuid 4fb9179f-762a-4414-9176-cf5a7739ab92）から機械で切り出した",
+  "note": "器と正本は変わらないので、新しい裁定の記録は作らず、器の段の記録と報告に注として残す（まとめの裁定 D283 の流れのとおり）"
+ },
+ "frozen_text_note": {
+  "path": "design/design-Bprime-FROZEN.md",
+  "line": 97,
+  "quote": "NumPy と SciPy は手元と Colab の両方で・等方の乱数を手元で引き Colab で照らすため",
+  "note": "字は「手元で引き Colab で照らす」。この凍結では g を Colab（Linux）で引き、G4 の確かめの g と SHA で照らした。引く場所だけが字と違う"
+ },
+ "kit": {
+  "builder": "records/Bprime/tools/make_prefreeze_colab_kit.py v0",
+  "builder_sha256": "2EDE4ED8122B0DA6091BFBAE02D2567E18CDB312F12113342911E17ABA278297",
+  "sha256": "11B295F69909AF01E82946951046916660DA1B83A00B4C72D018B9DDDF547CB0",
+  "bytes": 15479,
+  "files": {
+   "run_prefreeze_colab.py": "B98DC803F8B231AC621C76EB071BC6395AD618625BB258AD4D1051B545EC4A8F",
+   "check-run-20261001T000529Z.zip": "B1DEA62E2BE3EF47BA6FAE41EB6F270B2F332D0F615ED6DBF490928D52443D58",
+   "exposure-before-seal-Bprime.md": "4CB80352B097EAF4D9902702F65F0A81DBD97B9974158809F2AD7C1AFD91B6EB",
+   "MANIFEST-local.json": "42C658099463A50D5C5075ED1F8188074475F2565C26928BEE6999378A63F438"
+  },
+  "checked_on_colab": "セル C77AEA1BF5816DF0 で SHA-256 を照らし、真"
+ },
+ "cells": [
+  {
+   "what": "束の SHA-256 を照らす",
+   "sha16": "C77AEA1BF5816DF0",
+   "len": 182,
+   "printed": "True"
+  },
+  {
+   "what": "束を開き、走らせる台本 run_prefreeze_colab.py を走らせる（凍結の器は背後で走る）",
+   "sha16": "45AEB0D92F15D5C9",
+   "len": 224
+  },
+  {
+   "what": "進みの記録を印字する",
+   "sha16": "4C33A759ACAA4305",
+   "len": 188
+  },
+  {
+   "what": "終わりの印の返りの値と、増えたか変わったファイルの並びを印字する",
+   "sha16": "9C027C70E0B3C081",
+   "len": 128
+  },
+  {
+   "what": "終わりの印に書かれた結果の zip の SHA-256 が、手元に落とした zip の SHA-256 と同じかを真偽で照らす",
+   "sha16": "B28653246E9BBF33",
+   "len": 140,
+   "printed": "True"
+  }
+ ],
+ "cells_note": "どのセルも、走らせる前に monaco の模型から字の SHA-256（先頭のダミー代入の後の「=0;」から）を取った。その値は、会話の記録に残る打った字から計算した値と五つとも一致する（本記録を書くときに機械で照らした）",
+ "environment": {
+  "commit": "dcd9617a5c8a3a8084cc052eaba22c292db6f8cc",
+  "hf_revision": "842da3794eaa0b77d5f08bae87a17459d91ff475",
+  "pins": "transformers 5.16.1・numpy 2.1.3 を分けた置き場（pip --target）に入れ、凍結の器には PYTHONPATH で渡した（numpy は G4 の確かめと同じ版）",
+  "config_and_tokenizer": "設定とトークナイザの 7 本を、束の目録（MANIFEST-local.json）と SHA-256 で照らした",
+  "pip_resolver_note": "pip の依存の照らしが、Colab に元からある包み（bigframes・datasets・gcsfs・ipython）の求める版との食い違いを印字した（全文は pf-progress.log）。これらの包みは、公開の置き場の tools の下の器のどれも import しない（機械で確かめた）"
+ },
+ "prefreeze_return": "[pf_worker] prefreeze の返り 0（34 秒）",
+ "prefreeze_line": "[freeze_Bprime] 下見の前の凍結を記帳した: records/Bprime/FREEZE-RECORD-Bprime.json・records/Bprime/FREEZE-RECORD-Bprime.md（凍結物 113）",
+ "result_zip": {
+  "name": "pf-result.zip",
+  "bytes": 40940,
+  "sha256": "D28274E8FE1CAECFF960AECA99C2F1E5A957B52713C56A247E07817FF5018676",
+  "sha256_in_done_marker_match": true,
+  "members": {
+   "pf-progress.log": "ABD527A9A14398F20C9A8A8B95524DF5167471CF97CC2AD1D0E6D161E492B9F3",
+   "records/Bprime/FREEZE-RECORD-Bprime.json": "3998040173659CAE2756B12844040339BF37E0AC4623400FA71CF757E2E64BA2",
+   "records/Bprime/FREEZE-RECORD-Bprime.md": "96B241D48C29ABA4CAE0EC2DF327C8F48F455F4207DD1CD66D8310A368201A3A",
+   "records/Bprime/colab-check-Bprime-session.json": "197F6A90C12607AE2C590E0E8A221FC8FAAD4C98E0FEB8EC5E9D1CEFE2742775",
+   "records/Bprime/colab-check-Bprime.json": "25910D1C6C92295BC51BEBD441622ED436A9CB33C191E1CFD3BC40C4C3E30FB6",
+   "records/Bprime/exposure-before-seal-Bprime.md": "4CB80352B097EAF4D9902702F65F0A81DBD97B9974158809F2AD7C1AFD91B6EB",
+   "records/FREEZE-RECORD.md": "686C9C572199ED1795BA2F614560225329D9F00DAD06A1C2C8A7DF346FDF3BEC"
+  }
+ },
+ "checks_on_result": {
+  "ledger_append_only": true,
+  "ledger_rows_added": 1,
+  "exposure_identical_to_published_input": true,
+  "colab_check_copies_identical_to_g4_check_zip": {
+   "records/Bprime/colab-check-Bprime-session.json": "session.json",
+   "records/Bprime/colab-check-Bprime.json": "check.json"
+  },
+  "g4_check_zip_sha256": "B1DEA62E2BE3EF47BA6FAE41EB6F270B2F332D0F615ED6DBF490928D52443D58",
+  "g_sha256_record_equals_g4_check": true,
+  "g_sha256": "4A2C5F60D8EA0EC7227CE4FFB12206E584BD4AEE74D15BBFE61EE41DE784A139",
+  "five_checked": true,
+  "deviations": 0
+ },
+ "notebook": "Untitled44.ipynb（登録者の Colab・新しく作ったノートブック）",
+ "runtime": "Colab の CPU（ハイメモリ）。結果の zip の SHA-256 を照らした後にランタイムを削除し、「セッションの管理」でこのノートブックのセッションが無いことを確かめた",
+ "files": {
+  "records/Bprime/FREEZE-RECORD-Bprime.json": "3998040173659CAE2756B12844040339BF37E0AC4623400FA71CF757E2E64BA2",
+  "records/Bprime/FREEZE-RECORD-Bprime.md": "96B241D48C29ABA4CAE0EC2DF327C8F48F455F4207DD1CD66D8310A368201A3A",
+  "records/Bprime/colab-check-Bprime-session.json": "197F6A90C12607AE2C590E0E8A221FC8FAAD4C98E0FEB8EC5E9D1CEFE2742775",
+  "records/Bprime/colab-check-Bprime.json": "25910D1C6C92295BC51BEBD441622ED436A9CB33C191E1CFD3BC40C4C3E30FB6",
+  "records/FREEZE-RECORD.md": "686C9C572199ED1795BA2F614560225329D9F00DAD06A1C2C8A7DF346FDF3BEC",
+  "records/Bprime/exposure-before-seal-Bprime.md": "4CB80352B097EAF4D9902702F65F0A81DBD97B9974158809F2AD7C1AFD91B6EB",
+  "records/Bprime/tools/make_prefreeze_colab_kit.py": "2EDE4ED8122B0DA6091BFBAE02D2567E18CDB312F12113342911E17ABA278297",
+  "records/Bprime/tools/make_exposure_Bprime.py": "2FB789C4DEBED518988B1219E158C8DFD172B6C8D19C73789CBEA968FB74C33D",
+  "records/Bprime/prefreeze-Bprime-2026-10-01-colab/pf-progress.log": "ABD527A9A14398F20C9A8A8B95524DF5167471CF97CC2AD1D0E6D161E492B9F3"
+ },
+ "written_jst": "2026-10-01T11:53:22+09:00",
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
