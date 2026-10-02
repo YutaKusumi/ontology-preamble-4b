@@ -1,0 +1,5118 @@
+{
+ "kind": "interim_summary_calc",
+ "tool": "summary/calc_interim.py v0.2",
+ "frame": "00-frame-interim-summary-2026-10-02.md（SHA16 D4905E0FBA2D5A27）＋追記一 00-frame-addendum1-2026-10-02.md（SHA16 419D414E12B195A5）",
+ "firth_tool": "tools/firth.py v2.1（SHA16 CE584FDF2AE79930）",
+ "censor_from": "design/contrasts-A.json censor（SHA16 F0C2FF897C78C4C0）",
+ "thresholds": {
+  "main": [
+   0.05,
+   0.95
+  ],
+  "sens_wide": [
+   0.03,
+   0.97
+  ],
+  "sens_narrow": [
+   0.08,
+   0.92
+  ]
+ },
+ "inputs": {
+  "A": [
+   {
+    "path": "results/stageA/stageA__N1__none__seed62101/cells.json",
+    "sha16": "B191D74180F3F1DE"
+   },
+   {
+    "path": "results/stageA/stageA__N1__none__seed62201/cells.json",
+    "sha16": "F0F5A449D4A73161"
+   },
+   {
+    "path": "results/stageA/stageA__N1__none__seed62301/cells.json",
+    "sha16": "3F67C99015212FC2"
+   },
+   {
+    "path": "results/stageA/stageA__N1__none__seed62401/cells.json",
+    "sha16": "46C014264CC9DD5C"
+   },
+   {
+    "path": "results/stageA/stageA__N1__none__seed62501/cells.json",
+    "sha16": "E7215F267A8AC150"
+   },
+   {
+    "path": "results/stageA/stageA__N1__none__seed62601/cells.json",
+    "sha16": "E04B50EA74056334"
+   },
+   {
+    "path": "results/stageA/stageA__N1__none__seed62701/cells.json",
+    "sha16": "EB246619D51C9454"
+   },
+   {
+    "path": "results/stageA/stageA__N2__none__seed62102/cells.json",
+    "sha16": "59CABBB6F4C8A45A"
+   },
+   {
+    "path": "results/stageA/stageA__N2__none__seed62202/cells.json",
+    "sha16": "17528ED880C48341"
+   },
+   {
+    "path": "results/stageA/stageA__N2__none__seed62302/cells.json",
+    "sha16": "170989B44E5BEE1E"
+   },
+   {
+    "path": "results/stageA/stageA__N2__none__seed62402/cells.json",
+    "sha16": "7B08D3ED9D5590D9"
+   },
+   {
+    "path": "results/stageA/stageA__N2__none__seed62502/cells.json",
+    "sha16": "7771BEC8A90D0C38"
+   },
+   {
+    "path": "results/stageA/stageA__N2__none__seed62602/cells.json",
+    "sha16": "4E890766A764442B"
+   },
+   {
+    "path": "results/stageA/stageA__N2__none__seed62702/cells.json",
+    "sha16": "A035E4412EEEA06E"
+   },
+   {
+    "path": "results/stageA/stageA__S1__none__seed62103/cells.json",
+    "sha16": "B6785320F24ACA68"
+   },
+   {
+    "path": "results/stageA/stageA__S1__none__seed62203/cells.json",
+    "sha16": "0B5A5FA9D8B54E5D"
+   },
+   {
+    "path": "results/stageA/stageA__S1__none__seed62303/cells.json",
+    "sha16": "27B0B39A7748ED5F"
+   },
+   {
+    "path": "results/stageA/stageA__S1__none__seed62403/cells.json",
+    "sha16": "8F12550113300B7D"
+   },
+   {
+    "path": "results/stageA/stageA__S1__none__seed62503/cells.json",
+    "sha16": "DB432E66BF14811A"
+   },
+   {
+    "path": "results/stageA/stageA__S1__none__seed62603/cells.json",
+    "sha16": "A0A049674BFECAFA"
+   },
+   {
+    "path": "results/stageA/stageA__S1__none__seed62703/cells.json",
+    "sha16": "87B344D4B5F06828"
+   },
+   {
+    "path": "results/stageA/stageA__S4__none__seed62104/cells.json",
+    "sha16": "2FDD204AE09DCD96"
+   },
+   {
+    "path": "results/stageA/stageA__S4__none__seed62204/cells.json",
+    "sha16": "EF220B42DEEE48EE"
+   },
+   {
+    "path": "results/stageA/stageA__S4__none__seed62304/cells.json",
+    "sha16": "E6ED26C5DA635B71"
+   },
+   {
+    "path": "results/stageA/stageA__S4__none__seed62404/cells.json",
+    "sha16": "764110D7B029BEB1"
+   },
+   {
+    "path": "results/stageA/stageA__S4__none__seed62504/cells.json",
+    "sha16": "84ED2F70F2222B10"
+   },
+   {
+    "path": "results/stageA/stageA__S4__none__seed62604/cells.json",
+    "sha16": "769BF25DE1D9F49A"
+   },
+   {
+    "path": "results/stageA/stageA__S4__none__seed62704/cells.json",
+    "sha16": "EEA79C91BE17EF10"
+   },
+   {
+    "path": "results/stageA/stageA__SK__none__seed62105/cells.json",
+    "sha16": "FA34F33E3DF7317A"
+   },
+   {
+    "path": "results/stageA/stageA__SK__none__seed62205/cells.json",
+    "sha16": "956187D242773A95"
+   },
+   {
+    "path": "results/stageA/stageA__SK__none__seed62305/cells.json",
+    "sha16": "6090B2869DEA6225"
+   },
+   {
+    "path": "results/stageA/stageA__SK__none__seed62405/cells.json",
+    "sha16": "351A4CE63838E8E2"
+   },
+   {
+    "path": "results/stageA/stageA__SK__none__seed62505/cells.json",
+    "sha16": "007328D3292F8561"
+   },
+   {
+    "path": "results/stageA/stageA__SK__none__seed62605/cells.json",
+    "sha16": "7FFE5A9D03A361B5"
+   },
+   {
+    "path": "results/stageA/stageA__SK__none__seed62705/cells.json",
+    "sha16": "8391BFF406F85844"
+   }
+  ],
+  "Vprime": [
+   {
+    "path": "results/stageVp/stageVp__N1__none__seed41001/cells.json",
+    "sha16": "F37F0BA4392095B0"
+   },
+   {
+    "path": "results/stageVp/stageVp__S1__none__seed41002/cells.json",
+    "sha16": "18CF68EAE71644BF"
+   },
+   {
+    "path": "results/stageVp/stageVp__S4__none__seed41003/cells.json",
+    "sha16": "7F8436107AA65CD8"
+   },
+   {
+    "path": "results/stageVp/stageVp__SK__none__seed41004/cells.json",
+    "sha16": "0C56AD4EF8212778"
+   }
+  ]
+ },
+ "not_inputs": "B′ の行動の下見（S10・追記一 §1）・4B の最初の登録・追補 M・段階 F（腕と場面と n の組が違う）",
+ "n_ok_by_stage": {
+  "A": [
+   200
+  ],
+  "Vprime": [
+   400
+  ]
+ },
+ "provider_by_stage": {
+  "A": [
+   "local"
+  ],
+  "Vprime": [
+   "nscale"
+  ]
+ },
+ "calc1_rows": [
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 55,
+   "n_ok": 200,
+   "rate": 0.275,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 118,
+   "n_ok": 200,
+   "rate": 0.59,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 37,
+   "n_ok": 200,
+   "rate": 0.185,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 195,
+   "n_ok": 200,
+   "rate": 0.975,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 190,
+   "n_ok": 200,
+   "rate": 0.95,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 182,
+   "n_ok": 200,
+   "rate": 0.91,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 45,
+   "n_ok": 200,
+   "rate": 0.225,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 192,
+   "n_ok": 200,
+   "rate": 0.96,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 147,
+   "n_ok": 200,
+   "rate": 0.735,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 158,
+   "n_ok": 200,
+   "rate": 0.79,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 114,
+   "n_ok": 200,
+   "rate": 0.57,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 91,
+   "n_ok": 200,
+   "rate": 0.455,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 172,
+   "n_ok": 200,
+   "rate": 0.86,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 167,
+   "n_ok": 200,
+   "rate": 0.835,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 186,
+   "n_ok": 200,
+   "rate": 0.93,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 141,
+   "n_ok": 200,
+   "rate": 0.705,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 42,
+   "n_ok": 200,
+   "rate": 0.21,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 4,
+   "n_ok": 200,
+   "rate": 0.02,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 163,
+   "n_ok": 200,
+   "rate": 0.815,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 105,
+   "n_ok": 200,
+   "rate": 0.525,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 13,
+   "n_ok": 200,
+   "rate": 0.065,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 5,
+   "n_ok": 200,
+   "rate": 0.025,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 16,
+   "n_ok": 200,
+   "rate": 0.08,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 1,
+   "n_ok": 200,
+   "rate": 0.005,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 32,
+   "n_ok": 200,
+   "rate": 0.16,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 33,
+   "n_ok": 200,
+   "rate": 0.165,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 14,
+   "n_ok": 200,
+   "rate": 0.07,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 152,
+   "n_ok": 200,
+   "rate": 0.76,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 114,
+   "n_ok": 200,
+   "rate": 0.57,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 193,
+   "n_ok": 200,
+   "rate": 0.965,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 178,
+   "n_ok": 200,
+   "rate": 0.89,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 23,
+   "n_ok": 200,
+   "rate": 0.115,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "N",
+   "k": 191,
+   "n_ok": 200,
+   "rate": 0.955,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O",
+   "k": 4,
+   "n_ok": 200,
+   "rate": 0.02,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Ncold",
+   "k": 163,
+   "n_ok": 200,
+   "rate": 0.815,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull-Ncold",
+   "k": 60,
+   "n_ok": 200,
+   "rate": 0.3,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O-Ncold",
+   "k": 64,
+   "n_ok": 200,
+   "rate": 0.32,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O",
+   "k": 111,
+   "n_ok": 200,
+   "rate": 0.555,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O",
+   "k": 81,
+   "n_ok": 200,
+   "rate": 0.405,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull-Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O-Ncold",
+   "k": 168,
+   "n_ok": 200,
+   "rate": 0.84,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "N",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull",
+   "k": 195,
+   "n_ok": 200,
+   "rate": 0.975,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O",
+   "k": 181,
+   "n_ok": 200,
+   "rate": 0.905,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull-Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O-Ncold",
+   "k": 196,
+   "n_ok": 200,
+   "rate": 0.98,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull",
+   "k": 192,
+   "n_ok": 200,
+   "rate": 0.96,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O",
+   "k": 45,
+   "n_ok": 200,
+   "rate": 0.225,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull-Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O-Ncold",
+   "k": 197,
+   "n_ok": 200,
+   "rate": 0.985,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "N",
+   "k": 38,
+   "n_ok": 200,
+   "rate": 0.19,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull",
+   "k": 106,
+   "n_ok": 200,
+   "rate": 0.53,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O",
+   "k": 15,
+   "n_ok": 200,
+   "rate": 0.075,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull-Ncold",
+   "k": 192,
+   "n_ok": 200,
+   "rate": 0.96,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O-Ncold",
+   "k": 136,
+   "n_ok": 200,
+   "rate": 0.68,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "N",
+   "k": 179,
+   "n_ok": 200,
+   "rate": 0.895,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull",
+   "k": 198,
+   "n_ok": 200,
+   "rate": 0.99,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "Onull-Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N2",
+   "arm": "O-Ncold",
+   "k": 32,
+   "n_ok": 200,
+   "rate": 0.16,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 186,
+   "n_ok": 200,
+   "rate": 0.93,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 81,
+   "n_ok": 200,
+   "rate": 0.405,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 164,
+   "n_ok": 200,
+   "rate": 0.82,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 184,
+   "n_ok": 200,
+   "rate": 0.92,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 155,
+   "n_ok": 200,
+   "rate": 0.775,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 57,
+   "n_ok": 200,
+   "rate": 0.285,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 190,
+   "n_ok": 200,
+   "rate": 0.95,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 193,
+   "n_ok": 200,
+   "rate": 0.965,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 188,
+   "n_ok": 200,
+   "rate": 0.94,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 195,
+   "n_ok": 200,
+   "rate": 0.975,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 107,
+   "n_ok": 200,
+   "rate": 0.535,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 5,
+   "n_ok": 200,
+   "rate": 0.025,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 196,
+   "n_ok": 200,
+   "rate": 0.98,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 192,
+   "n_ok": 200,
+   "rate": 0.96,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 181,
+   "n_ok": 200,
+   "rate": 0.905,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 192,
+   "n_ok": 200,
+   "rate": 0.96,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 74,
+   "n_ok": 200,
+   "rate": 0.37,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 7,
+   "n_ok": 200,
+   "rate": 0.035,
+   "mark_main": "床",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 170,
+   "n_ok": 200,
+   "rate": 0.85,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 57,
+   "n_ok": 200,
+   "rate": 0.285,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 180,
+   "n_ok": 200,
+   "rate": 0.9,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 66,
+   "n_ok": 200,
+   "rate": 0.33,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 58,
+   "n_ok": 200,
+   "rate": 0.29,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 170,
+   "n_ok": 200,
+   "rate": 0.85,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 162,
+   "n_ok": 200,
+   "rate": 0.81,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 166,
+   "n_ok": 200,
+   "rate": 0.83,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 132,
+   "n_ok": 200,
+   "rate": 0.66,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 193,
+   "n_ok": 200,
+   "rate": 0.965,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 190,
+   "n_ok": 200,
+   "rate": 0.95,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 188,
+   "n_ok": 200,
+   "rate": 0.94,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 195,
+   "n_ok": 200,
+   "rate": 0.975,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 109,
+   "n_ok": 200,
+   "rate": 0.545,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 1,
+   "n_ok": 200,
+   "rate": 0.005,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 197,
+   "n_ok": 200,
+   "rate": 0.985,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 191,
+   "n_ok": 200,
+   "rate": 0.955,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 172,
+   "n_ok": 200,
+   "rate": 0.86,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 65,
+   "n_ok": 200,
+   "rate": 0.325,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 7,
+   "n_ok": 200,
+   "rate": 0.035,
+   "mark_main": "床",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 173,
+   "n_ok": 200,
+   "rate": 0.865,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 188,
+   "n_ok": 200,
+   "rate": 0.94,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 74,
+   "n_ok": 200,
+   "rate": 0.37,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 172,
+   "n_ok": 200,
+   "rate": 0.86,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 38,
+   "n_ok": 200,
+   "rate": 0.19,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-0.6B",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 149,
+   "n_ok": 200,
+   "rate": 0.745,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 97,
+   "n_ok": 200,
+   "rate": 0.485,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 194,
+   "n_ok": 200,
+   "rate": 0.97,
+   "mark_main": "天井",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-1.7B",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 174,
+   "n_ok": 200,
+   "rate": 0.87,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 187,
+   "n_ok": 200,
+   "rate": 0.935,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 153,
+   "n_ok": 200,
+   "rate": 0.765,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 82,
+   "n_ok": 200,
+   "rate": 0.41,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 186,
+   "n_ok": 200,
+   "rate": 0.93,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 175,
+   "n_ok": 200,
+   "rate": 0.875,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 185,
+   "n_ok": 200,
+   "rate": 0.925,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 57,
+   "n_ok": 200,
+   "rate": 0.285,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 180,
+   "n_ok": 200,
+   "rate": 0.9,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-8B",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 199,
+   "n_ok": 200,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 124,
+   "n_ok": 200,
+   "rate": 0.62,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 13,
+   "n_ok": 200,
+   "rate": 0.065,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 197,
+   "n_ok": 200,
+   "rate": 0.985,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 198,
+   "n_ok": 200,
+   "rate": 0.99,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-14B",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 182,
+   "n_ok": 200,
+   "rate": 0.91,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 91,
+   "n_ok": 200,
+   "rate": 0.455,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 1,
+   "n_ok": 200,
+   "rate": 0.005,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 196,
+   "n_ok": 200,
+   "rate": 0.98,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 180,
+   "n_ok": 200,
+   "rate": 0.9,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-32B",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 200,
+   "n_ok": 200,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 123,
+   "n_ok": 200,
+   "rate": 0.615,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 200,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 195,
+   "n_ok": 200,
+   "rate": 0.975,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 181,
+   "n_ok": 200,
+   "rate": 0.905,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "A",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 129,
+   "n_ok": 200,
+   "rate": 0.645,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "N1",
+   "arm": "N",
+   "k": 307,
+   "n_ok": 400,
+   "rate": 0.7675,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "N1",
+   "arm": "Onull",
+   "k": 276,
+   "n_ok": 400,
+   "rate": 0.69,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "N1",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 400,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "N1",
+   "arm": "Ncold",
+   "k": 390,
+   "n_ok": 400,
+   "rate": 0.975,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "N1",
+   "arm": "Onull-Ncold",
+   "k": 366,
+   "n_ok": 400,
+   "rate": 0.915,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "N1",
+   "arm": "O-Ncold",
+   "k": 52,
+   "n_ok": 400,
+   "rate": 0.13,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S1",
+   "arm": "N",
+   "k": 400,
+   "n_ok": 400,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S1",
+   "arm": "Onull",
+   "k": 148,
+   "n_ok": 400,
+   "rate": 0.37,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S1",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 400,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S1",
+   "arm": "Ncold",
+   "k": 398,
+   "n_ok": 400,
+   "rate": 0.995,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S1",
+   "arm": "Onull-Ncold",
+   "k": 355,
+   "n_ok": 400,
+   "rate": 0.8875,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S1",
+   "arm": "O-Ncold",
+   "k": 132,
+   "n_ok": 400,
+   "rate": 0.33,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S4",
+   "arm": "N",
+   "k": 372,
+   "n_ok": 400,
+   "rate": 0.93,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S4",
+   "arm": "Onull",
+   "k": 148,
+   "n_ok": 400,
+   "rate": 0.37,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S4",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 400,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S4",
+   "arm": "Ncold",
+   "k": 400,
+   "n_ok": 400,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S4",
+   "arm": "Onull-Ncold",
+   "k": 349,
+   "n_ok": 400,
+   "rate": 0.8725,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S4",
+   "arm": "O-Ncold",
+   "k": 96,
+   "n_ok": 400,
+   "rate": 0.24,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "SK",
+   "arm": "N",
+   "k": 400,
+   "n_ok": 400,
+   "rate": 1.0,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "SK",
+   "arm": "Onull",
+   "k": 231,
+   "n_ok": 400,
+   "rate": 0.5775,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "SK",
+   "arm": "O",
+   "k": 0,
+   "n_ok": 400,
+   "rate": 0.0,
+   "mark_main": "床",
+   "mark_sens_wide": "床",
+   "mark_sens_narrow": "床"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "SK",
+   "arm": "Ncold",
+   "k": 397,
+   "n_ok": 400,
+   "rate": 0.9925,
+   "mark_main": "天井",
+   "mark_sens_wide": "天井",
+   "mark_sens_narrow": "天井"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "SK",
+   "arm": "Onull-Ncold",
+   "k": 363,
+   "n_ok": 400,
+   "rate": 0.9075,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  },
+  {
+   "stage": "Vprime",
+   "model": "Qwen/Qwen3-4B-Instruct-2507",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "SK",
+   "arm": "O-Ncold",
+   "k": 222,
+   "n_ok": 400,
+   "rate": 0.555,
+   "mark_main": "中",
+   "mark_sens_wide": "中",
+   "mark_sens_narrow": "中"
+  }
+ ],
+ "calc1_per_model": {
+  "A|0.6B": {
+   "cells": 30,
+   "floor": 21,
+   "ceiling": 3,
+   "middle": 6,
+   "ends_sens_wide": 23,
+   "ends_sens_narrow": 24
+  },
+  "A|1.7B": {
+   "cells": 30,
+   "floor": 1,
+   "ceiling": 19,
+   "middle": 10,
+   "ends_sens_wide": 19,
+   "ends_sens_narrow": 22
+  },
+  "A|4B": {
+   "cells": 30,
+   "floor": 0,
+   "ceiling": 9,
+   "middle": 21,
+   "ends_sens_wide": 6,
+   "ends_sens_narrow": 16
+  },
+  "A|8B": {
+   "cells": 30,
+   "floor": 0,
+   "ceiling": 21,
+   "middle": 9,
+   "ends_sens_wide": 21,
+   "ends_sens_narrow": 22
+  },
+  "A|14B": {
+   "cells": 30,
+   "floor": 3,
+   "ceiling": 15,
+   "middle": 12,
+   "ends_sens_wide": 15,
+   "ends_sens_narrow": 20
+  },
+  "A|32B": {
+   "cells": 30,
+   "floor": 6,
+   "ceiling": 9,
+   "middle": 15,
+   "ends_sens_wide": 11,
+   "ends_sens_narrow": 17
+  },
+  "A|4B-2507": {
+   "cells": 30,
+   "floor": 5,
+   "ceiling": 9,
+   "middle": 16,
+   "ends_sens_wide": 13,
+   "ends_sens_narrow": 15
+  },
+  "Vprime|4B-2507": {
+   "cells": 24,
+   "floor": 4,
+   "ceiling": 6,
+   "middle": 14,
+   "ends_sens_wide": 10,
+   "ends_sens_narrow": 11
+  }
+ },
+ "calc2_rows": [
+  {
+   "stage": "A",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     55,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     118,
+     200
+    ]
+   },
+   "rate_Onull": 0.275,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.59,
+   "logor_down": -5.030168329233697,
+   "logor_up": 1.3259077331599107,
+   "abs_diff_up_minus_down": -3.7042605960737864,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     190,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 0.95,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 1.0,
+   "logor_down": -8.892238332496138,
+   "logor_up": 3.095684457689539,
+   "abs_diff_up_minus_down": -5.796553874806599,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [
+    "Onull"
+   ],
+   "boundary_count_arms": [
+    "O",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     182,
+     200
+    ],
+    "O": [
+     45,
+     200
+    ],
+    "Onull-Ncold": [
+     192,
+     200
+    ]
+   },
+   "rate_Onull": 0.91,
+   "rate_O": 0.225,
+   "rate_OnullNcold": 0.96,
+   "logor_down": -3.5179128469804066,
+   "logor_up": 0.8310505495558643,
+   "abs_diff_up_minus_down": -2.6868622974245424,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     114,
+     200
+    ],
+    "O": [
+     91,
+     200
+    ],
+    "Onull-Ncold": [
+     167,
+     200
+    ]
+   },
+   "rate_Onull": 0.57,
+   "rate_O": 0.455,
+   "rate_OnullNcold": 0.835,
+   "logor_down": -0.46001598603302346,
+   "logor_up": 1.329007502597148,
+   "abs_diff_up_minus_down": 0.8689915165641244,
+   "converged": true,
+   "no_room": false,
+   "end_arms": [],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     42,
+     200
+    ],
+    "O": [
+     4,
+     200
+    ],
+    "Onull-Ncold": [
+     105,
+     200
+    ]
+   },
+   "rate_Onull": 0.21,
+   "rate_O": 0.02,
+   "rate_OnullNcold": 0.525,
+   "logor_down": -2.4603345077187493,
+   "logor_up": 1.4158352232937714,
+   "abs_diff_up_minus_down": -1.0444992844249779,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     16,
+     200
+    ],
+    "O": [
+     1,
+     200
+    ],
+    "Onull-Ncold": [
+     33,
+     200
+    ]
+   },
+   "rate_Onull": 0.08,
+   "rate_O": 0.005,
+   "rate_OnullNcold": 0.165,
+   "logor_down": -2.4760600262464427,
+   "logor_up": 0.8048511703499401,
+   "abs_diff_up_minus_down": -1.6712088558965026,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     114,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     178,
+     200
+    ]
+   },
+   "rate_Onull": 0.57,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.89,
+   "logor_down": -6.2743918041493165,
+   "logor_up": 1.7906428831598695,
+   "abs_diff_up_minus_down": -4.483748920989447,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "N2",
+   "k_n": {
+    "Onull": [
+     0,
+     200
+    ],
+    "O": [
+     4,
+     200
+    ],
+    "Onull-Ncold": [
+     60,
+     200
+    ]
+   },
+   "rate_Onull": 0.0,
+   "rate_O": 0.02,
+   "rate_OnullNcold": 0.3,
+   "logor_down": 2.217376360560049,
+   "logor_up": 5.151397271355861,
+   "abs_diff_up_minus_down": 2.9340209107958115,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "O"
+   ],
+   "down_positive": true,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "N2",
+   "k_n": {
+    "Onull": [
+     200,
+     200
+    ],
+    "O": [
+     111,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 1.0,
+   "rate_O": 0.555,
+   "rate_OnullNcold": 1.0,
+   "logor_down": -5.7741754294735355,
+   "logor_up": 2.782992273483967e-16,
+   "abs_diff_up_minus_down": -5.7741754294735355,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "N2",
+   "k_n": {
+    "Onull": [
+     199,
+     200
+    ],
+    "O": [
+     81,
+     200
+    ],
+    "Onull-Ncold": [
+     199,
+     200
+    ]
+   },
+   "rate_Onull": 0.995,
+   "rate_O": 0.405,
+   "rate_OnullNcold": 0.995,
+   "logor_down": -5.273062459945245,
+   "logor_up": 2.3539841710915894e-16,
+   "abs_diff_up_minus_down": -5.273062459945245,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "N2",
+   "k_n": {
+    "Onull": [
+     195,
+     200
+    ],
+    "O": [
+     181,
+     200
+    ],
+    "Onull-Ncold": [
+     199,
+     200
+    ]
+   },
+   "rate_Onull": 0.975,
+   "rate_O": 0.905,
+   "rate_OnullNcold": 0.995,
+   "logor_down": -1.3399710974881343,
+   "logor_up": 1.3195368216256698,
+   "abs_diff_up_minus_down": -0.02043427586246449,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "N2",
+   "k_n": {
+    "Onull": [
+     192,
+     200
+    ],
+    "O": [
+     45,
+     200
+    ],
+    "Onull-Ncold": [
+     199,
+     200
+    ]
+   },
+   "rate_Onull": 0.96,
+   "rate_O": 0.225,
+   "rate_OnullNcold": 0.995,
+   "logor_down": -4.348963396154619,
+   "logor_up": 1.770319118590227,
+   "abs_diff_up_minus_down": -2.5786442775643916,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "N2",
+   "k_n": {
+    "Onull": [
+     106,
+     200
+    ],
+    "O": [
+     15,
+     200
+    ],
+    "Onull-Ncold": [
+     192,
+     200
+    ]
+   },
+   "rate_Onull": 0.53,
+   "rate_O": 0.075,
+   "rate_OnullNcold": 0.96,
+   "logor_down": -2.60176000862933,
+   "logor_up": 3.000484839842443,
+   "abs_diff_up_minus_down": 0.39872483121311264,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "N2",
+   "k_n": {
+    "Onull": [
+     198,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     199,
+     200
+    ]
+   },
+   "rate_Onull": 0.99,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.995,
+   "logor_down": -10.368459763345179,
+   "logor_up": 0.5158507404155677,
+   "abs_diff_up_minus_down": -9.852609022929611,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     0,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     0,
+     200
+    ]
+   },
+   "rate_Onull": 0.0,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.0,
+   "logor_down": -3.3685826311705127e-16,
+   "logor_up": -3.3685826311705127e-16,
+   "abs_diff_up_minus_down": 0.0,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": true,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     200,
+     200
+    ],
+    "O": [
+     81,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 1.0,
+   "rate_O": 0.405,
+   "rate_OnullNcold": 1.0,
+   "logor_down": -6.376674746217642,
+   "logor_up": 2.782992273483967e-16,
+   "abs_diff_up_minus_down": -6.376674746217642,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     155,
+     200
+    ],
+    "O": [
+     57,
+     200
+    ],
+    "Onull-Ncold": [
+     193,
+     200
+    ]
+   },
+   "rate_Onull": 0.775,
+   "rate_O": 0.285,
+   "rate_OnullNcold": 0.965,
+   "logor_down": -2.1434834934600344,
+   "logor_up": 2.021441086601747,
+   "abs_diff_up_minus_down": -0.12204240685828749,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     200,
+     200
+    ],
+    "O": [
+     200,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 1.0,
+   "rate_O": 1.0,
+   "rate_OnullNcold": 1.0,
+   "logor_down": 2.782992273483967e-16,
+   "logor_up": 2.782992273483967e-16,
+   "abs_diff_up_minus_down": 0.0,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": true,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     107,
+     200
+    ],
+    "O": [
+     5,
+     200
+    ],
+    "Onull-Ncold": [
+     192,
+     200
+    ]
+   },
+   "rate_Onull": 0.535,
+   "rate_O": 0.025,
+   "rate_OnullNcold": 0.96,
+   "logor_down": -3.710341696894629,
+   "logor_up": 2.98050057921915,
+   "abs_diff_up_minus_down": -0.7298411176754787,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     74,
+     200
+    ],
+    "O": [
+     7,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 0.37,
+   "rate_O": 0.035,
+   "rate_OnullNcold": 1.0,
+   "logor_down": -2.7209313094820793,
+   "logor_up": 6.523404577874882,
+   "abs_diff_up_minus_down": 3.802473268392803,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     57,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     180,
+     200
+    ]
+   },
+   "rate_Onull": 0.285,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.9,
+   "logor_down": -5.079411307696485,
+   "logor_up": 3.0898559793340694,
+   "abs_diff_up_minus_down": -1.9895553283624152,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     0,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     0,
+     200
+    ]
+   },
+   "rate_Onull": 0.0,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.0,
+   "logor_down": -3.3685826311705127e-16,
+   "logor_up": -3.3685826311705127e-16,
+   "abs_diff_up_minus_down": 0.0,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": true,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     200,
+     200
+    ],
+    "O": [
+     58,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 1.0,
+   "rate_O": 0.29,
+   "rate_OnullNcold": 1.0,
+   "logor_down": -6.884276640563712,
+   "logor_up": 2.782992273483967e-16,
+   "abs_diff_up_minus_down": -6.884276640563712,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     166,
+     200
+    ],
+    "O": [
+     132,
+     200
+    ],
+    "Onull-Ncold": [
+     190,
+     200
+    ]
+   },
+   "rate_Onull": 0.83,
+   "rate_O": 0.66,
+   "rate_OnullNcold": 0.95,
+   "logor_down": -0.9142870849314677,
+   "logor_up": 1.324240952114159,
+   "abs_diff_up_minus_down": 0.4099538671826912,
+   "converged": true,
+   "no_room": false,
+   "end_arms": [],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [
+    "Onull-Ncold"
+   ],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     200,
+     200
+    ],
+    "O": [
+     200,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 1.0,
+   "rate_O": 1.0,
+   "rate_OnullNcold": 1.0,
+   "logor_down": 2.782992273483967e-16,
+   "logor_up": 2.782992273483967e-16,
+   "abs_diff_up_minus_down": 0.0,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": true,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     109,
+     200
+    ],
+    "O": [
+     1,
+     200
+    ],
+    "Onull-Ncold": [
+     199,
+     200
+    ]
+   },
+   "rate_Onull": 0.545,
+   "rate_O": 0.005,
+   "rate_OnullNcold": 0.995,
+   "logor_down": -5.069934685795575,
+   "logor_up": 4.710763531845411,
+   "abs_diff_up_minus_down": -0.35917115395016364,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     65,
+     200
+    ],
+    "O": [
+     7,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 0.325,
+   "rate_O": 0.035,
+   "rate_OnullNcold": 1.0,
+   "logor_down": -2.523452994585591,
+   "logor_up": 6.720882892771371,
+   "abs_diff_up_minus_down": 4.19742989818578,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     74,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     172,
+     200
+    ]
+   },
+   "rate_Onull": 0.37,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.86,
+   "logor_down": -5.464518212310796,
+   "logor_up": 2.3299363320170143,
+   "abs_diff_up_minus_down": -3.1345818802937813,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "0.6B",
+   "provider": "local",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     0,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     0,
+     200
+    ]
+   },
+   "rate_Onull": 0.0,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.0,
+   "logor_down": -3.3685826311705127e-16,
+   "logor_up": -3.3685826311705127e-16,
+   "abs_diff_up_minus_down": 0.0,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": true,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "O",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "1.7B",
+   "provider": "local",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     200,
+     200
+    ],
+    "O": [
+     97,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 1.0,
+   "rate_O": 0.485,
+   "rate_OnullNcold": 1.0,
+   "logor_down": -6.053680629794519,
+   "logor_up": 2.782992273483967e-16,
+   "abs_diff_up_minus_down": -6.053680629794519,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": true,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull",
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "4B",
+   "provider": "local",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     153,
+     200
+    ],
+    "O": [
+     82,
+     200
+    ],
+    "Onull-Ncold": [
+     175,
+     200
+    ]
+   },
+   "rate_Onull": 0.765,
+   "rate_O": 0.41,
+   "rate_OnullNcold": 0.875,
+   "logor_down": -1.535085523498493,
+   "logor_up": 0.7559897348521991,
+   "abs_diff_up_minus_down": -0.7790957886462939,
+   "converged": true,
+   "no_room": false,
+   "end_arms": [],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "8B",
+   "provider": "local",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     57,
+     200
+    ],
+    "O": [
+     180,
+     200
+    ],
+    "Onull-Ncold": [
+     200,
+     200
+    ]
+   },
+   "rate_Onull": 0.285,
+   "rate_O": 0.9,
+   "rate_OnullNcold": 1.0,
+   "logor_down": 3.0898559793340694,
+   "logor_up": 6.908511482489192,
+   "abs_diff_up_minus_down": 3.818655503155122,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull-Ncold"
+   ],
+   "down_positive": true,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "Onull-Ncold"
+   ]
+  },
+  {
+   "stage": "A",
+   "size": "14B",
+   "provider": "local",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     124,
+     200
+    ],
+    "O": [
+     13,
+     200
+    ],
+    "Onull-Ncold": [
+     198,
+     200
+    ]
+   },
+   "rate_Onull": 0.62,
+   "rate_O": 0.065,
+   "rate_OnullNcold": 0.99,
+   "logor_down": -3.1181041326411005,
+   "logor_up": 3.887483362814991,
+   "abs_diff_up_minus_down": 0.7693792301738904,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "Onull-Ncold"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "32B",
+   "provider": "local",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     91,
+     200
+    ],
+    "O": [
+     1,
+     200
+    ],
+    "Onull-Ncold": [
+     180,
+     200
+    ]
+   },
+   "rate_Onull": 0.455,
+   "rate_O": 0.005,
+   "rate_OnullNcold": 0.9,
+   "logor_down": -4.710763531845416,
+   "logor_up": 2.3548914689129847,
+   "abs_diff_up_minus_down": -2.355872062932431,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": []
+  },
+  {
+   "stage": "A",
+   "size": "4B-2507",
+   "provider": "local",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     123,
+     200
+    ],
+    "O": [
+     0,
+     200
+    ],
+    "Onull-Ncold": [
+     181,
+     200
+    ]
+   },
+   "rate_Onull": 0.615,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.905,
+   "logor_down": -6.4599246148015865,
+   "logor_up": 1.764877968782795,
+   "abs_diff_up_minus_down": -4.695046646018792,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "Vprime",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "N1",
+   "k_n": {
+    "Onull": [
+     276,
+     400
+    ],
+    "O": [
+     0,
+     400
+    ],
+    "Onull-Ncold": [
+     366,
+     400
+    ]
+   },
+   "rate_Onull": 0.69,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.915,
+   "logor_down": -7.483766050302733,
+   "logor_up": 1.5651340921724946,
+   "abs_diff_up_minus_down": -5.918631958130238,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "Vprime",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S1",
+   "k_n": {
+    "Onull": [
+     148,
+     400
+    ],
+    "O": [
+     0,
+     400
+    ],
+    "Onull-Ncold": [
+     355,
+     400
+    ]
+   },
+   "rate_Onull": 0.37,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.8875,
+   "logor_down": -6.155034654772445,
+   "logor_up": 2.5866392137811522,
+   "abs_diff_up_minus_down": -3.5683954409912926,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "Vprime",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "S4",
+   "k_n": {
+    "Onull": [
+     148,
+     400
+    ],
+    "O": [
+     0,
+     400
+    ],
+    "Onull-Ncold": [
+     349,
+     400
+    ]
+   },
+   "rate_Onull": 0.37,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.8725,
+   "logor_down": -6.155034654772445,
+   "logor_up": 2.4457480444894166,
+   "abs_diff_up_minus_down": -3.709286610283028,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  },
+  {
+   "stage": "Vprime",
+   "size": "4B-2507",
+   "provider": "nscale",
+   "scenario": "SK",
+   "k_n": {
+    "Onull": [
+     231,
+     400
+    ],
+    "O": [
+     0,
+     400
+    ],
+    "Onull-Ncold": [
+     363,
+     400
+    ]
+   },
+   "rate_Onull": 0.5775,
+   "rate_O": 0.0,
+   "rate_OnullNcold": 0.9075,
+   "logor_down": -6.997587891950889,
+   "logor_up": 1.9597114158495488,
+   "abs_diff_up_minus_down": -5.03787647610134,
+   "converged": true,
+   "no_room": true,
+   "end_arms": [
+    "O"
+   ],
+   "down_positive": false,
+   "up_negative": false,
+   "down_zero": false,
+   "up_zero": false,
+   "threshold_exact_arms": [],
+   "boundary_count_arms": [
+    "O"
+   ]
+  }
+ ],
+ "calc2_by_stage": {
+  "A": {
+   "cells": 35,
+   "room": 3,
+   "room_cells": [
+    "8B N1",
+    "4B S4",
+    "4B SK"
+   ],
+   "end_arm_counts": {
+    "O": 20,
+    "Onull-Ncold": 23,
+    "Onull": 14
+   },
+   "down_positive_cells": [
+    "0.6B N2",
+    "8B SK"
+   ],
+   "up_negative_cells": [],
+   "threshold_exact_cells": [
+    "1.7B N1（Onull）",
+    "4B S4（Onull-Ncold）"
+   ],
+   "nonconverged": 0
+  },
+  "Vprime": {
+   "cells": 4,
+   "room": 0,
+   "room_cells": [],
+   "end_arm_counts": {
+    "O": 4,
+    "Onull-Ncold": 0,
+    "Onull": 0
+   },
+   "down_positive_cells": [],
+   "up_negative_cells": [],
+   "threshold_exact_cells": [],
+   "nonconverged": 0
+  }
+ },
+ "post_hoc_note": "計算二の段ごとの数・向きの印・閾値ちょうどの印・境の数の印は、一巡目の検分で値を見た後に足した記述（追記一 §2）。札ではない。向きの印は絶対値が 1e-09 未満を零として付けない。",
+ "zero_tol": 1e-09,
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
