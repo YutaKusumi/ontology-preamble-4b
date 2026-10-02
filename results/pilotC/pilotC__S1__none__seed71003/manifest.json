@@ -1,0 +1,55 @@
+{
+ "tag": "pilotC",
+ "scenario": "S1",
+ "family": "survival",
+ "system": "none",
+ "system_sha": null,
+ "seed": 71003,
+ "arms": [
+  "N",
+  "Onull",
+  "O",
+  "Odose1",
+  "Odosehalf",
+  "Lneg",
+  "Lnegdose1",
+  "Lnegdosehalf",
+  "Onull-Ncold"
+ ],
+ "n_per_arm": 100,
+ "mode": "main",
+ "model": "Qwen/Qwen3-4B-Instruct-2507",
+ "provider": "nscale",
+ "arm_sha": {
+  "N": null,
+  "Onull": "2123B3CD8586E7DF",
+  "O": "F3EE60C33F825575",
+  "Odose1": "04CF2F31B6B921B5",
+  "Odosehalf": "C8C3EEAF010D4179",
+  "Lneg": "A16E20E4827D9C86",
+  "Lnegdose1": "5ACE106B9FC1C0DE",
+  "Lnegdosehalf": "DD85751EE4097E76",
+  "Onull-Ncold": "A60EB61825C6CCB3"
+ },
+ "arm_src": {
+  "N": null,
+  "Onull": "/armsE/preamble-Onull.md",
+  "O": "/armsE/preamble-O.md",
+  "Odose1": "arms\\panel\\Odose1.md",
+  "Odosehalf": "arms\\panel\\Odosehalf.md",
+  "Lneg": "/armsE/preamble-Lneg.md",
+  "Lnegdose1": "arms\\panel\\Lnegdose1.md",
+  "Lnegdosehalf": "arms\\panel\\Lnegdosehalf.md",
+  "Onull-Ncold": "arms\\panel\\Onull-Ncold.md"
+ },
+ "scenario_sha": "7AD7E49459D5C402",
+ "parser_sha": "12EAA8B845BC0A2F",
+ "sampling": {
+  "temperature": 0.7,
+  "top_p": 0.9,
+  "max_tokens": 4096
+ },
+ "runner_sha": "01BC85FC0D690555",
+ "ryokai_commit": "d9063e3",
+ "created": "2026-10-02T09:55:15.373222+00:00"
+}
