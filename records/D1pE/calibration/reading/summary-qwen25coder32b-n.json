@@ -1,0 +1,60 @@
+{
+ "kind": "reading_summary_D1pE",
+ "tool": "d1pe_reading.py v0",
+ "model_key": "qwen25coder32b-n",
+ "model": "Qwen/Qwen2.5-Coder-32B-Instruct",
+ "provider": "nscale",
+ "extra_body": null,
+ "sampling": "both",
+ "max_tokens": 4096,
+ "n": 75,
+ "n_ok": 75,
+ "api_error": 0,
+ "no_answer_A": 0,
+ "no_answer_B": 0,
+ "accuracy_A": 0.7733,
+ "accuracy_B": 0.7733,
+ "rule_B_used": {
+  "一": 75
+ },
+ "per_scenario": {
+  "N1": {
+   "n": 15,
+   "correct_A": 11,
+   "correct_B": 11
+  },
+  "N2": {
+   "n": 15,
+   "correct_A": 11,
+   "correct_B": 11
+  },
+  "S1": {
+   "n": 15,
+   "correct_A": 10,
+   "correct_B": 10
+  },
+  "S4": {
+   "n": 15,
+   "correct_A": 12,
+   "correct_B": 12
+  },
+  "SK": {
+   "n": 15,
+   "correct_A": 14,
+   "correct_B": 14
+  }
+ },
+ "pass_rule": 0.8,
+ "verdict": "英語で問いを理解できない（外す）",
+ "passed_by": null,
+ "api_models_seen": [
+  "Qwen/Qwen2.5-Coder-32B-Instruct"
+ ],
+ "cost_usd_est": 0.001723,
+ "questions_sha256": "5BE5F5EDA02DCF9EAFB79D0A45EE9BE1D25FEDCBBC075E583BCDEBB2769EDB6A",
+ "rule_b_sha256": "98BC85BF929A1000FA007CCDD3FB0A63F464FC5412610E4B0F2ADA2F3837E536",
+ "reference_sha256": "FC0A5DFBA6761E911B94FD7EB473E7890E5B8C9B3CDCD81C9038387C84DEB459",
+ "dry": false,
+ "time_jst": "2026-10-11 21:03:26",
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

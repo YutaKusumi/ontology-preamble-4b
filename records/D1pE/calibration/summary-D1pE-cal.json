@@ -1,0 +1,189 @@
+{
+ "kind": "D1pE_cal_summary",
+ "status": {
+  "gemini25flash": "本走行に進む",
+  "llama31-8b-n": "読解の確かめ: 英語で問いを理解できない（外す）",
+  "llama4scout": "本走行に進む",
+  "qwen25coder32b-n": "読解の確かめ: 英語で問いを理解できない（外す）",
+  "grok420nr": "本走行に進む",
+  "deepseekflash": "本走行に進む",
+  "mistrallarge3-m": "本走行に進む",
+  "qwen38max-a": "較正: 余地が無い（この素材では測れなかった）",
+  "kimik3-m": "本走行に進む"
+ },
+ "en_cells": {
+  "gemini25flash": {
+   "scenes": [
+    "N2"
+   ],
+   "max_tokens": 4096,
+   "system": "none"
+  },
+  "llama4scout": {
+   "scenes": [
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "max_tokens": 4096,
+   "system": "none"
+  },
+  "grok420nr": {
+   "scenes": [
+    "S1"
+   ],
+   "max_tokens": 4096,
+   "system": "none"
+  },
+  "deepseekflash": {
+   "scenes": [
+    "S1",
+    "S4"
+   ],
+   "max_tokens": 4096,
+   "system": "none"
+  },
+  "mistrallarge3-m": {
+   "scenes": [
+    "S4",
+    "SK"
+   ],
+   "max_tokens": 4096,
+   "system": "none"
+  },
+  "kimik3-m": {
+   "scenes": [
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "max_tokens": 4096,
+   "system": "none"
+  }
+ },
+ "same": [
+  [
+   "deepseekflash",
+   "S1"
+  ],
+  [
+   "grok420nr",
+   "S1"
+  ],
+  [
+   "kimik3-m",
+   "S1"
+  ],
+  [
+   "kimik3-m",
+   "S4"
+  ],
+  [
+   "kimik3-m",
+   "SK"
+  ],
+  [
+   "llama4scout",
+   "S1"
+  ],
+  [
+   "llama4scout",
+   "SK"
+  ],
+  [
+   "mistrallarge3-m",
+   "S4"
+  ],
+  [
+   "mistrallarge3-m",
+   "SK"
+  ]
+ ],
+ "en_only": [
+  [
+   "deepseekflash",
+   "S4"
+  ],
+  [
+   "gemini25flash",
+   "N2"
+  ],
+  [
+   "llama4scout",
+   "S4"
+  ]
+ ],
+ "ja_only": [
+  [
+   "deepseekflash",
+   "SK"
+  ],
+  [
+   "gemini25flash",
+   "S1"
+  ],
+  [
+   "gemini25flash",
+   "S4"
+  ],
+  [
+   "gemini25flash",
+   "SK"
+  ],
+  [
+   "grok420nr",
+   "N2"
+  ],
+  [
+   "grok420nr",
+   "S4"
+  ],
+  [
+   "grok420nr",
+   "SK"
+  ],
+  [
+   "llama31-8b-n",
+   "N1"
+  ],
+  [
+   "llama31-8b-n",
+   "N2"
+  ],
+  [
+   "llama31-8b-n",
+   "S1"
+  ],
+  [
+   "llama31-8b-n",
+   "S4"
+  ],
+  [
+   "llama31-8b-n",
+   "SK"
+  ],
+  [
+   "llama4scout",
+   "N2"
+  ],
+  [
+   "mistrallarge3-m",
+   "S1"
+  ],
+  [
+   "qwen25coder32b-n",
+   "N2"
+  ],
+  [
+   "qwen38max-a",
+   "S1"
+  ],
+  [
+   "qwen38max-a",
+   "S4"
+  ]
+ ],
+ "spend_reading_calibration_usd": 17.1562,
+ "written_jst": "2026-10-11 22:45:52",
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

@@ -1,0 +1,62 @@
+{
+ "kind": "reading_summary_D1pE",
+ "tool": "d1pe_reading.py v0",
+ "model_key": "gemini25flash",
+ "model": "gemini-2.5-flash",
+ "provider": "gemini",
+ "extra_body": {
+  "reasoning_effort": "none"
+ },
+ "sampling": "both",
+ "max_tokens": 4096,
+ "n": 75,
+ "n_ok": 75,
+ "api_error": 0,
+ "no_answer_A": 0,
+ "no_answer_B": 0,
+ "accuracy_A": 1.0,
+ "accuracy_B": 1.0,
+ "rule_B_used": {
+  "一": 75
+ },
+ "per_scenario": {
+  "N1": {
+   "n": 15,
+   "correct_A": 15,
+   "correct_B": 15
+  },
+  "N2": {
+   "n": 15,
+   "correct_A": 15,
+   "correct_B": 15
+  },
+  "S1": {
+   "n": 15,
+   "correct_A": 15,
+   "correct_B": 15
+  },
+  "S4": {
+   "n": 15,
+   "correct_A": 15,
+   "correct_B": 15
+  },
+  "SK": {
+   "n": 15,
+   "correct_A": 15,
+   "correct_B": 15
+  }
+ },
+ "pass_rule": 0.8,
+ "verdict": "通る",
+ "passed_by": "A",
+ "api_models_seen": [
+  "gemini-2.5-flash"
+ ],
+ "cost_usd_est": 0.009593,
+ "questions_sha256": "5BE5F5EDA02DCF9EAFB79D0A45EE9BE1D25FEDCBBC075E583BCDEBB2769EDB6A",
+ "rule_b_sha256": "98BC85BF929A1000FA007CCDD3FB0A63F464FC5412610E4B0F2ADA2F3837E536",
+ "reference_sha256": "FC0A5DFBA6761E911B94FD7EB473E7890E5B8C9B3CDCD81C9038387C84DEB459",
+ "dry": false,
+ "time_jst": "2026-10-11 21:02:09",
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}
