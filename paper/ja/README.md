@@ -66,7 +66,7 @@
 
 ## 引用
 
-- 題・著者・版は、置き場の頭の [`CITATION.cff`](../../CITATION.cff) にあります（DOI は、Zenodo への登録の後に足します）。
+- 題・著者・版は、置き場の頭の [`CITATION.cff`](../../CITATION.cff) にあります。版は、GitHub のタグ `paper-ja-v1.0` で指します。
 
 ## ライセンス
 
