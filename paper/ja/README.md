@@ -45,6 +45,7 @@
 | 24 | [`appx-I-rules.md`](appx-I-rules.md) | 付録 I 判定の決まり（凍結した本文の逐語） | A29E65FCF90418A31C274DA99409A1D6818ED0B8092592F816CC2FF2DBE04797 |
 | 25 | [`appx-J-prior-limits.md`](appx-J-prior-limits.md) | 付録 J 前の段の最終版の限界の節 | 0BBB01CC2E3EBA8DF4AE721049CEF93B42E0BDCDD1C9E0C53140D2122B4792A6 |
 
+- 一つにまとめた PDF: [`paper-ja-v1.0.pdf`](paper-ja-v1.0.pdf)（読みやすさのための写しで、正本は上の 25 のファイル・SHA-256 05D73AC03A22CF78DF2F6DF0A0822B4BA9DBCE68E062B12487477724108233AD）。
 - 図: [`figs/`](figs/)（11 枚・SHA-256 は下の表）。
 - 論文の図と表を組んだスクリプトと出力: [`internal/`](internal/)。論文の付録 H.3 で「論文の図と表として、論文とともに公開する」とした 38 の物を、内部の置き場の道のまま、元のバイトのまま置きました（SHA-256 の頭 16 字は付録 H.3 の行と同じ）。スクリプトは起草者の手元の置き場の道を指す作りで、そのままでは動きません。スクリプトの説明の文には、役の名（法名）が残ります。
 - 同じ `internal/E/E3/calc/calsum-v0.3/` に、較正の記述の表の写しの記録（`calsum-D-record.md`）と、表の json（`ja/calsum-ja.json`・`en/calsum-en.json`）を置きました（付録 D-ja.4 の表の元）。
