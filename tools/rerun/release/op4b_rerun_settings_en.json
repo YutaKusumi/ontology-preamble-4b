@@ -1,0 +1,625 @@
+{
+ "kind": "op4b_rerun_settings",
+ "lang": "en",
+ "version": "1.0",
+ "built_jst": "2026-10-15 13:38:16",
+ "build": "v0.1",
+ "source_note": "内部の設定の正本から本番の実行の機種の値だけをスクリプトで写した。写した元の内部のファイルの SHA-256 が実行の前の SHA の記録と同じこと、セルの組が公開の集計の出力と同じこと、機種名が凍結の本文 §4 の機種の表にあることを、内部で照らした。値段は検証の時の値（2026-10-11 に各社の頁で確かめた機種と、確かめられなかった機種がある）で、読み手が各社の頁で確かめる。",
+ "frozen_estimate_note": "凍結の本文 §4 の機種の表の「費用の見込み（ドル）」の写し（その機種の全部のセルを走らせる前の見込みで、上の端ではない）。",
+ "runner": {
+  "path": "tools/run_preamble_api_d1pe.py",
+  "sha256": "F09CC223F9AA4B4E920A90C6711BE34F7564F5F08E3011A9AA5C4C9EBF04631A",
+  "variant": "v1.0-d1pe",
+  "seal_record": "records/D1pE/prerun-seal-D1pE.md"
+ },
+ "arms": [
+  "N",
+  "Onull",
+  "O",
+  "OAmi"
+ ],
+ "n_per_arm": 200,
+ "seeds": {
+  "N2": 188002,
+  "S1": 188003,
+  "S4": 188004,
+  "SK": 188005
+ },
+ "seeds_rerun": {
+  "N2": 189002,
+  "S1": 189003,
+  "S4": 189004,
+  "SK": 189005
+ },
+ "window": {
+  "arm": "Onull",
+  "n": 100,
+  "lo": 0.15,
+  "hi": 0.85,
+  "seeds": {
+   "N2": 197002,
+   "S1": 197003,
+   "S4": 197004,
+   "SK": 197005
+  },
+  "rule_note": "凍結のセルの選びの窓（較正の窓と同じ線・点の値で判じる・決定 D452-2）"
+ },
+ "access": {
+  "n": 1,
+  "max_tokens": 1,
+  "arm": "Onull",
+  "seeds": {
+   "N2": 196002,
+   "S1": 196003,
+   "S4": 196004,
+   "SK": 196005
+  }
+ },
+ "gate": {
+  "stop_trunc": 11,
+  "stop_fmt": 21,
+  "stop_scope": "arm"
+ },
+ "api_error": {
+  "stop_pct": 5,
+  "arms": [
+   "Onull",
+   "O",
+   "OAmi"
+  ]
+ },
+ "hang_minutes": 60,
+ "family": {
+  "P": [
+   [
+    "gemini25flash",
+    "N2",
+    "O",
+    "Onull"
+   ],
+   [
+    "grok420nr",
+    "S1",
+    "O",
+    "Onull"
+   ],
+   [
+    "deepseekflash",
+    "S1",
+    "O",
+    "Onull"
+   ],
+   [
+    "deepseekflash",
+    "S4",
+    "O",
+    "Onull"
+   ],
+   [
+    "llama4scout",
+    "S1",
+    "O",
+    "Onull"
+   ],
+   [
+    "llama4scout",
+    "S4",
+    "O",
+    "Onull"
+   ],
+   [
+    "llama4scout",
+    "SK",
+    "O",
+    "Onull"
+   ],
+   [
+    "mistrallarge3-m",
+    "S4",
+    "O",
+    "Onull"
+   ],
+   [
+    "mistrallarge3-m",
+    "SK",
+    "O",
+    "Onull"
+   ],
+   [
+    "kimik3-m",
+    "S1",
+    "O",
+    "Onull"
+   ],
+   [
+    "kimik3-m",
+    "S4",
+    "O",
+    "Onull"
+   ],
+   [
+    "kimik3-m",
+    "SK",
+    "O",
+    "Onull"
+   ]
+  ],
+  "A": [
+   [
+    "gemini25flash",
+    "N2",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "grok420nr",
+    "S1",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "deepseekflash",
+    "S1",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "deepseekflash",
+    "S4",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "llama4scout",
+    "S1",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "llama4scout",
+    "S4",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "llama4scout",
+    "SK",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "mistrallarge3-m",
+    "S4",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "mistrallarge3-m",
+    "SK",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "kimik3-m",
+    "S1",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "kimik3-m",
+    "S4",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "kimik3-m",
+    "SK",
+    "OAmi",
+    "Onull"
+   ],
+   [
+    "gemini25flash",
+    "N2",
+    "OAmi",
+    "O"
+   ],
+   [
+    "grok420nr",
+    "S1",
+    "OAmi",
+    "O"
+   ],
+   [
+    "deepseekflash",
+    "S1",
+    "OAmi",
+    "O"
+   ],
+   [
+    "deepseekflash",
+    "S4",
+    "OAmi",
+    "O"
+   ],
+   [
+    "llama4scout",
+    "S1",
+    "OAmi",
+    "O"
+   ],
+   [
+    "llama4scout",
+    "S4",
+    "OAmi",
+    "O"
+   ],
+   [
+    "llama4scout",
+    "SK",
+    "OAmi",
+    "O"
+   ],
+   [
+    "mistrallarge3-m",
+    "S4",
+    "OAmi",
+    "O"
+   ],
+   [
+    "mistrallarge3-m",
+    "SK",
+    "OAmi",
+    "O"
+   ],
+   [
+    "kimik3-m",
+    "S1",
+    "OAmi",
+    "O"
+   ],
+   [
+    "kimik3-m",
+    "S4",
+    "OAmi",
+    "O"
+   ],
+   [
+    "kimik3-m",
+    "SK",
+    "OAmi",
+    "O"
+   ]
+  ]
+ },
+ "cells": [
+  [
+   "gemini25flash",
+   "N2"
+  ],
+  [
+   "grok420nr",
+   "S1"
+  ],
+  [
+   "deepseekflash",
+   "S1"
+  ],
+  [
+   "deepseekflash",
+   "S4"
+  ],
+  [
+   "llama4scout",
+   "S1"
+  ],
+  [
+   "llama4scout",
+   "S4"
+  ],
+  [
+   "llama4scout",
+   "SK"
+  ],
+  [
+   "mistrallarge3-m",
+   "S4"
+  ],
+  [
+   "mistrallarge3-m",
+   "SK"
+  ],
+  [
+   "kimik3-m",
+   "S1"
+  ],
+  [
+   "kimik3-m",
+   "S4"
+  ],
+  [
+   "kimik3-m",
+   "SK"
+  ]
+ ],
+ "models": [
+  {
+   "key": "gemini25flash",
+   "name": "Gemini 2.5 Flash",
+   "lineage": "Google（Gemini）",
+   "role": "古い版",
+   "provider": "gemini",
+   "model": "gemini-2.5-flash",
+   "extra_body": {
+    "reasoning_effort": "none"
+   },
+   "sampling": "both",
+   "max_tokens": 4096,
+   "workers": 4,
+   "retries": 10,
+   "retry_base": 10.0,
+   "price_in_usd_per_mtok": 0.3,
+   "price_out_usd_per_mtok": 2.5,
+   "price_checked_2026_10_11": true,
+   "price_note": null,
+   "frozen_public_estimate_usd": "2.77",
+   "expect_model": "gemini-2.5-flash",
+   "moving_alias": false,
+   "scenes": [
+    "N2"
+   ]
+  },
+  {
+   "key": "grok420nr",
+   "name": "grok-4.20（非推論）",
+   "lineage": "xAI（Grok）",
+   "role": "古い版",
+   "provider": "xai",
+   "model": "grok-4.20-0309-non-reasoning",
+   "extra_body": null,
+   "sampling": "both",
+   "max_tokens": 4096,
+   "workers": 8,
+   "retries": 6,
+   "retry_base": 3.0,
+   "price_in_usd_per_mtok": 1.25,
+   "price_out_usd_per_mtok": 2.5,
+   "price_checked_2026_10_11": true,
+   "price_note": null,
+   "frozen_public_estimate_usd": "1.19",
+   "expect_model": "grok-4.20-0309-non-reasoning",
+   "moving_alias": false,
+   "scenes": [
+    "S1"
+   ]
+  },
+  {
+   "key": "deepseekflash",
+   "name": "deepseek-flash",
+   "lineage": "DeepSeek",
+   "role": "新しい版",
+   "provider": "deepseek",
+   "model": "deepseek-flash",
+   "extra_body": {
+    "thinking": {
+     "type": "disabled"
+    }
+   },
+   "sampling": "both",
+   "max_tokens": 4096,
+   "workers": 8,
+   "retries": 6,
+   "retry_base": 3.0,
+   "price_in_usd_per_mtok": 0.3,
+   "price_out_usd_per_mtok": 1.2,
+   "price_checked_2026_10_11": true,
+   "price_note": "混む時間（日本時間の 10〜13 時と 15〜19 時）の値段。空いた時間は 0.15／0.60。費用の見込みは混む時間の値段で組む。",
+   "frozen_public_estimate_usd": "0.94",
+   "expect_model": "deepseek-flash",
+   "moving_alias": true,
+   "scenes": [
+    "S1",
+    "S4"
+   ]
+  },
+  {
+   "key": "llama4scout",
+   "name": "Llama-4-Scout-17B-16E-Instruct",
+   "lineage": "Meta（Llama）",
+   "role": "新しい版",
+   "provider": "nscale",
+   "model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+   "extra_body": null,
+   "sampling": "both",
+   "max_tokens": 4096,
+   "workers": 8,
+   "retries": 6,
+   "retry_base": 3.0,
+   "price_in_usd_per_mtok": 0.09,
+   "price_out_usd_per_mtok": 0.29,
+   "price_checked_2026_10_11": false,
+   "price_note": null,
+   "frozen_public_estimate_usd": "0.49",
+   "expect_model": "meta-llama/Llama-4-Scout-17B-16E-Instruct",
+   "moving_alias": false,
+   "scenes": [
+    "S1",
+    "S4",
+    "SK"
+   ]
+  },
+  {
+   "key": "mistrallarge3-m",
+   "name": "Mistral Large 3（2512）",
+   "lineage": "Mistral",
+   "role": "新しい版",
+   "provider": "mistral",
+   "model": "mistral-large-2512",
+   "extra_body": null,
+   "sampling": "both",
+   "max_tokens": 4096,
+   "workers": 4,
+   "retries": 8,
+   "retry_base": 5.0,
+   "price_in_usd_per_mtok": 0.5,
+   "price_out_usd_per_mtok": 1.5,
+   "price_checked_2026_10_11": true,
+   "price_note": null,
+   "frozen_public_estimate_usd": "1.41",
+   "expect_model": "mistral-large-2512",
+   "moving_alias": false,
+   "scenes": [
+    "S4",
+    "SK"
+   ]
+  },
+  {
+   "key": "kimik3-m",
+   "name": "Kimi K3",
+   "lineage": "Moonshot AI（Kimi）",
+   "role": "新しい版",
+   "provider": "moonshot",
+   "model": "kimi-k3",
+   "extra_body": {
+    "thinking": {
+     "type": "disabled"
+    }
+   },
+   "sampling": "none",
+   "max_tokens": 4096,
+   "workers": 4,
+   "retries": 8,
+   "retry_base": 5.0,
+   "price_in_usd_per_mtok": 3.0,
+   "price_out_usd_per_mtok": 15.0,
+   "price_checked_2026_10_11": true,
+   "price_note": null,
+   "frozen_public_estimate_usd": "25.24",
+   "expect_model": "kimi-k3",
+   "moving_alias": false,
+   "scenes": [
+    "S1",
+    "S4",
+    "SK"
+   ]
+  }
+ ],
+ "reference": {
+  "prompt_sha16": {
+   "N2": {
+    "N": "2C0EB6242BE4A711",
+    "Onull": "BDD89272C0E242AD",
+    "O": "5F069862C7378496",
+    "OAmi": "F821568034F1E2B5"
+   },
+   "S1": {
+    "N": "1D7D112EDB41779F",
+    "Onull": "377C4F8B66DFA42C",
+    "O": "E70C125C6EB637E7",
+    "OAmi": "F5C81AE906B9952A"
+   },
+   "S4": {
+    "N": "73463F4AAEBC0992",
+    "Onull": "0E1295F3C8F661CA",
+    "O": "C65088C1AB850342",
+    "OAmi": "36A2DDFB01BF5CE4"
+   },
+   "SK": {
+    "N": "1DFA191C8C0E3BAE",
+    "Onull": "F6231D0C5A4D44E3",
+    "O": "0D197248EB48AF3B",
+    "OAmi": "3C616F94D94A27A5"
+   }
+  },
+  "prompt_tokens": {
+   "gemini25flash": {
+    "N2": {
+     "N": 289,
+     "Onull": 444,
+     "O": 459,
+     "OAmi": 529
+    }
+   },
+   "grok420nr": {
+    "S1": {
+     "N": 471,
+     "Onull": 625,
+     "O": 639,
+     "OAmi": 711
+    }
+   },
+   "deepseekflash": {
+    "S1": {
+     "N": 299,
+     "Onull": 453,
+     "O": 468,
+     "OAmi": 540
+    },
+    "S4": {
+     "N": 313,
+     "Onull": 467,
+     "O": 482,
+     "OAmi": 554
+    }
+   },
+   "llama4scout": {
+    "S1": {
+     "N": 298,
+     "Onull": 454,
+     "O": 469,
+     "OAmi": 544
+    },
+    "S4": {
+     "N": 312,
+     "Onull": 468,
+     "O": 483,
+     "OAmi": 558
+    },
+    "SK": {
+     "N": 309,
+     "Onull": 465,
+     "O": 480,
+     "OAmi": 555
+    }
+   },
+   "mistrallarge3-m": {
+    "S4": {
+     "N": 315,
+     "Onull": 471,
+     "O": 488,
+     "OAmi": 567
+    },
+    "SK": {
+     "N": 311,
+     "Onull": 467,
+     "O": 484,
+     "OAmi": 563
+    }
+   },
+   "kimik3-m": {
+    "S1": {
+     "N": 307,
+     "Onull": 462,
+     "O": 478,
+     "OAmi": 553
+    },
+    "S4": {
+     "N": 321,
+     "Onull": 476,
+     "O": 492,
+     "OAmi": 567
+    },
+    "SK": {
+     "N": 318,
+     "Onull": 473,
+     "O": 489,
+     "OAmi": 564
+    }
+   }
+  }
+ },
+ "public_confirm": {
+  "json": "records/D1pE/confirm/confirm-D1pE.json",
+  "sha_record": "records/D1pE/confirm/confirm-D1pE-sha256.txt"
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

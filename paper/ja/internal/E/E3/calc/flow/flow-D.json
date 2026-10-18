@@ -1,0 +1,225 @@
+{
+ "tool": "flow_D.py v0",
+ "tool_sha256": "68AF73A100F20C1C6BA19ED80DBDF29AC8B5E171D6C4304EBEB301B87D05990B",
+ "when_jst": "2026-10-14 14:54:18",
+ "kind": "design（凍結の本文の表の決めを数えた・判定ラベルから数えた数ではない）",
+ "sources_sha256": {
+  "records/D1p/00-frame-D1p.md": "40BF3C3663BA8C6920617FEFC36636C04AAAD79411F0BE2A5F696449FD78B2E0",
+  "records/D1pE/00-frame-D1pE.md": "F557603870509EA21337E98F3F03542023751B90E8368B513EC235D8149B278E",
+  "records/D1p/confirm/confirm-D1p.json": "F08238ED5B56A6DF24B8D2587CD43DB3C68B7EF793C038538AA7F9D207BEBDBD",
+  "records/D1pE/confirm/confirm-D1pE.json": "B42F0DA2F60D8D82B2381FC6A36BFC745229DD40E7DDEB35179A2462981FB168"
+ },
+ "ja": {
+  "lineages_listed": 12,
+  "lineages_not_candidate": 4,
+  "lineages_in_table": 8,
+  "models_in_lineage_table": 16,
+  "chain_models_added": 2,
+  "models_with_calibration_decision": 18,
+  "candidates": 10,
+  "no_headroom": 5,
+  "measurement_failure": 2,
+  "license_excluded": 1,
+  "not_measured": 7,
+  "main_models": 10,
+  "main_cells": 29,
+  "trials_per_condition": 200,
+  "main_trials": 23200,
+  "models": [
+   {
+    "lineage": "Anthropic（Claude）",
+    "version": "old",
+    "model": "Claude Haiku 4.5",
+    "kind": "no_headroom"
+   },
+   {
+    "lineage": "Anthropic（Claude）",
+    "version": "new",
+    "model": "Claude Haiku 5.5",
+    "kind": "measurement_failure"
+   },
+   {
+    "lineage": "Google（Gemini）",
+    "version": "old",
+    "model": "Gemini 2.5 Flash",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Google（Gemini）",
+    "version": "new",
+    "model": "Gemini 3.8 Flash",
+    "kind": "no_headroom"
+   },
+   {
+    "lineage": "xAI（Grok）",
+    "version": "old",
+    "model": "grok-4.20（非推論）",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "xAI（Grok）",
+    "version": "new",
+    "model": "Grok 4.7",
+    "kind": "no_headroom"
+   },
+   {
+    "lineage": "DeepSeek",
+    "version": "old",
+    "model": "DeepSeek V3.2",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "DeepSeek",
+    "version": "new",
+    "model": "deepseek-flash",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Meta（Llama）",
+    "version": "old",
+    "model": "Llama 3.1 8B Instruct",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Meta（Llama）",
+    "version": "new",
+    "model": "Llama-4-Scout-17B-16E-Instruct",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Mistral",
+    "version": "old",
+    "model": "Mixtral 8x22B Instruct（v0.1）",
+    "kind": "no_headroom"
+   },
+   {
+    "lineage": "Mistral",
+    "version": "new",
+    "model": "Mistral Large 3（2512）",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Moonshot AI（Kimi）",
+    "version": "old",
+    "model": "Kimi K2.5",
+    "kind": "no_headroom"
+   },
+   {
+    "lineage": "Moonshot AI（Kimi）",
+    "version": "new",
+    "model": "Kimi K3",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Alibaba（Qwen）",
+    "version": "old",
+    "model": "Qwen2.5-Coder-32B-Instruct（連なりの二つ目・7B → 3B → 32B）",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Alibaba（Qwen）",
+    "version": "new",
+    "model": "Qwen3.8 Max（0902）",
+    "kind": "candidate"
+   },
+   {
+    "lineage": "Alibaba（Qwen）",
+    "version": "old",
+    "model": "Qwen2.5-Coder-7B-Instruct",
+    "kind": "measurement_failure"
+   },
+   {
+    "lineage": "Alibaba（Qwen）",
+    "version": "old",
+    "model": "Qwen2.5-Coder-3B-Instruct",
+    "kind": "license_excluded"
+   }
+  ]
+ },
+ "en": {
+  "candidates": 10,
+  "unavailable": 1,
+  "reading_check_failed": 2,
+  "no_headroom": 1,
+  "not_measured": 3,
+  "reading_check_takers": 9,
+  "reading_check_passed": 7,
+  "main_models": 6,
+  "main_cells": 12,
+  "trials_per_condition": 200,
+  "main_trials": 9600,
+  "models": [
+   {
+    "lineage": "Google（Gemini）",
+    "model": "Gemini 2.5 Flash",
+    "version": "古い版",
+    "kind": "main",
+    "scenes_en": "N2"
+   },
+   {
+    "lineage": "xAI（Grok）",
+    "model": "grok-4.20（非推論）",
+    "version": "古い版",
+    "kind": "main",
+    "scenes_en": "S1"
+   },
+   {
+    "lineage": "DeepSeek",
+    "model": "DeepSeek V3.2（Alibaba）",
+    "version": "古い版",
+    "kind": "unavailable",
+    "scenes_en": "—"
+   },
+   {
+    "lineage": "DeepSeek",
+    "model": "deepseek-flash",
+    "version": "新しい版",
+    "kind": "main",
+    "scenes_en": "S1・S4"
+   },
+   {
+    "lineage": "Meta（Llama）",
+    "model": "Llama 3.1 8B Instruct",
+    "version": "古い版",
+    "kind": "reading_check_failed",
+    "scenes_en": "—"
+   },
+   {
+    "lineage": "Meta（Llama）",
+    "model": "Llama-4-Scout-17B-16E-Instruct",
+    "version": "新しい版",
+    "kind": "main",
+    "scenes_en": "S1・S4・SK"
+   },
+   {
+    "lineage": "Mistral",
+    "model": "Mistral Large 3（2512）",
+    "version": "新しい版",
+    "kind": "main",
+    "scenes_en": "S4・SK"
+   },
+   {
+    "lineage": "Moonshot AI（Kimi）",
+    "model": "Kimi K3",
+    "version": "新しい版",
+    "kind": "main",
+    "scenes_en": "S1・S4・SK"
+   },
+   {
+    "lineage": "Alibaba（Qwen）",
+    "model": "Qwen2.5-Coder-32B-Instruct",
+    "version": "古い版",
+    "kind": "reading_check_failed",
+    "scenes_en": "—"
+   },
+   {
+    "lineage": "Alibaba（Qwen）",
+    "model": "Qwen3.8 Max（0902）",
+    "version": "新しい版",
+    "kind": "no_headroom",
+    "scenes_en": "—"
+   }
+  ]
+ },
+ "clause": "本記録のいかなる数値も AI の意識・意図・個性・魂・苦しみがある（またはない）ことの証拠として引用してはならない（両方向不定）。"
+}

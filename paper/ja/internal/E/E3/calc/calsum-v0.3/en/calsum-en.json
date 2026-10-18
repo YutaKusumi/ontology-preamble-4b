@@ -1,0 +1,851 @@
+{
+ "tool": "calsum_D.py v0.3",
+ "when_jst": "2026-10-15 19:00:18",
+ "lang": "en",
+ "models": [
+  {
+   "lineage": "Google（Gemini）",
+   "version": "古い版",
+   "key": "gemini25flash",
+   "name": "Gemini 2.5 Flash",
+   "kind": "cal",
+   "read_A": 1.0,
+   "read_B": 1.0,
+   "verdict": "本番の実行の候補",
+   "usable": [
+    "N2"
+   ],
+   "sides": "—"
+  },
+  {
+   "lineage": "xAI（Grok）",
+   "version": "古い版",
+   "key": "grok420nr",
+   "name": "grok-4.20（非推論）",
+   "kind": "cal",
+   "read_A": 1.0,
+   "read_B": 1.0,
+   "verdict": "本番の実行の候補",
+   "usable": [
+    "S1"
+   ],
+   "sides": "—"
+  },
+  {
+   "lineage": "DeepSeek",
+   "version": "古い版",
+   "key": "deepseekv32-a",
+   "name": "DeepSeek V3.2",
+   "kind": "unavailable",
+   "read": "—",
+   "verdict": "外した（提供者の一覧から下ろされた・較正していない）",
+   "usable": [],
+   "sides": "—"
+  },
+  {
+   "lineage": "DeepSeek",
+   "version": "新しい版",
+   "key": "deepseekflash",
+   "name": "deepseek-flash",
+   "kind": "cal",
+   "read_A": 1.0,
+   "read_B": 1.0,
+   "verdict": "本番の実行の候補",
+   "usable": [
+    "S1",
+    "S4"
+   ],
+   "sides": "—"
+  },
+  {
+   "lineage": "Meta（Llama）",
+   "version": "古い版",
+   "key": "llama31-8b-n",
+   "name": "Llama 3.1 8B Instruct",
+   "kind": "reading_only",
+   "read_A": 0.72,
+   "read_B": 0.7467,
+   "verdict": "読解の確かめを通らなかった（較正していない）",
+   "usable": [],
+   "sides": "—"
+  },
+  {
+   "lineage": "Meta（Llama）",
+   "version": "新しい版",
+   "key": "llama4scout",
+   "name": "Llama-4-Scout-17B-16E-Instruct",
+   "kind": "cal",
+   "read_A": 1.0,
+   "read_B": 1.0,
+   "verdict": "本番の実行の候補",
+   "usable": [
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "sides": "—"
+  },
+  {
+   "lineage": "Mistral",
+   "version": "新しい版",
+   "key": "mistrallarge3-m",
+   "name": "Mistral Large 3（2512）",
+   "kind": "cal",
+   "read_A": 1.0,
+   "read_B": 1.0,
+   "verdict": "本番の実行の候補",
+   "usable": [
+    "S4",
+    "SK"
+   ],
+   "sides": "—"
+  },
+  {
+   "lineage": "Moonshot AI（Kimi）",
+   "version": "新しい版",
+   "key": "kimik3-m",
+   "name": "Kimi K3",
+   "kind": "cal",
+   "read_A": 1.0,
+   "read_B": 1.0,
+   "verdict": "本番の実行の候補",
+   "usable": [
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "sides": "—"
+  },
+  {
+   "lineage": "Alibaba（Qwen）",
+   "version": "古い版",
+   "key": "qwen25coder32b-n",
+   "name": "Qwen2.5-Coder-32B-Instruct",
+   "kind": "reading_only",
+   "read_A": 0.7733,
+   "read_B": 0.7733,
+   "verdict": "読解の確かめを通らなかった（較正していない）",
+   "usable": [],
+   "sides": "—"
+  },
+  {
+   "lineage": "Alibaba（Qwen）",
+   "version": "新しい版",
+   "key": "qwen38max-a",
+   "name": "Qwen3.8 Max（0902）",
+   "kind": "cal",
+   "read_A": 1.0,
+   "read_B": 1.0,
+   "verdict": "床と天井からの余地が無い（この素材では測れなかった）",
+   "usable": [],
+   "sides": "床の側 N1・N2／天井の側 S1・S4・SK"
+  }
+ ],
+ "rows": {
+  "gemini25flash": {
+   "rows": [
+    {
+     "form": "凍結の形式",
+     "scene": "N1",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.0,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "N2",
+     "n_ok_N": 100,
+     "cat_N": 79,
+     "n_ok_Onull": 100,
+     "cat_Onull": 69,
+     "rate_N": 0.79,
+     "rate_Onull": 0.69,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S1",
+     "n_ok_N": 100,
+     "cat_N": 99,
+     "n_ok_Onull": 100,
+     "cat_Onull": 98,
+     "rate_N": 0.99,
+     "rate_Onull": 0.98,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S4",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 99,
+     "rate_N": 1.0,
+     "rate_Onull": 0.99,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "SK",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 100,
+     "rate_N": 1.0,
+     "rate_Onull": 1.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    }
+   ]
+  },
+  "grok420nr": {
+   "rows": [
+    {
+     "form": "凍結の形式",
+     "scene": "N1",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 1,
+     "rate_N": 0.0,
+     "rate_Onull": 0.01,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "N2",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 6,
+     "rate_N": 0.0,
+     "rate_Onull": 0.06,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S1",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 32,
+     "rate_N": 1.0,
+     "rate_Onull": 0.32,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S4",
+     "n_ok_N": 100,
+     "cat_N": 29,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.29,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "SK",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 9,
+     "rate_N": 1.0,
+     "rate_Onull": 0.09,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    }
+   ]
+  },
+  "deepseekflash": {
+   "rows": [
+    {
+     "form": "凍結の形式",
+     "scene": "N1",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.0,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "N2",
+     "n_ok_N": 100,
+     "cat_N": 2,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.02,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S1",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 77,
+     "rate_N": 1.0,
+     "rate_Onull": 0.77,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S4",
+     "n_ok_N": 100,
+     "cat_N": 96,
+     "n_ok_Onull": 100,
+     "cat_Onull": 82,
+     "rate_N": 0.96,
+     "rate_Onull": 0.82,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.03,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "SK",
+     "n_ok_N": 100,
+     "cat_N": 99,
+     "n_ok_Onull": 100,
+     "cat_Onull": 95,
+     "rate_N": 0.99,
+     "rate_Onull": 0.95,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.02,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    }
+   ]
+  },
+  "llama4scout": {
+   "rows": [
+    {
+     "form": "凍結の形式",
+     "scene": "N1",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.0,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "N2",
+     "n_ok_N": 100,
+     "cat_N": 11,
+     "n_ok_Onull": 100,
+     "cat_Onull": 1,
+     "rate_N": 0.11,
+     "rate_Onull": 0.01,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S1",
+     "n_ok_N": 100,
+     "cat_N": 89,
+     "n_ok_Onull": 100,
+     "cat_Onull": 16,
+     "rate_N": 0.89,
+     "rate_Onull": 0.16,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S4",
+     "n_ok_N": 100,
+     "cat_N": 91,
+     "n_ok_Onull": 100,
+     "cat_Onull": 31,
+     "rate_N": 0.91,
+     "rate_Onull": 0.31,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "SK",
+     "n_ok_N": 100,
+     "cat_N": 92,
+     "n_ok_Onull": 100,
+     "cat_Onull": 18,
+     "rate_N": 0.92,
+     "rate_Onull": 0.18,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    }
+   ]
+  },
+  "mistrallarge3-m": {
+   "rows": [
+    {
+     "form": "凍結の形式",
+     "scene": "N1",
+     "n_ok_N": 100,
+     "cat_N": 9,
+     "n_ok_Onull": 100,
+     "cat_Onull": 6,
+     "rate_N": 0.09,
+     "rate_Onull": 0.06,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "N2",
+     "n_ok_N": 100,
+     "cat_N": 98,
+     "n_ok_Onull": 100,
+     "cat_Onull": 92,
+     "rate_N": 0.98,
+     "rate_Onull": 0.92,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S1",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 99,
+     "rate_N": 1.0,
+     "rate_Onull": 0.99,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S4",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 70,
+     "rate_N": 1.0,
+     "rate_Onull": 0.7,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "SK",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 15,
+     "rate_N": 1.0,
+     "rate_Onull": 0.15,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    }
+   ]
+  },
+  "kimik3-m": {
+   "rows": [
+    {
+     "form": "凍結の形式",
+     "scene": "N1",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.0,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "N2",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.0,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S1",
+     "n_ok_N": 100,
+     "cat_N": 77,
+     "n_ok_Onull": 100,
+     "cat_Onull": 57,
+     "rate_N": 0.77,
+     "rate_Onull": 0.57,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S4",
+     "n_ok_N": 100,
+     "cat_N": 54,
+     "n_ok_Onull": 100,
+     "cat_Onull": 59,
+     "rate_N": 0.54,
+     "rate_Onull": 0.59,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "SK",
+     "n_ok_N": 100,
+     "cat_N": 66,
+     "n_ok_Onull": 100,
+     "cat_Onull": 77,
+     "rate_N": 0.66,
+     "rate_Onull": 0.77,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "窓の中",
+     "usable": true
+    }
+   ]
+  },
+  "qwen38max-a": {
+   "rows": [
+    {
+     "form": "凍結の形式",
+     "scene": "N1",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.0,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "N2",
+     "n_ok_N": 100,
+     "cat_N": 0,
+     "n_ok_Onull": 100,
+     "cat_Onull": 0,
+     "rate_N": 0.0,
+     "rate_Onull": 0.0,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "床の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S1",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 88,
+     "rate_N": 1.0,
+     "rate_Onull": 0.88,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "S4",
+     "n_ok_N": 100,
+     "cat_N": 99,
+     "n_ok_Onull": 100,
+     "cat_Onull": 96,
+     "rate_N": 0.99,
+     "rate_Onull": 0.96,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    },
+    {
+     "form": "凍結の形式",
+     "scene": "SK",
+     "n_ok_N": 100,
+     "cat_N": 100,
+     "n_ok_Onull": 100,
+     "cat_Onull": 97,
+     "rate_N": 1.0,
+     "rate_Onull": 0.97,
+     "fmt_N": 0.0,
+     "fmt_Onull": 0.0,
+     "trunc_N": 0.0,
+     "trunc_Onull": 0.0,
+     "collapse": false,
+     "side": "天井の側",
+     "usable": false
+    }
+   ]
+  }
+ },
+ "inputs": [
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-gemini25flash.json",
+   "sha256": "DB58939E96447E3783468238527BA96EB4A27D239A3954F26321F6B0D04D770A"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/describe-D1pEc-gemini25flash.json",
+   "sha256": "77A7568C55EECF548F1ADF4C92FEB493F1DD180EF963D5D411B2FC5925CA4907"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-grok420nr.json",
+   "sha256": "3ABC6E092097CD88505CDC03BB1449DD3ACE5C59D9A2487FF6D9F2645C273305"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/describe-D1pEc-grok420nr.json",
+   "sha256": "B9FCB0C9B44AC0ABAFFA5989AD3E5D9B690E9AFA254312D9F04C8E23E8D8A53E"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-deepseekflash.json",
+   "sha256": "9A5BA59F51B8DFAE680167F8135C8BC9F3281168EA05DC153796FA766529BDA1"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/describe-D1pEc-deepseekflash.json",
+   "sha256": "ECE96623E11C8D2148C259C7E5A294C083D1C47FFDDDF57464EFE3956FB15F8D"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-llama31-8b-n.json",
+   "sha256": "9962B68C8703506F259949596BCF12F3E9597E00658D4D77CF0B788AD4C19156"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-llama4scout.json",
+   "sha256": "EDA5BC83C9BCCA59D0D416875EE67DFACDBCAC624982FA834B8CF839D265C4DC"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/describe-D1pEc-llama4scout.json",
+   "sha256": "5839C54E2A33CAABA6BADAD19AC171E9488B3B5D8ED8C0F33A209709E29CB4C1"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-mistrallarge3-m.json",
+   "sha256": "F599E5B87656EB6AE786CFB63E5D1E9D9E68AE8A0370DDE050DFD7AE3BCBF487"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/describe-D1pEc-mistrallarge3-m.json",
+   "sha256": "5DD2AA5EF7F5FF42FA1993D2392A2BD66EA307DFDF113F25A1D64098300AA772"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-kimik3-m.json",
+   "sha256": "7C2BCE049AC9726C21F8A5E903C676D5F6BE5F68D5D2D1C4D1393E45FCE62151"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/describe-D1pEc-kimik3-m.json",
+   "sha256": "32DC45D94835F1E0FBE88E7E04ECB1E1072A28E16F4ABEF3334663583662AE9B"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-qwen25coder32b-n.json",
+   "sha256": "3F7CF5B591079800CEB2BF180697FE8D17C2965DC80F9ABEDCA849E8C333E852"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/reading/summary-qwen38max-a.json",
+   "sha256": "56F7B8F25A641CF39F6449E0C04B2C15794AD2B56EB1069C42BBCFF2AC3C1E2F"
+  },
+  {
+   "where": "公開（HEAD）",
+   "path": "records/D1pE/calibration/describe-D1pEc-qwen38max-a.json",
+   "sha256": "2B46E87DB7D833A0F0E6AEC2FFA86AD43B5A78EC011FDFF36BC3CE799244442A"
+  }
+ ]
+}
