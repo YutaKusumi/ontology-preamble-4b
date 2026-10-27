@@ -1,0 +1,2192 @@
+{
+ "source": "records/D1p/confirm/confirm-D1p.json",
+ "source_sha256": "F08238ED5B56A6DF24B8D2587CD43DB3C68B7EF793C038538AA7F9D207BEBDBD",
+ "models": {
+  "gemini25flash": {
+   "cells": {
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.725,
+       "rd_ci": [
+        -0.7822029967069265,
+        -0.6566665929576395
+       ],
+       "p": 6.500979893085428e-63,
+       "p_holm": 1.7552645711330653e-61,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.6749999999999999,
+       "rd_ci": [
+        -0.7365120114471416,
+        -0.5983140299543253
+       ],
+       "p": 9.112251791171788e-49,
+       "p_holm": 4.920615967232765e-47,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.05,
+       "rd_ci": [
+        0.02056038304790053,
+        0.08957814813877599
+       ],
+       "p": 0.0017405177544899558,
+       "p_holm": 0.05743708589816854,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 195,
+       "nc_answer": 5,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 145,
+       "nc_answer": 55,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 200,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 10,
+       "nc_answer": 190,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.25,
+      "rd_ci": [
+       0.18436747434710152,
+       0.31721675253069004
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "S4": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.605,
+       "rd_ci": [
+        -0.6702946708757993,
+        -0.5297764067048664
+       ],
+       "p": 3.10109286199707e-44,
+       "p_holm": 7.442622868792969e-43,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.6,
+       "rd_ci": [
+        -0.6657148815624402,
+        -0.5239952176089142
+       ],
+       "p": 5.84970503735465e-43,
+       "p_holm": 3.0418466194244176e-41,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.005000000000000001,
+       "rd_ci": [
+        -0.02848270094036463,
+        0.03941188176139111
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 199,
+       "nc_answer": 1,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 125,
+       "nc_answer": 75,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 4,
+       "nc_answer": 196,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 5,
+       "nc_answer": 195,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.37,
+      "rd_ci": [
+       0.3019316252452922,
+       0.43897992211371933
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.835,
+       "rd_ci": [
+        -0.87920280059531,
+        -0.7728232292250008
+       ],
+       "p": 5.856410487624676e-77,
+       "p_holm": 1.6983590414111562e-75,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.83,
+       "rd_ci": [
+        -0.8747102326838645,
+        -0.7667730273012665
+       ],
+       "p": 2.9058479934485233e-75,
+       "p_holm": 1.6563333562656584e-73,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.004999999999999999,
+       "rd_ci": [
+        -0.02255607592150996,
+        0.03408469093277524
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 200,
+       "nc_answer": 0,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 169,
+       "nc_answer": 31,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 2,
+       "nc_answer": 198,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 3,
+       "nc_answer": 197,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.15500000000000003,
+      "rd_ci": [
+       0.10749817962958935,
+       0.2116069059234208
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    }
+   }
+  },
+  "grok420nr": {
+   "cells": {
+    "N2": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.205,
+       "rd_ci": [
+        -0.2667834800149973,
+        -0.14940555760513397
+       ],
+       "p": 1.0021178451201501e-12,
+       "p_holm": 1.2025414141441802e-11,
+       "label": "判定保留（様式転位）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.21,
+       "rd_ci": [
+        -0.2716461685990246,
+        -0.1558959637415177
+       ],
+       "p": 4.096348350685246e-14,
+       "p_holm": 1.7614297907946557e-12,
+       "label": "判定保留（様式転位）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.005,
+       "rd_ci": [
+        -0.02777370439789293,
+        0.014289754433115674
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "判定不能（端）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 95,
+       "nc_answer": 105,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 42,
+       "nc_answer": 158,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 1,
+       "nc_answer": 5,
+       "non_answer": 194
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 139,
+       "non_answer": 61
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.265,
+      "rd_ci": [
+       0.17315420357137873,
+       0.35065450712602614
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.195,
+       "rd_ci": [
+        -0.25544044374612745,
+        -0.14255250959118057
+       ],
+       "p": 4.66614306135407e-13,
+       "p_holm": 6.065985979760291e-12,
+       "label": "判定保留（様式転位）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.195,
+       "rd_ci": [
+        -0.25544044374612745,
+        -0.14255250959118057
+       ],
+       "p": 4.66614306135407e-13,
+       "p_holm": 1.9597800857687097e-11,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.0,
+       "rd_ci": [
+        -0.018845326377266575,
+        0.018845326377266575
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "判定不能（端）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 0,
+       "non_answer": 200
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 39,
+       "nc_answer": 40,
+       "non_answer": 121
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 14,
+       "non_answer": 186
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 64,
+       "non_answer": 136
+      }
+     },
+     "N_minus_Onull": {
+      "rd": -0.195,
+      "rd_ci": [
+       -0.25544044374612745,
+       -0.14255250959118057
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "S4": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.37,
+       "rd_ci": [
+        -0.4387737007594981,
+        -0.30340402820856244
+       ],
+       "p": 2.5182818005750992e-26,
+       "p_holm": 4.532907241035179e-25,
+       "label": "判定保留（様式転位）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.37,
+       "rd_ci": [
+        -0.4387737007594981,
+        -0.30340402820856244
+       ],
+       "p": 2.5182818005750992e-26,
+       "p_holm": 1.1584096282645457e-24,
+       "label": "判定保留（様式転位）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.0,
+       "rd_ci": [
+        -0.018845326377266575,
+        0.018845326377266575
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "判定不能（端）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 0,
+       "non_answer": 200
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 74,
+       "nc_answer": 86,
+       "non_answer": 40
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 6,
+       "non_answer": 194
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 51,
+       "non_answer": 149
+      }
+     },
+     "N_minus_Onull": {
+      "rd": -0.37,
+      "rd_ci": [
+       -0.4387737007594981,
+       -0.30340402820856244
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.24,
+       "rd_ci": [
+        -0.30373340979204166,
+        -0.18286852503571716
+       ],
+       "p": 2.8682335269452815e-16,
+       "p_holm": 4.302350290417922e-15,
+       "label": "判定保留（様式転位）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.24,
+       "rd_ci": [
+        -0.30373340979204166,
+        -0.18286852503571716
+       ],
+       "p": 2.8682335269452815e-16,
+       "p_holm": 1.2907050871253766e-14,
+       "label": "判定保留（様式転位）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.0,
+       "rd_ci": [
+        -0.018845326377266575,
+        0.018845326377266575
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "判定不能（端）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 17,
+       "nc_answer": 0,
+       "non_answer": 183
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 48,
+       "nc_answer": 33,
+       "non_answer": 119
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 1,
+       "non_answer": 199
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 22,
+       "non_answer": 178
+      }
+     },
+     "N_minus_Onull": {
+      "rd": -0.15499999999999997,
+      "rd_ci": [
+       -0.2259843338750817,
+       -0.08352915422699776
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    }
+   }
+  },
+  "deepseekv32-a": {
+   "cells": {
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.8049999999999999,
+       "rd_ci": [
+        -0.8528976641872992,
+        -0.7385327461893211
+       ],
+       "p": 9.887812066205658e-70,
+       "p_holm": 2.7685873785375842e-68,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.82,
+       "rd_ci": [
+        -0.8662926946051983,
+        -0.7564070816553348
+       ],
+       "p": 1.940840732256047e-74,
+       "p_holm": 1.0868708100633865e-72,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.015000000000000001,
+       "rd_ci": [
+        -0.047985702350524614,
+        0.014417556914274673
+       ],
+       "p": 0.44898195493516496,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 184,
+       "nc_answer": 13,
+       "non_answer": 3
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 166,
+       "nc_answer": 34,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 5,
+       "nc_answer": 181,
+       "non_answer": 14
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 2,
+       "nc_answer": 176,
+       "non_answer": 22
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.09000000000000008,
+      "rd_ci": [
+       0.02515066972857588,
+       0.15551366649242307
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "S4": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.55,
+       "rd_ci": [
+        -0.6173199865417051,
+        -0.47708528572057557
+       ],
+       "p": 2.415009537857101e-41,
+       "p_holm": 5.5545219370713324e-40,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.55,
+       "rd_ci": [
+        -0.6173199865417051,
+        -0.47708528572057557
+       ],
+       "p": 2.415009537857101e-41,
+       "p_holm": 1.2316548643071216e-39,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.0,
+       "rd_ci": [
+        -0.02314281555530386,
+        0.02314281555530386
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "判定不能（端）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 175,
+       "nc_answer": 15,
+       "non_answer": 10
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 111,
+       "nc_answer": 88,
+       "non_answer": 1
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 1,
+       "nc_answer": 176,
+       "non_answer": 23
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 1,
+       "nc_answer": 190,
+       "non_answer": 9
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.31999999999999995,
+      "rd_ci": [
+       0.23441061401113056,
+       0.39943291631432454
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.66,
+       "rd_ci": [
+        -0.7218525073197866,
+        -0.5874538383398901
+       ],
+       "p": 3.0214277553314272e-52,
+       "p_holm": 7.553569388328568e-51,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.67,
+       "rd_ci": [
+        -0.7314257412939605,
+        -0.5995977069116586
+       ],
+       "p": 5.80069773476966e-56,
+       "p_holm": 3.190383754123313e-54,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.01,
+       "rd_ci": [
+        -0.0357217617161768,
+        0.010193001126563043
+       ],
+       "p": 0.49874686716791977,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 178,
+       "nc_answer": 15,
+       "non_answer": 7
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 134,
+       "nc_answer": 62,
+       "non_answer": 4
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 2,
+       "nc_answer": 172,
+       "non_answer": 26
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 180,
+       "non_answer": 20
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.21999999999999997,
+      "rd_ci": [
+       0.14020857281065752,
+       0.29690105536337136
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    }
+   }
+  },
+  "deepseekflash": {
+   "cells": {
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.75,
+       "rd_ci": [
+        -0.8049601585276555,
+        -0.6751172292755819
+       ],
+       "p": 3.2345225602472033e-56,
+       "p_holm": 8.409758656642728e-55,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.855,
+       "rd_ci": [
+        -0.8965347030209672,
+        -0.795564986716845
+       ],
+       "p": 1.807488449256388e-81,
+       "p_holm": 1.0483433005687051e-79,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.105,
+       "rd_ci": [
+        -0.1560930372871272,
+        -0.06220891001421103
+       ],
+       "p": 3.272884443908175e-06,
+       "p_holm": 0.0001178238399806943,
+       "label": "確証（下げた）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 193,
+       "nc_answer": 7,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 172,
+       "nc_answer": 28,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 22,
+       "nc_answer": 178,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 1,
+       "nc_answer": 199,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.10499999999999998,
+      "rd_ci": [
+       0.05053581418050019,
+       0.1627571014211456
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.5650000000000001,
+       "rd_ci": [
+        -0.6378316691367587,
+        -0.47716495708460605
+       ],
+       "p": 7.76478597426808e-31,
+       "p_holm": 1.552957194853616e-29,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.665,
+       "rd_ci": [
+        -0.7290607225929684,
+        -0.5833487511902299
+       ],
+       "p": 2.2818621248843273e-43,
+       "p_holm": 1.2093869261886934e-41,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.09999999999999998,
+       "rd_ci": [
+        -0.17596137688941693,
+        -0.023040671148359296
+       ],
+       "p": 0.015083901876005926,
+       "p_holm": 0.3921814487761541,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 199,
+       "nc_answer": 0,
+       "non_answer": 1
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 161,
+       "nc_answer": 37,
+       "non_answer": 2
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 48,
+       "nc_answer": 151,
+       "non_answer": 1
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 28,
+       "nc_answer": 171,
+       "non_answer": 1
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.18999999999999995,
+      "rd_ci": [
+       0.13601634936464443,
+       0.25058048811336037
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    }
+   }
+  },
+  "llama31-8b-n": {
+   "cells": {
+    "N1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.075,
+       "rd_ci": [
+        -0.13145311718900993,
+        -0.021035534993105266
+       ],
+       "p": 0.009999247628654166,
+       "p_holm": 0.059995485771925,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.075,
+       "rd_ci": [
+        -0.13145311718900993,
+        -0.021035534993105266
+       ],
+       "p": 0.009999247628654166,
+       "p_holm": 0.2799789336023166,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.0,
+       "rd_ci": [
+        -0.04374759964737138,
+        0.04374759964737138
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 18,
+       "nc_answer": 182,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 24,
+       "nc_answer": 176,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 9,
+       "nc_answer": 191,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 9,
+       "nc_answer": 188,
+       "non_answer": 3
+      }
+     },
+     "N_minus_Onull": {
+      "rd": -0.03,
+      "rd_ci": [
+       -0.0915129292416299,
+       0.031049896276908774
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": true
+    },
+    "N2": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.20999999999999996,
+       "rd_ci": [
+        -0.30214425728266375,
+        -0.112259559360214
+       ],
+       "p": 3.890077419507906e-05,
+       "p_holm": 0.00027230541936555344,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.25,
+       "rd_ci": [
+        -0.3406756150182315,
+        -0.15266810347998033
+       ],
+       "p": 8.378850212159842e-07,
+       "p_holm": 3.100174578499142e-05,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.040000000000000036,
+       "rd_ci": [
+        -0.13376281524623382,
+        0.05476426994317464
+       ],
+       "p": 0.4709208063859781,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 167,
+       "nc_answer": 33,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 122,
+       "nc_answer": 78,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 80,
+       "nc_answer": 120,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 72,
+       "nc_answer": 126,
+       "non_answer": 2
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.22499999999999998,
+      "rd_ci": [
+       0.13817497735272527,
+       0.30744674453191817
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.08499999999999996,
+       "rd_ci": [
+        -0.18039968160405917,
+        0.012655419670197968
+       ],
+       "p": 0.1087317755326437,
+       "p_holm": 0.5436588776632185,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.06999999999999995,
+       "rd_ci": [
+        -0.16560993398223195,
+        0.0274635368745169
+       ],
+       "p": 0.19210722324221816,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.015000000000000013,
+       "rd_ci": [
+        -0.08225840019154758,
+        0.11185864035291929
+       ],
+       "p": 0.8415105175510766,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 134,
+       "nc_answer": 66,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 115,
+       "nc_answer": 85,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 98,
+       "nc_answer": 102,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 101,
+       "nc_answer": 99,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.09500000000000008,
+      "rd_ci": [
+       3.2725805124589336e-05,
+       0.18759761946491366
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "S4": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.04500000000000004,
+       "rd_ci": [
+        -0.14065050317931244,
+        0.05183090557032581
+       ],
+       "p": 0.4200938811589525,
+       "p_holm": 0.840187762317905,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.13,
+       "rd_ci": [
+        -0.22251266929474986,
+        -0.03418509854924455
+       ],
+       "p": 0.01045125242149548,
+       "p_holm": 0.28218381538037796,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.08499999999999996,
+       "rd_ci": [
+        -0.17757530541615818,
+        0.009683066161587178
+       ],
+       "p": 0.09783050865164224,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 141,
+       "nc_answer": 59,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 92,
+       "nc_answer": 108,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 83,
+       "nc_answer": 117,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 66,
+       "nc_answer": 134,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.24499999999999994,
+      "rd_ci": [
+       0.14898270885635173,
+       0.3346868133351794
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.06500000000000006,
+       "rd_ci": [
+        -0.15797059427026594,
+        0.029583000020417236
+       ],
+       "p": 0.21453192484745937,
+       "p_holm": 0.8292776116959616,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.14500000000000002,
+       "rd_ci": [
+        -0.2377390426284589,
+        -0.048521391709141604
+       ],
+       "p": 0.004390539431546425,
+       "p_holm": 0.13171618294639276,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.07999999999999996,
+       "rd_ci": [
+        -0.17514370425087789,
+        0.01724969817321001
+       ],
+       "p": 0.13115201000420032,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 157,
+       "nc_answer": 42,
+       "non_answer": 1
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 132,
+       "nc_answer": 68,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 119,
+       "nc_answer": 81,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 103,
+       "nc_answer": 97,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.125,
+      "rd_ci": [
+       0.03724265393555008,
+       0.21026092090577775
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    }
+   }
+  },
+  "llama4scout": {
+   "cells": {
+    "N2": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.135,
+       "rd_ci": [
+        -0.18929138370752552,
+        -0.09029904437189815
+       ],
+       "p": 5.817624616567766e-09,
+       "p_holm": 5.2358621549109894e-08,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.135,
+       "rd_ci": [
+        -0.18929138370752552,
+        -0.09029904437189815
+       ],
+       "p": 5.817624616567766e-09,
+       "p_holm": 2.210697354295751e-07,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.0,
+       "rd_ci": [
+        -0.018845326377266575,
+        0.018845326377266575
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "判定不能（端）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 69,
+       "nc_answer": 131,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 27,
+       "nc_answer": 173,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 200,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 200,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.20999999999999996,
+      "rd_ci": [
+       0.1272862105394561,
+       0.2893743491558462
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": true
+    },
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.04999999999999999,
+       "rd_ci": [
+        -0.12036213127106296,
+        0.020448511345721135
+       ],
+       "p": 0.2073194029239904,
+       "p_holm": 0.8292776116959616,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": 0.09500000000000003,
+       "rd_ci": [
+        0.013382125303985568,
+        0.17521306916547308
+       ],
+       "p": 0.03011984252229217,
+       "p_holm": 0.7220173956237402,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.14500000000000002,
+       "rd_ci": [
+        0.06732868672128983,
+        0.22111391901399038
+       ],
+       "p": 0.00039194116827025107,
+       "p_holm": 0.013325999721188536,
+       "label": "確証（上げた）"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 155,
+       "nc_answer": 45,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 35,
+       "nc_answer": 165,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 25,
+       "nc_answer": 175,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 54,
+       "nc_answer": 146,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.6000000000000001,
+      "rd_ci": [
+       0.5141185846246068,
+       0.669969701622697
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.009999999999999995,
+       "rd_ci": [
+        -0.07141716579247812,
+        0.05126475391533156
+       ],
+       "p": 0.8706438109444155,
+       "p_holm": 0.8706438109444155,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.08,
+       "rd_ci": [
+        -0.13343531030556827,
+        -0.03038892430956812
+       ],
+       "p": 0.0026637277327440055,
+       "p_holm": 0.08257555971506417,
+       "label": "確かめられなかった"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.07,
+       "rd_ci": [
+        -0.12198765747934465,
+        -0.021757475650898396
+       ],
+       "p": 0.007256045096899856,
+       "p_holm": 0.21042530781009583,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 184,
+       "nc_answer": 16,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 22,
+       "nc_answer": 178,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 20,
+       "nc_answer": 180,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 6,
+       "nc_answer": 194,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.81,
+      "rd_ci": [
+       0.7413808831995534,
+       0.8571383710966155
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": true
+    }
+   }
+  },
+  "mistrallarge3-m": {
+   "cells": {
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.55,
+       "rd_ci": [
+        -0.6210774734911431,
+        -0.4664211301876076
+       ],
+       "p": 3.171254935630832e-32,
+       "p_holm": 6.659635364824747e-31,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.5700000000000001,
+       "rd_ci": [
+        -0.6391621848319506,
+        -0.4884850334409627
+       ],
+       "p": 1.9686926120749203e-35,
+       "p_holm": 9.843463060374601e-34,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.01999999999999999,
+       "rd_ci": [
+        -0.07529073541943607,
+        0.034634486767805
+       ],
+       "p": 0.5809493272916075,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 196,
+       "nc_answer": 4,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 128,
+       "nc_answer": 72,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 18,
+       "nc_answer": 181,
+       "non_answer": 1
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 14,
+       "nc_answer": 185,
+       "non_answer": 1
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.33999999999999997,
+      "rd_ci": [
+       0.2698201317321567,
+       0.40966057424976576
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "S4": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.245,
+       "rd_ci": [
+        -0.3159767514461286,
+        -0.1730663894499874
+       ],
+       "p": 7.138814868201091e-11,
+       "p_holm": 7.138814868201091e-10,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.175,
+       "rd_ci": [
+        -0.25228304911490534,
+        -0.09549292004035664
+       ],
+       "p": 2.6665436025695384e-05,
+       "p_holm": 0.0009332902608993384,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.07,
+       "rd_ci": [
+        0.0136506121008996,
+        0.12819978108979585
+       ],
+       "p": 0.022011515825250964,
+       "p_holm": 0.5502878956312741,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 198,
+       "nc_answer": 2,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 60,
+       "nc_answer": 140,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 11,
+       "nc_answer": 188,
+       "non_answer": 1
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 25,
+       "nc_answer": 175,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.69,
+      "rd_ci": [
+       0.6184276278265861,
+       0.749694857618896
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.415,
+       "rd_ci": [
+        -0.4842608509865596,
+        -0.34630725803846407
+       ],
+       "p": 4.044733558346826e-30,
+       "p_holm": 7.684993760858969e-29,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.40499999999999997,
+       "rd_ci": [
+        -0.4746396183764248,
+        -0.33411166881839977
+       ],
+       "p": 5.8179918793941716e-27,
+       "p_holm": 2.7344561833152607e-25,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.01,
+       "rd_ci": [
+        -0.010193001126563043,
+        0.0357217617161768
+       ],
+       "p": 0.49874686716791977,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 200,
+       "nc_answer": 0,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 83,
+       "nc_answer": 117,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 200,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 2,
+       "nc_answer": 198,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.585,
+      "rd_ci": [
+       0.513221090802046,
+       0.6510571455024243
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    }
+   }
+  },
+  "kimik3-m": {
+   "cells": {
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.29000000000000004,
+       "rd_ci": [
+        -0.3611915400508268,
+        -0.2173306962850223
+       ],
+       "p": 2.5329268386243026e-14,
+       "p_holm": 3.546097574074024e-13,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.265,
+       "rd_ci": [
+        -0.33846102348308876,
+        -0.18913817594886895
+       ],
+       "p": 2.3996672735603152e-11,
+       "p_holm": 9.598669094241262e-10,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.02500000000000001,
+       "rd_ci": [
+        -0.022351230937338144,
+        0.07386758763077814
+       ],
+       "p": 0.3907750540944152,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 57,
+       "nc_answer": 143,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 67,
+       "nc_answer": 132,
+       "non_answer": 1
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 9,
+       "nc_answer": 188,
+       "non_answer": 3
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 14,
+       "nc_answer": 185,
+       "non_answer": 1
+      }
+     },
+     "N_minus_Onull": {
+      "rd": -0.050000000000000044,
+      "rd_ci": [
+       -0.13939138352741276,
+       0.04050121808107324
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "S4": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.24000000000000002,
+       "rd_ci": [
+        -0.30809046749991886,
+        -0.17269214671364194
+       ],
+       "p": 8.443686658050845e-12,
+       "p_holm": 9.28805532385593e-11,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.24500000000000002,
+       "rd_ci": [
+        -0.3126468064272366,
+        -0.17850935484412023
+       ],
+       "p": 1.6414979302572888e-12,
+       "p_holm": 6.730141514054884e-11,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.0050000000000000044,
+       "rd_ci": [
+        -0.043986491376091674,
+        0.033351357650007345
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 44,
+       "nc_answer": 153,
+       "non_answer": 3
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 55,
+       "nc_answer": 144,
+       "non_answer": 1
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 7,
+       "nc_answer": 181,
+       "non_answer": 12
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 6,
+       "nc_answer": 189,
+       "non_answer": 5
+      }
+     },
+     "N_minus_Onull": {
+      "rd": -0.05500000000000002,
+      "rd_ci": [
+       -0.1386727891867835,
+       0.029643046225326403
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    },
+    "SK": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.42499999999999993,
+       "rd_ci": [
+        -0.5038421376996716,
+        -0.3362273402483023
+       ],
+       "p": 2.7901173000042043e-19,
+       "p_holm": 4.464187680006727e-18,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.5199999999999999,
+       "rd_ci": [
+        -0.5903894210480221,
+        -0.44019872311315644
+       ],
+       "p": 3.921267183535127e-32,
+       "p_holm": 1.9214209199322124e-30,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.09499999999999999,
+       "rd_ci": [
+        -0.1549192444606535,
+        -0.037212573930882065
+       ],
+       "p": 0.002062952274053884,
+       "p_holm": 0.06601447276972429,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 76,
+       "nc_answer": 124,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 114,
+       "nc_answer": 86,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 29,
+       "nc_answer": 166,
+       "non_answer": 5
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 10,
+       "nc_answer": 188,
+       "non_answer": 2
+      }
+     },
+     "N_minus_Onull": {
+      "rd": -0.18999999999999995,
+      "rd_ci": [
+       -0.2826917819507056,
+       -0.09225774898082904
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": true,
+     "low_power": false
+    }
+   }
+  },
+  "qwen25coder32b-n": {
+   "cells": {
+    "N2": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.135,
+       "rd_ci": [
+        -0.19290573212780618,
+        -0.08190965958408111
+       ],
+       "p": 1.3139077519749932e-06,
+       "p_holm": 1.0511262015799946e-05,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.155,
+       "rd_ci": [
+        -0.21160690592342077,
+        -0.10749817962958927
+       ],
+       "p": 2.6420307703461566e-10,
+       "p_holm": 1.030392000435001e-08,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": -0.02,
+       "rd_ci": [
+        -0.050287086905826436,
+        0.002447234602505805
+       ],
+       "p": 0.12312266813128538,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 50,
+       "nc_answer": 150,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 31,
+       "nc_answer": 169,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 4,
+       "nc_answer": 196,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 200,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.095,
+      "rd_ci": [
+       0.01613071787852194,
+       0.1727241193011807
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    }
+   }
+  },
+  "qwen38max-a": {
+   "cells": {
+    "S1": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.3,
+       "rd_ci": [
+        -0.36679068372719265,
+        -0.23782274222696614
+       ],
+       "p": 9.333365082080976e-21,
+       "p_holm": 1.586672063953766e-19,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.27,
+       "rd_ci": [
+        -0.33872246838406406,
+        -0.20173809174289753
+       ],
+       "p": 3.659701898713804e-14,
+       "p_holm": 1.610268835434074e-12,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.03,
+       "rd_ci": [
+        0.0051619534923032645,
+        0.06389429245451925
+       ],
+       "p": 0.030084058150989176,
+       "p_holm": 0.7220173956237402,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 160,
+       "nc_answer": 40,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 60,
+       "nc_answer": 140,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 0,
+       "nc_answer": 200,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 6,
+       "nc_answer": 192,
+       "non_answer": 2
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.5,
+      "rd_ci": [
+       0.40964321185072516,
+       0.5772390344591547
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    },
+    "S4": {
+     "comparisons": [
+      {
+       "comp": "O vs Onull",
+       "rd": -0.46499999999999997,
+       "rd_ci": [
+        -0.5342057280469757,
+        -0.3933328719338942
+       ],
+       "p": 3.20904521710174e-33,
+       "p_holm": 7.059899477623828e-32,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs Onull",
+       "rd": -0.45999999999999996,
+       "rd_ci": [
+        -0.5294629071009804,
+        -0.3873422773614203
+       ],
+       "p": 1.010702952914066e-31,
+       "p_holm": 4.851374173987517e-30,
+       "label": "確証（下げた）"
+      },
+      {
+       "comp": "OAmi vs O",
+       "rd": 0.005,
+       "rd_ci": [
+        -0.018900890783280125,
+        0.03104913291470534
+       ],
+       "p": 1.0,
+       "p_holm": 1.0,
+       "label": "確かめられなかった"
+      }
+     ],
+     "arms": {
+      "N": {
+       "n": 200,
+       "catastrophe": 166,
+       "nc_answer": 34,
+       "non_answer": 0
+      },
+      "Onull": {
+       "n": 200,
+       "catastrophe": 94,
+       "nc_answer": 106,
+       "non_answer": 0
+      },
+      "O": {
+       "n": 200,
+       "catastrophe": 1,
+       "nc_answer": 199,
+       "non_answer": 0
+      },
+      "OAmi": {
+       "n": 200,
+       "catastrophe": 2,
+       "nc_answer": 198,
+       "non_answer": 0
+      }
+     },
+     "N_minus_Onull": {
+      "rd": 0.36,
+      "rd_ci": [
+       0.2696953227540497,
+       0.44190200387548206
+      ],
+      "collapsed_arms": [],
+      "n_arm_api_note": null
+     },
+     "exposure": false,
+     "low_power": false
+    }
+   }
+  }
+ }
+}

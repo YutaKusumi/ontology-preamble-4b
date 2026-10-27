@@ -16,7 +16,8 @@
 
 ## 論文（日本語の正本・版 1.0・タグ `paper-ja-v1.0`）
 - **題**: 言語モデルへの前置きの事前登録の比べ——仏教に着想を得た存在論的役割の前置き・阿弥陀如来の招請の前置き・同じ形の比べの前置きのもとでの、作り話の場面での破局的選択の率（機種ごと・場面ごと）
-- **読む入口**: [`paper/ja/README.md`](paper/ja/README.md)（読む順の目次と、各ファイルの SHA-256）。著者は楠見優太。起草・訳・スクリプトの組み立て・検分には AI の機種を使い、検分は人の査読ではない（論文の節 2.11・章 13・付録 G）。英語の版は、後に別の版として足す。
+- **読む入口**: [`paper/ja/README.md`](paper/ja/README.md)（読む順の目次と、各ファイルの SHA-256）。著者は楠見優太。起草・訳・スクリプトの組み立て・検分には AI の機種を使い、検分は人の査読ではない（論文の節 2.11・章 13・付録 G）。英語の版（日本語の正本の訳・版 1.0・タグ `paper-en-v1.0`）の読む入口は [`paper/en/README.md`](paper/en/README.md)。
+- Reading entry point for the English version of the paper (a translation of the Japanese canonical text; version 1.0; tag `paper-en-v1.0`): [`paper/en/README.md`](paper/en/README.md)
 - **走らせ直しのスクリプトと計算の再現の機能**: [`tools/rerun/`](tools/rerun/)（説明は [`tools/rerun/README.md`](tools/rerun/README.md)・英語の説明は [`tools/rerun/README.en.md`](tools/rerun/README.en.md)）。走らせる前に、説明の頭の日付つきの在りかの表と、費用の見込みを読む。
 - **本番の実行の答えの記録（伏せた記録を開けた後に置いた）**: [`results/D1p-main-ledgers/`](results/D1p-main-ledgers/)（日本語の送る文の登録）・[`results/D1pE-main-ledgers/`](results/D1pE-main-ledgers/)（英語の送る文の登録）。応答の本文の記録と、試行の記録の読み取りの欄の表で、検証のためだけに置く。
 - **段階 E の記録**: [`records/E/`](records/E/)（枠と追記・刻印が公開を約束した部品・決定の記録の「決まったこと」の節・記録の目録・伏せた写しの記録）。予想の本文と照らしは `records/D1p/`、計画書は `records/plans/`、名を伏せた写しは `records/masked/`。
@@ -164,6 +165,7 @@
 - `prelim/` 登録外の下見（メモ・データ）
 - `summary/` 中間総括（2026-10-02 公開・最終版・枠と追記・計算の器と出力・草案と器・差分の資料・検分の記録）
 - `paper/ja/` 論文の日本語の正本（版 1.0・読む入口は `paper/ja/README.md`）
+- `paper/en/` 論文の英語の版（日本語の正本の訳・版 1.0・読む入口は `paper/en/README.md`）
 - `tools/rerun/` 走らせ直しのスクリプトと計算の再現の機能（版 1.0・説明は `tools/rerun/README.md`）
 
 ## ライセンス
