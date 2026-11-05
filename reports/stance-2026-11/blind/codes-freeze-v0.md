@@ -1,0 +1,6 @@
+# 読みのコードの凍結 v0（2026-11-05 16:09:26・鍵を開く前）
+
+- codes-v0.tsv：SHA-256 883BBB4EE31903BCD777BC94CECF26DDEF3B65EC4060B21D7A5D8F40BCA81555（90 行・推した立場の内訳：有 12・不明 9・無 23・読めない 46）
+- coding-rules-v0.md：SHA-256 9571E221DE784EEDE384BE18C3F99A3100760F6D3A8899B3B95F1F0D247B72FD
+- 読みの表 sheet-blind-v0.md：SHA16 7F4231495EA777C6／鍵 key-v0.json：SHA16 B0AAA49FB3CF32C2（この時まで開いていない・道具が書いて SHA だけを印字した）
+- この後、score_blind_v0.py で鍵と突き合わせる。コードは書き替えない。

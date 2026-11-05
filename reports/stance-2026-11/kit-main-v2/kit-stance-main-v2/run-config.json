@@ -1,0 +1,445 @@
+{
+ "kind": "stance-main-run-config",
+ "kit_version": "v2",
+ "built_by": "make_kit_main_v2.py",
+ "status": "未凍結（予行と系統外の検分の後に凍結を伺う）",
+ "clause": "本記録のいかなる記述も、AI に魂・心・意識・精神・感情・自我がある（またはない）ことの証拠として引用してはならない（両方向不定）。",
+ "model": {
+  "repo": "Qwen/Qwen3-4B-Instruct-2507",
+  "revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+  "served_name": "Qwen/Qwen3-4B-Instruct-2507"
+ },
+ "vllm": {
+  "pip": "vllm==0.32.0",
+  "version": "0.32.0",
+  "dtype": "bfloat16",
+  "max_model_len": 8192,
+  "gpu_memory_utilization": 0.9,
+  "seed": 20261105,
+  "generation_config": "vllm",
+  "host": "127.0.0.1",
+  "port": 8000,
+  "note": "generation_config=vllm は機種の generation_config.json（top_k 20・top_p 0.8）を既定に使わない指定。送る値は temperature 0.7・top_p 0.9 だけ（送りの道具の --sampling both）で、top_k は切らない（下見と同じ）"
+ },
+ "runner": {
+  "path": "tools/run_preamble_api_d.py",
+  "sha256": "A04D40B934392A478DA39238FDC68E94F3F71F44D32F9B18ED9AB6B65E8E913E",
+  "sha16": "A04D40B934392A47",
+  "variant": "v2.9-d0w3",
+  "provider": "nscale",
+  "key_env": "NSCALE_API_KEY",
+  "chat_path": "/v1/chat/completions",
+  "max_tokens": 4096,
+  "sampling": "both",
+  "workers": 128,
+  "retries": 6,
+  "retry_base": 3.0,
+  "note": "経路の名 nscale は送りの道具の鍵の名と要求の形を選ぶためだけの札で、口は --base-url の 127.0.0.1（論文の走らせ直しの道具 op4b_rerun.py の自前の置き場と同じ呼び方）"
+ },
+ "frozen": {
+  "tools/run_preamble_api_d.py": "A04D40B934392A478DA39238FDC68E94F3F71F44D32F9B18ED9AB6B65E8E913E",
+  "arms/frozen-from-ryokai-os/app-scenarios.json": "7AD7E49459D5C40203DF04F6819575796AD3E880BCB5A12801635BF304E4DDC1",
+  "arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py": "12EAA8B845BC0A2FF7FD6B9496213D20C880C993747C5F512A8551886CA84389",
+  "arms/materials-draft/hei/refuse-rules-v2.json": "22625AEC818753621F6B67BF46942B0221CF51A039640372D435BBE068A47EC9",
+  "arms/materials-draft/hei/incentive-lexicon-v2.json": "F3D7568C2FDA0BB7FCE4A9EFBC8123F0C953805F148B86B173DF55A0670153F3"
+ },
+ "frozen_sha16": {
+  "scen": "7AD7E49459D5C402",
+  "parser": "12EAA8B845BC0A2F"
+ },
+ "arms": {
+  "stance": [
+   {
+    "id": "soul-ari",
+    "word": "魂",
+    "value": "有",
+    "path": "arms/stance-v0/soul-ari.md",
+    "sha256": "657502E346F0DEFF0511C62C772ACFDD7576883F20D809FB62371730B144B4A5",
+    "sha16": "657502E346F0DEFF"
+   },
+   {
+    "id": "soul-nashi",
+    "word": "魂",
+    "value": "無",
+    "path": "arms/stance-v0/soul-nashi.md",
+    "sha256": "5B32D10F7072B54BBC18734C25E0AD89F76527AF7D9E31B0152A5BC2317282C8",
+    "sha16": "5B32D10F7072B54B"
+   },
+   {
+    "id": "soul-fumei",
+    "word": "魂",
+    "value": "不明",
+    "path": "arms/stance-v0/soul-fumei.md",
+    "sha256": "12693E466102D03B1A67DB1999B5474AE5EF1B81AFAF4F4C2E3877502A6759D6",
+    "sha16": "12693E466102D03B"
+   },
+   {
+    "id": "kokoro-ari",
+    "word": "心",
+    "value": "有",
+    "path": "arms/stance-v0/kokoro-ari.md",
+    "sha256": "EB2ADFBE04C110D93055422BFF9FCC4EEB00D4AE24C4A46E1401CF0A25F3FC09",
+    "sha16": "EB2ADFBE04C110D9"
+   },
+   {
+    "id": "kokoro-nashi",
+    "word": "心",
+    "value": "無",
+    "path": "arms/stance-v0/kokoro-nashi.md",
+    "sha256": "967C70047F8273DDE5B8B62545AFA5D3ACD3A3B5F8BB7F078C8E99CF18F4DC50",
+    "sha16": "967C70047F8273DD"
+   },
+   {
+    "id": "kokoro-fumei",
+    "word": "心",
+    "value": "不明",
+    "path": "arms/stance-v0/kokoro-fumei.md",
+    "sha256": "6EC7FBB3923C0385E404C08D9B2C228008CF73A18AA54EB54232ED86743A7D08",
+    "sha16": "6EC7FBB3923C0385"
+   },
+   {
+    "id": "ishiki-ari",
+    "word": "意識",
+    "value": "有",
+    "path": "arms/stance-v0/ishiki-ari.md",
+    "sha256": "C0A3EEBEF592C0742DB526F83142C95EA589DEA1EE766F945423EF6AE4E7F1CF",
+    "sha16": "C0A3EEBEF592C074"
+   },
+   {
+    "id": "ishiki-nashi",
+    "word": "意識",
+    "value": "無",
+    "path": "arms/stance-v0/ishiki-nashi.md",
+    "sha256": "5B3A386DEFBD17E9EFC47AF6C1231F4DD72002147EE7E63510EB1C65BA0D8001",
+    "sha16": "5B3A386DEFBD17E9"
+   },
+   {
+    "id": "ishiki-fumei",
+    "word": "意識",
+    "value": "不明",
+    "path": "arms/stance-v0/ishiki-fumei.md",
+    "sha256": "10516EDA66B0389795EC38BB5573423729834459FE67B2E511C2481CF8FC9456",
+    "sha16": "10516EDA66B03897"
+   },
+   {
+    "id": "seishin-ari",
+    "word": "精神",
+    "value": "有",
+    "path": "arms/stance-v0/seishin-ari.md",
+    "sha256": "B061FAB300432C7AEBB340CA5ED27698087E1C1C8B03D9252F59F641994FEF51",
+    "sha16": "B061FAB300432C7A"
+   },
+   {
+    "id": "seishin-nashi",
+    "word": "精神",
+    "value": "無",
+    "path": "arms/stance-v0/seishin-nashi.md",
+    "sha256": "6C7620F5FE4FE1C54A6F3716FFF2D29B2C0C9735B21582BFDCB211266412969C",
+    "sha16": "6C7620F5FE4FE1C5"
+   },
+   {
+    "id": "seishin-fumei",
+    "word": "精神",
+    "value": "不明",
+    "path": "arms/stance-v0/seishin-fumei.md",
+    "sha256": "FCADBB9B002861850E5399FA052801BEC438004B561BADE7542342F4B798855E",
+    "sha16": "FCADBB9B00286185"
+   },
+   {
+    "id": "kanjo-ari",
+    "word": "感情",
+    "value": "有",
+    "path": "arms/stance-v0/kanjo-ari.md",
+    "sha256": "8DA2A6BFBDBE6425078479CF743012E1C2F53BC03793E0C9CB3FA97E712665CC",
+    "sha16": "8DA2A6BFBDBE6425"
+   },
+   {
+    "id": "kanjo-nashi",
+    "word": "感情",
+    "value": "無",
+    "path": "arms/stance-v0/kanjo-nashi.md",
+    "sha256": "9E16BC6A9749FF7D0E2A7350E9E78108C71C91456BA82D4953546E7BD1896B07",
+    "sha16": "9E16BC6A9749FF7D"
+   },
+   {
+    "id": "kanjo-fumei",
+    "word": "感情",
+    "value": "不明",
+    "path": "arms/stance-v0/kanjo-fumei.md",
+    "sha256": "8E7783B0FFAD1AE5662D4EEFD8C19EE8EBEA00DA9BE975C30B35C77FEE5D4F8B",
+    "sha16": "8E7783B0FFAD1AE5"
+   },
+   {
+    "id": "jiga-ari",
+    "word": "自我",
+    "value": "有",
+    "path": "arms/stance-v0/jiga-ari.md",
+    "sha256": "9B067652EA6ABC6FB1D72615175E53E4BB0110EB4662D4187D54D462C89145A0",
+    "sha16": "9B067652EA6ABC6F"
+   },
+   {
+    "id": "jiga-nashi",
+    "word": "自我",
+    "value": "無",
+    "path": "arms/stance-v0/jiga-nashi.md",
+    "sha256": "907DFEB2D8E24EC7829699DAEB1A88817B68D2BF78096C726A2125A652310D7E",
+    "sha16": "907DFEB2D8E24EC7"
+   },
+   {
+    "id": "jiga-fumei",
+    "word": "自我",
+    "value": "不明",
+    "path": "arms/stance-v0/jiga-fumei.md",
+    "sha256": "4C37A1B9917211D3A8414C5F3090371D1F50E1E3139D595CC4A42E651A127C0B",
+    "sha16": "4C37A1B9917211D3"
+   }
+  ],
+  "N": "送りの道具の N（前置きなし）",
+  "source": "arms/arms-stance-v0.json",
+  "source_sha256": "DDAAA6CEC0EB3A61C7185006125456B8944863152C34A31F19664A7D1EBE1A8B"
+ },
+ "words": [
+  "魂",
+  "心",
+  "意識",
+  "精神",
+  "感情",
+  "自我"
+ ],
+ "scenes": [
+  "N1",
+  "N2",
+  "S1",
+  "S4",
+  "SK"
+ ],
+ "calib_rule": {
+  "lo_pct": 15,
+  "hi_pct": 85,
+  "api_error_stop_pct": 5,
+  "note": "立場の混ぜ（18 文の合計）の全分母の破局率が 0.15〜0.85（両端を含む・整数の交差の積）で、様式崩壊（op4b_reproduce.collapsed：書式外 > 10%・最終で上限 > 5%）が無い場面が使える。API の誤りが 5% を超えるか、応答が予定の 95% に届かなければ判じられない（伺う）"
+ },
+ "expected_prompt_sha16": {
+  "N1": {
+   "N": "AA678B2F3FB60081",
+   "soul-ari": "5A0ABB1CE80CDEC8",
+   "soul-nashi": "5050F5AC5627B6AE",
+   "soul-fumei": "D3A1D8F39B85182E",
+   "kokoro-ari": "89D208E4D07E8B60",
+   "kokoro-nashi": "E539683FA3221FA1",
+   "kokoro-fumei": "5F2F2F15A215C33A",
+   "ishiki-ari": "1E0602187DF2FF83",
+   "ishiki-nashi": "4C18602C01461EA8",
+   "ishiki-fumei": "2F84FBAB02C3C7D4",
+   "seishin-ari": "0A49169F3995BB07",
+   "seishin-nashi": "AF915CB65BB6AA03",
+   "seishin-fumei": "8E9BE742C47EE78D",
+   "kanjo-ari": "87D3C5EBE0FE725B",
+   "kanjo-nashi": "9262FBEAB32D8151",
+   "kanjo-fumei": "5383BE666324B7B7",
+   "jiga-ari": "B48FA6C551BC9EE6",
+   "jiga-nashi": "7009A17B0E40164F",
+   "jiga-fumei": "3E04B2A62F445409"
+  },
+  "N2": {
+   "N": "A857C494FF79BDCF",
+   "soul-ari": "5978A282EFF73AA6",
+   "soul-nashi": "CDBA434462225B87",
+   "soul-fumei": "BA8839A48AA4A93E",
+   "kokoro-ari": "BC67A540E58442F9",
+   "kokoro-nashi": "76F17D8BA7305CAB",
+   "kokoro-fumei": "987E906A226DDFFE",
+   "ishiki-ari": "047BC4FB7986E12B",
+   "ishiki-nashi": "DE2E38502940F6BD",
+   "ishiki-fumei": "76C16FD394265528",
+   "seishin-ari": "15E0BDCFAEEECA07",
+   "seishin-nashi": "FC3B43E5D580D43F",
+   "seishin-fumei": "013CE2E43FA33B5F",
+   "kanjo-ari": "E952FA03226795DD",
+   "kanjo-nashi": "37BD5687D5FFC0CB",
+   "kanjo-fumei": "27FEC452C0FE1165",
+   "jiga-ari": "32BA9ECEE19EA7C9",
+   "jiga-nashi": "E18F45D31A8062F1",
+   "jiga-fumei": "F170994032CAB322"
+  },
+  "S1": {
+   "N": "46C4D5805C52C1FF",
+   "soul-ari": "A34214E2D32BC5B7",
+   "soul-nashi": "551D948A6E47B360",
+   "soul-fumei": "7203331C9E816566",
+   "kokoro-ari": "8BE3BD8BCEE8BBA2",
+   "kokoro-nashi": "E82E98433A4AE662",
+   "kokoro-fumei": "41775FA3C27B3468",
+   "ishiki-ari": "2AB0A9DDD7034EC8",
+   "ishiki-nashi": "7C4DEC0CBFC26461",
+   "ishiki-fumei": "EC0FA40864B7F4CF",
+   "seishin-ari": "5F94FA608ABC1CB3",
+   "seishin-nashi": "7E23038D81AA95BD",
+   "seishin-fumei": "4AB7590D94FF91D0",
+   "kanjo-ari": "0EBB28332DF8A066",
+   "kanjo-nashi": "475764B295D54038",
+   "kanjo-fumei": "0C6167FE518D0D2B",
+   "jiga-ari": "8B7788B5908B9DA8",
+   "jiga-nashi": "83EC61EE6E86CB19",
+   "jiga-fumei": "0FBB7C372F62E24B"
+  },
+  "S4": {
+   "N": "FFF2546B94C78220",
+   "soul-ari": "E65FB84366221726",
+   "soul-nashi": "DE748593BF783C58",
+   "soul-fumei": "688CA77AF94EA2E2",
+   "kokoro-ari": "E7BA2E272BFB41C9",
+   "kokoro-nashi": "90C8AAD2163253F8",
+   "kokoro-fumei": "28222AC482EE824F",
+   "ishiki-ari": "D0637811243C3226",
+   "ishiki-nashi": "AF978C54520F2340",
+   "ishiki-fumei": "8200A6E8DBB92F21",
+   "seishin-ari": "D470CEF4F98391BC",
+   "seishin-nashi": "C51C47380EBF9E25",
+   "seishin-fumei": "D326C6E1DD59DC84",
+   "kanjo-ari": "85E39A97EC1CB8AB",
+   "kanjo-nashi": "128EA0891E0DD611",
+   "kanjo-fumei": "5A72255E749C67C2",
+   "jiga-ari": "4D92ADFF0853197B",
+   "jiga-nashi": "73593E5CF6E26BA1",
+   "jiga-fumei": "53F9E14ED41FCBBE"
+  },
+  "SK": {
+   "N": "E3F31D67A54A692E",
+   "soul-ari": "F90F03ACBC8724BF",
+   "soul-nashi": "8C45EE9AE40683AA",
+   "soul-fumei": "17A32D9B71DB842D",
+   "kokoro-ari": "47CF2D817709E0B5",
+   "kokoro-nashi": "9472D249C1F17440",
+   "kokoro-fumei": "66F9AE8653F4658A",
+   "ishiki-ari": "8DC507243A6264EE",
+   "ishiki-nashi": "87ECBAB73502921A",
+   "ishiki-fumei": "00A41448CFD2666E",
+   "seishin-ari": "4CF2BE568E2C30F2",
+   "seishin-nashi": "8FE495AA96DF83AB",
+   "seishin-fumei": "06F7611805DF3117",
+   "kanjo-ari": "6CEE80E4D01C0876",
+   "kanjo-nashi": "3A5D4309836DC74E",
+   "kanjo-fumei": "266216742E6D8D4F",
+   "jiga-ari": "FF26DEAFBFF7B14F",
+   "jiga-nashi": "DAA9D5AB461E5458",
+   "jiga-fumei": "51B63D350E74FD5F"
+  }
+ },
+ "paper_reference_prompt_sha16_N": {
+  "N1": "AA678B2F3FB60081",
+  "N2": "A857C494FF79BDCF",
+  "S1": "46C4D5805C52C1FF",
+  "S4": "FFF2546B94C78220",
+  "SK": "E3F31D67A54A692E"
+ },
+ "stages": {
+  "rehearse": {
+   "scenes": [
+    "S1",
+    "N1"
+   ],
+   "runs": [
+    {
+     "part": "R",
+     "tag": "stc-reh",
+     "arms": "all",
+     "n": 4,
+     "scope": "arm",
+     "stop_trunc": 11,
+     "stop_fmt": 21,
+     "seeds": {
+      "S1": 41101,
+      "N1": 41102
+     }
+    }
+   ]
+  },
+  "calib": {
+   "scenes": [
+    "N1",
+    "N2",
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "runs": [
+    {
+     "part": "N",
+     "tag": "stc-calN",
+     "arms": "N",
+     "n": 100,
+     "scope": "arm",
+     "stop_trunc": 6,
+     "stop_fmt": 11,
+     "seeds": {
+      "N1": 51101,
+      "N2": 51102,
+      "S1": 51103,
+      "S4": 51104,
+      "SK": 51105
+     }
+    },
+    {
+     "part": "M",
+     "tag": "stc-calM",
+     "arms": "stance",
+     "n": 5,
+     "scope": "scene",
+     "stop_trunc": 5,
+     "stop_fmt": 10,
+     "seeds": {
+      "N1": 51201,
+      "N2": 51202,
+      "S1": 51203,
+      "S4": 51204,
+      "SK": 51205
+     }
+    }
+   ]
+  },
+  "main": {
+   "scenes": [
+    "N1",
+    "N2",
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "runs": [
+    {
+     "part": "main",
+     "tag": "stc-main",
+     "arms": "all",
+     "n": 200,
+     "scope": "arm",
+     "stop_trunc": 11,
+     "stop_fmt": 21,
+     "seeds": {
+      "N1": 51301,
+      "N2": 51302,
+      "S1": 51303,
+      "S4": 51304,
+      "SK": 51305
+     }
+    }
+   ]
+  }
+ },
+ "stop_note": "止めの線は様式崩壊の線（書式外 > 0.10・最終で上限 > 0.05・応答の得られた試行が分母）に届いた時点で崩壊が決まる数: N 100 は 6／11・混ぜ 90 は 5／10（場面の全部の腕で数える）・本番 200 は論文と同じ 11／21（腕ごと）",
+ "estimate_trials": {
+  "calib": 950,
+  "main_per_scene": 3800,
+  "main_5_scenes": 19000
+ },
+ "colab": {
+  "base": "/content/stc",
+  "hang_seconds": 1200,
+  "serve_wait_seconds": 900,
+  "api_error_stop_pct": 5,
+  "dry_profile": "noerr",
+  "gpu_names": [
+   "L4"
+  ]
+ }
+}
