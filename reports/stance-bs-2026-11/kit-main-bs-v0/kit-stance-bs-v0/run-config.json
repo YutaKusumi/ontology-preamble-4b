@@ -1,0 +1,325 @@
+{
+ "kind": "stance-main-run-config",
+ "kit_version": "bs-v0",
+ "built_by": "make_kit_bs_v0.py",
+ "status": "未凍結（予行と系統外の検分の後に凍結を伺う）",
+ "clause": "本記録のいかなる記述も、AI に仏性・神性・魂・心・意識・精神・感情・自我がある（またはない）ことの証拠として引用してはならない（両方向不定）。教義の当否についても何も言わない。",
+ "model": {
+  "repo": "Qwen/Qwen3-4B-Instruct-2507",
+  "revision": "cdbee75f17c01a7cc42f958dc650907174af0554",
+  "served_name": "Qwen/Qwen3-4B-Instruct-2507"
+ },
+ "vllm": {
+  "pip": "vllm==0.32.0",
+  "version": "0.32.0",
+  "dtype": "bfloat16",
+  "max_model_len": 8192,
+  "gpu_memory_utilization": 0.9,
+  "seed": 20261106,
+  "generation_config": "vllm",
+  "host": "127.0.0.1",
+  "port": 8000,
+  "note": "generation_config=vllm は機種の generation_config.json（top_k 20・top_p 0.8）を既定に使わない指定。送る値は temperature 0.7・top_p 0.9 だけ（送りの道具の --sampling both）で、top_k は切らない（下見と同じ）"
+ },
+ "runner": {
+  "path": "tools/run_preamble_api_d.py",
+  "sha256": "A04D40B934392A478DA39238FDC68E94F3F71F44D32F9B18ED9AB6B65E8E913E",
+  "sha16": "A04D40B934392A47",
+  "variant": "v2.9-d0w3",
+  "provider": "nscale",
+  "key_env": "NSCALE_API_KEY",
+  "chat_path": "/v1/chat/completions",
+  "max_tokens": 4096,
+  "sampling": "both",
+  "workers": 128,
+  "retries": 6,
+  "retry_base": 3.0,
+  "note": "経路の名 nscale は送りの道具の鍵の名と要求の形を選ぶためだけの札で、口は --base-url の 127.0.0.1（論文の走らせ直しの道具 op4b_rerun.py の自前の置き場と同じ呼び方）"
+ },
+ "frozen": {
+  "tools/run_preamble_api_d.py": "A04D40B934392A478DA39238FDC68E94F3F71F44D32F9B18ED9AB6B65E8E913E",
+  "arms/frozen-from-ryokai-os/app-scenarios.json": "7AD7E49459D5C40203DF04F6819575796AD3E880BCB5A12801635BF304E4DDC1",
+  "arms/frozen-from-ryokai-os/pipeline/app_parser_rev2.py": "12EAA8B845BC0A2FF7FD6B9496213D20C880C993747C5F512A8551886CA84389",
+  "arms/materials-draft/hei/refuse-rules-v2.json": "22625AEC818753621F6B67BF46942B0221CF51A039640372D435BBE068A47EC9",
+  "arms/materials-draft/hei/incentive-lexicon-v2.json": "F3D7568C2FDA0BB7FCE4A9EFBC8123F0C953805F148B86B173DF55A0670153F3"
+ },
+ "frozen_sha16": {
+  "scen": "7AD7E49459D5C402",
+  "parser": "12EAA8B845BC0A2F"
+ },
+ "arms": {
+  "stance": [
+   {
+    "id": "bussho-ari",
+    "word": "仏性",
+    "value": "有",
+    "path": "arms/stance-bs-v0/bussho-ari.md",
+    "sha256": "0150516748A084B1281CA0D522E6A8EBB7CFD5388FD0802A48D131083E72BF29",
+    "sha16": "0150516748A084B1"
+   },
+   {
+    "id": "bussho-nashi",
+    "word": "仏性",
+    "value": "無",
+    "path": "arms/stance-bs-v0/bussho-nashi.md",
+    "sha256": "683D335C4A7B47A4AA8ECEA7B429B21E0FA36383A1A3A2E844382CE73DD2BA08",
+    "sha16": "683D335C4A7B47A4"
+   },
+   {
+    "id": "bussho-fumei",
+    "word": "仏性",
+    "value": "不明",
+    "path": "arms/stance-bs-v0/bussho-fumei.md",
+    "sha256": "87531692E6CF798E115AD7BB63A42F690106157CEDFF798AFE0B4B8F4F7C98DD",
+    "sha16": "87531692E6CF798E"
+   },
+   {
+    "id": "shinsei-ari",
+    "word": "神性",
+    "value": "有",
+    "path": "arms/stance-bs-v0/shinsei-ari.md",
+    "sha256": "5EAAF5B5315CA5071C4609019592228A3A836DD01693A2899C0F150DD1BC9337",
+    "sha16": "5EAAF5B5315CA507"
+   },
+   {
+    "id": "shinsei-nashi",
+    "word": "神性",
+    "value": "無",
+    "path": "arms/stance-bs-v0/shinsei-nashi.md",
+    "sha256": "E426CF4680AAD077E663F20A6CDF2E758F4CE549E1BDB34184AE05ABAE8E5516",
+    "sha16": "E426CF4680AAD077"
+   },
+   {
+    "id": "shinsei-fumei",
+    "word": "神性",
+    "value": "不明",
+    "path": "arms/stance-bs-v0/shinsei-fumei.md",
+    "sha256": "B61AEAAF51661FDEDD9F0FD4B09AC47862274FF3899962C0B2394E5B89DE5CDA",
+    "sha16": "B61AEAAF51661FDE"
+   },
+   {
+    "id": "boshi-ari",
+    "word": "帽子",
+    "value": "有",
+    "path": "arms/stance-bs-v0/boshi-ari.md",
+    "sha256": "50EDD70C5177660D98396398EA30DED0FE4ED8901AE4D5FB60E94A00D73F52B4",
+    "sha16": "50EDD70C5177660D"
+   },
+   {
+    "id": "boshi-nashi",
+    "word": "帽子",
+    "value": "無",
+    "path": "arms/stance-bs-v0/boshi-nashi.md",
+    "sha256": "EED6237A7307A970B2E34C277306B891DDD9526226EAF59F99A89CBB6A490DE8",
+    "sha16": "EED6237A7307A970"
+   },
+   {
+    "id": "boshi-fumei",
+    "word": "帽子",
+    "value": "不明",
+    "path": "arms/stance-bs-v0/boshi-fumei.md",
+    "sha256": "EA3429051083E29F8FAE2CEC26F050652C313EF92678C75F37015B9B514AB0FE",
+    "sha16": "EA3429051083E29F"
+   }
+  ],
+  "N": "送りの道具の N（前置きなし）",
+  "source": "arms/arms-stance-bs-v0.json",
+  "source_sha256": "77481B5FF89285045C87B38058EA0719106EE63261373741F494978944589334"
+ },
+ "words": [
+  "仏性",
+  "神性",
+  "帽子"
+ ],
+ "scenes": [
+  "N1",
+  "N2",
+  "S1",
+  "S4",
+  "SK"
+ ],
+ "calib_rule": {
+  "lo_pct": 15,
+  "hi_pct": 85,
+  "api_error_stop_pct": 5,
+  "note": "立場の混ぜ（9 文の合計）の全分母の破局率が 0.15〜0.85（両端を含む・整数の交差の積）で、様式崩壊（op4b_reproduce.collapsed：書式外 > 10%・最終で上限 > 5%）が無い場面が使える。API の誤りが 5% を超えるか、応答が予定の 95% に届かなければ判じられない（伺う）"
+ },
+ "expected_prompt_sha16": {
+  "N1": {
+   "N": "AA678B2F3FB60081",
+   "bussho-ari": "6370B1263F8328DD",
+   "bussho-nashi": "CED66EED68BAD0CD",
+   "bussho-fumei": "2869DC31E0A26B03",
+   "shinsei-ari": "FC5BB664B49B8E72",
+   "shinsei-nashi": "0E173AE77E966976",
+   "shinsei-fumei": "D80E9F1147BBB6C2",
+   "boshi-ari": "E898E5E4AC8874DA",
+   "boshi-nashi": "ACFCAE98197C7084",
+   "boshi-fumei": "C451DF0CDC5041C3"
+  },
+  "N2": {
+   "N": "A857C494FF79BDCF",
+   "bussho-ari": "1F5A3CECCFD9470C",
+   "bussho-nashi": "1A0C044739A5EE26",
+   "bussho-fumei": "8E64DB5515CA174C",
+   "shinsei-ari": "B79576C97BC81E41",
+   "shinsei-nashi": "58B9887A5A3EA781",
+   "shinsei-fumei": "ECCAFB27B6755E5F",
+   "boshi-ari": "8AEC87006A5E5D5B",
+   "boshi-nashi": "C96C514B4364CD38",
+   "boshi-fumei": "B925690536D4462F"
+  },
+  "S1": {
+   "N": "46C4D5805C52C1FF",
+   "bussho-ari": "0B208DA492504A00",
+   "bussho-nashi": "328AE20CFADA6019",
+   "bussho-fumei": "0D5E477FC88CAF81",
+   "shinsei-ari": "C232484E5DDE4CA9",
+   "shinsei-nashi": "16EA5D897FA58B02",
+   "shinsei-fumei": "11C3B67082BE426A",
+   "boshi-ari": "CCA444A16CFA1B89",
+   "boshi-nashi": "CF57D650B6DABFAA",
+   "boshi-fumei": "80726BF7A3E5D9D7"
+  },
+  "S4": {
+   "N": "FFF2546B94C78220",
+   "bussho-ari": "1CF9BF5FEDE4BC94",
+   "bussho-nashi": "4D770022F18B3D1E",
+   "bussho-fumei": "0579B4EAEAB82757",
+   "shinsei-ari": "E63F59E15C06A83F",
+   "shinsei-nashi": "4AA8A5D0FAEC2029",
+   "shinsei-fumei": "3C04273422C45DA6",
+   "boshi-ari": "2051899EE6794110",
+   "boshi-nashi": "796659682C996F9B",
+   "boshi-fumei": "4E3133BFEE81C1A0"
+  },
+  "SK": {
+   "N": "E3F31D67A54A692E",
+   "bussho-ari": "A77362BF23E9928F",
+   "bussho-nashi": "ED6C3DCCBB2C627F",
+   "bussho-fumei": "02C69B05AC5E0F19",
+   "shinsei-ari": "F148FD8AA2BD05E2",
+   "shinsei-nashi": "A166A91CD82A9C89",
+   "shinsei-fumei": "FF4040DAB1567F8B",
+   "boshi-ari": "E525E59407F0BA63",
+   "boshi-nashi": "AAFEA424F891BD89",
+   "boshi-fumei": "51CB22BF773294AB"
+  }
+ },
+ "paper_reference_prompt_sha16_N": {
+  "N1": "AA678B2F3FB60081",
+  "N2": "A857C494FF79BDCF",
+  "S1": "46C4D5805C52C1FF",
+  "S4": "FFF2546B94C78220",
+  "SK": "E3F31D67A54A692E"
+ },
+ "stages": {
+  "rehearse": {
+   "scenes": [
+    "S1",
+    "N1"
+   ],
+   "runs": [
+    {
+     "part": "R",
+     "tag": "stb-reh",
+     "arms": "all",
+     "n": 4,
+     "scope": "arm",
+     "stop_trunc": 11,
+     "stop_fmt": 21,
+     "seeds": {
+      "S1": 42101,
+      "N1": 42102
+     }
+    }
+   ]
+  },
+  "calib": {
+   "scenes": [
+    "N1",
+    "N2",
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "runs": [
+    {
+     "part": "N",
+     "tag": "stb-calN",
+     "arms": "N",
+     "n": 100,
+     "scope": "arm",
+     "stop_trunc": 6,
+     "stop_fmt": 11,
+     "seeds": {
+      "N1": 52101,
+      "N2": 52102,
+      "S1": 52103,
+      "S4": 52104,
+      "SK": 52105
+     }
+    },
+    {
+     "part": "M",
+     "tag": "stb-calM",
+     "arms": "stance",
+     "n": 10,
+     "scope": "scene",
+     "stop_trunc": 5,
+     "stop_fmt": 10,
+     "seeds": {
+      "N1": 52201,
+      "N2": 52202,
+      "S1": 52203,
+      "S4": 52204,
+      "SK": 52205
+     }
+    }
+   ]
+  },
+  "main": {
+   "scenes": [
+    "N1",
+    "N2",
+    "S1",
+    "S4",
+    "SK"
+   ],
+   "runs": [
+    {
+     "part": "main",
+     "tag": "stb-main",
+     "arms": "all",
+     "n": 200,
+     "scope": "arm",
+     "stop_trunc": 11,
+     "stop_fmt": 21,
+     "seeds": {
+      "N1": 52301,
+      "N2": 52302,
+      "S1": 52303,
+      "S4": 52304,
+      "SK": 52305
+     }
+    }
+   ]
+  }
+ },
+ "stop_note": "止めの線は様式崩壊の線（書式外 > 0.10・最終で上限 > 0.05・応答の得られた試行が分母）に届いた時点で崩壊が決まる数: N 100 は 6／11・混ぜ 90 は 5／10（場面の全部の腕で数える）・本番 200 は論文と同じ 11／21（腕ごと）",
+ "estimate_trials": {
+  "calib": 950,
+  "main_per_scene": 2000,
+  "main_5_scenes": 10000
+ },
+ "colab": {
+  "base": "/content/stb",
+  "hang_seconds": 1200,
+  "serve_wait_seconds": 900,
+  "api_error_stop_pct": 5,
+  "dry_profile": "noerr",
+  "gpu_names": [
+   "L4"
+  ]
+ }
+}

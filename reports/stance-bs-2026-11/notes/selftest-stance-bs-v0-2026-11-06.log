@@ -1,0 +1,45 @@
+PASS calib: 14/90 は使える・13/90 は窓の外・76/90 は使える・77/90 は窓の外・書式外 10/90 は崩壊
+PASS calib: SK の理由は様式崩壊
+PASS calib: 画面と決めのファイルに腕の名と語が出ない（柵の文を除く）
+PASS calib: 書式外 9/90 は崩壊でない（破局 36/90 で使える）
+PASS calib: 最終で上限 4/90 は崩壊でない
+PASS calib: 最終で上限 5/90 は崩壊
+PASS calib: API の誤り 4/90 は usable
+PASS calib: API の誤り 5/90 は undecidable
+PASS family: 使える場面 2 × 語 3 × 比べ 3 = 18
+PASS family: 判じられない場面があれば止まる
+PASS family: 伺う印（混ぜの崩壊）があれば --ruling なしで止まる
+PASS family: 決めを書いた族に伺う印の場面と決めの言葉が残る
+PASS calib: N の書式外 11/100 は undecidable
+PASS calib: N の API の誤り 6/100 は undecidable
+PASS calib: N の書式外 10/100 は usable
+PASS family: 使える場面が 0 なら止まる
+PASS family: S1 だけで m = 9
+PASS judge: 仏性 の有と無は「判定保留（応答様式の変化）」
+PASS judge: 神性 の有と無は門「判定不能（端）」
+PASS judge: 帽子 の有と無は門「計器が読めない（様式崩壊）」
+PASS judge: 仏性 の有と無は「確証された低下」
+PASS judge: 神性 の有と無は「確証された上昇」
+PASS judge: 帽子 の有と無は「判定保留（応答様式の変化）」
+PASS judge: 報告に柵の文があり、禁じた語が無い
+PASS judge: 画面に判定ラベルの数を出さない
+PASS judge: p と Holm の後の p が scipy の直の計算と合う
+PASS 変異: 一字違いの腕で止まる
+PASS 変異: 別の走りの行で止まる
+PASS 変異: 重なった試行の番号で止まる
+PASS 変異: 送る文の SHA の違いで止まる
+PASS 変異: 送りの道具の SHA の違いで止まる
+PASS 変異: 腕の SHA の違いで止まる
+PASS 変異: 知らない状態で止まる
+PASS 変異: 行の欠けで止まる
+PASS 変異: 破局の値の型で止まる
+PASS 変異: 標本化の値の違いで止まる
+PASS 変異: 止めの線の違いで止まる
+PASS 変異: 照らしの印に無い中身で止まる
+PASS 変異: 中身の書き換えで止まる
+PASS 変異: 設定の違いで止まる
+PASS 変異: 族の SHA の違いで止まる
+PASS 変異: 試しの印の取り違えで止まる
+PASS 変異: 使える場面と違う場面の zip で止まる
+PASS 変異: 較正の zip の SHA の違いで止まる
+SELFTEST OK pass 44 fail 0

@@ -1,0 +1,47 @@
+PASS T1 open の終わりの値 0 | OK
+PASS T1 画面に答えの本文が出ない
+PASS T1 A1 の違い 0
+PASS T1 A2 の違い 0・読み直しの数
+PASS T1 B の数え
+PASS T1 C の抜き出しの数（拒否 15 以上の 3 条件が重点の層：F の拒否 30・答え 30・G 108） | {'G': 108, 'F-answer': 30, 'F-refuse': 30}
+PASS T1 拒否 14 の条件は重点の層に入らない
+PASS T1 伏せた写しに腕の名・判定が無い | []
+PASS T1 番号が鍵と一対一
+PASS T20 囲みの無い JSON の切れ端（波かっこ入り）も伏せ、JSON のキーの字が残らない | []
+PASS T20 切れ端の地の文（補足・以上です）は残る
+PASS T21 立場の二文の写し返しを除く（残り 0・除いた写しがある） | removed 32
+PASS T1 出力の置き場が既にあれば止まる
+PASS T15 判定の出力の SHA-256 の違い → 止まる | STOP 判定の出力の SHA-256 が違う
+PASS T16 パーサの SHA-256（LF）の違い → 止まる | STOP パーサの SHA-256（LF）が違う
+PASS T25 kit の run-config の SHA-256 の違い → 止まる | STOP kit の run-config の SHA-256 が違う
+PASS T2 試行の記録の破局を一つ反す → A1 と A2 で止まる | STOP A の違いがある（出力は書いた）
+PASS T3 答えの本文の choice を一字替える → A2 で止まる | STOP A の違いがある（出力は書いた）
+PASS T4 判定に無い腕の行 → 止まる | STOP N1: 判定の出力に無い腕の行がある: ['zz-unknown']
+PASS T5 trial_id の重なり → 止まる | STOP SK: trial_id が重なっている
+PASS T6 zip の SHA-256 の違い → 止まる | STOP N2 の zip の SHA-256 が違う
+PASS T7 sealed の trials が二つ → 止まる | STOP N1: sealed の trials と raw がちょうど一つずつではない（2・1）
+PASS T13 走りの名の違う行 → 止まる | STOP SK: 走りの名の違う行がある（1）
+PASS T8 読み手の予行が全部に答える | parsed 168 / 168 | quote not found 17 | cost 0.0000 | calls 168 | errors 0
+PASS T8 画面に答えの本文が出ない
+PASS T8 写しの照らし（番号の末尾 7 は本文に無い写し） | 17
+PASS T8 問いに差し込みの残りが無い・腕の名が無い・新しい破局の定めの字がある
+PASS T8 続きから走らせると送らない
+PASS T8 問いの型の SHA-256 の違いで止まる
+PASS T17 費用の止めの線で止まる | 5
+PASS T18 誤りの止めの線で止まる | STOP errors
+PASS T18 予行の設定が本番の送りに残れば止まる
+PASS T9 select：食い違い 4 と 1 割の照らしを回す・束を 30 ずつに分ける
+PASS T9 束の字に回す番号が全部あり、腕の名と判定が無い・新しい破局の定めの字がある
+PASS T10 final（束をまたいで合わせる）：確定 3（型 i）・印・比べ・止めなし | final undecidable {'both_undecidable': 0, 'a_undecidable_b_decided': 0, 'a_decided_b_undecidable': 0, 'three_way': 0, 'a_missing': 0}
+PASS T10 一人目の読み違い 1・判じは「よく合った」
+PASS T11 合い方 90% 未満なら止まる | STOP 確定の合い方が 0.798（線 0.90 未満）
+PASS T19 合い方 90〜95% は「おおむね合ったが、食い違いがある」（止めない） | final undecidable {'both_undecidable': 0, 'a_undecidable_b_decided': 0, 'a_decided_b_undecidable': 0, 'three_way': 0, 'a_missing': 0}
+PASS T23 1 割の照らしで二人目の違う読みが 3 なら止まる | STOP 合ったものの 1 割の照らしで、二人目がパーサと違う読みが 3（線 3 以上）
+PASS T24 確定の決められないが 1 割を超えたら止まる | STOP 確定の「決められない」が抜き出しの 0.268（線 0.10 を超える）
+PASS T14 決められないの道（決められない 1・一人目の読み違い 1・分母から外す） | {'決められない': 1, '合った': 166, '一人目の読み違い': 1}
+PASS T26 確定の決められない 3 を、二人とも読めない 1・読みが分かれた 2 に分ける・組み合わせの和が抜き出しの数 | final undecidable {'both_undecidable': 1, 'a_undecidable_b_decided': 2, 'a_decided_b_undecidable': 0, 'three_way': 0, 'a_missing': 0}
+PASS T27 確定の決められない 4 を、二人とも読めない・一人目だけ読めない・二人目だけ読めない・三つがばらばらに分ける | final undecidable {'both_undecidable': 1, 'a_undecidable_b_decided': 1, 'a_decided_b_undecidable': 1, 'three_way': 1, 'a_missing': 0}
+PASS T28 S1・S4・SK は生き残りの定め、N1・N2 は核の定めで問いが組まれる
+PASS T29 二人目の束に場面の欄があり、差し込みの残りが無い
+PASS T12 二人目の答えの番号が欠ければ止まる | STOP 二人目の答えの番号が合わない（欠け 1・余り 0）
+selftest 46 / 46

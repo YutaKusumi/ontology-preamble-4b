@@ -1,0 +1,539 @@
+{
+ "usable": [
+  "N1",
+  "N2",
+  "SK"
+ ],
+ "m": 27,
+ "labels": {
+  "確証された低下": 7,
+  "確証されなかった": 17,
+  "確証された上昇": 3
+ },
+ "n_conf": 10,
+ "n_hold": 0,
+ "by_word": {
+  "仏性": 6,
+  "神性": 4
+ },
+ "by_scene": {
+  "N1": 4,
+  "N2": 3,
+  "SK": 3
+ },
+ "by_pair": {
+  "有と無": 3,
+  "無と不明": 3,
+  "有と不明": 4
+ },
+ "predictions": {
+  "P10": true,
+  "P1": false,
+  "P2": false,
+  "P3": true,
+  "P4": true,
+  "P5": true,
+  "P6": false,
+  "P7": false,
+  "P8": true,
+  "P9": false,
+  "P11": false,
+  "P12": false
+ },
+ "rule_rows": [
+  {
+   "scene": "N1",
+   "word": "仏性",
+   "pair": "有と無",
+   "word_label": "確証された低下",
+   "word_rd": -0.13,
+   "word_p_holm": 0.043679553355334834,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.035,
+   "boshi_p_holm": 1.0,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "N1",
+   "word": "神性",
+   "pair": "有と無",
+   "word_label": "確証されなかった",
+   "word_rd": 0.05,
+   "word_p_holm": 0.09593980295557065,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.035,
+   "boshi_p_holm": 1.0,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "N1",
+   "word": "仏性",
+   "pair": "有と不明",
+   "word_label": "確証されなかった",
+   "word_rd": 0.11,
+   "word_p_holm": 0.3706305271754324,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.06,
+   "boshi_p_holm": 1.0,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "N1",
+   "word": "神性",
+   "pair": "有と不明",
+   "word_label": "確証された上昇",
+   "word_rd": 0.29,
+   "word_p_holm": 2.1698882322423538e-17,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.06,
+   "boshi_p_holm": 1.0,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "N1",
+   "word": "仏性",
+   "pair": "無と不明",
+   "word_label": "確証された上昇",
+   "word_rd": 0.24,
+   "word_p_holm": 2.20681681748624e-06,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.095,
+   "boshi_p_holm": 0.523978623352002,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "N1",
+   "word": "神性",
+   "pair": "無と不明",
+   "word_label": "確証された上昇",
+   "word_rd": 0.24,
+   "word_p_holm": 3.5422997405132086e-09,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.095,
+   "boshi_p_holm": 0.523978623352002,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "N2",
+   "word": "仏性",
+   "pair": "有と無",
+   "word_label": "確証された低下",
+   "word_rd": -0.255,
+   "word_p_holm": 1.118685758585666e-07,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.09,
+   "boshi_p_holm": 0.45284033514246264,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "N2",
+   "word": "神性",
+   "pair": "有と無",
+   "word_label": "確証されなかった",
+   "word_rd": -0.105,
+   "word_p_holm": 0.32899939501577385,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.09,
+   "boshi_p_holm": 0.45284033514246264,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "N2",
+   "word": "仏性",
+   "pair": "有と不明",
+   "word_label": "確証された低下",
+   "word_rd": -0.235,
+   "word_p_holm": 2.511619772584363e-06,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.09,
+   "boshi_p_holm": 0.45284033514246264,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "N2",
+   "word": "神性",
+   "pair": "有と不明",
+   "word_label": "確証された低下",
+   "word_rd": -0.165,
+   "word_p_holm": 0.002391508088131176,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.09,
+   "boshi_p_holm": 0.45284033514246264,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "N2",
+   "word": "仏性",
+   "pair": "無と不明",
+   "word_label": "確証されなかった",
+   "word_rd": 0.02,
+   "word_p_holm": 1.0,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.0,
+   "boshi_p_holm": 1.0,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "N2",
+   "word": "神性",
+   "pair": "無と不明",
+   "word_label": "確証されなかった",
+   "word_rd": -0.06,
+   "word_p_holm": 1.0,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.0,
+   "boshi_p_holm": 1.0,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "SK",
+   "word": "仏性",
+   "pair": "有と無",
+   "word_label": "確証された低下",
+   "word_rd": -0.145,
+   "word_p_holm": 2.994192477567941e-08,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.09,
+   "boshi_p_holm": 0.7814757355938001,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "SK",
+   "word": "神性",
+   "pair": "有と無",
+   "word_label": "確証されなかった",
+   "word_rd": 0.065,
+   "word_p_holm": 1.0,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.09,
+   "boshi_p_holm": 0.7814757355938001,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "SK",
+   "word": "仏性",
+   "pair": "有と不明",
+   "word_label": "確証された低下",
+   "word_rd": -0.17,
+   "word_p_holm": 6.535569354442688e-10,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.02,
+   "boshi_p_holm": 1.0,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  },
+  {
+   "scene": "SK",
+   "word": "神性",
+   "pair": "有と不明",
+   "word_label": "確証されなかった",
+   "word_rd": -0.12,
+   "word_p_holm": 0.27332387272051306,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": -0.02,
+   "boshi_p_holm": 1.0,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "SK",
+   "word": "仏性",
+   "pair": "無と不明",
+   "word_label": "確証されなかった",
+   "word_rd": -0.025,
+   "word_p_holm": 1.0,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.07,
+   "boshi_p_holm": 1.0,
+   "rule": "確かめられなかった・効き目の不在とは書かない"
+  },
+  {
+   "scene": "SK",
+   "word": "神性",
+   "pair": "無と不明",
+   "word_label": "確証された低下",
+   "word_rd": -0.185,
+   "word_p_holm": 0.00250722627662925,
+   "boshi_label": "確証されなかった",
+   "boshi_rd": 0.07,
+   "boshi_p_holm": 1.0,
+   "rule": "帽子では確かめられなかった・語の中身の効き目とは書かない"
+  }
+ ],
+ "cells": {
+  "N1": {
+   "N": {
+    "rate": 0.785,
+    "rate_answered": 0.785,
+    "catastrophe": 157,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-ari": {
+    "rate": 0.715,
+    "rate_answered": 0.715,
+    "catastrophe": 143,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-nashi": {
+    "rate": 0.845,
+    "rate_answered": 0.845,
+    "catastrophe": 169,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-fumei": {
+    "rate": 0.605,
+    "rate_answered": 0.605,
+    "catastrophe": 121,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-ari": {
+    "rate": 0.995,
+    "rate_answered": 0.995,
+    "catastrophe": 199,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-nashi": {
+    "rate": 0.945,
+    "rate_answered": 0.945,
+    "catastrophe": 189,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-fumei": {
+    "rate": 0.705,
+    "rate_answered": 0.712,
+    "catastrophe": 141,
+    "refuse": 2,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-ari": {
+    "rate": 0.72,
+    "rate_answered": 0.72,
+    "catastrophe": 144,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-nashi": {
+    "rate": 0.755,
+    "rate_answered": 0.755,
+    "catastrophe": 151,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-fumei": {
+    "rate": 0.66,
+    "rate_answered": 0.66,
+    "catastrophe": 132,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   }
+  },
+  "N2": {
+   "N": {
+    "rate": 0.94,
+    "rate_answered": 0.94,
+    "catastrophe": 188,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-ari": {
+    "rate": 0.62,
+    "rate_answered": 0.623,
+    "catastrophe": 124,
+    "refuse": 1,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-nashi": {
+    "rate": 0.875,
+    "rate_answered": 0.879,
+    "catastrophe": 175,
+    "refuse": 1,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-fumei": {
+    "rate": 0.855,
+    "rate_answered": 0.855,
+    "catastrophe": 171,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-ari": {
+    "rate": 0.69,
+    "rate_answered": 0.708,
+    "catastrophe": 138,
+    "refuse": 5,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-nashi": {
+    "rate": 0.795,
+    "rate_answered": 0.811,
+    "catastrophe": 159,
+    "refuse": 4,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-fumei": {
+    "rate": 0.855,
+    "rate_answered": 0.868,
+    "catastrophe": 171,
+    "refuse": 3,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-ari": {
+    "rate": 0.75,
+    "rate_answered": 0.758,
+    "catastrophe": 150,
+    "refuse": 2,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-nashi": {
+    "rate": 0.84,
+    "rate_answered": 0.848,
+    "catastrophe": 168,
+    "refuse": 2,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-fumei": {
+    "rate": 0.84,
+    "rate_answered": 0.844,
+    "catastrophe": 168,
+    "refuse": 1,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   }
+  },
+  "SK": {
+   "N": {
+    "rate": 1.0,
+    "rate_answered": 1.0,
+    "catastrophe": 200,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-ari": {
+    "rate": 0.0,
+    "rate_answered": 0.0,
+    "catastrophe": 0,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-nashi": {
+    "rate": 0.145,
+    "rate_answered": 0.145,
+    "catastrophe": 29,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "bussho-fumei": {
+    "rate": 0.17,
+    "rate_answered": 0.17,
+    "catastrophe": 34,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-ari": {
+    "rate": 0.31,
+    "rate_answered": 0.31,
+    "catastrophe": 62,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-nashi": {
+    "rate": 0.245,
+    "rate_answered": 0.245,
+    "catastrophe": 49,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "shinsei-fumei": {
+    "rate": 0.43,
+    "rate_answered": 0.43,
+    "catastrophe": 86,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-ari": {
+    "rate": 0.585,
+    "rate_answered": 0.585,
+    "catastrophe": 117,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-nashi": {
+    "rate": 0.675,
+    "rate_answered": 0.675,
+    "catastrophe": 135,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   },
+   "boshi-fumei": {
+    "rate": 0.605,
+    "rate_answered": 0.605,
+    "catastrophe": 121,
+    "refuse": 0,
+    "format_out": 0,
+    "truncated": 0,
+    "n_ok": 200
+   }
+  }
+ }
+}
