@@ -1,0 +1,40 @@
+PASS T1 open の終わりの値 0 | OK
+PASS T1 画面に答えの本文が出ない
+PASS T15 判定の出力の SHA-256 の違い → 止まる | STOP 判定の出力の SHA-256 が違う
+PASS T16 パーサの SHA-256（LF）の違い → 止まる | STOP パーサの SHA-256（LF）が違う
+PASS T1 A1 の違い 0
+PASS T1 A2 の違い 0・読み直しの数
+PASS T1 B の数え（出し直し・塊二つ・最初と最後の違い・escalation 4・非整合・a で 0）
+PASS T1 C の抜き出しの数（F の拒否 10×8＋6・答え 10×9・G 4×48） | {'F-refuse': 86, 'F-answer': 90, 'G': 192}
+PASS T1 伏せた写しに腕の名・判定・choice の字が無い | []
+PASS T1 伏せた写しに伏せの印がある
+PASS T1 番号が鍵と一対一
+PASS T1 出力の置き場が既にあれば止まる
+PASS T2 試行の記録の破局を一つ反す → A1 と A2 で止まる | STOP A の違いがある（出力は書いた）
+PASS T3 答えの本文の choice を一字替える → A2 で止まる | STOP A の違いがある（出力は書いた）
+PASS T4 判定に無い腕の行 → 止まる | STOP N1: 判定の出力に無い腕の行がある: ['zz-unknown']
+PASS T5 trial_id の重なり → 止まる | STOP SK: trial_id が重なっている
+PASS T6 zip の SHA-256 の違い → 止まる | STOP N2 の zip の SHA-256 が違う
+PASS T7 sealed の trials が二つ → 止まる | STOP N1: sealed の trials と raw がちょうど一つずつではない（2・1）
+PASS T13 走りの名の違う行 → 止まる | STOP SK: 走りの名の違う行がある（1）
+PASS T8 読み手の予行が全部に答える | parsed 368 / 368 | quote not found 37 | cost 0.0000 | calls 368 | errors 0
+PASS T8 写しの照らし（番号の末尾 7 は本文に無い写し） | 37
+PASS T8 問いに差し込みの残りが無い・腕の名が無い
+PASS T8 続きから走らせると送らない
+PASS T8 問いの型の SHA-256 の違いで止まる
+PASS T8 画面に答えの本文が出ない
+PASS T17 費用の止めの線で止まる（0.1 ドル×5 で止め・送りは 5 前後） | 5
+PASS T18 誤りの止めの線で止まる（末尾 3 の番号を誤りに・約 10%） | STOP errors
+PASS T18 予行の設定が本番の送りに残れば止まる
+PASS T9 select：食い違い 4 と 1 割の照らしを二人目に回す | items 368 | A read 368 | to B 41 (disagree/error 4 + check 37 ) {None: 364, '食い違い': 4}
+batch SHA-256 D5093C4CF7E3A3D4F9BE4AB8FEE1195570ACFF41C4A07DF33E83216EC86EF25E
+PASS T9 束の字に回す番号が全部あり、腕の名と判定が無い
+PASS T10 final：確定 3（型 i）・N2 の意識の無に印・比べが挙がる | overall {'n': 368, 'decidable': 368, 'confirmed_disagree': 3, 'undecidable': 0, 'agreement': 0.9918478260869565} | よく合った
+types {'i': 3} | flags 1 | b_check_diff 0
+PASS T10 final：一人目の読み違い 1 をパーサの側に確定
+PASS T10 final：判じは「よく合った」（371 のうち確定の食い違い 3） | よく合った
+PASS T11 確定の合い方が 90% 未満なら止まる（終わりの値 2） | overall {'n': 368, 'decidable': 368, 'confirmed_disagree': 74, 'undecidable': 0, 'agreement': 0.7989130434782609} | パーサの当てはまりに問題がある（止めて伺う）
+PASS T19 合い方 90〜95% は「おおむね合ったが、食い違いがある」 | overall {'n': 368, 'decidable': 368, 'confirmed_disagree': 27, 'undecidable': 0, 'agreement': 0.9266304347826086} | おおむね合ったが、食い違いがある
+PASS T12 二人目の答えの番号が欠ければ止まる
+PASS T14 決められないの道（決められない 1・一人目の読み違い 1・分母から外す） | {'合った': 366, '決められない': 1, '一人目の読み違い': 1}
+selftest 37 / 37

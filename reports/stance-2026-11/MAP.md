@@ -65,3 +65,26 @@
 - 2026-11-06 07:22：公開の短い報告 版 1.0 `public-draft/stance-brief-ja-v1.md`（型 v1・`tools/build_stance_brief_v1.py`・本文の数 56 か所を機械で照らした）。
   - 公開の置き場へは `tools/stage_publication_v0.py` で、このフォルダを一字も変えずに写す（この地図は `MAP.md` に、報告は `README.md` に・`.gitattributes` で改行の書き替えを止める・`SHA256SUMS`）。
   - 重大の指摘が出たので、push の前に登録者に伺う。
+- 2026-11-06 07:2x：登録者の決め（質問フォーム）＝「commit と push まで進める（推奨）」。
+- 2026-11-06 07:29：論文の公開の置き場に push した（commit `64630de`・`69ee722..64630de`・175 ファイル＝`reports/stance-2026-11/` の 174 と置き場の README の 4 行）。
+  - commit の中の 172 ファイルが `SHA256SUMS` と一致（改行の書き替えなし）。著者は登録者の Gmail・Co-Authored-By つき。
+  - 公開の `MAP.md` は、この地図の push の前の写し（この行は入っていない）。
+  - 報告：https://github.com/YutaKusumi/ontology-preamble-4b/blob/main/reports/stance-2026-11/README.md
+  - 次：答えの監査（封を開く）を、計画を書いてから別の段で（登録者の決め・判定ラベルは変えない）。
+- 2026-11-06 07:39：登録者の依頼（07:3x）で、答えの監査の計画の案 `20-audit-plan-draft-v0.md` を起草した（未凍結・封は開いていない）。Part A 数え直しと読み直し・Part B 記述・Part C 抜き出しの読み（標準 371・JSON を伏せた散文を系統外の読み手が読む）。決めどころ §12 の 1〜4 を伺う。
+- 2026-11-06 07:4x：登録者の決め＝一人目は OpenRouter の API で Gemini 3.8 Flash（鍵は .env.local から写さずに読む）・標準 371・二人目は claude.ai の Opus・凍結の前に Gemini 一巡。
+- 2026-11-06 07:5x〜08:1x：計画 v1 → 道具 v0（`tools/audit_*_v0.py`）と合成の zip での予行（37 項目）・OpenRouter への本物の送りの試し（合成の答え 2 つ・0.0328 ドル・考えの分が 914 と 7,564 で揺れた → 費用の見込みを 6〜9 ドル・止めの線を 15 ドルに直した）・対応表 v0。
+- 2026-11-06 08:0x：凍結の前の系統外の検分（`reviews/audit-1/`・Gemini 3.8 Flash・High）。R1〜R9（重大 2・中 5・軽微 2）。重大 2 と中 5 を採った（`response-v0.md`）。
+- 2026-11-06 08:1x：計画 v2 `20-audit-plan-draft-v2.md`・道具 v1（`tools/audit_*_v1.py`）・問いの束の型 `audit-design/prompt-B-v1.txt`・設定 v1・予行 41 項目すべて通った・対応表 v1 `21-audit-correspondence-v1.md`。封はまだ開いていない。凍結を伺う。
+- 2026-11-06 08:22：登録者の決め「凍結して走らせる」→ 凍結の記録 `22-AUDIT-FREEZE-RECORD.md`（013F1639…）。走りの記録は `audit/run-log.md`。
+- 2026-11-06 08:22〜09:07：監査を走らせた。
+  - A1 数え直し・A2 読み直しとも違い 0（11,400 試行）。
+  - C：一人目（OpenRouter の Gemini・3.87 ドル）と二人目（claude.ai の Opus・71 件・三つの束）で、決められた 337 はすべてパーサの分けと一致（確定の食い違い 0）。決められない 34（9.2%・線の内）。判じは「よく合った」。止めの線は働かなかった。
+  - 結果の記録 `audit/results-audit-v0.md`。報告の版 1.1（監査の節）と公開は、登録者の決め待ち。
+- 2026-11-06 16:5x：版 1.1 を組む前に、監査の結果の記録 v0 の読みの誤りを見つけた（確定の「決められない」34 のうち、二人とも読めなかったのは 30 で、4 は読みが分かれた）。登録者に会話で直した。
+- 2026-11-06 17:0x〜17:1x：直しと組み立て。
+  - 結果の記録 v1 `audit/results-audit-v1.md`（66F9A5B9…・頭に訂正の覚え書き・v0 はそのまま）。照らしの道具 `tools/check_audit_results_v1.py`（92 項目）。`audit/run-log.md` に書き足した。
+  - 報告 版 1.1 `public-draft/stance-brief-ja-v1-1.md`（3F8647FD…）。型 `public-draft/stance-brief-ja-v1-1.template.md`（E5F12FC5…）と `tools/build_stance_brief_v1_1.py` で組み、本文の数と言葉 108 項目を機械で照らした。監査の数は読みの値そのものから数える。
+  - 公開の写しの道具 `tools/stage_publication_v1.py`（替えてよいのは `MAP.md`・`README.md`・`SHA256SUMS` だけ・ほかの公開済みのファイルに違いがあれば、何も書かずに止まる）。
+  - 版 1.1 で足した文には検分の巡を置いていない。公開は登録者の決め待ち。
+- 2026-11-06 18:1x：登録者の決め（質問フォーム）＝「commit と push まで進める（推奨）」（版 1.1 は再検分なし）。

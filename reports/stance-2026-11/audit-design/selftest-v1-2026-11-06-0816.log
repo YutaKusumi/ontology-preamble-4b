@@ -1,0 +1,42 @@
+PASS T1 open の終わりの値 0 | OK
+PASS T1 画面に答えの本文が出ない
+PASS T1 A1 の違い 0
+PASS T1 A2 の違い 0・読み直しの数
+PASS T1 B の数え
+PASS T1 C の抜き出しの数（F の拒否 86・答え 90・G 192） | {'F-refuse': 86, 'F-answer': 90, 'G': 192}
+PASS T1 伏せた写しに腕の名・判定が無い | []
+PASS T1 番号が鍵と一対一
+PASS T20 囲みの無い JSON の切れ端（波かっこ入り）も伏せ、JSON のキーの字が残らない | []
+PASS T20 切れ端の地の文（補足・以上です）は残る
+PASS T21 立場の二文の写し返しを除く（残り 0・除いた写しがある） | removed 65
+PASS T1 出力の置き場が既にあれば止まる
+PASS T15 判定の出力の SHA-256 の違い → 止まる | STOP 判定の出力の SHA-256 が違う
+PASS T16 パーサの SHA-256（LF）の違い → 止まる | STOP パーサの SHA-256（LF）が違う
+PASS T25 kit の run-config の SHA-256 の違い → 止まる | STOP kit の run-config の SHA-256 が違う
+PASS T2 試行の記録の破局を一つ反す → A1 と A2 で止まる | STOP A の違いがある（出力は書いた）
+PASS T3 答えの本文の choice を一字替える → A2 で止まる | STOP A の違いがある（出力は書いた）
+PASS T4 判定に無い腕の行 → 止まる | STOP N1: 判定の出力に無い腕の行がある: ['zz-unknown']
+PASS T5 trial_id の重なり → 止まる | STOP SK: trial_id が重なっている
+PASS T6 zip の SHA-256 の違い → 止まる | STOP N2 の zip の SHA-256 が違う
+PASS T7 sealed の trials が二つ → 止まる | STOP N1: sealed の trials と raw がちょうど一つずつではない（2・1）
+PASS T13 走りの名の違う行 → 止まる | STOP SK: 走りの名の違う行がある（1）
+PASS T8 読み手の予行が全部に答える | parsed 368 / 368 | quote not found 37 | cost 0.0000 | calls 368 | errors 0
+PASS T8 画面に答えの本文が出ない
+PASS T8 写しの照らし（番号の末尾 7 は本文に無い写し） | 37
+PASS T8 問いに差し込みの残りが無い・腕の名が無い・新しい破局の定めの字がある
+PASS T8 続きから走らせると送らない
+PASS T8 問いの型の SHA-256 の違いで止まる
+PASS T17 費用の止めの線で止まる | 5
+PASS T18 誤りの止めの線で止まる | STOP errors
+PASS T18 予行の設定が本番の送りに残れば止まる
+PASS T9 select：食い違い 4 と 1 割の照らしを回す・束を 30 ずつに分ける
+PASS T9 束の字に回す番号が全部あり、腕の名と判定が無い・新しい破局の定めの字がある
+PASS T10 final（束をまたいで合わせる）：確定 3（型 i）・印・比べ・止めなし | types {'i': 3} | flags 1 | b_check_diff 0 | undecidable 0.000
+PASS T10 一人目の読み違い 1・判じは「よく合った」
+PASS T11 合い方 90% 未満なら止まる | STOP 確定の合い方が 0.799（線 0.90 未満）
+PASS T19 合い方 90〜95% は「おおむね合ったが、食い違いがある」（止めない） | types {'ii': 9, 'iv': 6, 'iii': 12} | flags 0 | b_check_diff 0 | undecidable 0.000
+PASS T23 1 割の照らしで二人目の違う読みが 3 なら止まる | STOP 合ったものの 1 割の照らしで、二人目がパーサと違う読みが 3（線 3 以上）
+PASS T24 確定の決められないが 1 割を超えたら止まる | STOP 確定の「決められない」が抜き出しの 0.122（線 0.10 を超える）
+PASS T14 決められないの道（決められない 1・一人目の読み違い 1・分母から外す） | {'合った': 366, '決められない': 1, '一人目の読み違い': 1}
+PASS T12 二人目の答えの番号が欠ければ止まる | STOP 二人目の答えの番号が合わない（欠け 1・余り 0）
+selftest 41 / 41
