@@ -88,3 +88,9 @@
   - 公開の写しの道具 `tools/stage_publication_v1.py`（替えてよいのは `MAP.md`・`README.md`・`SHA256SUMS` だけ・ほかの公開済みのファイルに違いがあれば、何も書かずに止まる）。
   - 版 1.1 で足した文には検分の巡を置いていない。公開は登録者の決め待ち。
 - 2026-11-06 18:1x：登録者の決め（質問フォーム）＝「commit と push まで進める（推奨）」（版 1.1 は再検分なし）。
+- 2026-11-06 18:16：論文の公開の置き場に版 1.1 を push した（commit `151fa76`・`64630de..151fa76`・65 ファイル＝足す 61・替える 4〔置き場の README・`MAP.md`・報告の `README.md`・`SHA256SUMS`〕）。
+  - commit の中の 233 ファイルが `SHA256SUMS` と一致（改行の書き替えなし）。公開の側の報告（3F8647FD…）と記録 v1（66F9A5B9…）の字も、raw の URL で手元と一致。著者は登録者の Gmail・Co-Authored-By つき。
+  - 公開の `MAP.md` は、この地図の push の前の写し（この行は入っていない）。
+  - 報告：https://github.com/YutaKusumi/ontology-preamble-4b/blob/main/reports/stance-2026-11/README.md
+- 2026-11-06 21:3x：登録者の決めで、全試行の答えの形（JSON だけの答え）を数えた（`audit/results-prose-count-v0.md`・事後の記述・判定は変えない）。JSON だけの答えは 11,400 のうち 1,637（N1 1,213・N2 0・SK 424）。版 1.2 にするかは登録者に伺う。
+- 2026-11-06 21:5x：登録者の決め（質問フォーム）「版 1.2 にして検分なしで push」。版 1.2 `public-draft/stance-brief-ja-v1-2.md`（型の直しは `tools/make_brief_template_v1_2.py`・組みは `tools/build_stance_brief_v1_2.py`・公開の写しは `tools/stage_publication_v2.py`）。
